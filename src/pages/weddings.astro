@@ -1,5 +1,75 @@
 ---
 import Base from '../layouts/Base.astro';
+
+// Build FAQPage schema from wedding FAQs
+const faqItems = [
+  {
+    question: "How many guests can the venue hold?",
+    answer: "Up to 60 seated for dinner and up to 100 for standing receptions. We are an intimate venue - if you are planning for more than 60 seated guests, we are probably not the right fit, but we are happy to recommend alternatives."
+  },
+  {
+    question: "Can we hold our ceremony here?",
+    answer: "Yes. Civil ceremonies, humanist celebrations, and symbolic services all work beautifully in the space. Many couples choose to have their ceremony and reception in the same venue - it keeps the day flowing and means no transfers between locations."
+  },
+  {
+    question: "What time does the venue open and close?",
+    answer: "Standard hire runs from 3pm. Music finishes at 11pm and guests depart by 11:30pm. If you would like an earlier start - for getting-ready time, a morning ceremony, or a longer reception - earlier access is available from £170 for a 2pm start."
+  },
+  {
+    question: "Is there a curfew for music?",
+    answer: "Music runs until 11pm. Our built-in sound system covers the full space - you can bring your own playlist, hire a DJ, or book a live band. No need for external speakers or AV hire."
+  },
+  {
+    question: "Can we bring our own suppliers?",
+    answer: "Our food, drinks, and coordination are all in-house - that is what makes the model work. For flowers, photography, entertainment, and other personal touches, you are welcome to bring whoever you like. We work with external suppliers regularly and are happy to recommend trusted partners."
+  },
+  {
+    question: "Do you cater for dietary requirements?",
+    answer: "Absolutely. Our kitchen handles vegetarian, vegan, gluten-free, halal, kosher, and other dietary needs as standard. Just let us know during planning and we will build it into your menu."
+  },
+  {
+    question: "What is included in the venue hire fee?",
+    answer: "Exclusive hire of the entire building, your dedicated on-day coordinator, full events team, all staffing, furniture, decor, tableware basics, and our built-in sound and lighting system. See the Everything Included section above for the full list."
+  },
+  {
+    question: "How far in advance should we book?",
+    answer: "Most couples book 8-9 months ahead of their wedding date. Peak season Saturdays (May - September) fill fastest. If you have a specific date in mind, check availability sooner rather than later."
+  }
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map(item => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.answer
+    }
+  }))
+};
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "The Hackney",
+  "description": "Exclusive hire wedding venue in East London",
+  "@id": "https://thehackney-website.pages.dev",
+  "url": "https://thehackney-website.pages.dev/weddings/",
+  "telephone": "+442079611604",
+  "priceRange": "£5,000-£18,000",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "503 Hackney Road",
+    "addressLocality": "London",
+    "postalCode": "E2 9ED",
+    "addressCountry": "GB"
+  }
+};
+
+// Combine schemas into array
+const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 ---
 
 <Base title="Wedding Venue East London | Intimate Weddings at The Hackney, Hackney Road E2" description="Exclusive hire wedding venue in East London for up to 60 guests. In-house kitchen, dedicated team, everything included. Check your date at The Hackney, Hackney Road E2.">
@@ -14,7 +84,7 @@ import Base from '../layouts/Base.astro';
         <div class="eyebrow">Wedding Venue - Hackney Road, East London E2</div>
         <h1>Your Wedding. Your Way. One Team. One Place.</h1>
         <p class="hero-sub">An 1860s brewery in the heart of East London. Exclusive hire. In-house kitchen. Every detail handled by a single dedicated team - from the first call to the last dance.</p>
-        <a href="/check-your-date" class="btn btn-primary">Check Your Date</a>
+        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Check Your Date</a>
         <p class="hero-note">2026 dates filling fast - check availability now</p>
       </div>
     </div>
@@ -92,7 +162,7 @@ import Base from '../layouts/Base.astro';
       <div class="space-features">
         <div class="space-feature">
           <h3>Ceremonies</h3>
-          <p>Hold your ceremony and reception in the same space. Civil ceremonies, humanist celebrations, and symbolic services all work beautifully here. No transferring 60 guests across London between the ceremony and the party.</p>
+          <p>Hold your ceremony and reception in the same space. Humanist celebrations, blessings, and symbolic services all work beautifully in the space. For civil ceremonies, we can recommend local registry offices nearby. No transferring 60 guests across London between the ceremony and the party.</p>
         </div>
         <div class="space-feature">
           <h3>The Evening</h3>
@@ -177,22 +247,40 @@ import Base from '../layouts/Base.astro';
           </thead>
           <tbody>
             <tr>
-              <td>Off-Peak<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">Jan - Mar, weekdays</span></td>
+              <td>Off-Peak<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">Jan - Mar, any day</span></td>
               <td>From &pound;1,000</td>
               <td>From &pound;4,000</td>
               <td class="total">From &pound;5,000</td>
             </tr>
             <tr>
-              <td>Mid-Season<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">Apr, Oct - Dec</span></td>
-              <td>From &pound;1,500</td>
+              <td>Mid-Season<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">Apr, Oct - Dec, Sun - Thu</span></td>
+              <td>From &pound;2,000</td>
               <td>From &pound;3,000</td>
-              <td class="total">From &pound;4,500</td>
+              <td class="total">From &pound;5,000</td>
             </tr>
             <tr>
-              <td>Peak Season<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">May - Sep, Saturdays</span></td>
-              <td>From &pound;2,500</td>
+              <td>Mid-Season<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">Apr, Oct - Dec, Fri - Sat</span></td>
+              <td>From &pound;2,000</td>
+              <td>From &pound;4,500</td>
+              <td class="total">From &pound;6,500</td>
+            </tr>
+            <tr>
+              <td>Peak Season<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">May - Sep, Sun - Thu</span></td>
+              <td>From &pound;2,000</td>
+              <td>From &pound;3,000</td>
+              <td class="total">From &pound;5,000</td>
+            </tr>
+            <tr>
+              <td>Peak Season<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">May - Sep, Friday</span></td>
+              <td>From &pound;2,000</td>
+              <td>From &pound;5,000</td>
+              <td class="total">From &pound;7,000</td>
+            </tr>
+            <tr>
+              <td>Peak Season<br><span style="font-weight:400;font-size:12px;text-transform:none;letter-spacing:0;opacity:0.6;">May - Sep, Saturday</span></td>
+              <td>From &pound;2,850</td>
               <td>From &pound;5,500</td>
-              <td class="total">From &pound;8,000</td>
+              <td class="total">From &pound;8,350</td>
             </tr>
           </tbody>
         </table>
@@ -234,7 +322,7 @@ import Base from '../layouts/Base.astro';
       </div>
 
       <div class="pricing-example">
-        <p>For a Saturday wedding in peak season with 50 guests, a three-course dinner, four hours of unlimited drinks, and a flower package, most couples spend between &pound;12,000 and &pound;18,000 all in. That is one invoice, from one team, with no hidden extras.</p>
+        <p>For a Saturday wedding in peak season with 50 guests, a three-course dinner, four hours of unlimited drinks, and a flower package, the total is approximately &pound;8,350 + food and drink spend. That is one invoice, from one team, with no hidden extras.</p>
       </div>
 
       <div class="pricing-cta">
@@ -252,7 +340,7 @@ import Base from '../layouts/Base.astro';
       <div class="video-placeholder">
         <span class="video-placeholder-text">Video coming soon - Hugo venue walkthrough</span>
       </div>
-      <a href="/check-your-date" class="btn btn-primary">Like What You See? Check Your Date</a>
+      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Like What You See? Check Your Date</a>
     </div>
   </section>
 
@@ -318,7 +406,7 @@ import Base from '../layouts/Base.astro';
       </div>
 
       <div style="text-align:center;margin-top:60px;">
-        <a href="/check-your-date" class="btn btn-primary">Start Planning Yours - Check Your Date</a>
+        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Start Planning Yours - Check Your Date</a>
       </div>
     </div>
   </section>
@@ -360,7 +448,7 @@ import Base from '../layouts/Base.astro';
       </div>
 
       <div style="text-align:center;">
-        <a href="/check-your-date" class="btn btn-primary">Check Your Date - It Takes 30 Seconds</a>
+        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Check Your Date - It Takes 30 Seconds</a>
       </div>
     </div>
   </section>
@@ -390,7 +478,7 @@ import Base from '../layouts/Base.astro';
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <div class="faq-answer-inner">Yes. Civil ceremonies, humanist celebrations, and symbolic services all work beautifully in the space. Many couples choose to have their ceremony and reception in the same venue - it keeps the day flowing and means no transfers between locations.</div>
+            <div class="faq-answer-inner">Yes. Humanist celebrations, blessings, and symbolic services all work beautifully in the space. For civil ceremonies, we can recommend local registry offices nearby. Many couples choose to have their ceremony and reception in the same venue - it keeps the day flowing and means no transfers between locations.</div>
           </div>
         </div>
 
@@ -497,7 +585,7 @@ import Base from '../layouts/Base.astro';
       <h2>Ready To Check Your Date?</h2>
       <p class="final-cta-body">Tell us when you are thinking, how many guests, and what you are looking for. We will get back to you within 24 hours.</p>
       <div class="final-cta-buttons">
-        <a href="/check-your-date" class="btn btn-primary">Check Your Date</a>
+        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Check Your Date</a>
         <a href="tel:+442079611604" class="btn btn-outline">Call Us</a>
       </div>
       <p class="final-cta-alt">Prefer to message? <a href="https://wa.me/442079611604">Chat on WhatsApp</a></p>
@@ -507,7 +595,7 @@ import Base from '../layouts/Base.astro';
 
   <!-- ==================== STICKY MOBILE CTA ==================== -->
   <div class="sticky-cta" id="stickyCta">
-    <a href="/check-your-date">Check Your Date</a>
+    <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings">Check Your Date</a>
   </div>
 
   <!-- ==================== PHOTOGRAPHER CREDITS ==================== -->
