@@ -1,0 +1,45 @@
+---
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  subheading?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+const { eyebrow, heading, subheading, ctaLabel, ctaHref } = Astro.props;
+---
+
+<section class="hero section-lg">
+  <div class="container">
+    {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+    <h1>{heading}</h1>
+    {subheading && <p class="hero-sub">{subheading}</p>}
+    {ctaLabel && ctaHref && (
+      <a href={ctaHref} class="btn btn-primary">{ctaLabel}</a>
+    )}
+  </div>
+</section>
+
+<style>
+  .hero {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+  }
+
+  .hero h1 {
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .hero-sub {
+    font-size: 1.125rem;
+    max-width: 50ch;
+    margin-inline: auto;
+    margin-bottom: var(--space-lg);
+    opacity: 0.85;
+  }
+</style>

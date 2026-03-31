@@ -1,0 +1,153 @@
+---
+const navItems = [
+  { label: 'About', href: '/about/' },
+  { label: 'Weddings & Private Events', href: '/private-events/' },
+  { label: 'Corporate Events', href: '/corporate-events/' },
+  { label: 'Check Your Date', href: '/check-your-date/' },
+  { label: 'Contact', href: '/contact/' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo" aria-label="The Hackney - Home">
+      <span class="logo-text">The Hackney</span>
+    </a>
+
+    <button
+      class="nav-toggle"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+    >
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </button>
+
+    <nav id="primary-nav" class="primary-nav" aria-label="Main navigation">
+      <ul class="nav-list">
+        {navItems.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={['nav-link', { active: currentPath === item.href }]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--header-height);
+    background-color: var(--color-bg);
+    border-bottom: 1px solid rgba(44, 24, 16, 0.1);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .logo {
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .logo-text {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .nav-list {
+    display: flex;
+    gap: var(--space-lg);
+    list-style: none;
+  }
+
+  .nav-link {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-text);
+    padding-block: var(--space-xs);
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    border-bottom-color: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-sm);
+  }
+
+  .nav-toggle-bar {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: var(--color-text);
+    transition: transform 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: flex;
+    }
+
+    .primary-nav {
+      display: none;
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      background-color: var(--color-bg);
+      border-bottom: 1px solid rgba(44, 24, 16, 0.1);
+      padding: var(--space-lg);
+    }
+
+    .primary-nav.is-open {
+      display: block;
+    }
+
+    .nav-list {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.primary-nav');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = nav?.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  });
+</script>

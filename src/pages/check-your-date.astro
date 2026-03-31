@@ -1,0 +1,50 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+---
+
+<Base title="Check Your Date" description="Check availability for your event at The Hackney. Tell us your date and we'll get back to you.">
+  <Hero
+    eyebrow="Availability"
+    heading="Check your date"
+    subheading="Tell us a bit about your event and we'll confirm availability - usually within a few hours."
+  />
+
+  <section class="section">
+    <div class="container" style="max-width: 640px;">
+      <!--
+        TODO: Qualifying form (Klaviyo-first architecture)
+        Step 1: Name, email, phone, event type, proposed date, guest count, budget range
+        Step 2: Conditional response (guest count >60 or budget too low = gentle redirect)
+        Step 3: Discovery call booking (HubSpot calendar, only after qualifying)
+        Step 4: Tour invitation happens on the call
+
+        Technical: GCLID injection, UTM capture, GA4 conversion events on both
+        form submit and calendar booking to measure drop-off.
+
+        See: project memory - project_check_your_date_strategy.md
+      -->
+      <div class="form-placeholder">
+        <p>
+          <strong>Qualifying form goes here</strong><br />
+          This page will house the Klaviyo-powered qualifying form. The flow is:
+          qualify first, then book a discovery call with Hugo.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .form-placeholder {
+    background-color: rgba(44, 24, 16, 0.05);
+    border: 2px dashed rgba(44, 24, 16, 0.2);
+    border-radius: 4px;
+    padding: var(--space-xl);
+    text-align: center;
+  }
+
+  .form-placeholder p {
+    margin-inline: auto;
+  }
+</style>

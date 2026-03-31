@@ -1,0 +1,85 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+---
+
+<Base title="Home" description="The Hackney - Industrial-chic wedding and events venue on Hackney Road, East London. Brewery heritage meets modern elegance.">
+  <Hero
+    eyebrow="503 Hackney Road, London E2"
+    heading="Where brewery heritage meets modern celebration"
+    subheading="An industrial-chic venue for weddings, private events and corporate gatherings in the heart of East London."
+    ctaLabel="Check your date"
+    ctaHref="/check-your-date/"
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="home-grid">
+        <div class="home-card">
+          <span class="eyebrow">Weddings & private events</span>
+          <h2>Your celebration, your way</h2>
+          <p>
+            From intimate gatherings to full-scale weddings, The Hackney provides a
+            distinctive canvas for your most important moments - with flexible spaces,
+            in-house catering, and a dedicated events team.
+          </p>
+          <a href="/private-events/" class="btn btn-secondary">Explore private events</a>
+        </div>
+        <div class="home-card">
+          <span class="eyebrow">Corporate events</span>
+          <h2>Impress, connect, celebrate</h2>
+          <p>
+            Product launches, team socials, conferences and away days - all with the
+            character and service that sets The Hackney apart from the usual hotel
+            function room.
+          </p>
+          <a href="/corporate-events/" class="btn btn-secondary">Explore corporate</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-band">
+    <div class="container" style="text-align: center;">
+      <h2>Ready to start planning?</h2>
+      <p style="margin-inline: auto;">
+        Check availability for your date and let us show you what we can do.
+      </p>
+      <a href="/check-your-date/" class="btn btn-primary">Check your date</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+    gap: var(--space-xl);
+  }
+
+  .home-card h2 {
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .home-card .btn {
+    margin-top: var(--space-md);
+  }
+
+  .cta-band {
+    background-color: var(--brewery-dark);
+    color: var(--warm-canvas);
+    padding-block: var(--space-xl);
+  }
+
+  .cta-band h2 {
+    color: var(--warm-canvas);
+    margin-bottom: var(--space-sm);
+  }
+
+  .cta-band p {
+    color: var(--warm-canvas);
+    opacity: 0.85;
+    margin-bottom: var(--space-lg);
+  }
+</style>

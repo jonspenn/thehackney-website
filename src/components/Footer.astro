@@ -1,0 +1,114 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">The Hackney</span>
+      <p class="footer-address">
+        503 Hackney Road, London E2 9ED
+      </p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4 class="footer-heading">Events</h4>
+        <ul>
+          <li><a href="/private-events/">Weddings & Private Events</a></li>
+          <li><a href="/corporate-events/">Corporate Events</a></li>
+          <li><a href="/check-your-date/">Check Your Date</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Info</h4>
+        <ul>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {currentYear} The Hackney. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background-color: var(--brewery-dark);
+    color: var(--warm-canvas);
+    padding-block: var(--space-xl) var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-xl);
+  }
+
+  .footer-logo {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .footer-address {
+    margin-top: var(--space-sm);
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--space-xl);
+  }
+
+  .footer-heading {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-md);
+    opacity: 0.6;
+  }
+
+  .footer-col ul {
+    list-style: none;
+  }
+
+  .footer-col li {
+    margin-bottom: var(--space-sm);
+  }
+
+  .footer-col a {
+    color: var(--warm-canvas);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-col a:hover {
+    opacity: 1;
+    color: var(--warm-canvas);
+  }
+
+  .footer-bottom {
+    grid-column: 1 / -1;
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(245, 240, 232, 0.15);
+    font-size: 0.8125rem;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+    }
+  }
+</style>

@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+---
+
+<Base title="Contact" description="Get in touch with The Hackney - 503 Hackney Road, London E2 9ED.">
+  <Hero
+    eyebrow="Get in touch"
+    heading="We'd love to hear from you"
+    subheading="Whether you have a question, want to book a tour, or just want to say hello."
+  />
+
+  <section class="section">
+    <div class="container contact-grid">
+      <div>
+        <h2>Find us</h2>
+        <p>
+          <strong>The Hackney</strong><br />
+          503 Hackney Road<br />
+          London E2 9ED
+        </p>
+        <p>
+          <a href="mailto:info@thehackney.co">info@thehackney.co</a>
+        </p>
+      </div>
+      <div>
+        <h2>Send us a message</h2>
+        <!-- TODO: Klaviyo or HubSpot contact form -->
+        <div class="form-placeholder">
+          <p><strong>Contact form goes here</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--space-xl);
+  }
+
+  .form-placeholder {
+    background-color: rgba(44, 24, 16, 0.05);
+    border: 2px dashed rgba(44, 24, 16, 0.2);
+    border-radius: 4px;
+    padding: var(--space-xl);
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
