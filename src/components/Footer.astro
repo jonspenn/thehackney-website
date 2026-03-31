@@ -37,8 +37,8 @@ const currentYear = new Date().getFullYear();
         <a href="https://uk.pinterest.com/TheHackneyCo/_saved/" target="_blank" rel="noopener">Pinterest</a>
       </div>
       <div class="footer-badges">
-        <span class="footer-badge">Hitched</span>
-        <span class="footer-badge">Bridebook</span>
+        <a href="https://www.hitched.co.uk/wedding-venues/the-hackney_15702.htm" target="_blank" rel="noopener" class="footer-badge">Hitched</a>
+        <a href="https://bridebook.com/uk/the-hackney" target="_blank" rel="noopener" class="footer-badge">Bridebook</a>
       </div>
     </div>
   </div>
@@ -172,6 +172,13 @@ const currentYear = new Date().getFullYear();
     text-transform: uppercase;
     letter-spacing: 0.05em;
     opacity: 0.6;
+    text-decoration: none;
+    color: var(--warm-canvas);
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-badge:hover {
+    opacity: 0.9;
   }
 
   .footer-bottom {

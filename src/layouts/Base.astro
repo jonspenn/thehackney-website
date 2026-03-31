@@ -7,12 +7,14 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  schema?: string;
 }
 
 const {
   title,
   description = 'The Hackney is a converted 1860s brewery on Hackney Road, E2. One of East London\'s most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours.',
   ogImage,
+  schema,
 } = Astro.props;
 ---
 
@@ -24,9 +26,10 @@ const {
     <meta name="description" content={description} />
     <meta property="og:title" content={`${title} - The Hackney`} />
     <meta property="og:description" content={description} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage ? <meta property="og:image" content={ogImage} /> : <meta property="og:image" content="/images/the-hackney-og-default.webp" />}
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
+    <link rel="canonical" href={`https://thehackney-website.pages.dev${Astro.url.pathname}`} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,6 +37,30 @@ const {
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
       rel="stylesheet"
     />
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "The Hackney",
+        "url": "https://thehackney-website.pages.dev",
+        "telephone": "+442079611604",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "503 Hackney Road",
+          "addressLocality": "London",
+          "postalCode": "E2 9ED",
+          "addressCountry": "GB"
+        },
+        "sameAs": [
+          "https://instagram.com/thehackney.co",
+          "https://www.tiktok.com/@thehackney",
+          "https://www.facebook.com/TheHackney.Co/"
+        ]
+      }
+    </script>
+    <!-- Page-specific Schema -->
+    {schema && <script type="application/ld+json" set:html={schema} />}
     <!-- HubSpot Forms -->
     <script charset="utf-8" type="text/javascript" src="//js-eu1.hsforms.net/forms/embed/v2.js"></script>
     <script charset="utf-8" type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"></script>
