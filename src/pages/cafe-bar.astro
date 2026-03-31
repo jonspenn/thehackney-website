@@ -13,7 +13,7 @@ import Base from '../layouts/Base.astro';
       <div class="hero-content">
         <div class="eyebrow">Cafe & Bar - Hackney Road, East London E2</div>
         <h1>Speciality Coffee In A Restored 1860s Brewery.</h1>
-        <p class="hero-sub">A dog-friendly cafe with high ceilings, skylights and hanging greenery — two minutes from Cambridge Heath station.</p>
+        <p class="hero-sub">A dog-friendly cafe with high ceilings, skylights and hanging greenery - two minutes from Cambridge Heath station.</p>
         <a href="#menu" class="btn btn-primary">See The Menu</a>
       </div>
     </div>
@@ -62,7 +62,7 @@ import Base from '../layouts/Base.astro';
         </div>
       </div>
 
-      <a href="#" class="btn btn-outline-dark">Download Full Menu (PDF)</a>
+      <a href="/private-events/" class="btn btn-outline-dark">Explore Events</a>
     </div>
   </section>
 
@@ -207,4 +207,423 @@ import Base from '../layouts/Base.astro';
   
 
   <!-- ==================== JAVASCRIPT ==================== -->
+
+<style is:global>
+    /* ==================== PAGE-SPECIFIC STYLES ==================== */
+    .hero {
+      position: relative;
+      height: 70vh;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--brewery-dark);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+    }
+
+    .hero .container { width: 100%; }
+
+    .eyebrow {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dusty-coral);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .hero-sub {
+      color: #fff;
+      font-size: 20px;
+      line-height: 1.5;
+      margin-bottom: 36px;
+      max-width: 560px;
+    }
+
+    /* ==================== THE SPACE ==================== */
+    .the-space {
+      padding: 100px 0;
+    }
+
+    .the-space-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .the-space-text h2 {
+      margin-bottom: 24px;
+    }
+
+    .the-space-text p {
+      font-size: 17px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .the-space-text p:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .the-space-images {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .space-placeholder {
+      aspect-ratio: 4/3;
+      background: #3D2117;
+    }
+
+    .space-placeholder:nth-child(2) { background: #4A3228; }
+
+    .history-note {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-style: italic;
+      color: var(--brewery-dark);
+      opacity: 0.75;
+      margin-top: 24px;
+    }
+
+    /* ==================== WHAT WE SERVE ==================== */
+    .serve {
+      padding: 100px 0;
+      border-top: 1px solid rgba(44,24,16,0.06);
+    }
+
+    .serve-header {
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    .serve-header h2 {
+      margin-bottom: 16px;
+    }
+
+    .serve-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 48px;
+    }
+
+    .serve-category h3 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--fired-brick);
+    }
+
+    .serve-category p {
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .serve-highlight {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-style: italic;
+      color: var(--brewery-dark);
+      opacity: 0.8;
+    }
+
+    /* ==================== OPENING HOURS ==================== */
+    .hours {
+      padding: 80px 0;
+      background: var(--brewery-dark);
+    }
+
+    .hours-inner {
+      max-width: 700px;
+    }
+
+    .hours h2 {
+      color: #fff;
+      margin-bottom: 24px;
+    }
+
+    .hours p {
+      color: rgba(255,255,255,0.7);
+      font-size: 18px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .hours-table {
+      max-width: 360px;
+      margin-bottom: 28px;
+    }
+
+    .hours-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.8);
+      font-size: 16px;
+    }
+
+    .hours-row span:first-child {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .hours-note {
+      background: rgba(255,255,255,0.06);
+      padding: 24px 28px;
+      border-left: 4px solid var(--fired-brick);
+      margin-top: 28px;
+      margin-bottom: 28px;
+    }
+
+    .hours-note p {
+      font-size: 16px;
+      margin-bottom: 0;
+    }
+
+    .hours .btn-outline {
+      margin-top: 8px;
+    }
+
+    /* ==================== FIND US ==================== */
+    .find-us {
+      padding: 100px 0;
+    }
+
+    .find-us-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .find-us-details h2 {
+      margin-bottom: 24px;
+    }
+
+    .find-us-address {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .transport-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .transport-list li {
+      font-size: 16px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .transport-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--fired-brick);
+    }
+
+    .parking-note {
+      font-size: 15px;
+      opacity: 0.7;
+      margin-bottom: 28px;
+    }
+
+    .find-us-map {
+      aspect-ratio: 4/3;
+      background: #3D2117;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .map-placeholder-text {
+      color: rgba(255,255,255,0.3);
+      font-family: var(--font-body);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+    }
+
+    /* ==================== FAQs ==================== */
+    .faqs {
+      padding: 100px 0;
+      border-top: 1px solid rgba(44,24,16,0.06);
+    }
+
+    .faqs-header {
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    .faqs-header h2 { margin-bottom: 16px; }
+
+    .faq-list {
+      max-width: 800px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(44,24,16,0.1);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--brewery-dark);
+      gap: 16px;
+    }
+
+    .faq-question:hover {
+      color: var(--fired-brick);
+    }
+
+    .faq-icon {
+      font-size: 24px;
+      font-weight: 300;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      font-family: var(--font-body);
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+    }
+
+    .faq-answer-inner {
+      padding: 0 0 24px;
+      font-size: 16px;
+      line-height: 1.65;
+      opacity: 0.8;
+    }
+
+    /* ==================== CROSS-SELL ==================== */
+    .cross-sell {
+      padding: 80px 0;
+      background: var(--brewery-dark);
+      text-align: center;
+    }
+
+    .cross-sell .section-label {
+      color: rgba(255,255,255,0.5);
+    }
+
+    .cross-sell h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .cross-sell-body {
+      color: rgba(255,255,255,0.7);
+      font-size: 18px;
+      max-width: 500px;
+      margin: 0 auto 36px;
+    }
+
+    .cross-sell-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ==================== SCROLL ANIMATIONS ==================== */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .the-space-inner {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .serve-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .find-us-inner {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .cross-sell-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      body {
+        padding-bottom: 52px;
+      }
+    }
+  </style>
 </Base>

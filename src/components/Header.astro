@@ -1,7 +1,14 @@
 ---
 const navItems = [
   { label: 'Weddings', href: '/weddings/' },
-  { label: 'Events', href: '/private-events/' },
+  {
+    label: 'Events',
+    href: '#',
+    submenu: [
+      { label: 'Private Events', href: '/private-events/' },
+      { label: 'Corporate', href: '/corporate/' }
+    ]
+  },
   { label: 'Supper Club', href: '/supper-club/' },
   { label: 'Cafe & Bar', href: '/cafe-bar/' },
   { label: 'About', href: '/about/' },
@@ -19,13 +26,33 @@ const currentPath = Astro.url.pathname;
     <nav id="primary-nav" class="primary-nav" aria-label="Main navigation">
       <ul class="nav-list">
         {navItems.map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class:list={['nav-link', { active: currentPath === item.href || (currentPath.startsWith(item.href) && item.href !== '/') }]}
-            >
-              {item.label}
-            </a>
+          <li class={item.submenu ? 'has-submenu' : ''}>
+            {item.submenu ? (
+              <>
+                <button class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+                  {item.label}
+                </button>
+                <ul class="nav-submenu">
+                  {item.submenu.map((subitem) => (
+                    <li>
+                      <a
+                        href={subitem.href}
+                        class:list={['nav-sublink', { active: currentPath === subitem.href || (currentPath.startsWith(subitem.href) && subitem.href !== '/') }]}
+                      >
+                        {subitem.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <a
+                href={item.href}
+                class:list={['nav-link', { active: currentPath === item.href || (currentPath.startsWith(item.href) && item.href !== '/') }]}
+              >
+                {item.label}
+              </a>
+            )}
           </li>
         ))}
       </ul>
@@ -129,6 +156,61 @@ const currentPath = Astro.url.pathname;
     background: var(--color-accent);
   }
 
+  .has-submenu {
+    position: relative;
+  }
+
+  .dropdown-toggle {
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .nav-submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--color-bg);
+    border: 1px solid rgba(44, 24, 16, 0.08);
+    border-top: none;
+    list-style: none;
+    margin: 0;
+    padding: var(--space-sm) 0;
+    min-width: 160px;
+    box-shadow: 0 4px 6px rgba(44, 24, 16, 0.1);
+  }
+
+  .has-submenu:hover .nav-submenu {
+    display: block;
+  }
+
+  .nav-submenu li {
+    margin: 0;
+  }
+
+  .nav-sublink {
+    display: block;
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: color 0.2s ease;
+  }
+
+  .nav-sublink:hover {
+    color: var(--color-accent);
+  }
+
+  .nav-sublink.active {
+    color: var(--color-accent);
+  }
+
   .nav-cta-desktop {
     display: inline-flex;
   }
@@ -203,6 +285,29 @@ const currentPath = Astro.url.pathname;
       display: none;
     }
 
+    .nav-submenu {
+      position: static;
+      display: none;
+      background-color: rgba(44, 24, 16, 0.05);
+      border: none;
+      box-shadow: none;
+      padding: var(--space-sm) 0 var(--space-sm) var(--space-md);
+      margin-top: var(--space-sm);
+    }
+
+    .has-submenu.open .nav-submenu {
+      display: block;
+    }
+
+    .nav-submenu li {
+      margin: var(--space-xs) 0;
+    }
+
+    .nav-sublink {
+      padding: var(--space-xs) 0;
+      font-size: 0.75rem;
+    }
+
     .hamburger {
       display: flex;
       order: 3;
@@ -223,6 +328,7 @@ const currentPath = Astro.url.pathname;
   const hamburger = document.getElementById('hamburger');
   const nav = document.getElementById('primary-nav');
   const navLinks = nav?.querySelectorAll('a');
+  const dropdownToggles = nav?.querySelectorAll('.dropdown-toggle');
   const headerNav = document.getElementById('nav');
 
   // Toggle mobile menu
@@ -232,8 +338,29 @@ const currentPath = Astro.url.pathname;
     hamburger.setAttribute('aria-expanded', String(isOpen));
   });
 
-  // Close mobile menu on link click
+  // Handle dropdown toggles on mobile
+  dropdownToggles?.forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      const parentLi = toggle.closest('li');
+      const isOpen = parentLi?.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+
+  // Close mobile menu on regular link click
   navLinks?.forEach(link => {
+    if (!link.classList.contains('dropdown-toggle')) {
+      link.addEventListener('click', () => {
+        nav?.classList.remove('open');
+        hamburger?.classList.remove('open');
+        hamburger?.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+
+  // Close submenu when clicking a sublink
+  nav?.querySelectorAll('.nav-sublink')?.forEach(link => {
     link.addEventListener('click', () => {
       nav?.classList.remove('open');
       hamburger?.classList.remove('open');

@@ -3,12 +3,9 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base title="The Hackney - East London Wedding & Events Venue" description="The Hackney is a converted 1860s brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours.">
-<!-- ==================== NAVIGATION ==================== -->
-  
-
-  <!-- ==================== HERO ==================== -->
+<!-- ==================== HERO ==================== -->
   <section class="hero">
-    <div class="hero-bg"></div>
+    <div class="hero-bg" style="background: var(--forest-olive) url('/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp') center center / cover no-repeat;"></div>
     <div class="container">
       <div class="hero-content">
         <p class="eyebrow">East London &nbsp;-&nbsp; 503 Hackney Road &nbsp;-&nbsp; E2</p>
@@ -81,31 +78,31 @@ import Base from '../layouts/Base.astro';
   <section class="occasions">
     <div class="container">
       <div class="occasions-grid">
-        <a href="/weddings/" class="occasion-card" style="background-image: url('images/hackney-wedding-ceremony-kiss-industrial-backdrop.webp');">
+        <a href="/weddings/" class="occasion-card" style="background-image: url('/images/hackney-wedding-ceremony-kiss-industrial-backdrop.webp');">
           <div class="occasion-card-content">
             <h3>Weddings</h3>
             <p class="occasion-card-desc">Exclusively yours. Ceremony to last dance.</p>
           </div>
         </a>
-        <a href="/events/" class="occasion-card" style="background-image: url('images/hackney-wedding-breakfast-guests-edison-bulbs-skylights.webp');">
+        <a href="/corporate/" class="occasion-card" style="background-image: url('/images/hackney-wedding-breakfast-guests-edison-bulbs-skylights.webp');">
           <div class="occasion-card-content">
             <h3>Corporate</h3>
             <p class="occasion-card-desc">Conferences, launches and team events.</p>
           </div>
         </a>
-        <a href="/events/" class="occasion-card" style="background-image: url('images/hackney-wedding-evening-celebration-couple-entrance.webp');">
+        <a href="/private-events/" class="occasion-card" style="background-image: url('/images/hackney-wedding-evening-celebration-couple-entrance.webp');">
           <div class="occasion-card-content">
             <h3>Private Events</h3>
             <p class="occasion-card-desc">Birthdays, anniversaries, celebrations.</p>
           </div>
         </a>
-        <a href="/supper-club/" class="occasion-card" style="background-image: url('images/hackney-wedding-table-detail-flowers-place-settings.webp');">
+        <a href="/supper-club/" class="occasion-card" style="background-image: url('/images/hackney-wedding-table-detail-flowers-place-settings.webp');">
           <div class="occasion-card-content">
             <h3>Supper Club</h3>
             <p class="occasion-card-desc">Guest chef dinners. Communal dining.</p>
           </div>
         </a>
-        <a href="/cafe-bar/" class="occasion-card" style="background-image: url('images/hackney-wedding-couple-portrait-exposed-brick.webp');">
+        <a href="/cafe-bar/" class="occasion-card" style="background-image: url('/images/hackney-wedding-couple-portrait-exposed-brick.webp');">
           <div class="occasion-card-content">
             <h3>Cafe and Bar</h3>
             <p class="occasion-card-desc">Coffee, brunch and natural wine. Open daily.</p>
@@ -212,3 +209,503 @@ import Base from '../layouts/Base.astro';
 
   <!-- ==================== FOOTER ==================== -->
 </Base>
+
+<style is:global>
+  /* ==================== HERO ==================== */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    background: var(--forest-olive);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--forest-olive) url('/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp') center center / cover no-repeat;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    padding-left: 24px;
+  }
+
+  .hero .container {
+    width: 100%;
+  }
+
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .hero-sub {
+    color: #fff;
+    font-size: 20px;
+    line-height: 1.5;
+    margin-bottom: 36px;
+    max-width: 500px;
+  }
+
+  .hero-note {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin-top: 14px;
+  }
+
+  /* ==================== SOCIAL PROOF BAR ==================== */
+  .proof-bar {
+    background: var(--warm-canvas);
+    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
+    padding: 40px 0;
+  }
+
+  .proof-bar-inner {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    text-align: center;
+  }
+
+  .proof-stat-number {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4vw, 52px);
+    font-weight: 800;
+    color: var(--brewery-dark);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .proof-stat-label {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  /* ==================== VENUE INTRO ==================== */
+  .venue-intro {
+    padding: 100px 0;
+  }
+
+  .venue-intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+
+  .pull-quote {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 3.5vw, 40px);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.15;
+    color: var(--brewery-dark);
+  }
+
+  .venue-intro-body p {
+    margin-bottom: 20px;
+  }
+
+  .differentiators {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .diff-item-label {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--fired-brick);
+    margin-bottom: 4px;
+  }
+
+  .diff-item-text {
+    font-size: 16px;
+    color: var(--brewery-dark);
+    opacity: 0.85;
+  }
+
+  .venue-intro .btn {
+    margin-top: 40px;
+  }
+
+  /* ==================== FIVE OCCASIONS ==================== */
+  .occasions {
+    padding: 0 0 100px;
+  }
+
+  .occasions-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+
+  .occasion-card {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+    border-top: 3px solid transparent;
+    transition: border-color 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--brewery-dark);
+  }
+
+  .occasion-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: rgba(0, 0, 0, 0.4);
+    transition: opacity 0.3s ease;
+  }
+
+  .occasion-card:hover::before {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .occasion-card:hover {
+    border-top-color: var(--fired-brick);
+  }
+
+  .occasion-card-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .occasion-card h3 {
+    color: #fff;
+    font-size: 18px;
+    letter-spacing: 0.1em;
+  }
+
+  .occasion-card-desc {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 8px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .occasion-card:hover .occasion-card-desc {
+    max-height: 80px;
+    opacity: 1;
+  }
+
+  /* ==================== TESTIMONIALS ==================== */
+  .testimonials {
+    background: var(--forest-olive);
+    padding: 80px 0;
+  }
+
+  .testimonials .eyebrow {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+
+  .testimonial-quote {
+    font-size: clamp(20px, 2.5vw, 26px);
+    color: #fff;
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .testimonial-attribution {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dusty-coral);
+  }
+
+  /* ==================== PRICING ==================== */
+  .pricing {
+    padding: 100px 0;
+  }
+
+  .pricing-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 60px;
+  }
+
+  .pricing-header .section-label {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--dusty-coral);
+    margin-bottom: 16px;
+  }
+
+  .pricing-header h2 {
+    margin-bottom: 20px;
+  }
+
+  .pricing-header p {
+    font-size: 18px;
+    opacity: 0.85;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .pricing-card {
+    background: #fff;
+    border: 1px solid rgba(44, 24, 16, 0.08);
+    padding: 40px 32px;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .pricing-card:hover {
+    box-shadow: 0 8px 32px rgba(44, 24, 16, 0.08);
+  }
+
+  .pricing-card h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .pricing-card-guests {
+    font-size: 14px;
+    color: var(--dusty-coral);
+    margin-bottom: 20px;
+  }
+
+  .pricing-card-price {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--fired-brick);
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  .pricing-card-desc {
+    font-size: 15px;
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  .pricing-cta {
+    text-align: center;
+  }
+
+  /* ==================== TEAM ==================== */
+  .team {
+    padding: 100px 0;
+    border-top: 1px solid rgba(44, 24, 16, 0.06);
+  }
+
+  .team-header {
+    max-width: 600px;
+    margin-bottom: 60px;
+  }
+
+  .team-header .section-label {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--dusty-coral);
+    margin-bottom: 16px;
+  }
+
+  .team-header h2 {
+    margin-bottom: 20px;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 36px;
+  }
+
+  .team-card-photo {
+    aspect-ratio: 4/5;
+    background: var(--forest-olive);
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .team-card-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .team-card h3 {
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+
+  .team-card-role {
+    font-size: 13px;
+    color: var(--dusty-coral);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .team-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  /* ==================== FINAL CTA ==================== */
+  .final-cta {
+    background: var(--brewery-dark);
+    padding: 80px 0;
+    text-align: center;
+  }
+
+  .final-cta h2 {
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .final-cta-body {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    max-width: 500px;
+    margin: 0 auto 36px;
+  }
+
+  .final-cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .final-cta-note {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 14px;
+    margin-top: 24px;
+  }
+
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 1200px) {
+    .occasions-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-content {
+      padding: 0;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+    }
+
+    .proof-bar-inner {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    .venue-intro-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .occasions-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .occasion-card:last-child {
+      grid-column: span 2;
+    }
+
+    .testimonials-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .pricing-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .team-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+
+    .final-cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  /* Section label shared style override */
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--dusty-coral);
+    margin-bottom: 16px;
+  }
+</style>

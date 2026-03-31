@@ -34,6 +34,9 @@ const {
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
       rel="stylesheet"
     />
+    <!-- HubSpot Forms -->
+    <script charset="utf-8" type="text/javascript" src="//js-eu1.hsforms.net/forms/embed/v2.js"></script>
+    <script charset="utf-8" type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"></script>
     <title>{title} - The Hackney</title>
   </head>
   <body>
@@ -54,6 +57,50 @@ const {
       }, { threshold: 0.1 });
 
       document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+      // Lazy background images
+      const lazyBgs = document.querySelectorAll('.lazy-bg[data-bg]');
+      if (lazyBgs.length) {
+        const lazyBgObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              const bg = el.dataset.bg;
+              if (bg) {
+                el.style.backgroundImage = `url('${bg}')`;
+                el.style.backgroundSize = 'cover';
+                el.style.backgroundPosition = el.dataset.bgPos || 'center center';
+              }
+              lazyBgObserver.unobserve(el);
+            }
+          });
+        }, { rootMargin: '200px' });
+        lazyBgs.forEach(el => lazyBgObserver.observe(el));
+      }
+
+      // FAQ accordion
+      document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = btn.closest('.faq-item');
+          const isOpen = item?.classList.contains('open');
+          // Close all
+          document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+          // Toggle current
+          if (!isOpen) item?.classList.add('open');
+        });
+      });
+
+      // Sticky mobile CTA
+      const stickyCta = document.getElementById('stickyCta');
+      if (stickyCta) {
+        const hero = document.querySelector('.hero');
+        if (hero) {
+          const stickyObserver = new IntersectionObserver(([entry]) => {
+            stickyCta.classList.toggle('visible', !entry.isIntersecting);
+          });
+          stickyObserver.observe(hero);
+        }
+      }
     </script>
   </body>
 </html>

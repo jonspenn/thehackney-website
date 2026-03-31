@@ -3,21 +3,224 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base title="Contact The Hackney | Wedding & Events Venue, East London E2" description="Get in touch with The Hackney - a restored 1860s brewery venue on Hackney Road, East London. Two minutes from Cambridge Heath station. Call +44 20 7961 1604.">
-<!-- Navigation -->
-  
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <span class="eyebrow">Contact Us</span>
-      <h1>Get in touch</h1>
-      <p>Whether you have a question, want to discuss your event, or just want to say hello - we would love to hear from you.</p>
-    </div>
-  </section>
+<style is:global>
+  /* Hero Section */
+  .hero {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    text-align: center;
+  }
 
-  <!-- Main Content -->
-  <main class="main">
-    <div class="content-grid">
+  .hero-content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero p {
+    font-size: 18px;
+    line-height: 1.65;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: 3rem 1.5rem;
+    }
+
+    .hero h1 {
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 16px;
+    }
+  }
+
+  /* Main Content */
+  .main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  @media (max-width: 1200px) {
+    .content-grid {
+      gap: 3rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .content-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+
+  /* HubSpot Form */
+  .form-container {
+    background-color: var(--warm-canvas);
+  }
+
+  #hubspot-contact-form {
+    margin-bottom: 2rem;
+  }
+
+  /* HubSpot form styling overrides */
+  .hbspt-form {
+    font-family: var(--font-body) !important;
+  }
+
+  .hbspt-form input,
+  .hbspt-form textarea,
+  .hbspt-form select {
+    font-family: var(--font-body) !important;
+    font-size: 16px !important;
+    border-radius: 4px !important;
+    border: 1px solid #e0dbd0 !important;
+    padding: 12px !important;
+  }
+
+  .hbspt-form input:focus,
+  .hbspt-form textarea:focus,
+  .hbspt-form select:focus {
+    outline: none !important;
+    border-color: var(--fired-brick) !important;
+    box-shadow: 0 0 0 3px rgba(140, 71, 46, 0.1) !important;
+  }
+
+  .hbspt-form .hs-button {
+    background-color: var(--fired-brick) !important;
+    color: var(--warm-canvas) !important;
+    font-family: var(--font-body) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    padding: 12px 24px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease !important;
+  }
+
+  .hbspt-form .hs-button:hover {
+    background-color: var(--brewery-dark) !important;
+  }
+
+  /* Contact Details */
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .contact-section h3 {
+    margin-bottom: 1rem;
+    font-size: clamp(18px, 2vw, 24px);
+  }
+
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .contact-info a {
+    color: var(--fired-brick);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .contact-info a:hover {
+    color: var(--brewery-dark);
+  }
+
+  .contact-info p {
+    line-height: 1.65;
+  }
+
+  .map-link {
+    display: block;
+    width: 100%;
+    margin-top: 2rem;
+    text-decoration: none;
+  }
+
+  .map-placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: var(--brewery-dark);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .contact-details {
+      gap: 2rem;
+    }
+
+    .map-container {
+      height: 300px;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero, .content-grid {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .contact-section {
+    animation: fadeIn 0.6s ease-out forwards;
+    animation-delay: 0.1s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero, .content-grid, .contact-section {
+      animation: none;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <span class="eyebrow">Contact Us</span>
+    <h1>Get in touch</h1>
+    <p>Whether you have a question, want to discuss your event, or just want to say hello - we would love to hear from you.</p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<div class="content-grid">
       <!-- HubSpot Form Column -->
       <div class="form-container">
         <div id="hubspot-contact-form"></div>
@@ -60,19 +263,22 @@ import Base from '../layouts/Base.astro';
         </div>
 
         <!-- Map -->
-        <div class="map-container">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.5829156988656!2d-0.05698932346916816!3d51.54370607187234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48760d9f9e8a8a8a%3A0x8f0a8a8a8a8a8a8a!2s503%20Hackney%20Rd%2C%20London%20E2%209ED!5e0!3m2!1sen!2suk!4v1234567890" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        </div>
+        <a href="https://maps.app.goo.gl/RwT31Y6tmXPzyqGQ9" target="_blank" rel="noopener" class="map-link">
+          <div class="map-placeholder">View on Google Maps</div>
+        </a>
       </aside>
     </div>
-  </main>
 
-  <!-- Footer -->
-  
+<script>
+  // Initialize HubSpot form when page loads
+  if (typeof hbspt !== 'undefined') {
+    hbspt.forms.create({
+      region: 'eu1',
+      portalId: '25870094',
+      formId: '6966c5ba-2f16-4229-ab5b-7fe24774fad6',
+      target: '#hubspot-contact-form'
+    });
+  }
+</script>
 
-  <!-- HubSpot Form Script -->
-  
-  
-
-  <!-- Navigation & Interaction Script -->
 </Base>
