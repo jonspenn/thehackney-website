@@ -5,86 +5,119 @@ const currentYear = new Date().getFullYear();
 <footer class="site-footer">
   <div class="container footer-inner">
     <div class="footer-brand">
-      <span class="footer-logo">The Hackney</span>
-      <p class="footer-address">
-        503 Hackney Road, London E2 9ED
-      </p>
+      <div class="footer-logo">
+        <img src="/images/the-hackney-logo-white.webp" alt="The Hackney" style="height:36px;width:auto;" />
+      </div>
+      <div class="footer-address">
+        <p>503 Hackney Road<br />London E2 9ED</p>
+        <p style="margin-top: 0.5rem;">
+          <a href="tel:+442079611604">+44 20 7961 1604</a>
+        </p>
+      </div>
     </div>
 
     <div class="footer-links">
-      <div class="footer-col">
-        <h4 class="footer-heading">Events</h4>
-        <ul>
-          <li><a href="/private-events/">Weddings & Private Events</a></li>
-          <li><a href="/corporate-events/">Corporate Events</a></li>
-          <li><a href="/check-your-date/">Check Your Date</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-heading">Info</h4>
-        <ul>
-          <li><a href="/about/">About</a></li>
-          <li><a href="/contact/">Contact</a></li>
-        </ul>
-      </div>
+      <ul>
+        <li><a href="/weddings/">Weddings</a></li>
+        <li><a href="/private-events/">Events</a></li>
+        <li><a href="/supper-club/">Supper Club</a></li>
+        <li><a href="/cafe-bar/">Cafe & Bar</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+        <li><a href="/privacy/">Privacy Policy</a></li>
+      </ul>
     </div>
 
-    <div class="footer-bottom">
+    <div class="footer-social-badges">
+      <div class="footer-social">
+        <a href="https://instagram.com/thehackney.co" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.tiktok.com/@thehackney" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://www.facebook.com/TheHackney.Co/" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://uk.pinterest.com/TheHackneyCo/_saved/" target="_blank" rel="noopener">Pinterest</a>
+      </div>
+      <div class="footer-badges">
+        <span class="footer-badge">Hitched</span>
+        <span class="footer-badge">Bridebook</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container">
       <p>&copy; {currentYear} The Hackney. All rights reserved.</p>
     </div>
   </div>
+
+  <div class="footer-accent"></div>
 </footer>
 
 <style>
   .site-footer {
     background-color: var(--brewery-dark);
     color: var(--warm-canvas);
-    padding-block: var(--space-xl) var(--space-lg);
+    padding-block: var(--space-xl) 0;
     margin-top: var(--space-xl);
+    position: relative;
   }
 
   .footer-inner {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: var(--space-xl);
+    padding-bottom: var(--space-xl);
+  }
+
+  .footer-brand {
+    grid-column: 1;
   }
 
   .footer-logo {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 600;
+    margin-bottom: var(--space-lg);
+  }
+
+  .footer-logo img {
+    height: 36px;
+    width: auto;
+    display: block;
   }
 
   .footer-address {
-    margin-top: var(--space-sm);
-    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  .footer-address p {
+    margin: 0;
+    font-size: 0.9375rem;
     opacity: 0.8;
+    line-height: 1.65;
+  }
+
+  .footer-address a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-address a:hover {
+    opacity: 1;
+    color: var(--warm-canvas);
   }
 
   .footer-links {
-    display: flex;
-    gap: var(--space-xl);
+    grid-column: 2;
   }
 
-  .footer-heading {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: var(--space-md);
-    opacity: 0.6;
-  }
-
-  .footer-col ul {
+  .footer-links ul {
     list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  .footer-col li {
+  .footer-links li {
     margin-bottom: var(--space-sm);
   }
 
-  .footer-col a {
+  .footer-links a {
     color: var(--warm-canvas);
     text-decoration: none;
     font-size: 0.9375rem;
@@ -92,23 +125,97 @@ const currentYear = new Date().getFullYear();
     transition: opacity 0.2s ease;
   }
 
-  .footer-col a:hover {
+  .footer-links a:hover {
     opacity: 1;
     color: var(--warm-canvas);
   }
 
+  .footer-social-badges {
+    grid-column: 3;
+  }
+
+  .footer-social {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+
+  .footer-social a {
+    color: var(--warm-canvas);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    width: fit-content;
+  }
+
+  .footer-social a:hover {
+    opacity: 1;
+    color: var(--warm-canvas);
+  }
+
+  .footer-badges {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .footer-badge {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(245, 240, 232, 0.1);
+    border: 1px solid rgba(245, 240, 232, 0.2);
+    border-radius: 2px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
   .footer-bottom {
-    grid-column: 1 / -1;
-    padding-top: var(--space-lg);
+    padding-block: var(--space-lg);
     border-top: 1px solid rgba(245, 240, 232, 0.15);
+    text-align: center;
+  }
+
+  .footer-bottom p {
+    margin: 0;
     font-size: 0.8125rem;
     opacity: 0.5;
+  }
+
+  .footer-accent {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: var(--color-accent);
   }
 
   @media (max-width: 768px) {
     .footer-inner {
       grid-template-columns: 1fr;
       gap: var(--space-lg);
+    }
+
+    .footer-brand {
+      grid-column: 1;
+    }
+
+    .footer-links {
+      grid-column: 1;
+    }
+
+    .footer-social-badges {
+      grid-column: 1;
+    }
+
+    .footer-social {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-md);
     }
   }
 </style>

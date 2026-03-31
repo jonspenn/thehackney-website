@@ -1,50 +1,107 @@
 ---
 import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
 ---
 
-<Base title="Check Your Date" description="Check availability for your event at The Hackney. Tell us your date and we'll get back to you.">
-  <Hero
-    eyebrow="Availability"
-    heading="Check your date"
-    subheading="Tell us a bit about your event and we'll confirm availability - usually within a few hours."
-  />
+<Base title="Check Your Date | Wedding & Events Venue | The Hackney, East London E2" description="Check if your date is available at The Hackney - East London's restored 1860s brewery venue. Weddings, events, celebrations. 60 seated, 100 standing. Exclusively yours.">
+<!-- ==================== NAVIGATION ==================== -->
 
-  <section class="section">
-    <div class="container" style="max-width: 640px;">
-      <!--
-        TODO: Qualifying form (Klaviyo-first architecture)
-        Step 1: Name, email, phone, event type, proposed date, guest count, budget range
-        Step 2: Conditional response (guest count >60 or budget too low = gentle redirect)
-        Step 3: Discovery call booking (HubSpot calendar, only after qualifying)
-        Step 4: Tour invitation happens on the call
 
-        Technical: GCLID injection, UTM capture, GA4 conversion events on both
-        form submit and calendar booking to measure drop-off.
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content fade-in">
+      <div class="eyebrow">Check Your Date</div>
+      <h1>See if your date is available</h1>
+      <p class="hero-sub">It takes 30 seconds. Tell us your date and we will let you know if The Hackney is free.</p>
+    </div>
+  </div>
+</section>
 
-        See: project memory - project_check_your_date_strategy.md
-      -->
-      <div class="form-placeholder">
-        <p>
-          <strong>Qualifying form goes here</strong><br />
-          This page will house the Klaviyo-powered qualifying form. The flow is:
-          qualify first, then book a discovery call with Hugo.
-        </p>
+<!-- ==================== AVAILABILITY CALENDAR ==================== -->
+<section class="calendar-section fade-in">
+  <div class="container">
+    <div class="calendar-header">
+      <p class="section-label">Availability</p>
+      <h2>Check the calendar</h2>
+      <p>See which dates are already booked. If your date looks free, book a discovery call below and we will confirm within 24 hours.</p>
+    </div>
+    <div class="calendar-embed">
+      <iframe src="https://calendar.google.com/calendar/embed?src=c_v2a5l8vh2qenad1lm0ejd8hq7s%40group.calendar.google.com&ctz=Europe%2FLondon&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=2" style="border:none;" width="100%" height="500" frameborder="0" scrolling="no"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== BOOK A DISCOVERY CALL ==================== -->
+<section class="content-section">
+  <div class="container">
+    <div class="two-column fade-in">
+      <!-- LEFT COLUMN: Form -->
+      <div class="form-column">
+        <h2 style="margin-bottom:8px;">Book a discovery call</h2>
+        <p style="margin-bottom:32px; color: rgba(44,24,16,0.7);">A 15-minute chat with Hugo. No obligation. He will confirm your date and answer any questions.</p>
+        <div class="hubspot-form">
+          <!-- HubSpot Meetings Embed -->
+          <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/bookings-team/book-a-discovery-call?embed=true"></div>
+          
+        </div>
+        <p class="form-note">Prefer to call? Ring us on <a href="tel:+442079611604">+44 20 7961 1604</a> - available Mon to Sun, 9am to 7pm</p>
+      </div>
+
+      <!-- RIGHT COLUMN: Trust Signals -->
+      <div class="sidebar-column">
+        <!-- What happens next -->
+        <div class="trust-box">
+          <h3>What happens next?</h3>
+          <ul class="steps-list">
+            <li class="step-item">
+              <div class="step-number">1</div>
+              <div class="step-text">
+                <p><strong>Check your date</strong> - we will confirm availability within 24 hours</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-number">2</div>
+              <div class="step-text">
+                <p><strong>Book a discovery call</strong> - a 15-minute chat with Hugo to answer your questions</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-number">3</div>
+              <div class="step-text">
+                <p><strong>Tour the venue</strong> - see the space in person. No obligation.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-box">
+          <div class="stat">
+            <div class="stat-number">4.9</div>
+            <div class="stat-label">Google Rating</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">98</div>
+            <div class="stat-label">NPS Score</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">200+</div>
+            <div class="stat-label">Events Hosted</div>
+          </div>
+        </div>
+
+        <!-- Testimonial -->
+        <div class="testimonial-box">
+          <p class="testimonial-quote">&ldquo;From the first tour we knew this was the one. Hugo made everything feel easy.&rdquo;</p>
+          <p class="testimonial-attribution">Sarah &amp; Lee</p>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+
+
+<!-- ==================== JAVASCRIPT ==================== -->
 </Base>
-
-<style>
-  .form-placeholder {
-    background-color: rgba(44, 24, 16, 0.05);
-    border: 2px dashed rgba(44, 24, 16, 0.2);
-    border-radius: 4px;
-    padding: var(--space-xl);
-    text-align: center;
-  }
-
-  .form-placeholder p {
-    margin-inline: auto;
-  }
-</style>

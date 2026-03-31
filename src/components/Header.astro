@@ -1,31 +1,20 @@
 ---
 const navItems = [
+  { label: 'Weddings', href: '/weddings/' },
+  { label: 'Events', href: '/private-events/' },
+  { label: 'Supper Club', href: '/supper-club/' },
+  { label: 'Cafe & Bar', href: '/cafe-bar/' },
   { label: 'About', href: '/about/' },
-  { label: 'Weddings & Private Events', href: '/private-events/' },
-  { label: 'Corporate Events', href: '/corporate-events/' },
-  { label: 'Check Your Date', href: '/check-your-date/' },
-  { label: 'Contact', href: '/contact/' },
 ];
 
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="site-header">
+<header class="site-header" id="nav">
   <div class="container header-inner">
     <a href="/" class="logo" aria-label="The Hackney - Home">
-      <span class="logo-text">The Hackney</span>
+      <img src="/images/the-hackney-logo.webp" alt="The Hackney" width="160" height="113" />
     </a>
-
-    <button
-      class="nav-toggle"
-      aria-label="Toggle navigation"
-      aria-expanded="false"
-      aria-controls="primary-nav"
-    >
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
-    </button>
 
     <nav id="primary-nav" class="primary-nav" aria-label="Main navigation">
       <ul class="nav-list">
@@ -33,7 +22,7 @@ const currentPath = Astro.url.pathname;
           <li>
             <a
               href={item.href}
-              class:list={['nav-link', { active: currentPath === item.href }]}
+              class:list={['nav-link', { active: currentPath === item.href || (currentPath.startsWith(item.href) && item.href !== '/') }]}
             >
               {item.label}
             </a>
@@ -41,17 +30,40 @@ const currentPath = Astro.url.pathname;
         ))}
       </ul>
     </nav>
+
+    <a href="/check-your-date/" class="btn btn-primary btn-nav nav-cta-desktop">Check Your Date</a>
+
+    <button
+      class="hamburger"
+      id="hamburger"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <a href="/check-your-date/" class="btn btn-primary btn-nav nav-cta-mobile">Check Your Date</a>
   </div>
 </header>
 
 <style>
   .site-header {
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 100;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     height: var(--header-height);
     background-color: var(--color-bg);
-    border-bottom: 1px solid rgba(44, 24, 16, 0.1);
+    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .site-header.scrolled {
+    box-shadow: 0 1px 0 rgba(44, 24, 16, 0.08);
   }
 
   .header-inner {
@@ -59,45 +71,73 @@ const currentPath = Astro.url.pathname;
     align-items: center;
     justify-content: space-between;
     height: 100%;
+    gap: var(--space-lg);
   }
 
   .logo {
     text-decoration: none;
     color: var(--color-text);
+    flex-shrink: 0;
   }
 
-  .logo-text {
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    font-weight: 600;
+  .logo img {
+    height: 40px;
+    width: auto;
+    display: block;
+  }
+
+  .primary-nav {
+    flex: 1;
   }
 
   .nav-list {
     display: flex;
     gap: var(--space-lg);
     list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   .nav-link {
     font-family: var(--font-body);
     font-size: 0.8125rem;
     font-weight: 500;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
     color: var(--color-text);
     padding-block: var(--space-xs);
-    border-bottom: 2px solid transparent;
-    transition: border-color 0.2s ease;
+    position: relative;
+    transition: color 0.2s ease;
   }
 
-  .nav-link:hover,
+  .nav-link:hover {
+    color: var(--color-accent);
+  }
+
   .nav-link.active {
-    border-bottom-color: var(--color-accent);
-    color: var(--color-text);
+    color: var(--color-accent);
   }
 
-  .nav-toggle {
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-accent);
+  }
+
+  .nav-cta-desktop {
+    display: inline-flex;
+  }
+
+  .nav-cta-mobile {
+    display: none;
+  }
+
+  .hamburger {
     display: none;
     flex-direction: column;
     gap: 5px;
@@ -105,19 +145,32 @@ const currentPath = Astro.url.pathname;
     border: none;
     cursor: pointer;
     padding: var(--space-sm);
+    margin-left: auto;
   }
 
-  .nav-toggle-bar {
+  .hamburger span {
     display: block;
     width: 24px;
     height: 2px;
     background-color: var(--color-text);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .hamburger.open span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+  }
+
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.open span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
   }
 
   @media (max-width: 768px) {
-    .nav-toggle {
-      display: flex;
+    .header-inner {
+      gap: var(--space-md);
     }
 
     .primary-nav {
@@ -127,11 +180,12 @@ const currentPath = Astro.url.pathname;
       left: 0;
       right: 0;
       background-color: var(--color-bg);
-      border-bottom: 1px solid rgba(44, 24, 16, 0.1);
+      border-bottom: 1px solid rgba(44, 24, 16, 0.08);
       padding: var(--space-lg);
+      flex: none;
     }
 
-    .primary-nav.is-open {
+    .primary-nav.open {
       display: block;
     }
 
@@ -139,15 +193,60 @@ const currentPath = Astro.url.pathname;
       flex-direction: column;
       gap: var(--space-md);
     }
+
+    .nav-link {
+      display: block;
+      padding-block: var(--space-sm);
+    }
+
+    .nav-link.active::after {
+      display: none;
+    }
+
+    .hamburger {
+      display: flex;
+      order: 3;
+    }
+
+    .nav-cta-desktop {
+      display: none;
+    }
+
+    .nav-cta-mobile {
+      display: inline-flex;
+      order: 4;
+    }
   }
 </style>
 
 <script>
-  const toggle = document.querySelector('.nav-toggle');
-  const nav = document.querySelector('.primary-nav');
+  const hamburger = document.getElementById('hamburger');
+  const nav = document.getElementById('primary-nav');
+  const navLinks = nav?.querySelectorAll('a');
+  const headerNav = document.getElementById('nav');
 
-  toggle?.addEventListener('click', () => {
-    const isOpen = nav?.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded', String(isOpen));
+  // Toggle mobile menu
+  hamburger?.addEventListener('click', () => {
+    const isOpen = nav?.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  // Close mobile menu on link click
+  navLinks?.forEach(link => {
+    link.addEventListener('click', () => {
+      nav?.classList.remove('open');
+      hamburger?.classList.remove('open');
+      hamburger?.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Add scroll state to header
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+      headerNav?.classList.add('scrolled');
+    } else {
+      headerNav?.classList.remove('scrolled');
+    }
   });
 </script>

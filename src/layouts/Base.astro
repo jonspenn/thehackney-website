@@ -6,11 +6,13 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
 }
 
 const {
   title,
-  description = 'The Hackney - Industrial-chic wedding and events venue on Hackney Road, East London.',
+  description = 'The Hackney is a converted 1860s brewery on Hackney Road, E2. One of East London\'s most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours.',
+  ogImage,
 } = Astro.props;
 ---
 
@@ -20,11 +22,16 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta property="og:title" content={`${title} - The Hackney`} />
+    <meta property="og:description" content={description} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
       rel="stylesheet"
     />
     <title>{title} - The Hackney</title>
@@ -35,5 +42,18 @@ const {
       <slot />
     </main>
     <Footer />
+
+    <script>
+      // Fade-in on scroll intersection observer
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
   </body>
 </html>

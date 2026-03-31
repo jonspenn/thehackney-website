@@ -1,57 +1,78 @@
 ---
 import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
 ---
 
-<Base title="Contact" description="Get in touch with The Hackney - 503 Hackney Road, London E2 9ED.">
-  <Hero
-    eyebrow="Get in touch"
-    heading="We'd love to hear from you"
-    subheading="Whether you have a question, want to book a tour, or just want to say hello."
-  />
+<Base title="Contact The Hackney | Wedding & Events Venue, East London E2" description="Get in touch with The Hackney - a restored 1860s brewery venue on Hackney Road, East London. Two minutes from Cambridge Heath station. Call +44 20 7961 1604.">
+<!-- Navigation -->
+  
 
-  <section class="section">
-    <div class="container contact-grid">
-      <div>
-        <h2>Find us</h2>
-        <p>
-          <strong>The Hackney</strong><br />
-          503 Hackney Road<br />
-          London E2 9ED
-        </p>
-        <p>
-          <a href="mailto:info@thehackney.co">info@thehackney.co</a>
-        </p>
-      </div>
-      <div>
-        <h2>Send us a message</h2>
-        <!-- TODO: Klaviyo or HubSpot contact form -->
-        <div class="form-placeholder">
-          <p><strong>Contact form goes here</strong></p>
-        </div>
-      </div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <span class="eyebrow">Contact Us</span>
+      <h1>Get in touch</h1>
+      <p>Whether you have a question, want to discuss your event, or just want to say hello - we would love to hear from you.</p>
     </div>
   </section>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="content-grid">
+      <!-- HubSpot Form Column -->
+      <div class="form-container">
+        <div id="hubspot-contact-form"></div>
+      </div>
+
+      <!-- Contact Details Column -->
+      <aside class="contact-details">
+        <!-- Address Section -->
+        <div class="contact-section">
+          <h3>Visit us</h3>
+          <div class="contact-info">
+            <p>503 Hackney Road<br>London E2 9ED<br>United Kingdom</p>
+          </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section">
+          <h3>Get in touch</h3>
+          <div class="contact-info">
+            <p><strong>Phone:</strong><br><a href="tel:+442079611604">+44 20 7961 1604</a></p>
+            <p><strong>Email:</strong><br><a href="mailto:jon@thehackney.co">jon@thehackney.co</a></p>
+          </div>
+        </div>
+
+        <!-- Hours Section -->
+        <div class="contact-section">
+          <h3>Opening hours</h3>
+          <div class="contact-info">
+            <p><strong>Cafe &amp; Bar</strong><br>Tuesday to Sunday, 9am to 5pm</p>
+            <p><strong>Events</strong><br>7 days by appointment</p>
+          </div>
+        </div>
+
+        <!-- Getting Here Section -->
+        <div class="contact-section">
+          <h3>Getting here</h3>
+          <div class="contact-info">
+            <p>Two minutes walk from Cambridge Heath station (London Overground). Bethnal Green tube (Central line) is a 10-minute walk. Bus routes 106, 254, D6 stop outside.</p>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div class="map-container">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.5829156988656!2d-0.05698932346916816!3d51.54370607187234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48760d9f9e8a8a8a%3A0x8f0a8a8a8a8a8a8a!2s503%20Hackney%20Rd%2C%20London%20E2%209ED!5e0!3m2!1sen!2suk!4v1234567890" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  
+
+  <!-- HubSpot Form Script -->
+  
+  
+
+  <!-- Navigation & Interaction Script -->
 </Base>
-
-<style>
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: var(--space-xl);
-  }
-
-  .form-placeholder {
-    background-color: rgba(44, 24, 16, 0.05);
-    border: 2px dashed rgba(44, 24, 16, 0.2);
-    border-radius: 4px;
-    padding: var(--space-xl);
-    text-align: center;
-  }
-
-  @media (max-width: 768px) {
-    .contact-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
