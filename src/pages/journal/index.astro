@@ -98,7 +98,7 @@ const schema = JSON.stringify({
 <style>
   .journal-hero {
     text-align: center;
-    padding-block: var(--space-xl) var(--space-lg);
+    padding-block: var(--space-xl) var(--space-md);
   }
 
   .journal-hero .eyebrow {
@@ -118,11 +118,15 @@ const schema = JSON.stringify({
     opacity: 0.8;
   }
 
+  .journal-list {
+    padding-top: var(--space-md);
+  }
+
   .posts-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-xl);
-    max-width: 800px;
+    max-width: 900px;
     margin-inline: auto;
   }
 
@@ -133,11 +137,12 @@ const schema = JSON.stringify({
 
   .post-card:last-child {
     border-bottom: none;
+    padding-bottom: 0;
   }
 
   .post-card-image-link {
     display: block;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     overflow: hidden;
   }
 
@@ -230,7 +235,11 @@ const schema = JSON.stringify({
 
   @media (max-width: 768px) {
     .journal-hero {
-      padding-block: var(--space-lg) var(--space-md);
+      padding-block: var(--space-lg) var(--space-sm);
+    }
+
+    .journal-list {
+      padding-top: var(--space-sm);
     }
 
     .post-meta {
