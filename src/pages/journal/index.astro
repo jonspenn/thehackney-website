@@ -1,0 +1,240 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('journal', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+function readingTime(body: string): string {
+  const words = body.trim().split(/\s+/).length;
+  const mins = Math.ceil(words / 230);
+  return `${mins} min read`;
+}
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "The Hackney Journal",
+  "description": "Stories from a restored 1856 brewery on Hackney Road - heritage, weddings, and East London life.",
+  "url": "https://thehackney-website.pages.dev/journal/",
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Hackney"
+  }
+});
+---
+
+<Base
+  title="Journal"
+  description="Stories from a restored 1856 brewery on Hackney Road. Heritage, weddings, local guides, and life at The Hackney."
+  schema={schema}
+>
+  <!-- Hero -->
+  <section class="journal-hero section">
+    <div class="container">
+      <p class="eyebrow">Journal</p>
+      <h1>Stories From Hackney Road</h1>
+      <p class="journal-intro">Heritage, weddings, and life at a restored 1856 brewery in the heart of East London.</p>
+    </div>
+  </section>
+
+  <!-- Posts -->
+  <section class="journal-list section">
+    <div class="container">
+      {posts.length === 0 ? (
+        <p>Coming soon.</p>
+      ) : (
+        <div class="posts-grid">
+          {posts.map((post) => (
+            <article class="post-card fade-in">
+              {post.data.image && (
+                <a href={`/journal/${post.slug}/`} class="post-card-image-link">
+                  <img
+                    src={post.data.image}
+                    alt={post.data.imageAlt || post.data.title}
+                    class="post-card-image"
+                    loading="lazy"
+                    width="600"
+                    height="400"
+                  />
+                </a>
+              )}
+              <div class="post-card-body">
+                <div class="post-meta">
+                  <span class="post-category">{post.data.category}</span>
+                  <span class="post-date">
+                    <time datetime={post.data.pubDate.toISOString()}>
+                      {post.data.pubDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </time>
+                  </span>
+                  <span class="post-reading-time">{readingTime(post.body || '')}</span>
+                </div>
+                <h2 class="post-title">
+                  <a href={`/journal/${post.slug}/`}>{post.data.title}</a>
+                </h2>
+                <p class="post-excerpt">{post.data.description}</p>
+                <a href={`/journal/${post.slug}/`} class="post-read-more">Read more</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="journal-cta section" style="background-color: var(--brewery-dark); color: var(--warm-canvas);">
+    <div class="container" style="text-align: center;">
+      <p class="eyebrow" style="color: var(--dusty-coral);">Your Celebration</p>
+      <h2 style="color: var(--warm-canvas); margin-bottom: var(--space-md);">Start Planning Your Day</h2>
+      <p style="color: var(--warm-canvas); opacity: 0.85; max-width: 50ch; margin-inline: auto; margin-bottom: var(--space-lg);">
+        Whether it's a wedding, a birthday, or a corporate away day - check if your date is available.
+      </p>
+      <a href="/check-your-date/?utm_source=website&utm_medium=journal&utm_campaign=cta" class="btn btn-primary" style="background-color: var(--dusty-coral);">Check Your Date</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .journal-hero {
+    text-align: center;
+    padding-block: var(--space-xl) var(--space-lg);
+  }
+
+  .journal-hero .eyebrow {
+    color: var(--dusty-coral);
+    margin-bottom: var(--space-sm);
+  }
+
+  .journal-hero h1 {
+    margin-bottom: var(--space-md);
+  }
+
+  .journal-intro {
+    font-size: 1.125rem;
+    max-width: 50ch;
+    margin-inline: auto;
+    color: var(--brewery-dark);
+    opacity: 0.8;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+    max-width: 800px;
+    margin-inline: auto;
+  }
+
+  .post-card {
+    border-bottom: 1px solid rgba(44, 24, 16, 0.1);
+    padding-bottom: var(--space-xl);
+  }
+
+  .post-card:last-child {
+    border-bottom: none;
+  }
+
+  .post-card-image-link {
+    display: block;
+    margin-bottom: var(--space-lg);
+    overflow: hidden;
+  }
+
+  .post-card-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .post-card-image-link:hover .post-card-image {
+    transform: scale(1.02);
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.05em;
+  }
+
+  .post-category {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dusty-coral);
+    font-size: 0.75rem;
+  }
+
+  .post-date,
+  .post-reading-time {
+    color: var(--brewery-dark);
+    opacity: 0.55;
+  }
+
+  .post-date::before,
+  .post-reading-time::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--brewery-dark);
+    opacity: 0.3;
+    vertical-align: middle;
+    margin-right: var(--space-sm);
+  }
+
+  .post-title {
+    margin-bottom: var(--space-sm);
+  }
+
+  .post-title a {
+    color: var(--brewery-dark);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .post-title a:hover {
+    color: var(--fired-brick);
+  }
+
+  .post-excerpt {
+    font-size: 1rem;
+    line-height: 1.65;
+    opacity: 0.8;
+    max-width: 60ch;
+    margin-bottom: var(--space-md);
+  }
+
+  .post-read-more {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .post-read-more:hover {
+    color: var(--fired-brick);
+  }
+
+  @media (max-width: 768px) {
+    .journal-hero {
+      padding-block: var(--space-lg) var(--space-md);
+    }
+
+    .post-meta {
+      gap: var(--space-sm);
+    }
+  }
+</style>

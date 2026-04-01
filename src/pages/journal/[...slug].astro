@@ -1,0 +1,299 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('journal', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+function readingTime(body: string): string {
+  const words = body.trim().split(/\s+/).length;
+  const mins = Math.ceil(words / 230);
+  return `${mins} min read`;
+}
+
+const formattedDate = post.data.pubDate.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "datePublished": post.data.pubDate.toISOString(),
+  ...(post.data.updatedDate && { "dateModified": post.data.updatedDate.toISOString() }),
+  ...(post.data.image && { "image": `https://thehackney-website.pages.dev${post.data.image}` }),
+  "author": {
+    "@type": "Organization",
+    "name": "The Hackney",
+    "url": "https://thehackney-website.pages.dev"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Hackney",
+    "url": "https://thehackney-website.pages.dev"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `https://thehackney-website.pages.dev/journal/${post.slug}/`
+  }
+});
+---
+
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  ogImage={post.data.image}
+  schema={schema}
+>
+  <article class="journal-post">
+    <!-- Post Header -->
+    <header class="post-header section">
+      <div class="container post-container">
+        <a href="/journal/" class="back-link">&larr; Back to Journal</a>
+        <div class="post-meta">
+          <span class="post-category">{post.data.category}</span>
+          <span class="post-date">
+            <time datetime={post.data.pubDate.toISOString()}>{formattedDate}</time>
+          </span>
+          <span class="post-reading-time">{readingTime(post.body || '')}</span>
+        </div>
+        <h1>{post.data.title}</h1>
+        <p class="post-description">{post.data.description}</p>
+      </div>
+    </header>
+
+    <!-- Featured Image -->
+    {post.data.image && (
+      <div class="post-featured-image">
+        <div class="container">
+          <img
+            src={post.data.image}
+            alt={post.data.imageAlt || post.data.title}
+            width="1200"
+            height="675"
+            loading="eager"
+          />
+        </div>
+      </div>
+    )}
+
+    <!-- Post Content -->
+    <div class="post-content section">
+      <div class="container post-container">
+        <div class="prose">
+          <Content />
+        </div>
+      </div>
+    </div>
+
+    <!-- Post Footer -->
+    <footer class="post-footer">
+      <div class="container post-container">
+        <div class="post-divider"></div>
+        <a href="/journal/" class="back-link">&larr; Back to Journal</a>
+      </div>
+    </footer>
+  </article>
+
+  <!-- CTA -->
+  <section class="section" style="background-color: var(--brewery-dark); color: var(--warm-canvas);">
+    <div class="container" style="text-align: center;">
+      <p class="eyebrow" style="color: var(--dusty-coral);">Visit Us</p>
+      <h2 style="color: var(--warm-canvas); margin-bottom: var(--space-md);">See The Building For Yourself</h2>
+      <p style="color: var(--warm-canvas); opacity: 0.85; max-width: 50ch; margin-inline: auto; margin-bottom: var(--space-lg);">
+        Book a tour with Hugo and experience 170 years of Hackney Road history in person.
+      </p>
+      <a href="/check-your-date/?utm_source=website&utm_medium=journal&utm_campaign=post_cta" class="btn btn-primary" style="background-color: var(--dusty-coral);">Check Your Date</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .post-container {
+    max-width: 720px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    text-decoration: none;
+    margin-bottom: var(--space-lg);
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: var(--fired-brick);
+  }
+
+  .post-header {
+    padding-bottom: 0;
+  }
+
+  .post-header .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+  }
+
+  .post-category {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dusty-coral);
+    font-size: 0.75rem;
+  }
+
+  .post-date,
+  .post-reading-time {
+    color: var(--brewery-dark);
+    opacity: 0.55;
+  }
+
+  .post-date::before,
+  .post-reading-time::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--brewery-dark);
+    opacity: 0.3;
+    vertical-align: middle;
+    margin-right: var(--space-sm);
+  }
+
+  .post-header h1 {
+    margin-bottom: var(--space-md);
+    max-width: 20ch;
+  }
+
+  .post-description {
+    font-size: 1.125rem;
+    line-height: 1.65;
+    opacity: 0.8;
+    max-width: 55ch;
+  }
+
+  .post-featured-image {
+    padding-block: var(--space-lg);
+  }
+
+  .post-featured-image img {
+    width: 100%;
+    max-width: 960px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .post-content {
+    padding-top: 0;
+  }
+
+  /* Prose styling for markdown content */
+  .prose {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .prose :global(h2) {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-md);
+  }
+
+  .prose :global(h3) {
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+  }
+
+  .prose :global(p) {
+    margin-bottom: var(--space-md);
+    max-width: 65ch;
+  }
+
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--forest-olive);
+    padding-left: var(--space-lg);
+    margin-block: var(--space-lg);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: var(--fired-brick);
+  }
+
+  .prose :global(blockquote p) {
+    margin-bottom: 0;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-bottom: var(--space-md);
+    padding-left: var(--space-lg);
+  }
+
+  .prose :global(li) {
+    margin-bottom: var(--space-xs);
+  }
+
+  .prose :global(img) {
+    width: 100%;
+    height: auto;
+    margin-block: var(--space-lg);
+  }
+
+  .prose :global(hr) {
+    border: none;
+    border-top: 1px solid rgba(44, 24, 16, 0.1);
+    margin-block: var(--space-xl);
+  }
+
+  .post-divider {
+    height: 1px;
+    background: rgba(44, 24, 16, 0.1);
+    margin-bottom: var(--space-lg);
+  }
+
+  .post-footer {
+    padding-bottom: var(--space-xl);
+  }
+
+  @media (max-width: 768px) {
+    .post-header .post-meta {
+      gap: var(--space-sm);
+    }
+
+    .post-header h1 {
+      font-size: clamp(1.75rem, 5vw, 2.75rem);
+    }
+
+    .prose {
+      font-size: 1rem;
+    }
+
+    .prose :global(blockquote) {
+      font-size: 1.125rem;
+      padding-left: var(--space-md);
+    }
+  }
+</style>
