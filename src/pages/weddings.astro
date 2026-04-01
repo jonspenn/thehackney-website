@@ -217,6 +217,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
     </div>
   </section>
 
+  <!-- ==================== PHOTO BREAK: VENUE ATMOSPHERE ==================== -->
+  <section class="photo-break">
+    <div class="photo-break-image" style="background-image: url('/images/hackney-wedding-couple-between-tables-pampas-edison-bulbs.webp');" role="img" aria-label="Wedding couple standing between long dinner tables with pampas grass and Edison bulbs at The Hackney"></div>
+  </section>
+
   <!-- ==================== SECTION 6: PRICING ==================== -->
   <section class="pricing fade-in" id="pricing">
     <div class="container">
@@ -395,6 +400,15 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       <div style="text-align:center;margin-top:60px;">
         <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Start Planning Yours - Check Your Date</a>
       </div>
+    </div>
+  </section>
+
+  <!-- ==================== PHOTO STRIP: WEDDING DETAILS ==================== -->
+  <section class="photo-strip">
+    <div class="photo-strip-inner">
+      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-table-detail-candles-gold-chargers-eucalyptus.webp');" role="img" aria-label="Wedding table detail with candles, gold chargers and eucalyptus at The Hackney"></div>
+      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-ceremony-celebration-colourful-flowers.webp');" role="img" aria-label="Wedding ceremony celebration with colourful flowers at The Hackney"></div>
+      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-bride-laughing-dinner-pink-flowers.webp');" role="img" aria-label="Bride laughing at dinner table with pink flowers at The Hackney"></div>
     </div>
   </section>
 
@@ -640,6 +654,8 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       position: relative;
       z-index: 2;
       max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
     }
 
     .hero .container { width: 100%; }
@@ -665,6 +681,8 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       line-height: 1.5;
       margin-bottom: 36px;
       max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .hero-note {
@@ -676,7 +694,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
     /* ==================== SOCIAL PROOF BAR ==================== */
     .proof-bar {
       background: var(--brewery-dark);
-      padding: 28px 0;
+      padding: 56px 0;
       border-bottom: 3px solid var(--fired-brick);
     }
 
@@ -704,7 +722,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== WHAT MAKES US DIFFERENT ==================== */
     .different {
-      padding: 100px 0;
+      padding: 120px 0;
     }
 
     .different-inner {
@@ -727,7 +745,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== THE SPACE ==================== */
     .the-space {
-      padding: 100px 0;
+      padding: 120px 0;
       border-top: 1px solid rgba(44,24,16,0.06);
     }
 
@@ -779,16 +797,28 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
     .space-image:nth-child(3) .space-image-bg { background-color: #4A3228; }
     .space-image:nth-child(4) .space-image-bg { background-color: #5C3A1E; }
 
+    .space-image::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%);
+      pointer-events: none;
+    }
+
     .space-image-caption {
       position: absolute;
       bottom: 16px;
       left: 16px;
-      color: rgba(255,255,255,0.8);
+      color: #fff;
       font-size: 13px;
       font-family: var(--font-body);
       text-transform: uppercase;
       letter-spacing: 0.1em;
       font-weight: 500;
+      z-index: 1;
     }
 
     .space-features {
@@ -811,7 +841,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== EVERYTHING INCLUDED ==================== */
     .included {
-      padding: 100px 0;
+      padding: 120px 0;
       border-top: 1px solid rgba(44,24,16,0.06);
     }
 
@@ -881,7 +911,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== PRICING ==================== */
     .pricing {
-      padding: 100px 0;
+      padding: 120px 0;
       border-top: 1px solid rgba(44,24,16,0.06);
     }
 
@@ -1039,7 +1069,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== REAL WEDDINGS ==================== */
     .real-weddings {
-      padding: 100px 0;
+      padding: 120px 0;
     }
 
     .real-weddings-header {
@@ -1120,7 +1150,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== PLANNING PROCESS ==================== */
     .process {
-      padding: 100px 0;
+      padding: 120px 0;
       border-top: 1px solid rgba(44,24,16,0.06);
     }
 
@@ -1168,7 +1198,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== FAQs ==================== */
     .faqs {
-      padding: 100px 0;
+      padding: 120px 0;
       border-top: 1px solid rgba(44,24,16,0.06);
     }
 
@@ -1240,7 +1270,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
 
     /* ==================== BROCHURE DOWNLOAD ==================== */
     .brochure {
-      padding: 80px 0;
+      padding: 120px 0;
       background: rgba(44,24,16,0.03);
       border-top: 1px solid rgba(44,24,16,0.06);
     }
@@ -1263,7 +1293,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
     }
 
     .brochure-form {
-      background: #fff;
+      background: rgba(255, 255, 255, 0.5);
       padding: 40px;
       border: 1px solid rgba(44,24,16,0.08);
     }
@@ -1326,7 +1356,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
     /* ==================== FINAL CTA ==================== */
     .final-cta {
       background: var(--brewery-dark);
-      padding: 80px 0;
+      padding: 120px 0;
       text-align: center;
     }
 
@@ -1440,6 +1470,41 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       color: #fff;
     }
 
+    /* ==================== PHOTO BREAK ==================== */
+    .photo-break {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .photo-break-image {
+      width: 100%;
+      height: 60vh;
+      min-height: 400px;
+      max-height: 600px;
+      background-size: cover;
+      background-position: center 40%;
+      background-color: var(--brewery-dark);
+    }
+
+    /* ==================== PHOTO STRIP ==================== */
+    .photo-strip {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .photo-strip-inner {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .photo-strip-item {
+      aspect-ratio: 1;
+      background-size: cover;
+      background-position: center;
+      background-color: var(--forest-olive);
+    }
+
     /* ==================== SCROLL ANIMATIONS ==================== */
     .fade-in {
       opacity: 0;
@@ -1517,6 +1582,19 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       .pricing-example,
       .included-promise {
         padding: 28px;
+      }
+
+      .photo-break-image {
+        height: 40vh;
+        min-height: 250px;
+      }
+
+      .photo-strip-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .photo-strip-item {
+        aspect-ratio: 16/9;
       }
 
       .sticky-cta {
