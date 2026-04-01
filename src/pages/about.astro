@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import FinalCTA from '../components/FinalCTA.astro';
 ---
 
 <Base title="About The Hackney | 1856 Brewery Wedding & Events Venue, East London E2" description="The Hackney is a restored 1856 brewery on Hackney Road, East London. One team runs everything - weddings, events, cafe-bar and in-house kitchen. Meet the team behind the venue.">
@@ -183,17 +184,14 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- ==================== SECTION 7: FINAL CTA ==================== -->
-  <section class="final-cta">
-    <div class="container">
-      <div class="eyebrow" style="text-align:center;">Come And See Us</div>
-      <h2>Ready To See The Space?</h2>
-      <p class="final-cta-body">Whether you are planning a wedding, an event, or just want a great coffee - we would love to welcome you.</p>
-      <div class="final-cta-buttons">
-        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=about" class="btn btn-primary">Check Your Date</a>
-        <a href="/cafe-bar/" class="btn btn-outline">Visit The Cafe</a>
-      </div>
-    </div>
-  </section>
+  <FinalCTA
+    eyebrow="Come And See Us"
+    heading="Ready To See The Space?"
+    body="Whether you are planning a wedding, an event, or just want a great coffee - we would love to welcome you."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    secondaryCTA={{ label: "Visit The Cafe", href: "/cafe-bar/" }}
+    utmCampaign="about"
+  />
 
   <!-- ==================== FOOTER ==================== -->
   
@@ -520,34 +518,6 @@ import Base from '../layouts/Base.astro';
       opacity: 0.6;
     }
 
-    /* ==================== FINAL CTA ==================== */
-    .final-cta {
-      background: var(--brewery-dark);
-      padding: 120px 0;
-      text-align: center;
-    }
-
-    .final-cta h2 {
-      color: #fff;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .final-cta-body {
-      color: rgba(255,255,255,0.7);
-      font-size: 18px;
-      max-width: 600px;
-      margin: 0 auto 36px;
-      text-align: center;
-    }
-
-    .final-cta-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
     /* ==================== SCROLL ANIMATIONS ==================== */
     .fade-in {
       opacity: 0;
@@ -584,11 +554,6 @@ import Base from '../layouts/Base.astro';
 
       .gallery-grid {
         grid-template-columns: 1fr 1fr;
-      }
-
-      .final-cta-buttons {
-        flex-direction: column;
-        align-items: center;
       }
 
       .one-team-callout {

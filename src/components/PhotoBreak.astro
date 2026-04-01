@@ -1,0 +1,59 @@
+---
+/**
+ * PhotoBreak - Full-bleed edge-to-edge photo section.
+ * Creates visual breathing room between content sections.
+ *
+ * Usage:
+ *   <PhotoBreak
+ *     image="/images/hackney-wedding-couple.webp"
+ *     alt="Wedding couple at The Hackney"
+ *     position="center 40%"
+ *   />
+ */
+
+interface Props {
+  image: string;
+  alt: string;
+  /** CSS background-position value. Default: "center center" */
+  position?: string;
+  /** CSS height value. Default: "60vh" */
+  height?: string;
+}
+
+const {
+  image,
+  alt,
+  position = 'center center',
+  height = '60vh',
+} = Astro.props;
+---
+
+<section class="photo-break">
+  <div
+    class="photo-break-image"
+    style={`background-image: url('${image}'); background-position: ${position}; --photo-height: ${height};`}
+    role="img"
+    aria-label={alt}
+  ></div>
+</section>
+
+<style>
+  .photo-break {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .photo-break-image {
+    width: 100%;
+    height: var(--photo-height, 60vh);
+    min-height: 350px;
+    background-size: cover;
+  }
+
+  @media (max-width: 768px) {
+    .photo-break-image {
+      height: 40vh;
+      min-height: 250px;
+    }
+  }
+</style>

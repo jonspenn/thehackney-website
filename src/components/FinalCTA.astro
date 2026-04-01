@@ -1,0 +1,168 @@
+---
+/**
+ * FinalCTA - Dark closing section used across the site.
+ * Replaces ~120 lines of duplicated CSS per page.
+ *
+ * Usage:
+ *   <FinalCTA
+ *     heading="Ready to see the space?"
+ *     body="Tours run 7 days a week."
+ *     primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+ *     secondaryCTA={{ label: "Download The Brochure", href: "/weddings/#brochure" }}
+ *     phone={true}
+ *     whatsapp={true}
+ *     note="2026 dates are filling fast."
+ *   />
+ */
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  body?: string;
+  primaryCTA: { label: string; href: string };
+  secondaryCTA?: { label: string; href: string };
+  phone?: boolean;
+  whatsapp?: boolean;
+  note?: string;
+  /** UTM campaign param appended to /check-your-date/ links */
+  utmCampaign?: string;
+}
+
+const {
+  eyebrow,
+  heading,
+  body,
+  primaryCTA,
+  secondaryCTA,
+  phone = false,
+  whatsapp = false,
+  note,
+  utmCampaign,
+} = Astro.props;
+
+// Append UTM params to check-your-date links if campaign specified
+function resolveHref(href: string): string {
+  if (utmCampaign && href.startsWith('/check-your-date')) {
+    return `${href}${href.includes('?') ? '&' : '?'}utm_source=website&utm_medium=cta&utm_campaign=${utmCampaign}`;
+  }
+  return href;
+}
+---
+
+<section class="final-cta">
+  <div class="container">
+    {eyebrow && <div class="eyebrow final-cta-eyebrow">{eyebrow}</div>}
+    <h2>{heading}</h2>
+    {body && <p class="final-cta-body">{body}</p>}
+    <div class="final-cta-buttons">
+      <a href={resolveHref(primaryCTA.href)} class="btn btn-primary">{primaryCTA.label}</a>
+      {secondaryCTA && <a href={resolveHref(secondaryCTA.href)} class="btn btn-outline">{secondaryCTA.label}</a>}
+    </div>
+    {(phone || whatsapp) && (
+      <div class="final-cta-contact">
+        {phone && (
+          <p class="final-cta-contact-line">
+            Or call us on <a href="tel:+442079611604">+44 20 7961 1604</a> - available Mon to Sun, 9am to 7pm
+          </p>
+        )}
+        {whatsapp && (
+          <p class="final-cta-contact-line">
+            Prefer to message? <a href="https://wa.me/442079611604" class="whatsapp-link">Chat on WhatsApp</a>
+          </p>
+        )}
+      </div>
+    )}
+    {note && <p class="final-cta-note">{note}</p>}
+  </div>
+</section>
+
+<style>
+  .final-cta {
+    background: var(--brewery-dark);
+    padding: 120px 0;
+    text-align: center;
+  }
+
+  .final-cta h2 {
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .final-cta-eyebrow {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .final-cta-body {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 36px;
+  }
+
+  .final-cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* On dark backgrounds, outline buttons get light borders */
+  .final-cta .btn-outline {
+    color: var(--warm-canvas);
+    border-color: rgba(245, 240, 232, 0.3);
+  }
+
+  .final-cta .btn-outline:hover {
+    background-color: rgba(245, 240, 232, 0.1);
+    color: #fff;
+  }
+
+  .final-cta-contact {
+    margin-top: 24px;
+    width: 100%;
+  }
+
+  .final-cta-contact-line {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 14px;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+
+  .final-cta-contact-line a {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .final-cta-contact-line a:hover {
+    color: #fff;
+  }
+
+  .final-cta-contact-line .whatsapp-link {
+    color: var(--dusty-coral);
+  }
+
+  .final-cta-contact-line .whatsapp-link:hover {
+    color: #fff;
+  }
+
+  .final-cta-note {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 14px;
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .final-cta {
+      padding: 80px 0;
+    }
+
+    .final-cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>

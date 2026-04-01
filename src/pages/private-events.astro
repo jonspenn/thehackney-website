@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import FinalCTA from '../components/FinalCTA.astro';
 ---
 
 <style is:global>
@@ -262,45 +263,6 @@ import Base from '../layouts/Base.astro';
     background: rgba(44, 24, 16, 0.03);
   }
 
-  /* Final CTA Section */
-  .final-cta {
-    background-color: var(--brewery-dark);
-    color: var(--warm-canvas);
-    text-align: center;
-    padding: 120px 0;
-  }
-
-  .final-cta h2 {
-    color: var(--warm-canvas);
-    margin-bottom: 30px;
-  }
-
-  .final-cta .btn-primary {
-    background-color: var(--dusty-coral);
-    font-size: 14px;
-    padding: 14px 35px;
-    margin-bottom: 30px;
-  }
-
-  .final-cta .btn-primary:hover {
-    background-color: var(--fired-brick);
-  }
-
-  .contact-note {
-    font-size: 16px;
-    margin-top: 20px;
-  }
-
-  .contact-note a {
-    color: var(--dusty-coral);
-    text-decoration: none;
-    font-weight: 500;
-  }
-
-  .contact-note a:hover {
-    text-decoration: underline;
-  }
-
   /* Animations */
   @keyframes fadeInUp {
     from {
@@ -440,13 +402,12 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- Final CTA Section -->
-  <section class="final-cta">
-    <h2>Ready to book your event?</h2>
-    <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=private-events" class="btn btn-primary">Check Your Date</a>
-    <div class="contact-note">
-      Or call us on <a href="tel:+442079611604">+44 20 7961 1604</a>
-    </div>
-  </section>
+  <FinalCTA
+    heading="Ready to book your event?"
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    phone={true}
+    utmCampaign="private-events"
+  />
 
   <!-- Footer -->
 </Base>

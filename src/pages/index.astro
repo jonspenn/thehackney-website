@@ -1,5 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
+import ProofBar from '../components/ProofBar.astro';
+import PhotoBreak from '../components/PhotoBreak.astro';
+import PhotoStrip from '../components/PhotoStrip.astro';
+import FinalCTA from '../components/FinalCTA.astro';
 ---
 
 <Base title="Wedding & Events Venue East London | The Hackney, E2" description="The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours.">
@@ -18,28 +22,12 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- ==================== SOCIAL PROOF BAR ==================== -->
-  <section class="proof-bar">
-    <div class="container">
-      <div class="proof-bar-inner">
-        <div class="proof-stat fade-in">
-          <div class="proof-stat-number">98</div>
-          <div class="proof-stat-label">NPS Score</div>
-        </div>
-        <div class="proof-stat fade-in">
-          <div class="proof-stat-number">4.6</div>
-          <div class="proof-stat-label">Google Rating</div>
-        </div>
-        <div class="proof-stat fade-in">
-          <div class="proof-stat-number">75+</div>
-          <div class="proof-stat-label">Weddings Per Year</div>
-        </div>
-        <div class="proof-stat fade-in">
-          <div class="proof-stat-number">1856</div>
-          <div class="proof-stat-label">Brewery Building</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ProofBar stats={[
+    { number: "98", label: "NPS Score" },
+    { number: "4.6", label: "Google Rating" },
+    { number: "75+", label: "Weddings Per Year" },
+    { number: "1856", label: "Brewery Building" }
+  ]} />
 
   <!-- ==================== VENUE INTRODUCTION ==================== -->
   <section class="venue-intro">
@@ -114,9 +102,10 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- ==================== FULL-BLEED PHOTO BREAK ==================== -->
-  <section class="photo-break">
-    <div class="photo-break-image" style="background-image: url('/images/hackney-venue-dinner-long-tables-greenery-edison-bulbs.webp');"></div>
-  </section>
+  <PhotoBreak
+    image="/images/hackney-venue-dinner-long-tables-greenery-edison-bulbs.webp"
+    alt="Long dinner tables with greenery and Edison bulbs at The Hackney"
+  />
 
   <!-- ==================== TESTIMONIALS ==================== -->
   <section class="testimonials">
@@ -170,13 +159,11 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- ==================== DETAIL PHOTO STRIP ==================== -->
-  <section class="photo-strip">
-    <div class="photo-strip-inner">
-      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-flowers-arrangement-coral-pink.webp');"></div>
-      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-table-setting-pink-napkins-flowers.webp');"></div>
-      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-flowers-blue-thistle-lavender.webp');"></div>
-    </div>
-  </section>
+  <PhotoStrip images={[
+    { src: "/images/hackney-wedding-flowers-arrangement-coral-pink.webp", alt: "Wedding flower arrangement in coral and pink" },
+    { src: "/images/hackney-wedding-table-setting-pink-napkins-flowers.webp", alt: "Wedding table setting with pink napkins and flowers" },
+    { src: "/images/hackney-wedding-flowers-blue-thistle-lavender.webp", alt: "Wedding flowers with blue thistle and lavender" }
+  ]} />
 
   <!-- ==================== THE TEAM ==================== -->
   <section class="team">
@@ -210,18 +197,15 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- ==================== FINAL CTA ==================== -->
-  <section class="final-cta">
-    <div class="container">
-      <h2>Ready to see the space?</h2>
-      <p class="final-cta-body">Tours run 7 days a week. No obligation. 45 minutes with Hugo and you will know if The Hackney is the right venue for you.</p>
-      <div class="final-cta-buttons">
-        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage" class="btn btn-primary">Check Your Date</a>
-        <a href="/weddings/#brochure" class="btn btn-outline">Download The Brochure</a>
-      </div>
-      <p class="final-cta-note">Or call us on +44 20 7961 1604 - available Mon to Sun, 9am to 7pm</p>
-      <p class="final-cta-note" style="margin-top: 12px;">Prefer to message? <a href="https://wa.me/442079611604" style="color: var(--dusty-coral);">Chat on WhatsApp</a></p>
-    </div>
-  </section>
+  <FinalCTA
+    heading="Ready to see the space?"
+    body="Tours run 7 days a week. No obligation. 45 minutes with Hugo and you will know if The Hackney is the right venue for you."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    secondaryCTA={{ label: "Download The Brochure", href: "/weddings/#brochure" }}
+    phone={true}
+    whatsapp={true}
+    utmCampaign="homepage"
+  />
 
   <!-- ==================== FOOTER ==================== -->
 </Base>
@@ -296,37 +280,6 @@ import Base from '../layouts/Base.astro';
   }
 
   /* ==================== SOCIAL PROOF BAR ==================== */
-  .proof-bar {
-    background: var(--warm-canvas);
-    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
-    padding: 56px 0;
-  }
-
-  .proof-bar-inner {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    text-align: center;
-  }
-
-  .proof-stat-number {
-    font-family: var(--font-heading);
-    font-size: clamp(36px, 4vw, 52px);
-    font-weight: 800;
-    color: var(--brewery-dark);
-    letter-spacing: 0.02em;
-    line-height: 1;
-  }
-
-  .proof-stat-label {
-    font-size: 13px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--dusty-coral);
-    margin-top: 6px;
-    font-weight: 500;
-  }
-
   /* ==================== VENUE INTRO ==================== */
   .venue-intro {
     padding: 140px 0;
@@ -635,77 +588,6 @@ import Base from '../layouts/Base.astro';
     opacity: 0.8;
   }
 
-  /* ==================== FULL-BLEED PHOTO BREAK ==================== */
-  .photo-break {
-    width: 100%;
-    overflow: hidden;
-  }
-
-  .photo-break-image {
-    width: 100%;
-    height: 60vh;
-    min-height: 400px;
-    max-height: 600px;
-    background-size: cover;
-    background-position: center 40%;
-    background-color: var(--brewery-dark);
-  }
-
-  /* ==================== DETAIL PHOTO STRIP ==================== */
-  .photo-strip {
-    padding: 0;
-    overflow: hidden;
-  }
-
-  .photo-strip-inner {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-  }
-
-  .photo-strip-item {
-    aspect-ratio: 1;
-    background-size: cover;
-    background-position: center;
-    background-color: var(--forest-olive);
-  }
-
-  /* ==================== FINAL CTA ==================== */
-  .final-cta {
-    background: var(--brewery-dark);
-    padding: 120px 0;
-    text-align: center;
-  }
-
-  .final-cta h2 {
-    color: #fff;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .final-cta-body {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 18px;
-    max-width: 600px;
-    margin: 0 auto 36px;
-    text-align: center;
-  }
-
-  .final-cta-buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .final-cta-note {
-    color: rgba(255, 255, 255, 0.45);
-    font-size: 14px;
-    margin-top: 24px;
-    text-align: center;
-    width: 100%;
-  }
-
   /* ==================== RESPONSIVE ==================== */
   @media (max-width: 1200px) {
     .occasions-grid {
@@ -726,11 +608,6 @@ import Base from '../layouts/Base.astro';
       font-size: 17px;
     }
 
-    .proof-bar-inner {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 32px;
-    }
-
     .venue-intro-grid {
       grid-template-columns: 1fr;
       gap: 32px;
@@ -749,19 +626,6 @@ import Base from '../layouts/Base.astro';
       gap: 40px;
     }
 
-    .photo-break-image {
-      height: 40vh;
-      min-height: 250px;
-    }
-
-    .photo-strip-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .photo-strip-item {
-      aspect-ratio: 16/9;
-    }
-
     .venue-intro-image {
       margin-top: 32px;
     }
@@ -775,10 +639,6 @@ import Base from '../layouts/Base.astro';
       gap: 48px;
     }
 
-    .final-cta-buttons {
-      flex-direction: column;
-      align-items: center;
-    }
   }
 
   /* Section label shared style override */

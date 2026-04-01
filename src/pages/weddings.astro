@@ -1,5 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
+import ProofBar from '../components/ProofBar.astro';
+import PhotoBreak from '../components/PhotoBreak.astro';
+import PhotoStrip from '../components/PhotoStrip.astro';
+import FinalCTA from '../components/FinalCTA.astro';
 
 // Build FAQPage schema from wedding FAQs
 const faqItems = [
@@ -91,28 +95,12 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
   </section>
 
   <!-- ==================== SECTION 2: SOCIAL PROOF BAR ==================== -->
-  <div class="proof-bar">
-    <div class="container">
-      <div class="proof-bar-inner">
-        <div class="proof-stat">
-          <div class="proof-stat-number">75+</div>
-          <div class="proof-stat-label">Weddings a year</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-stat-number">4.6</div>
-          <div class="proof-stat-label">Google rating</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-stat-number">Est. 1856</div>
-          <div class="proof-stat-label">A historic brewery, reimagined</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-stat-number">98</div>
-          <div class="proof-stat-label">NPS score - 98% would recommend</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <ProofBar stats={[
+    { number: "75+", label: "Weddings a year" },
+    { number: "4.6", label: "Google rating" },
+    { number: "Est. 1856", label: "A historic brewery, reimagined" },
+    { number: "98", label: "NPS score - 98% would recommend" }
+  ]} />
 
   <!-- ==================== SECTION 3: WHAT MAKES US DIFFERENT ==================== -->
   <section class="different fade-in">
@@ -218,9 +206,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
   </section>
 
   <!-- ==================== PHOTO BREAK: VENUE ATMOSPHERE ==================== -->
-  <section class="photo-break">
-    <div class="photo-break-image" style="background-image: url('/images/hackney-wedding-couple-between-tables-pampas-edison-bulbs.webp');" role="img" aria-label="Wedding couple standing between long dinner tables with pampas grass and Edison bulbs at The Hackney"></div>
-  </section>
+  <PhotoBreak
+    image="/images/hackney-wedding-couple-between-tables-pampas-edison-bulbs.webp"
+    alt="Wedding couple standing between long dinner tables with pampas grass and Edison bulbs at The Hackney"
+    position="center 40%"
+  />
 
   <!-- ==================== SECTION 6: PRICING ==================== -->
   <section class="pricing fade-in" id="pricing">
@@ -404,13 +394,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
   </section>
 
   <!-- ==================== PHOTO STRIP: WEDDING DETAILS ==================== -->
-  <section class="photo-strip">
-    <div class="photo-strip-inner">
-      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-table-detail-candles-gold-chargers-eucalyptus.webp');" role="img" aria-label="Wedding table detail with candles, gold chargers and eucalyptus at The Hackney"></div>
-      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-ceremony-celebration-colourful-flowers.webp');" role="img" aria-label="Wedding ceremony celebration with colourful flowers at The Hackney"></div>
-      <div class="photo-strip-item" style="background-image: url('/images/hackney-wedding-bride-laughing-dinner-pink-flowers.webp');" role="img" aria-label="Bride laughing at dinner table with pink flowers at The Hackney"></div>
-    </div>
-  </section>
+  <PhotoStrip images={[
+    { src: "/images/hackney-wedding-table-detail-candles-gold-chargers-eucalyptus.webp", alt: "Wedding table detail with candles, gold chargers and eucalyptus at The Hackney" },
+    { src: "/images/hackney-wedding-ceremony-celebration-colourful-flowers.webp", alt: "Wedding ceremony celebration with colourful flowers at The Hackney" },
+    { src: "/images/hackney-wedding-bride-laughing-dinner-pink-flowers.webp", alt: "Bride laughing at dinner table with pink flowers at The Hackney" }
+  ]} />
 
   <!-- ==================== SECTION 9: PLANNING PROCESS ==================== -->
   <section class="process fade-in">
@@ -580,19 +568,16 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
   </section>
 
   <!-- ==================== SECTION 12: FINAL CTA ==================== -->
-  <section class="final-cta">
-    <div class="container">
-      <div class="eyebrow" style="text-align:center;">Start Here</div>
-      <h2>Ready To Check Your Date?</h2>
-      <p class="final-cta-body">Tell us when you are thinking, how many guests, and what you are looking for. We will get back to you within 24 hours.</p>
-      <div class="final-cta-buttons">
-        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Check Your Date</a>
-        <a href="tel:+442079611604" class="btn btn-outline">Call Us</a>
-      </div>
-      <p class="final-cta-alt">Prefer to message? <a href="https://wa.me/442079611604">Chat on WhatsApp</a></p>
-      <p class="final-cta-note">2026 dates are filling fast. Saturday availability for peak season is limited.</p>
-    </div>
-  </section>
+  <FinalCTA
+    eyebrow="Start Here"
+    heading="Ready To Check Your Date?"
+    body="Tell us when you are thinking, how many guests, and what you are looking for. We will get back to you within 24 hours."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    secondaryCTA={{ label: "Call Us", href: "tel:+442079611604" }}
+    whatsapp={true}
+    note="2026 dates are filling fast. Saturday availability for peak season is limited."
+    utmCampaign="weddings"
+  />
 
   <!-- ==================== STICKY MOBILE CTA ==================== -->
   <div class="sticky-cta" id="stickyCta">
@@ -689,35 +674,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       color: rgba(255,255,255,0.7);
       font-size: 14px;
       margin-top: 14px;
-    }
-
-    /* ==================== SOCIAL PROOF BAR ==================== */
-    .proof-bar {
-      background: var(--brewery-dark);
-      padding: 56px 0;
-      border-bottom: 3px solid var(--fired-brick);
-    }
-
-    .proof-bar-inner {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      text-align: center;
-    }
-
-    .proof-stat-number {
-      font-family: var(--font-heading);
-      font-size: clamp(24px, 3vw, 32px);
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.01em;
-      line-height: 1.2;
-    }
-
-    .proof-stat-label {
-      font-size: 13px;
-      color: rgba(255,255,255,0.55);
-      margin-top: 4px;
     }
 
     /* ==================== WHAT MAKES US DIFFERENT ==================== */
@@ -1353,55 +1309,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       line-height: 1.5;
     }
 
-    /* ==================== FINAL CTA ==================== */
-    .final-cta {
-      background: var(--brewery-dark);
-      padding: 120px 0;
-      text-align: center;
-    }
-
-    .final-cta h2 {
-      color: #fff;
-      margin-bottom: 20px;
-    }
-
-    .final-cta-body {
-      color: rgba(255,255,255,0.7);
-      font-size: 18px;
-      max-width: 500px;
-      margin: 0 auto 36px;
-    }
-
-    .final-cta-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    .final-cta-alt {
-      color: rgba(255,255,255,0.55);
-      font-size: 15px;
-      margin-bottom: 8px;
-      width: 100%;
-    }
-
-    .final-cta-alt a {
-      color: rgba(255,255,255,0.75);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    .final-cta-alt a:hover { color: #fff; }
-
-    .final-cta-note {
-      color: rgba(255,255,255,0.35);
-      font-size: 14px;
-      margin-top: 16px;
-      width: 100%;
-    }
-
     /* ==================== STICKY MOBILE CTA ==================== */
     .sticky-cta {
       display: none;
@@ -1472,41 +1379,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
       color: #fff;
     }
 
-    /* ==================== PHOTO BREAK ==================== */
-    .photo-break {
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .photo-break-image {
-      width: 100%;
-      height: 60vh;
-      min-height: 400px;
-      max-height: 600px;
-      background-size: cover;
-      background-position: center 40%;
-      background-color: var(--brewery-dark);
-    }
-
-    /* ==================== PHOTO STRIP ==================== */
-    .photo-strip {
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .photo-strip-inner {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-    }
-
-    .photo-strip-item {
-      aspect-ratio: 1;
-      background-size: cover;
-      background-position: center;
-      background-color: var(--forest-olive);
-    }
-
     /* ==================== SCROLL ANIMATIONS ==================== */
     .fade-in {
       opacity: 0;
@@ -1531,11 +1403,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
     }
 
     @media (max-width: 768px) {
-      .proof-bar-inner {
-        grid-template-columns: 1fr 1fr;
-        gap: 20px 12px;
-      }
-
       .space-gallery {
         grid-template-columns: 1fr;
       }
@@ -1576,27 +1443,9 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
         padding: 28px;
       }
 
-      .final-cta-buttons {
-        flex-direction: column;
-        align-items: center;
-      }
-
       .pricing-example,
       .included-promise {
         padding: 28px;
-      }
-
-      .photo-break-image {
-        height: 40vh;
-        min-height: 250px;
-      }
-
-      .photo-strip-inner {
-        grid-template-columns: 1fr;
-      }
-
-      .photo-strip-item {
-        aspect-ratio: 16/9;
       }
 
       .sticky-cta {

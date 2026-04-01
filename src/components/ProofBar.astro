@@ -1,0 +1,75 @@
+---
+/**
+ * ProofBar - Social proof stats strip.
+ * Warm Canvas background, big numbers, compact padding.
+ *
+ * Usage:
+ *   <ProofBar
+ *     stats={[
+ *       { number: "98", label: "NPS Score" },
+ *       { number: "4.6", label: "Google Rating" },
+ *       { number: "75+", label: "Weddings Per Year" },
+ *       { number: "1856", label: "Brewery Building" }
+ *     ]}
+ *   />
+ */
+
+interface Props {
+  stats: Array<{ number: string; label: string }>;
+}
+
+const { stats } = Astro.props;
+---
+
+<section class="proof-bar">
+  <div class="container">
+    <div class="proof-bar-inner" style={`--stat-cols: ${stats.length};`}>
+      {stats.map((stat) => (
+        <div class="proof-stat fade-in">
+          <div class="proof-stat-number">{stat.number}</div>
+          <div class="proof-stat-label">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .proof-bar {
+    background: var(--warm-canvas);
+    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
+    padding: 56px 0;
+  }
+
+  .proof-bar-inner {
+    display: grid;
+    grid-template-columns: repeat(var(--stat-cols, 4), 1fr);
+    gap: 24px;
+    text-align: center;
+  }
+
+  .proof-stat-number {
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4vw, 52px);
+    font-weight: 800;
+    color: var(--brewery-dark);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .proof-stat-label {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .proof-bar-inner {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+/**
+ * PhotoStrip - 3-image edge-to-edge grid with square aspect ratio.
+ * Creates visual rhythm between content sections.
+ *
+ * Usage:
+ *   <PhotoStrip
+ *     images={[
+ *       { src: "/images/detail.webp", alt: "Table detail" },
+ *       { src: "/images/ceremony.webp", alt: "Ceremony" },
+ *       { src: "/images/bride.webp", alt: "Bride laughing" }
+ *     ]}
+ *   />
+ */
+
+interface Props {
+  images: Array<{ src: string; alt: string; position?: string }>;
+}
+
+const { images } = Astro.props;
+---
+
+<section class="photo-strip">
+  <div class="photo-strip-inner">
+    {images.map((img) => (
+      <div
+        class="photo-strip-item"
+        style={`background-image: url('${img.src}'); background-position: ${img.position || 'center center'};`}
+        role="img"
+        aria-label={img.alt}
+      ></div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .photo-strip {
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .photo-strip-inner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+
+  .photo-strip-item {
+    aspect-ratio: 1;
+    background-size: cover;
+  }
+
+  @media (max-width: 768px) {
+    .photo-strip-inner {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
