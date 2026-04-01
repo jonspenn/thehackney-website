@@ -4,7 +4,7 @@ description: "From Victorian brewery to wedding venue - the story of the buildin
 pubDate: 2026-04-01
 category: "Heritage"
 author: "The Hackney"
-draft: true
+draft: false
 ---
 
 The building at 503 Hackney Road has been standing since 1856. Not as a concept or a brand, but as brick and mortar on one of East London's oldest thoroughfares - a road with possibly pre-Roman origins as a cattle route to Smithfield Market. The story of this building is the story of the neighbourhood it has watched change around it.
