@@ -8,6 +8,7 @@ interface Props {
   description?: string;
   ogImage?: string;
   schema?: string;
+  pageType?: string;
 }
 
 const {
@@ -15,6 +16,7 @@ const {
   description = 'The Hackney is a restored 1856 brewery on Hackney Road, E2. One of East London\'s most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours.',
   ogImage,
   schema,
+  pageType = 'general',
 } = Astro.props;
 ---
 
@@ -23,6 +25,22 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Google Tag Manager - dataLayer init -->
+    <script is:inline define:vars={{ pageType }}>
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'page_type': pageType
+      });
+    </script>
+    <!-- Google Tag Manager -->
+    <script is:inline>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-W2JW4T2');
+    </script>
+    <!-- End Google Tag Manager -->
     <meta name="description" content={description} />
     <meta property="og:title" content={`${title} - The Hackney`} />
     <meta property="og:description" content={description} />
@@ -67,6 +85,9 @@ const {
     <title>{title} - The Hackney</title>
   </head>
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W2JW4T2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <Header />
     <main>
       <slot />

@@ -9,7 +9,7 @@ import Base from '../layouts/Base.astro';
   .hero {
     position: relative;
     padding: 120px 0 80px;
-    margin-top: 72px;
+    margin-top: var(--header-height);
     display: flex;
     align-items: center;
     background: var(--warm-canvas);
@@ -261,7 +261,7 @@ import Base from '../layouts/Base.astro';
   @media (max-width: 768px) {
     .hero {
       padding: 100px 0 60px;
-      margin-top: 72px;
+      margin-top: var(--header-height);
     }
 
     .hero h1 {
