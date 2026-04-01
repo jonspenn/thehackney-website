@@ -4,8 +4,8 @@ description: "From Victorian brewery to wedding venue - the story of the buildin
 pubDate: 2026-04-01
 category: "Heritage"
 author: "The Hackney"
-image: "/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp"
-imageAlt: "The Hackney interior - exposed brick, timber beams, and edison bulbs in the restored 1856 brewery"
+image: "/images/hackney-road-chandlers-brewery-victorian.webp"
+imageAlt: "Victorian photograph of Hackney Road showing Chandler's Brewery - the building that became The Hackney"
 draft: false
 ---
 
