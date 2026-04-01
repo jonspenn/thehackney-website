@@ -1,0 +1,119 @@
+# ============================================================
+# The Hackney - 301 Redirect Map
+# Shopify (thehackney.co) -> Astro (Cloudflare Pages)
+# ============================================================
+# Format: /old-path /new-path 301
+# Cloudflare Pages processes these top-to-bottom, first match wins.
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# Pages that exist on the new site:
+#   / /about/ /cafe-bar/ /check-your-date/ /contact/ /corporate/
+#   /private-events/ /supper-club/ /weddings/ /privacy/ /journal/
+#
+# Pages that DON'T exist yet are redirected to the closest equivalent.
+# When new pages are built, update the redirect target.
+# ============================================================
+
+# --- Homepage variants ---
+/pages/the-hackney-historic-event-venue-cafe-bar-in-east-london-e2 / 301
+
+# --- Core pages ---
+/pages/the-venue-in-hackney-e2 /about/ 301
+/pages/cafe-bar /cafe-bar/ 301
+/pages/cafe-bar-for-food-and-drinks-east-london-e2 /cafe-bar/ 301
+/pages/about-us-our-story-and-values-the-hackney-e2 /about/ 301
+/pages/contact-us /contact/ 301
+/pages/contact-us-for-enquiries-the-hackney-e2 /contact/ 301
+/pages/faq-about-the-hackney-e2 /contact/ 301
+/pages/cafe-bar-faqs-about-the-hackney /cafe-bar/ 301
+/pages/availability-calendar-the-hackney-e2 /check-your-date/ 301
+/pages/virtual-tour-the-hackney-e2 /about/ 301
+/pages/what-to-expect /weddings/ 301
+/pages/real-weddings /weddings/ 301
+/pages/why-couples-choose-the-hackney /weddings/ 301
+/pages/privacy-policy-the-hackney-e2 /privacy/ 301
+/pages/music-guidelines-and-policies /contact/ 301
+
+# --- Weddings ---
+/pages/weddings-at-the-hackney-east-london-e2 /weddings/ 301
+/pages/weddings /weddings/ 301
+/pages/the-hackney-wedding-pricing /weddings/ 301
+/pages/welcome-to-the-hackney-your-dream-wedding-venue-in-london /weddings/ 301
+
+# --- Corporate ---
+/pages/corporate-hire-the-hackney /corporate/ 301
+/pages/brand-activation-venue-east-london-e2 /corporate/ 301
+/pages/product-launch-venue-east-london-e2 /corporate/ 301
+/pages/press-pr-event-venue-east-london-e2 /corporate/ 301
+/pages/conference-panel-talks-venue-east-london-e2 /corporate/ 301
+/pages/workshop-venue-in-east-london-e2 /corporate/ 301
+/pages/off-site-days-the-hackney-e2 /corporate/ 301
+/pages/meeting-rooms-hire-the-hackney-east-london-e2 /corporate/ 301
+
+# --- Private events ---
+/pages/birthday-parties-at-the-hackney-east-london-e2 /private-events/ 301
+/pages/baby-shower-venue-at-the-hackney-east-london-e2 /private-events/ 301
+/pages/photography-and-film-venue-at-the-hackney-e2 /private-events/ 301
+/pages/photography-and-film-venue /private-events/ 301
+/pages/christmas-party-venue-east-london-e2 /private-events/ 301
+/pages/event-types /private-events/ 301
+
+# --- Booking pages (redirect to parent) ---
+/pages/book-a-venue-tour /check-your-date/ 301
+/pages/book-a-discovery-call /check-your-date/ 301
+/pages/book-your-wedding-now /weddings/ 301
+/pages/book-your-corporate-event /corporate/ 301
+/pages/book-your-brand-activation-now /corporate/ 301
+/pages/book-your-workshop-now /corporate/ 301
+/pages/book-your-conference-panel-talk-now /corporate/ 301
+/pages/book-your-birthday-celebration-now /private-events/ 301
+/pages/book-your-baby-shower-now /private-events/ 301
+/pages/book-your-board-meeting-room-now /corporate/ 301
+/pages/book-your-book-launch-now /private-events/ 301
+/pages/off-site-away-day-now-brochure /corporate/ 301
+/pages/product-launch-brochure /corporate/ 301
+/pages/press-pr-brochure /corporate/ 301
+
+# --- Community / misc ---
+/pages/join-the-hackney-east-london-e2-community /contact/ 301
+/pages/spotify-playlists-for-your-event-at-the-hackney-e2 /about/ 301
+/pages/testimonials /weddings/ 301
+/pages/brands-we-work-with /corporate/ 301
+/pages/why-work-with-us /about/ 301
+/pages/book-launches /private-events/ 301
+
+# --- Blog indexes ---
+/blogs/the-hackney-handbook /journal/ 301
+/blogs/real-weddings /weddings/ 301
+
+# --- Blog posts: Real Weddings (redirect to /weddings/ until real-weddings section built) ---
+/blogs/real-weddings/charlotte-stephen-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/hannah-piers-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/sian-josh-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/jenny-steven-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/lucy-michelle-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/helen-michael-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/james-matthew-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/zoe-tom-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/fiona-james-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/verity-andy-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/amy-john-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/tom-danielle-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/connie-jordan-wedding-at-the-hackney /weddings/ 301
+/blogs/real-weddings/kate-james-wedding-at-the-hackney /weddings/ 301
+
+# --- Blog posts: The Hackney Handbook (redirect to /journal/) ---
+/blogs/the-hackney-handbook/5-reasons-why-hackney-is-the-best-place-to-host-a-wedding-reception /journal/ 301
+/blogs/the-hackney-handbook/dream-wedding-venue-hackney-london /journal/ 301
+/blogs/the-hackney-handbook/how-to-plan-a-fun-and-memorable-christmas-party /journal/ 301
+/blogs/the-hackney-handbook/ollie-hinds-the-hackneys-preferred-photographer-for-capturing-unforgettable-moments /journal/ 301
+/blogs/the-hackney-handbook/photographer-spotlight-this-modern-revelry /journal/ 301
+/blogs/the-hackney-handbook/ceremony-venues-for-weddings-at-the-hackney /journal/ 301
+/blogs/the-hackney-handbook/a-celebration-of-miso-at-the-hackney /journal/ 301
+/blogs/the-hackney-handbook/impulse-brand-activation-at-the-hackney /journal/ 301
+/blogs/the-hackney-handbook/inside-a-gozney-brand-activation-event /journal/ 301
+/blogs/the-hackney-handbook/brand-activation-venue-london-vagabond-at-the-hackney /journal/ 301
+/blogs/the-hackney-handbook/a-taste-of-toronto-at-the-hackney /journal/ 301
+
+# --- Product page ---
+/products/menu-tasting-experience /supper-club/ 301
