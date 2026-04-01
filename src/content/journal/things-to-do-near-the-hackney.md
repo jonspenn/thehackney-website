@@ -6,7 +6,7 @@ category: "Local Guide"
 author: "The Hackney"
 image: "/images/hackney-road-street-view-east-london.webp"
 imageAlt: "View along Hackney Road in East London showing independent shops and tree-lined streets near The Hackney venue"
-draft: true
+draft: false
 ---
 
 One of the best things about hosting an event at 503 Hackney Road is what surrounds it. This part of East London has the kind of neighbourhood that rewards a slow afternoon - independent food, green space, markets that actually feel like markets, and streets worth walking without a destination.
