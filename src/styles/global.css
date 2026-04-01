@@ -34,7 +34,7 @@
 
   /* Layout */
   --max-width: 1200px;
-  --header-height: 72px;
+  --header-height: 96px;
 }
 
 /* --- Reset / Base --- */
@@ -325,7 +325,7 @@ img {
 }
 
 .footer-logo img {
-  height: 36px;
+  height: 48px;
   width: auto;
 }
 
