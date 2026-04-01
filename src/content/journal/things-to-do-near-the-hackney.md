@@ -4,8 +4,8 @@ description: "A local's guide to the best things to do near The Hackney on Hackn
 pubDate: 2026-04-01
 category: "Local Guide"
 author: "The Hackney"
-image: "/images/hackney-road-street-view-east-london.webp"
-imageAlt: "View along Hackney Road in East London showing independent shops and tree-lined streets near The Hackney venue"
+image: "/images/hackney-wedding-couple-east-london-streets.webp"
+imageAlt: "Couple walking through the streets of East London near The Hackney on Hackney Road"
 draft: false
 ---
 
