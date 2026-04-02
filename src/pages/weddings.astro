@@ -4,6 +4,7 @@ import ProofBar from '../components/ProofBar.astro';
 import PhotoBreak from '../components/PhotoBreak.astro';
 import PhotoStrip from '../components/PhotoStrip.astro';
 import FinalCTA from '../components/FinalCTA.astro';
+import WeddingQuestionnaire from '../components/WeddingQuestionnaire.astro';
 
 // Build FAQPage schema from wedding FAQs
 const faqItems = [
@@ -211,6 +212,9 @@ const combinedSchema = JSON.stringify([localBusinessSchema, faqSchema]);
     alt="Wedding couple standing between long dinner tables with pampas grass and Edison bulbs at The Hackney"
     position="center 40%"
   />
+
+  <!-- ==================== SECTION 5.5: WEDDING QUESTIONNAIRE ==================== -->
+  <WeddingQuestionnaire />
 
   <!-- ==================== SECTION 6: PRICING ==================== -->
   <section class="pricing fade-in" id="pricing">
