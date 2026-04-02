@@ -40,7 +40,7 @@ const {
   cta,
   note,
   height = 'full',
-  overlay = 0.35
+  overlay = 0.45
 } = Astro.props;
 
 const heightMap = {
@@ -107,16 +107,6 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
     z-index: 1;
   }
 
-  /* Inset frame - subtle border that contains the hero */
-  .hero-section::after {
-    content: '';
-    position: absolute;
-    inset: 1rem;
-    border: 1px solid rgba(245, 240, 232, 0.15);
-    z-index: 2;
-    pointer-events: none;
-  }
-
   .hero-section .container {
     width: 100%;
     position: relative;
@@ -124,7 +114,7 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
   }
 
   .hero-section-content {
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
     text-align: center;
   }
