@@ -55,7 +55,7 @@ function resolveHref(href: string): string {
     <h2>{heading}</h2>
     {body && <p class="final-cta-body">{body}</p>}
     <div class="final-cta-buttons">
-      <a href={resolveHref(primaryCTA.href)} class="btn btn-primary">{primaryCTA.label}</a>
+      <a href={resolveHref(primaryCTA.href)} class="btn btn-primary-dark">{primaryCTA.label}</a>
       {secondaryCTA && <a href={resolveHref(secondaryCTA.href)} class="btn btn-outline">{secondaryCTA.label}</a>}
     </div>
     {(phone || whatsapp) && (
@@ -79,7 +79,7 @@ function resolveHref(href: string): string {
 <style>
   .final-cta {
     background: var(--brewery-dark);
-    padding: 120px 0;
+    padding: 80px 0;
     text-align: center;
   }
 
@@ -162,7 +162,7 @@ function resolveHref(href: string): string {
 
   @media (max-width: 768px) {
     .final-cta {
-      padding: 80px 0;
+      padding: 64px 0;
     }
 
     .final-cta-buttons {
