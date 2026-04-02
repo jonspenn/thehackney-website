@@ -21,7 +21,6 @@ interface Props {
   body?: string;
   primaryCTA: { label: string; href: string };
   secondaryCTA?: { label: string; href: string };
-  phone?: boolean;
   whatsapp?: boolean;
   note?: string;
   /** UTM campaign param appended to /check-your-date/ links */
@@ -34,7 +33,6 @@ const {
   body,
   primaryCTA,
   secondaryCTA,
-  phone = false,
   whatsapp = false,
   note,
   utmCampaign,
@@ -58,18 +56,11 @@ function resolveHref(href: string): string {
       <a href={resolveHref(primaryCTA.href)} class="btn btn-primary">{primaryCTA.label}</a>
       {secondaryCTA && <a href={resolveHref(secondaryCTA.href)} class="btn btn-outline">{secondaryCTA.label}</a>}
     </div>
-    {(phone || whatsapp) && (
+    {whatsapp && (
       <div class="final-cta-contact">
-        {phone && (
-          <p class="final-cta-contact-line">
-            Or call us on <a href="tel:+442079611604">+44 20 7961 1604</a> - available Mon to Sun, 9am to 7pm
-          </p>
-        )}
-        {whatsapp && (
-          <p class="final-cta-contact-line">
-            Prefer to message? <a href="https://wa.me/442079611604" class="whatsapp-link">Chat on WhatsApp</a>
-          </p>
-        )}
+        <p class="final-cta-contact-line">
+          Prefer to message? <a href="https://wa.me/442079611604" class="whatsapp-link">Chat on WhatsApp</a>
+        </p>
       </div>
     )}
     {note && <p class="final-cta-note">{note}</p>}
