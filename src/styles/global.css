@@ -257,18 +257,7 @@ img {
   transform: translateY(0);
 }
 
-/* --- Proof Bar / Stats --- */
-.proof-bar {
-  display: flex;
-  gap: var(--space-lg);
-  flex-wrap: wrap;
-  margin: var(--space-xl) 0;
-}
-
-.proof-stat {
-  flex: 1;
-  min-width: 150px;
-}
+/* --- Proof Bar / Stats --- (legacy - component styles now in ProofBar.astro) */
 
 .proof-stat strong {
   display: block;
@@ -449,10 +438,6 @@ img {
     padding-top: var(--header-height);
   }
 
-  .proof-bar {
-    flex-direction: column;
-    gap: var(--space-md);
-  }
 
   .proof-stat {
     min-width: auto;
