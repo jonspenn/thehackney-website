@@ -1,0 +1,156 @@
+---
+/**
+ * HeroSection - Full-viewport hero with image background
+ *
+ * Three height variants based on page importance:
+ *   full    - 100vh (homepage)
+ *   mid     - 70vh  (subpages: weddings, corporate, private events)
+ *   compact - 50vh  (utility pages: contact, check-your-date)
+ *
+ * Props:
+ *   image    - path to background image
+ *   alt      - accessible description of the image
+ *   eyebrow  - uppercase label (e.g. location, page type)
+ *   heading  - the h1 text
+ *   subtext  - paragraph below heading
+ *   cta      - { label, href, utm } for primary CTA button
+ *   note     - small text below CTA (e.g. "Free. No obligation.")
+ *   height   - 'full' | 'mid' | 'compact'
+ *   overlay  - overlay opacity 0-1 (default 0.35)
+ */
+
+interface Props {
+  image: string;
+  alt: string;
+  eyebrow?: string;
+  heading: string;
+  subtext?: string;
+  cta?: { label: string; href: string; utm?: string };
+  note?: string;
+  height?: 'full' | 'mid' | 'compact';
+  overlay?: number;
+}
+
+const {
+  image,
+  alt,
+  eyebrow,
+  heading,
+  subtext,
+  cta,
+  note,
+  height = 'full',
+  overlay = 0.35
+} = Astro.props;
+
+const heightMap = {
+  full: '100vh',
+  mid: '70vh',
+  compact: '50vh'
+};
+
+const minHeightMap = {
+  full: '600px',
+  mid: '450px',
+  compact: '350px'
+};
+
+const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&utm_campaign=${cta.utm}` : cta.href) : '';
+---
+
+<section
+  class="hero-section"
+  style={`--hero-height: ${heightMap[height]}; --hero-min-height: ${minHeightMap[height]}; --hero-overlay: ${overlay}`}
+>
+  <div
+    class="hero-section-bg"
+    role="img"
+    aria-label={alt}
+    style={`background-image: url('${image}');`}
+  ></div>
+  <div class="hero-section-overlay"></div>
+  <div class="container">
+    <div class="hero-section-content">
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1 set:html={heading} />
+      {subtext && <p class="hero-section-sub">{subtext}</p>}
+      {cta && <a href={ctaHref} class="btn btn-primary-dark">{cta.label}</a>}
+      {note && <p class="hero-section-note">{note}</p>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    position: relative;
+    height: var(--hero-height, 100vh);
+    min-height: var(--hero-min-height, 600px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--forest-olive);
+    overflow: hidden;
+  }
+
+  .hero-section-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+
+  .hero-section-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(44, 24, 16, var(--hero-overlay, 0.35));
+    z-index: 1;
+  }
+
+  .hero-section .container {
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-section-content {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-section-content :global(.eyebrow) {
+    color: var(--dusty-coral);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-section-content h1 {
+    color: var(--warm-canvas);
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-section-sub {
+    color: var(--warm-canvas);
+    font-size: 1.25rem;
+    line-height: 1.5;
+    margin-bottom: 2.25rem;
+    max-width: 500px;
+    margin-inline: auto;
+  }
+
+  .hero-section-note {
+    color: rgba(245, 240, 232, 0.7);
+    font-size: 0.875rem;
+    margin-top: 0.875rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section-content h1 {
+      font-size: 2.25rem;
+    }
+
+    .hero-section-sub {
+      font-size: 1.0625rem;
+    }
+  }
+</style>

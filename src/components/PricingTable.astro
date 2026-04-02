@@ -1,0 +1,99 @@
+---
+/**
+ * PricingTable - Rate card grid with tiers
+ *
+ * Displays pricing tiers in a responsive grid.
+ * Prices shown in Fired Brick (warm highlight per brand guide).
+ *
+ * Props:
+ *   tiers - array of { name, period, price, description }
+ *   cta   - optional { label, href, utm }
+ */
+
+interface Tier {
+  name: string;
+  period: string;
+  price: string;
+  description: string;
+}
+
+interface Props {
+  tiers: Tier[];
+  cta?: { label: string; href: string; utm?: string };
+}
+
+const { tiers, cta } = Astro.props;
+const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&utm_campaign=${cta.utm}` : cta.href) : '';
+---
+
+<div class="pricing-table-grid">
+  {tiers.map((tier) => (
+    <div class="pricing-table-card fade-in">
+      <h3>{tier.name}</h3>
+      <p class="pricing-table-period">{tier.period}</p>
+      <p class="pricing-table-price">{tier.price}</p>
+      <p class="pricing-table-desc">{tier.description}</p>
+    </div>
+  ))}
+</div>
+{cta && (
+  <div class="pricing-table-cta">
+    <a href={ctaHref} class="btn btn-primary">{cta.label}</a>
+  </div>
+)}
+
+<style>
+  .pricing-table-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .pricing-table-card {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(44, 24, 16, 0.08);
+    padding: 2.5rem 2rem;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .pricing-table-card:hover {
+    box-shadow: 0 8px 32px rgba(44, 24, 16, 0.08);
+  }
+
+  .pricing-table-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .pricing-table-period {
+    font-size: 0.875rem;
+    color: var(--dusty-coral);
+    margin-bottom: 1.25rem;
+  }
+
+  .pricing-table-price {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--fired-brick);
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.02em;
+  }
+
+  .pricing-table-desc {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  .pricing-table-cta {
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .pricing-table-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

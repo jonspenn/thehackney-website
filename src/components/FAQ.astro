@@ -1,0 +1,121 @@
+---
+/**
+ * FAQ - Accordion with structured data (schema.org)
+ *
+ * Renders FAQ items as expandable accordion.
+ * Includes FAQPage schema markup for SEO.
+ * Uses compact section padding by default.
+ *
+ * Props:
+ *   items  - array of { question, answer }
+ *   schema - if true (default), outputs FAQPage JSON-LD
+ */
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  items: FAQItem[];
+  schema?: boolean;
+}
+
+const { items, schema = true } = Astro.props;
+
+const faqSchema = schema ? JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": items.map(item => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.answer
+    }
+  }))
+}) : null;
+---
+
+{faqSchema && <script type="application/ld+json" set:html={faqSchema} />}
+
+<div class="faq-list">
+  {items.map((item) => (
+    <details class="faq-item">
+      <summary class="faq-question">
+        <span>{item.question}</span>
+        <svg class="faq-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M5 8l5 5 5-5" />
+        </svg>
+      </summary>
+      <div class="faq-answer">
+        <p>{item.answer}</p>
+      </div>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq-list {
+    max-width: 780px;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid rgba(44, 24, 16, 0.1);
+  }
+
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--brewery-dark);
+    list-style: none;
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-icon {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  details[open] .faq-icon {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    padding-bottom: 1.5rem;
+  }
+
+  .faq-answer p {
+    font-size: 1rem;
+    line-height: 1.65;
+    opacity: 0.85;
+    max-width: 65ch;
+  }
+
+  /* Dark section overrides */
+  :global(.section-bg-dark) .faq-item {
+    border-color: rgba(245, 240, 232, 0.15);
+  }
+
+  :global(.section-bg-dark) .faq-question {
+    color: var(--warm-canvas);
+  }
+
+  :global(.section-bg-olive) .faq-item {
+    border-color: rgba(245, 240, 232, 0.15);
+  }
+
+  :global(.section-bg-olive) .faq-question {
+    color: var(--warm-canvas);
+  }
+</style>

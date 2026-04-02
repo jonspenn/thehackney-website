@@ -1,5 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import HeroSection from '../components/HeroSection.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ContentBlock from '../components/ContentBlock.astro';
+import TestimonialBlock from '../components/TestimonialBlock.astro';
+import PricingTable from '../components/PricingTable.astro';
 import ProofBar from '../components/ProofBar.astro';
 import PhotoBreak from '../components/PhotoBreak.astro';
 import PhotoStrip from '../components/PhotoStrip.astro';
@@ -7,19 +13,18 @@ import FinalCTA from '../components/FinalCTA.astro';
 ---
 
 <Base title="Wedding & Events Venue East London | The Hackney, E2" description="The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours.">
-<!-- ==================== HERO ==================== -->
-  <section class="hero">
-    <div class="hero-bg" style="background: var(--forest-olive) url('/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp') center center / cover no-repeat;"></div>
-    <div class="container">
-      <div class="hero-content">
-        <p class="eyebrow">East London &nbsp;-&nbsp; 503 Hackney Road &nbsp;-&nbsp; E2</p>
-        <h1>Where East London<br>Gets Married</h1>
-        <p class="hero-sub">An 1856 brewery building. 60 seated, 100 standing.<br>Exclusively yours for the day.</p>
-        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage" class="btn btn-primary">Check Your Date</a>
-        <p class="hero-note">Free. No obligation. See if your date is available.</p>
-      </div>
-    </div>
-  </section>
+
+  <!-- ==================== HERO ==================== -->
+  <HeroSection
+    image="/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp"
+    alt="The Hackney wedding venue interior with long dinner tables, Edison bulbs and exposed brick"
+    eyebrow="East London - 503 Hackney Road - E2"
+    heading="Where East London<br>Gets Married"
+    subtext="An 1856 brewery building. 60 seated, 100 standing. Exclusively yours for the day."
+    cta={{ label: "Check Your Date", href: "/check-your-date/", utm: "homepage" }}
+    note="Free. No obligation. See if your date is available."
+    height="full"
+  />
 
   <!-- ==================== SOCIAL PROOF BAR ==================== -->
   <ProofBar stats={[
@@ -30,41 +35,39 @@ import FinalCTA from '../components/FinalCTA.astro';
   ]} />
 
   <!-- ==================== VENUE INTRODUCTION ==================== -->
-  <section class="venue-intro">
-    <div class="container">
-      <div class="venue-intro-grid">
-        <div class="fade-in venue-intro-left">
-          <h2 class="pull-quote">"Industrial Romance. East London. Entirely Yours."</h2>
-          <div class="venue-intro-image" style="background-image: url('/images/hackney-wedding-first-dance-guests-venue.webp');"></div>
+  <Section bg="light" padding="standard">
+    <ContentBlock
+      image="/images/hackney-wedding-first-dance-guests-venue.webp"
+      alt="First dance at a Hackney wedding with guests watching"
+      reverse={true}
+      aspect="4/3"
+    >
+      <h2 class="pull-quote">"Industrial Romance. East London. Entirely Yours."</h2>
+      <p>The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues.</p>
+      <p>Exclusively hired. 60 seated, 100 standing. Everything in-house - catering, bar, florals, coordination.</p>
+      <p>No corkage. No hidden fees. No outside caterers. Just one team, one venue, one day that is entirely yours.</p>
+
+      <div class="differentiators">
+        <div>
+          <div class="diff-item-label">Exclusively Hired</div>
+          <div class="diff-item-text">The whole venue is yours. No other events, no shared spaces.</div>
         </div>
-        <div class="venue-intro-body fade-in">
-          <p>The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues.</p>
-          <p>Exclusively hired. 60 seated, 100 standing. Everything in-house - catering, bar, florals, coordination.</p>
-          <p>No corkage. No hidden fees. No outside caterers. Just one team, one venue, one day that is entirely yours.</p>
-
-          <div class="differentiators">
-            <div>
-              <div class="diff-item-label">Exclusively Hired</div>
-              <div class="diff-item-text">The whole venue is yours. No other events, no shared spaces.</div>
-            </div>
-            <div>
-              <div class="diff-item-label">Everything In-House</div>
-              <div class="diff-item-text">Kitchen, bar, florals and coordination. One team from start to finish.</div>
-            </div>
-            <div>
-              <div class="diff-item-label">East London</div>
-              <div class="diff-item-text">503 Hackney Road E2. 8 minutes from Bethnal Green tube.</div>
-            </div>
-          </div>
-
-          <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage" class="btn btn-primary">Check Your Date</a>
+        <div>
+          <div class="diff-item-label">Everything In-House</div>
+          <div class="diff-item-text">Kitchen, bar, florals and coordination. One team from start to finish.</div>
+        </div>
+        <div>
+          <div class="diff-item-label">East London</div>
+          <div class="diff-item-text">503 Hackney Road E2. 8 minutes from Bethnal Green tube.</div>
         </div>
       </div>
-    </div>
-  </section>
+
+      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage" class="btn btn-primary">Check Your Date</a>
+    </ContentBlock>
+  </Section>
 
   <!-- ==================== FIVE OCCASIONS ==================== -->
-  <section class="occasions">
+  <Section bg="light" padding="none" class="occasions-section">
     <div class="container">
       <div class="occasions-grid">
         <a href="/weddings/" class="occasion-card" style="background-image: url('/images/hackney-wedding-ceremony-kiss-industrial-backdrop.webp');">
@@ -99,7 +102,7 @@ import FinalCTA from '../components/FinalCTA.astro';
         </a>
       </div>
     </div>
-  </section>
+  </Section>
 
   <!-- ==================== FULL-BLEED PHOTO BREAK ==================== -->
   <PhotoBreak
@@ -108,55 +111,31 @@ import FinalCTA from '../components/FinalCTA.astro';
   />
 
   <!-- ==================== TESTIMONIALS ==================== -->
-  <section class="testimonials">
-    <div class="container">
-      <p class="eyebrow">What Couples Say</p>
-      <div class="testimonials-grid">
-        <div class="fade-in">
-          <p class="testimonial-quote">"The Hackney made our wedding feel completely effortless. The team thought of everything. We just showed up and it was perfect."</p>
-          <p class="testimonial-attribution">Sophie and James, October 2025</p>
-        </div>
-        <div class="fade-in">
-          <p class="testimonial-quote">"From the first tour we knew this was the one. The space is stunning and the food genuinely impressed our guests."</p>
-          <p class="testimonial-attribution">Priya and Tom, August 2025</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Section bg="olive" padding="standard">
+    <SectionHeader eyebrow="What Couples Say" heading="" align="center" />
+    <TestimonialBlock testimonials={[
+      { quote: "The Hackney made our wedding feel completely effortless. The team thought of everything. We just showed up and it was perfect.", attribution: "Sophie and James, October 2025" },
+      { quote: "From the first tour we knew this was the one. The space is stunning and the food genuinely impressed our guests.", attribution: "Priya and Tom, August 2025" }
+    ]} />
+  </Section>
 
   <!-- ==================== PRICING ==================== -->
-  <section class="pricing">
-    <div class="container">
-      <div class="pricing-header fade-in">
-        <p class="section-label">Investment</p>
-        <h2>Honest Pricing. No Hidden Fees.</h2>
-        <p>Most couples spend between £10,000 and £18,000 all in. Everything is in-house - what you see is what you pay.</p>
-      </div>
-      <div class="pricing-grid">
-        <div class="pricing-card fade-in">
-          <h3>Off-Peak</h3>
-          <p class="pricing-card-guests">Jan - Mar, any day</p>
-          <p class="pricing-card-price">From &pound;5,000</p>
-          <p class="pricing-card-desc">Exclusive hire + minimum spend</p>
-        </div>
-        <div class="pricing-card fade-in">
-          <h3>Mid-Season</h3>
-          <p class="pricing-card-guests">Apr, Oct - Dec</p>
-          <p class="pricing-card-price">From &pound;5,000</p>
-          <p class="pricing-card-desc">Exclusive hire + minimum spend</p>
-        </div>
-        <div class="pricing-card fade-in">
-          <h3>Peak Season</h3>
-          <p class="pricing-card-guests">May - Sep</p>
-          <p class="pricing-card-price">From &pound;7,000</p>
-          <p class="pricing-card-desc">Exclusive hire + minimum spend</p>
-        </div>
-      </div>
-      <div class="pricing-cta">
-        <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage" class="btn btn-primary">Check Your Date</a>
-      </div>
-    </div>
-  </section>
+  <Section bg="light" padding="standard">
+    <SectionHeader
+      eyebrow="Investment"
+      heading="Honest Pricing. No Hidden Fees."
+      subtext="Most couples spend between £10,000 and £18,000 all in. Everything is in-house - what you see is what you pay."
+      align="center"
+    />
+    <PricingTable
+      tiers={[
+        { name: "Off-Peak", period: "Jan - Mar, any day", price: "From £5,000", description: "Exclusive hire + minimum spend" },
+        { name: "Mid-Season", period: "Apr, Oct - Dec", price: "From £5,000", description: "Exclusive hire + minimum spend" },
+        { name: "Peak Season", period: "May - Sep", price: "From £7,000", description: "Exclusive hire + minimum spend" }
+      ]}
+      cta={{ label: "Check Your Date", href: "/check-your-date/", utm: "homepage" }}
+    />
+  </Section>
 
   <!-- ==================== DETAIL PHOTO STRIP ==================== -->
   <PhotoStrip images={[
@@ -166,35 +145,33 @@ import FinalCTA from '../components/FinalCTA.astro';
   ]} />
 
   <!-- ==================== THE TEAM ==================== -->
-  <section class="team">
-    <div class="container">
-      <div class="team-header fade-in">
-        <p class="section-label">The Team</p>
-        <h2>The People Who Make It Happen.</h2>
-        <p>Every wedding at The Hackney is run by the same team from your first tour to the moment you leave. No agency hand-offs. No strangers on your day.</p>
+  <Section bg="light" padding="standard" class="team-section">
+    <SectionHeader
+      eyebrow="The Team"
+      heading="The People Who Make It Happen."
+      subtext="Every wedding at The Hackney is run by the same team from your first tour to the moment you leave. No agency hand-offs. No strangers on your day."
+    />
+    <div class="team-grid">
+      <div class="team-card fade-in">
+        <div class="team-card-photo"></div>
+        <h3>Hugo Correia</h3>
+        <p class="team-card-role">General Manager</p>
+        <p>Your first point of contact. Hugo runs venue tours, answers every question, and makes sure everything is locked in before your day.</p>
       </div>
-      <div class="team-grid">
-        <div class="team-card fade-in">
-          <div class="team-card-photo"></div>
-          <h3>Hugo Correia</h3>
-          <p class="team-card-role">General Manager</p>
-          <p>Your first point of contact. Hugo runs venue tours, answers every question, and makes sure everything is locked in before your day.</p>
-        </div>
-        <div class="team-card fade-in">
-          <div class="team-card-photo"></div>
-          <h3>Eva</h3>
-          <p class="team-card-role">Events Manager</p>
-          <p>Eva coordinates every detail of your wedding day. She has delivered over 150 events at The Hackney and knows the venue better than anyone.</p>
-        </div>
-        <div class="team-card fade-in">
-          <div class="team-card-photo"></div>
-          <h3>The Kitchen</h3>
-          <p class="team-card-role">In-House Catering Team</p>
-          <p>Everything cooked on site. Seasonal menus, dietary flexibility, nothing outsourced.</p>
-        </div>
+      <div class="team-card fade-in">
+        <div class="team-card-photo"></div>
+        <h3>Eva</h3>
+        <p class="team-card-role">Events Manager</p>
+        <p>Eva coordinates every detail of your wedding day. She has delivered over 150 events at The Hackney and knows the venue better than anyone.</p>
+      </div>
+      <div class="team-card fade-in">
+        <div class="team-card-photo"></div>
+        <h3>The Kitchen</h3>
+        <p class="team-card-role">In-House Catering Team</p>
+        <p>Everything cooked on site. Seasonal menus, dietary flexibility, nothing outsourced.</p>
       </div>
     </div>
-  </section>
+  </Section>
 
   <!-- ==================== FINAL CTA ==================== -->
   <FinalCTA
@@ -207,91 +184,10 @@ import FinalCTA from '../components/FinalCTA.astro';
     utmCampaign="homepage"
   />
 
-  <!-- ==================== FOOTER ==================== -->
 </Base>
 
-<style is:global>
-  /* ==================== HERO ==================== */
-  .hero {
-    position: relative;
-    height: 100vh;
-    min-height: 600px;
-    display: flex;
-    align-items: center;
-    background: var(--forest-olive);
-    overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 1;
-  }
-
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background: var(--forest-olive) url('/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp') center center / cover no-repeat;
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 700px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .hero .container {
-    width: 100%;
-  }
-
-  .eyebrow {
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--dusty-coral);
-    margin-bottom: 24px;
-  }
-
-  .hero h1 {
-    color: #fff;
-    margin-bottom: 20px;
-  }
-
-  .hero-sub {
-    color: #fff;
-    font-size: 20px;
-    line-height: 1.5;
-    margin-bottom: 36px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-note {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
-    margin-top: 14px;
-  }
-
-  /* ==================== SOCIAL PROOF BAR ==================== */
-  /* ==================== VENUE INTRO ==================== */
-  .venue-intro {
-    padding: 140px 0;
-  }
-
-  .venue-intro-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-  }
-
+<style>
+  /* ==================== VENUE INTRO - pull quote ==================== */
   .pull-quote {
     font-family: var(--font-heading);
     font-size: clamp(28px, 3.5vw, 40px);
@@ -299,56 +195,41 @@ import FinalCTA from '../components/FinalCTA.astro';
     letter-spacing: 0.05em;
     line-height: 1.15;
     color: var(--brewery-dark);
-  }
-
-  .venue-intro-body p {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
   }
 
   .differentiators {
-    margin-top: 40px;
+    margin-top: 2.5rem;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 1.5rem;
   }
 
   .diff-item-label {
     font-family: var(--font-heading);
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--fired-brick);
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
   }
 
   .diff-item-text {
-    font-size: 16px;
+    font-size: 1rem;
     color: var(--brewery-dark);
     opacity: 0.85;
   }
 
-  .venue-intro-image {
-    margin-top: 48px;
-    aspect-ratio: 4/3;
-    background-size: cover;
-    background-position: center;
-    background-color: var(--forest-olive);
-  }
-
-  .venue-intro .btn {
-    margin-top: 40px;
-  }
-
-  /* ==================== FIVE OCCASIONS ==================== */
-  .occasions {
-    padding: 0 0 140px;
+  /* ==================== OCCASIONS GRID ==================== */
+  .occasions-section {
+    padding-bottom: var(--space-section);
   }
 
   .occasions-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
+    gap: 0.75rem;
   }
 
   .occasion-card {
@@ -358,12 +239,13 @@ import FinalCTA from '../components/FinalCTA.astro';
     cursor: pointer;
     display: flex;
     align-items: flex-end;
-    padding: 24px;
+    padding: 1.5rem;
     border-top: 3px solid transparent;
     transition: border-color 0.3s ease;
     background-size: cover;
     background-position: center;
     background-color: var(--brewery-dark);
+    text-decoration: none;
   }
 
   .occasion-card::before {
@@ -380,7 +262,8 @@ import FinalCTA from '../components/FinalCTA.astro';
   }
 
   .occasion-card:hover {
-    border-top-color: var(--fired-brick);
+    border-top-color: var(--dusty-coral);
+    color: inherit;
   }
 
   .occasion-card-content {
@@ -390,15 +273,15 @@ import FinalCTA from '../components/FinalCTA.astro';
 
   .occasion-card h3 {
     color: #fff;
-    font-size: 18px;
+    font-size: 1.125rem;
     letter-spacing: 0.1em;
   }
 
   .occasion-card-desc {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.5;
-    margin-top: 8px;
+    margin-top: 0.5rem;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
@@ -410,152 +293,21 @@ import FinalCTA from '../components/FinalCTA.astro';
     opacity: 1;
   }
 
-  /* ==================== TESTIMONIALS ==================== */
-  .testimonials {
-    background: var(--forest-olive);
-    padding: 120px 0;
-  }
-
-  .testimonials .eyebrow {
-    text-align: center;
-    margin-bottom: 48px;
-  }
-
-  .testimonials-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-  }
-
-  .testimonial-quote {
-    font-size: clamp(20px, 2.5vw, 26px);
-    color: #fff;
-    font-style: italic;
-    line-height: 1.5;
-    margin-bottom: 20px;
-  }
-
-  .testimonial-attribution {
-    font-family: var(--font-heading);
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--dusty-coral);
-  }
-
-  /* ==================== PRICING ==================== */
-  .pricing {
-    padding: 120px 0;
-  }
-
-  .pricing-header {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 60px;
-  }
-
-  .pricing-header .section-label {
-    font-family: var(--font-heading);
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--dusty-coral);
-    margin-bottom: 16px;
-  }
-
-  .pricing-header h2 {
-    margin-bottom: 20px;
-  }
-
-  .pricing-header p {
-    font-size: 18px;
-    opacity: 0.85;
-  }
-
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-bottom: 48px;
-  }
-
-  .pricing-card {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(44, 24, 16, 0.08);
-    padding: 40px 32px;
-    transition: box-shadow 0.3s ease;
-  }
-
-  .pricing-card:hover {
-    box-shadow: 0 8px 32px rgba(44, 24, 16, 0.08);
-  }
-
-  .pricing-card h3 {
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-
-  .pricing-card-guests {
-    font-size: 14px;
-    color: var(--dusty-coral);
-    margin-bottom: 20px;
-  }
-
-  .pricing-card-price {
-    font-family: var(--font-heading);
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--fired-brick);
-    margin-bottom: 20px;
-    letter-spacing: 0.02em;
-  }
-
-  .pricing-card-desc {
-    font-size: 15px;
-    line-height: 1.6;
-    opacity: 0.8;
-  }
-
-  .pricing-cta {
-    text-align: center;
-  }
-
   /* ==================== TEAM ==================== */
-  .team {
-    padding: 120px 0;
+  .team-section {
     border-top: 1px solid rgba(44, 24, 16, 0.06);
-  }
-
-  .team-header {
-    max-width: 600px;
-    margin-bottom: 60px;
-  }
-
-  .team-header .section-label {
-    font-family: var(--font-heading);
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--dusty-coral);
-    margin-bottom: 16px;
-  }
-
-  .team-header h2 {
-    margin-bottom: 20px;
   }
 
   .team-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 36px;
+    gap: 2.25rem;
   }
 
   .team-card-photo {
     aspect-ratio: 4/5;
     background: var(--forest-olive);
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
     position: relative;
     overflow: hidden;
   }
@@ -569,21 +321,21 @@ import FinalCTA from '../components/FinalCTA.astro';
   }
 
   .team-card h3 {
-    font-size: 18px;
-    margin-bottom: 2px;
+    font-size: 1.125rem;
+    margin-bottom: 0.125rem;
   }
 
   .team-card-role {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--dusty-coral);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 500;
-    margin-bottom: 12px;
+    margin-bottom: 0.75rem;
   }
 
   .team-card p {
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.6;
     opacity: 0.8;
   }
@@ -596,23 +348,6 @@ import FinalCTA from '../components/FinalCTA.astro';
   }
 
   @media (max-width: 768px) {
-    .hero-content {
-      padding: 0;
-    }
-
-    .hero h1 {
-      font-size: 36px;
-    }
-
-    .hero-sub {
-      font-size: 17px;
-    }
-
-    .venue-intro-grid {
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-
     .occasions-grid {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -621,34 +356,9 @@ import FinalCTA from '../components/FinalCTA.astro';
       grid-column: span 2;
     }
 
-    .testimonials-grid {
-      grid-template-columns: 1fr;
-      gap: 40px;
-    }
-
-    .venue-intro-image {
-      margin-top: 32px;
-    }
-
-    .pricing-grid {
-      grid-template-columns: 1fr;
-    }
-
     .team-grid {
       grid-template-columns: 1fr;
-      gap: 48px;
+      gap: 3rem;
     }
-
-  }
-
-  /* Section label shared style override */
-  .section-label {
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--dusty-coral);
-    margin-bottom: 16px;
   }
 </style>

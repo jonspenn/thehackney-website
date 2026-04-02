@@ -1,0 +1,59 @@
+---
+/**
+ * SectionHeader - Eyebrow + heading + optional subtext
+ *
+ * Consistent section header pattern used across all pages.
+ * Replaces the repeated eyebrow/h2/p pattern that was hand-coded on every page.
+ *
+ * Props:
+ *   eyebrow  - uppercase label above heading (e.g. "Weddings", "Investment")
+ *   heading  - the h2 text
+ *   subtext  - optional paragraph below heading
+ *   align    - 'center' or 'left' (default: 'left')
+ *   class    - additional classes
+ */
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  subtext?: string;
+  align?: 'center' | 'left';
+  class?: string;
+}
+
+const {
+  eyebrow,
+  heading,
+  subtext,
+  align = 'left',
+  class: className = ''
+} = Astro.props;
+---
+
+<div class:list={['section-header', `section-header-${align}`, className]}>
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <h2>{heading}</h2>
+  {subtext && <p class="section-header-sub">{subtext}</p>}
+</div>
+
+<style>
+  .section-header {
+    margin-bottom: 3rem;
+    max-width: 640px;
+  }
+
+  .section-header-center {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .section-header h2 {
+    margin-bottom: 1.25rem;
+  }
+
+  .section-header-sub {
+    font-size: 1.125rem;
+    line-height: 1.65;
+    opacity: 0.85;
+  }
+</style>

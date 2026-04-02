@@ -12,12 +12,18 @@
   --dusty-coral: #BF7256;
   --signal-green: #28A745;
 
+  /* Extended palette */
+  --mid-olive: #49590E;
+  --mahogany: #40160C;
+
   /* Semantic aliases */
   --color-bg: var(--warm-canvas);
   --color-text: var(--brewery-dark);
-  --color-accent: var(--fired-brick);
-  --color-accent-2: var(--dusty-coral);
-  --color-cta: var(--forest-olive);
+  --color-accent: var(--dusty-coral);
+  --color-cta-light: var(--forest-olive);   /* CTA on light backgrounds */
+  --color-cta-dark: var(--dusty-coral);     /* CTA on dark backgrounds */
+  --color-eyebrow: var(--dusty-coral);      /* Eyebrow labels */
+  --color-quote: var(--fired-brick);        /* Quote text, warm highlight */
   --color-success: var(--signal-green);
 
   /* Typography */
@@ -31,6 +37,10 @@
   --space-lg: 2rem;
   --space-xl: 4rem;
   --space-2xl: 6rem;
+
+  /* Section padding */
+  --space-section: 6rem;          /* 96px - standard sections */
+  --space-section-compact: 4rem;  /* 64px - proof bars, cross-sells, FAQs */
 
   /* Layout */
   --max-width: 1200px;
@@ -83,14 +93,14 @@ p {
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--forest-olive);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--color-accent-2);
+  color: var(--dusty-coral);
 }
 
 /* --- Utility classes --- */
@@ -117,20 +127,14 @@ a:hover {
   font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--color-accent);
-}
-
-.section-label {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-eyebrow);
   margin-bottom: var(--space-md);
 }
+
+/* Legacy alias - use .eyebrow instead */
+.section-label { }
 
 /* --- Buttons --- */
 .btn {
@@ -151,8 +155,9 @@ a:hover {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Primary CTA: Forest Olive on light backgrounds */
 .btn-primary {
-  background-color: var(--color-accent);
+  background-color: var(--color-cta-light);
   color: var(--warm-canvas);
 }
 
@@ -161,17 +166,18 @@ a:hover {
   color: var(--warm-canvas);
 }
 
-.btn-secondary {
-  background-color: transparent;
-  color: var(--color-text);
-  border: 1px solid var(--color-text);
-}
-
-.btn-secondary:hover {
-  background-color: var(--color-text);
+/* Primary CTA on dark backgrounds: Dusty Coral */
+.btn-primary-dark {
+  background-color: var(--color-cta-dark);
   color: var(--warm-canvas);
 }
 
+.btn-primary-dark:hover {
+  background-color: var(--warm-canvas);
+  color: var(--brewery-dark);
+}
+
+/* Outline on light backgrounds */
 .btn-outline {
   background-color: transparent;
   color: var(--color-text);
@@ -183,6 +189,30 @@ a:hover {
   color: var(--warm-canvas);
 }
 
+/* Outline on dark backgrounds */
+.btn-outline-dark {
+  background-color: transparent;
+  color: var(--warm-canvas);
+  border: 1px solid rgba(245, 240, 232, 0.4);
+}
+
+.btn-outline-dark:hover {
+  background-color: var(--warm-canvas);
+  color: var(--brewery-dark);
+}
+
+/* Legacy alias */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-text);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-text);
+  color: var(--warm-canvas);
+}
+
 .btn-nav {
   padding: 0.625rem 1.125rem;
   font-size: 0.75rem;
@@ -190,11 +220,11 @@ a:hover {
 
 /* --- Sections --- */
 .section {
-  padding-block: var(--space-xl);
+  padding-block: var(--space-section);
 }
 
-.section-lg {
-  padding-block: var(--space-2xl);
+.section-compact {
+  padding-block: var(--space-section-compact);
 }
 
 /* --- Images --- */

@@ -1,0 +1,84 @@
+---
+/**
+ * CrossSell - Link cards to other pages/sections
+ *
+ * Used at the bottom of pages to guide visitors to related content.
+ * "The venue is the constant. The occasion changes."
+ *
+ * Props:
+ *   cards - array of { title, description, href, image }
+ */
+
+interface Card {
+  title: string;
+  description: string;
+  href: string;
+  image: string;
+}
+
+interface Props {
+  cards: Card[];
+}
+
+const { cards } = Astro.props;
+---
+
+<div class="crosssell-grid" style={`--crosssell-cols: ${Math.min(cards.length, 4)}`}>
+  {cards.map((card) => (
+    <a href={card.href} class="crosssell-card">
+      <div class="crosssell-card-image" style={`background-image: url('${card.image}');`}></div>
+      <div class="crosssell-card-content">
+        <h3>{card.title}</h3>
+        <p>{card.description}</p>
+      </div>
+    </a>
+  ))}
+</div>
+
+<style>
+  .crosssell-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--crosssell-cols, 3), 1fr);
+    gap: 1.5rem;
+  }
+
+  .crosssell-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }
+
+  .crosssell-card:hover {
+    transform: translateY(-4px);
+    color: inherit;
+  }
+
+  .crosssell-card-image {
+    aspect-ratio: 3/2;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--forest-olive);
+    margin-bottom: 1.25rem;
+  }
+
+  .crosssell-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .crosssell-card p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .crosssell-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+</style>

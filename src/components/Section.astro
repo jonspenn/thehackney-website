@@ -1,0 +1,91 @@
+---
+/**
+ * Section - Universal wrapper component
+ *
+ * Standardises padding, background, and container width for all page sections.
+ * Every section on every page should use this wrapper.
+ *
+ * Props:
+ *   bg      - 'light' (Warm Canvas), 'dark' (Brewery Dark), 'olive' (Forest Olive), 'image' (for custom bg)
+ *   padding - 'standard' (96px), 'compact' (64px), 'none' (0)
+ *   id      - optional HTML id for anchor links
+ *   class   - additional classes passed through
+ *   full    - if true, content goes full-width (no container). Used for photo breaks, edge-to-edge grids
+ */
+
+interface Props {
+  bg?: 'light' | 'dark' | 'olive' | 'image';
+  padding?: 'standard' | 'compact' | 'none';
+  id?: string;
+  full?: boolean;
+  class?: string;
+}
+
+const {
+  bg = 'light',
+  padding = 'standard',
+  id,
+  full = false,
+  class: className = ''
+} = Astro.props;
+
+const paddingClass = padding === 'standard' ? 'section' : padding === 'compact' ? 'section-compact' : '';
+const bgClass = `section-bg-${bg}`;
+---
+
+<section
+  class:list={[paddingClass, bgClass, className]}
+  id={id}
+>
+  {full ? (
+    <slot />
+  ) : (
+    <div class="container">
+      <slot />
+    </div>
+  )}
+</section>
+
+<style>
+  .section-bg-light {
+    background-color: var(--warm-canvas);
+    color: var(--brewery-dark);
+  }
+
+  .section-bg-dark {
+    background-color: var(--brewery-dark);
+    color: var(--warm-canvas);
+  }
+
+  .section-bg-dark :global(h1),
+  .section-bg-dark :global(h2),
+  .section-bg-dark :global(h3),
+  .section-bg-dark :global(h4) {
+    color: var(--warm-canvas);
+  }
+
+  .section-bg-dark :global(.eyebrow) {
+    color: var(--dusty-coral);
+  }
+
+  .section-bg-olive {
+    background-color: var(--forest-olive);
+    color: var(--warm-canvas);
+  }
+
+  .section-bg-olive :global(h1),
+  .section-bg-olive :global(h2),
+  .section-bg-olive :global(h3),
+  .section-bg-olive :global(h4) {
+    color: var(--warm-canvas);
+  }
+
+  .section-bg-olive :global(.eyebrow) {
+    color: var(--dusty-coral);
+  }
+
+  .section-bg-image {
+    position: relative;
+    color: var(--warm-canvas);
+  }
+</style>
