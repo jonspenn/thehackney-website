@@ -39,8 +39,8 @@
   --space-2xl: 6rem;
 
   /* Section padding */
-  --space-section: 6rem;          /* 96px - standard sections */
-  --space-section-compact: 4rem;  /* 64px - proof bars, cross-sells, FAQs */
+  --space-section: 4.5rem;        /* 72px - standard sections */
+  --space-section-compact: 3rem;  /* 48px - proof bars, cross-sells, FAQs */
 
   /* Layout */
   --max-width: 1200px;
