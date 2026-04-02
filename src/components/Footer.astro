@@ -26,20 +26,18 @@ const currentYear = new Date().getFullYear();
       </div>
     </div>
 
-    <nav class="footer-nav">
-      <div class="footer-nav-col">
-        <a href="/weddings/">Weddings</a>
-        <a href="/private-events/">Private Events</a>
-        <a href="/corporate/">Corporate</a>
-        <a href="/supper-club/">Supper Club</a>
-        <a href="/cafe-bar/">Cafe & Bar</a>
-      </div>
-      <div class="footer-nav-col">
-        <a href="/about/">About</a>
-        <a href="/contact/">Contact</a>
-        <a href="/journal/">Journal</a>
-        <a href="/privacy/">Privacy Policy</a>
-      </div>
+    <nav class="footer-nav-col">
+      <a href="/weddings/">Weddings</a>
+      <a href="/private-events/">Private Events</a>
+      <a href="/corporate/">Corporate</a>
+      <a href="/supper-club/">Supper Club</a>
+      <a href="/cafe-bar/">Cafe & Bar</a>
+    </nav>
+    <nav class="footer-nav-col">
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/journal/">Journal</a>
+      <a href="/privacy/">Privacy Policy</a>
     </nav>
 
   </div>
@@ -60,7 +58,7 @@ const currentYear = new Date().getFullYear();
 
   .footer-inner {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 64px;
     align-items: start;
     padding-block: 56px 48px;
@@ -128,11 +126,6 @@ const currentYear = new Date().getFullYear();
   }
 
   /* ---- Nav columns ---- */
-  .footer-nav {
-    display: flex;
-    gap: 48px;
-  }
-
   .footer-nav-col {
     display: flex;
     flex-direction: column;
@@ -167,13 +160,13 @@ const currentYear = new Date().getFullYear();
   /* ---- Responsive ---- */
   @media (max-width: 768px) {
     .footer-inner {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 32px;
       padding-block: 40px 32px;
     }
 
-    .footer-nav {
-      gap: 32px;
+    .footer-brand {
+      grid-column: 1 / -1;
     }
 
     .footer-social {
