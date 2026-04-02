@@ -1,284 +1,388 @@
 ---
 import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
 ---
 
-<Base title="Contact The Hackney | Wedding & Events Venue, East London E2" description="Get in touch with The Hackney - a restored 1856 brewery venue on Hackney Road, East London. Two minutes from Cambridge Heath station. Call +44 20 7961 1604.">
+<Base
+  title="Contact The Hackney | Wedding & Events Venue, East London E2"
+  description="Get in touch with The Hackney - a restored 1856 brewery venue on Hackney Road, East London. Two minutes from Cambridge Heath station. Call +44 20 7961 1604."
+>
 
-<style is:global>
-  /* Hero Section */
-  .hero {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 4rem 1.5rem;
+<!-- Hero -->
+<Section bg="light" padding="standard">
+  <div class="contact-hero">
+    <span class="eyebrow">Contact us</span>
+    <h1>Get in touch</h1>
+    <p class="contact-hero-sub">Whether you have a question, want to discuss your event, or just want to say hello - we would love to hear from you.</p>
+  </div>
+</Section>
+
+<!-- Main Content: Form + Details -->
+<Section bg="light" padding="standard" border="top">
+  <div class="contact-grid">
+
+    <!-- Form Column -->
+    <div class="form-column">
+      <h2 class="form-heading">Send us a message</h2>
+      <p class="form-intro">Fill in the form below and we will get back to you as soon as we can.</p>
+
+      <!-- HubSpot form target -->
+      <div id="hubspot-contact-form"></div>
+
+      <!-- Placeholder form (shown when HubSpot hasn't loaded) -->
+      <form class="contact-form" id="placeholder-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first-name">First name</label>
+            <input type="text" id="first-name" name="first-name" required />
+          </div>
+          <div class="form-group">
+            <label for="last-name">Last name</label>
+            <input type="text" id="last-name" name="last-name" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone <span class="optional">(optional)</span></label>
+          <input type="tel" id="phone" name="phone" />
+        </div>
+        <div class="form-group">
+          <label for="event-type">What are you enquiring about?</label>
+          <select id="event-type" name="event-type">
+            <option value="" disabled selected>Select an option</option>
+            <option value="wedding">Wedding</option>
+            <option value="corporate">Corporate event</option>
+            <option value="private">Private celebration</option>
+            <option value="supper-club">Supper club</option>
+            <option value="cafe-bar">Cafe and bar</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Your message</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary form-submit">Send message</button>
+      </form>
+    </div>
+
+    <!-- Contact Details Column -->
+    <aside class="details-column">
+      <div class="detail-block">
+        <h3>Call or message</h3>
+        <div class="detail-content">
+          <p><a href="tel:+442079611604" class="detail-link">+44 20 7961 1604</a></p>
+          <p><a href="https://wa.me/442079611604" class="detail-link whatsapp-link">Chat on WhatsApp</a></p>
+          <p><a href="mailto:hello@thehackney.co" class="detail-link">hello@thehackney.co</a></p>
+        </div>
+      </div>
+
+      <div class="detail-block">
+        <h3>Visit us</h3>
+        <div class="detail-content">
+          <p><a href="https://www.google.com/maps/dir//The+Hackney,+503+Hackney+Road,+London+E2+9ED,+United+Kingdom/@51.5325459,-0.0584213,17z/" target="_blank" rel="noopener" class="detail-link">503 Hackney Road<br>London E2 9ED</a></p>
+        </div>
+      </div>
+
+      <div class="detail-block">
+        <h3>Getting here</h3>
+        <div class="detail-content">
+          <p>Two minutes walk from Cambridge Heath station (London Overground). Bethnal Green tube (Central line) is a 10-minute walk.</p>
+          <p>Bus routes 106, 254, D6 stop outside.</p>
+        </div>
+      </div>
+
+      <div class="detail-block">
+        <h3>Opening hours</h3>
+        <div class="detail-content">
+          <p><strong>Cafe and bar</strong><br>Tuesday 8am - 4pm<br>Wednesday to Friday 8am - 5pm<br>Saturday 9am - 5pm<br>Sunday 9am - 4pm<br>Closed Mondays</p>
+          <p><strong>Events</strong><br>7 days by appointment</p>
+        </div>
+      </div>
+
+      <!-- Map link -->
+      <a href="https://www.google.com/maps/dir//The+Hackney,+503+Hackney+Road,+London+E2+9ED,+United+Kingdom/@51.5325459,-0.0584213,17z/" target="_blank" rel="noopener" class="map-block">
+        <span class="map-label">Get directions on Google Maps</span>
+      </a>
+    </aside>
+
+  </div>
+</Section>
+
+<script>
+  // Hide placeholder form when HubSpot loads successfully
+  function initHubSpotForm() {
+    if (typeof hbspt !== 'undefined') {
+      hbspt.forms.create({
+        region: 'eu1',
+        portalId: '25870094',
+        formId: '6966c5ba-2f16-4229-ab5b-7fe24774fad6',
+        target: '#hubspot-contact-form',
+        onFormReady: function() {
+          var placeholder = document.getElementById('placeholder-form');
+          if (placeholder) placeholder.style.display = 'none';
+        }
+      });
+    }
+  }
+
+  // Try immediately, and also after a short delay for script loading
+  if (document.readyState === 'complete') {
+    initHubSpotForm();
+  } else {
+    window.addEventListener('load', initHubSpotForm);
+  }
+</script>
+
+</Base>
+
+<style>
+  /* === Hero === */
+  .contact-hero {
     text-align: center;
-  }
-
-  .hero-content {
-    max-width: 700px;
+    max-width: 640px;
     margin: 0 auto;
+    padding: 2rem 0 0;
   }
 
-  .hero h1 {
-    margin-bottom: 1.5rem;
+  .contact-hero h1 {
+    margin-bottom: 1rem;
   }
 
-  .hero p {
-    font-size: 18px;
+  .contact-hero-sub {
+    font-size: 1.125rem;
     line-height: 1.65;
-    margin-bottom: 2rem;
+    opacity: 0.8;
+    max-width: none;
   }
 
-  @media (max-width: 768px) {
-    .hero {
-      padding: 3rem 1.5rem;
-    }
-
-    .hero h1 {
-      margin-bottom: 1rem;
-    }
-
-    .hero p {
-      font-size: 16px;
-    }
-  }
-
-  /* Main Content */
-  .main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 1.5rem 4rem;
-  }
-
-  .content-grid {
+  /* === Grid === */
+  .contact-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.2fr 0.8fr;
     gap: 4rem;
     align-items: start;
   }
 
-  @media (max-width: 1200px) {
-    .content-grid {
-      gap: 3rem;
-    }
+  /* === Form Column === */
+  .form-heading {
+    font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+    margin-bottom: 0.5rem;
   }
 
-  @media (max-width: 768px) {
-    .content-grid {
-      grid-template-columns: 1fr;
-      gap: 3rem;
-    }
-  }
-
-  /* HubSpot Form */
-  .form-container {
-    background-color: var(--warm-canvas);
-  }
-
-  #hubspot-contact-form {
+  .form-intro {
+    font-size: 1rem;
+    line-height: 1.65;
+    opacity: 0.7;
     margin-bottom: 2rem;
   }
 
-  /* HubSpot form styling overrides */
-  .hbspt-form {
+  /* Placeholder form styling */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .form-group label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--brewery-dark);
+    letter-spacing: 0.01em;
+  }
+
+  .form-group .optional {
+    font-weight: 400;
+    opacity: 0.5;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    padding: 0.75rem;
+    border: 1px solid rgba(44, 24, 16, 0.15);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--brewery-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--fired-brick);
+    box-shadow: 0 0 0 3px rgba(140, 71, 46, 0.08);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%232C1810' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+  }
+
+  .form-submit {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  /* HubSpot form overrides (when it loads) */
+  #hubspot-contact-form :global(.hbspt-form) {
     font-family: var(--font-body) !important;
   }
 
-  .hbspt-form input,
-  .hbspt-form textarea,
-  .hbspt-form select {
+  #hubspot-contact-form :global(input),
+  #hubspot-contact-form :global(textarea),
+  #hubspot-contact-form :global(select) {
     font-family: var(--font-body) !important;
-    font-size: 16px !important;
+    font-size: 1rem !important;
     border-radius: 4px !important;
-    border: 1px solid #e0dbd0 !important;
-    padding: 12px !important;
+    border: 1px solid rgba(44, 24, 16, 0.15) !important;
+    padding: 0.75rem !important;
+    background: rgba(255, 255, 255, 0.5) !important;
   }
 
-  .hbspt-form input:focus,
-  .hbspt-form textarea:focus,
-  .hbspt-form select:focus {
+  #hubspot-contact-form :global(input:focus),
+  #hubspot-contact-form :global(textarea:focus),
+  #hubspot-contact-form :global(select:focus) {
     outline: none !important;
     border-color: var(--fired-brick) !important;
-    box-shadow: 0 0 0 3px rgba(140, 71, 46, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(140, 71, 46, 0.08) !important;
   }
 
-  .hbspt-form .hs-button {
-    background-color: var(--fired-brick) !important;
+  #hubspot-contact-form :global(.hs-button) {
+    background-color: var(--forest-olive) !important;
     color: var(--warm-canvas) !important;
     font-family: var(--font-body) !important;
-    font-size: 13px !important;
+    font-size: 0.8125rem !important;
     font-weight: 500 !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
-    padding: 12px 24px !important;
+    padding: 0.75rem 1.5rem !important;
     border: none !important;
     border-radius: 4px !important;
     cursor: pointer !important;
     transition: background-color 0.3s ease !important;
   }
 
-  .hbspt-form .hs-button:hover {
+  #hubspot-contact-form :global(.hs-button:hover) {
     background-color: var(--brewery-dark) !important;
   }
 
-  /* Contact Details */
-  .contact-details {
+  /* === Details Column === */
+  .details-column {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 2rem;
+    padding: 2rem;
+    background: rgba(44, 24, 16, 0.03);
+    border-radius: 4px;
   }
 
-  .contact-section h3 {
-    margin-bottom: 1rem;
-    font-size: clamp(18px, 2vw, 24px);
+  .detail-block h3 {
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    margin-bottom: 0.5rem;
   }
 
-  .contact-info {
+  .detail-content {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
-  .contact-info a {
-    color: var(--fired-brick);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-
-  .contact-info a:hover {
-    color: var(--brewery-dark);
-  }
-
-  .contact-info p {
+  .detail-content p {
+    font-size: 0.9375rem;
     line-height: 1.65;
   }
 
-  .map-link {
-    display: block;
-    width: 100%;
-    margin-top: 2rem;
+  .detail-link {
+    color: var(--fired-brick);
     text-decoration: none;
+    transition: color 0.2s ease;
   }
 
-  .map-placeholder {
-    width: 100%;
-    aspect-ratio: 4/3;
-    background: var(--brewery-dark);
-    border-radius: 4px;
+  .detail-link:hover {
+    color: var(--brewery-dark);
+  }
+
+  .whatsapp-link {
+    color: var(--forest-olive);
+  }
+
+  .whatsapp-link:hover {
+    color: var(--brewery-dark);
+  }
+
+  /* Map block */
+  .map-block {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 14px;
+    padding: 1.5rem;
+    background: var(--brewery-dark);
+    border-radius: 4px;
     text-decoration: none;
+    transition: opacity 0.2s ease;
   }
 
-  @media (max-width: 768px) {
-    .contact-details {
-      gap: 2rem;
+  .map-block:hover {
+    opacity: 0.9;
+  }
+
+  .map-label {
+    color: var(--warm-canvas);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* === Responsive === */
+  @media (max-width: 900px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
     }
 
-    .map-container {
-      height: 300px;
+    .details-column {
+      order: -1;
     }
   }
 
-  /* Animations */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
+  @media (max-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 
-  .hero, .content-grid {
-    animation: fadeIn 0.6s ease-out forwards;
-  }
-
-  .contact-section {
-    animation: fadeIn 0.6s ease-out forwards;
-    animation-delay: 0.1s;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero, .content-grid, .contact-section {
-      animation: none;
+    .contact-hero {
+      padding: 1rem 0 0;
     }
   }
 </style>
-
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-content">
-    <span class="eyebrow">Contact Us</span>
-    <h1>Get in touch</h1>
-    <p>Whether you have a question, want to discuss your event, or just want to say hello - we would love to hear from you.</p>
-  </div>
-</section>
-
-<!-- Main Content -->
-<div class="content-grid">
-      <!-- HubSpot Form Column -->
-      <div class="form-container">
-        <div id="hubspot-contact-form"></div>
-      </div>
-
-      <!-- Contact Details Column -->
-      <aside class="contact-details">
-        <!-- Address Section -->
-        <div class="contact-section">
-          <h3>Visit us</h3>
-          <div class="contact-info">
-            <p>503 Hackney Road<br>London E2 9ED<br>United Kingdom</p>
-          </div>
-        </div>
-
-        <!-- Contact Section -->
-        <div class="contact-section">
-          <h3>Get in touch</h3>
-          <div class="contact-info">
-            <p><strong>Phone:</strong><br><a href="tel:+442079611604">+44 20 7961 1604</a></p>
-            <p><strong>Email:</strong><br><a href="mailto:hello@thehackney.co">hello@thehackney.co</a></p>
-          </div>
-        </div>
-
-        <!-- Hours Section -->
-        <div class="contact-section">
-          <h3>Opening hours</h3>
-          <div class="contact-info">
-            <p><strong>Cafe &amp; Bar</strong><br>Tuesday 8am - 4pm, Wednesday to Friday 8am - 5pm, Saturday 9am - 5pm, Sunday 9am - 4pm (closed Mondays)</p>
-            <p><strong>Events</strong><br>7 days by appointment</p>
-          </div>
-        </div>
-
-        <!-- Getting Here Section -->
-        <div class="contact-section">
-          <h3>Getting here</h3>
-          <div class="contact-info">
-            <p>Two minutes walk from Cambridge Heath station (London Overground). Bethnal Green tube (Central line) is a 10-minute walk. Bus routes 106, 254, D6 stop outside.</p>
-          </div>
-        </div>
-
-        <!-- Map -->
-        <a href="https://maps.app.goo.gl/RwT31Y6tmXPzyqGQ9" target="_blank" rel="noopener" class="map-link">
-          <div class="map-placeholder">View on Google Maps</div>
-        </a>
-      </aside>
-    </div>
-
-<script>
-  // Initialize HubSpot form when page loads
-  if (typeof hbspt !== 'undefined') {
-    hbspt.forms.create({
-      region: 'eu1',
-      portalId: '25870094',
-      formId: '6966c5ba-2f16-4229-ab5b-7fe24774fad6',
-      target: '#hubspot-contact-form'
-    });
-  }
-</script>
-
-</Base>
