@@ -90,6 +90,7 @@ h4 { font-size: 1.125rem; }
 
 p {
   max-width: 65ch;
+  margin-top: 0;
   margin-bottom: var(--space-md);
 }
 
