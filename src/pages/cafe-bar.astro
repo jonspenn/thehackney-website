@@ -1,335 +1,184 @@
 ---
 import Base from '../layouts/Base.astro';
+import HeroSection from '../components/HeroSection.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FAQ from '../components/FAQ.astro';
+
+const cafeFaqs = [
+  { question: "Is The Hackney cafe-bar dog friendly?", answer: "Yes. Dogs are welcome inside and on the terrace." },
+  { question: "Do I need to book a table?", answer: "No. The cafe-bar is walk-in only. Just turn up." },
+  { question: "What are the opening hours?", answer: "We are open Tuesday to Sunday (closed Mondays). Weekdays from 8am, weekends from 9am. Hours may change when the venue hosts a private event, so check Google Maps for today's live hours." },
+  { question: "Is this the same place as Hackney Coffee Company?", answer: "Yes. We started as the Hackney Coffee Company and rebranded to The Hackney. Same building, same coffee, same team." },
+  { question: "Can I work from the cafe?", answer: "Yes. We have free wifi, plug sockets, and plenty of space during the day. Lots of freelancers and remote workers use us as a regular spot." },
+  { question: "Where exactly is The Hackney cafe-bar?", answer: "503 Hackney Road, London E2 9ED. Two minutes walk from Cambridge Heath Overground, eight minutes from Bethnal Green Underground on the Central line." }
+];
 ---
 
 <Base title="Cafe & Bar East London | Speciality Coffee & Light Bites | The Hackney, Hackney Road E2" description="Dog-friendly cafe-bar inside a restored 1856 brewery on Hackney Road, East London. Speciality coffee, craft cocktails, natural wines. Two minutes from Cambridge Heath station. Walk-ins welcome.">
-<!-- ==================== NAVIGATION ==================== -->
-  
 
-  <!-- ==================== SECTION 1: HERO ==================== -->
-  <section class="hero">
-    <div class="hero-bg" role="img" aria-label="The Hackney cafe-bar interior with exposed brick and natural light"></div>
-    <div class="container">
-      <div class="hero-content">
-        <div class="eyebrow">Cafe & Bar - Hackney Road, East London E2</div>
-        <h1>Speciality Coffee In A Restored 1856 Brewery.</h1>
-        <p class="hero-sub">A dog-friendly cafe with high ceilings, skylights and hanging greenery - two minutes from Cambridge Heath station.</p>
-        <a href="#menu" class="btn btn-primary">See The Menu</a>
+  <!-- ==================== HERO ==================== -->
+  <HeroSection
+    image="/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp"
+    alt="The Hackney cafe-bar interior with exposed brick and natural light"
+    eyebrow="Cafe & Bar - Hackney Road, East London E2"
+    heading="Speciality Coffee In A Restored 1856 Brewery."
+    subtext="A dog-friendly cafe with high ceilings, skylights and hanging greenery - two minutes from Cambridge Heath station."
+    cta={{ label: "See The Menu", href: "#menu" }}
+    height="mid"
+  />
+
+  <!-- ==================== THE SPACE ==================== -->
+  <Section bg="light" border="bottom">
+    <div class="space-grid">
+      <div class="space-text">
+        <SectionHeader
+          eyebrow="The Space"
+          heading="A Proper Cafe-Bar In East London"
+        />
+        <p>We are at 503 Hackney Road, London E2 9ED, right between Bethnal Green and Cambridge Heath. The building is a former Victorian brewery with high ceilings, exposed brick, a skylit winter garden and a covered courtyard terrace.</p>
+        <p>It is a nice place to sit with a laptop, meet someone for coffee, or come for drinks after work. Free wifi, plenty of plug sockets, and a good atmosphere all day.</p>
+        <p>Dogs are welcome. You do not need to book. Just walk in.</p>
+        <p class="history-note">Some of you might remember us as the Hackney Coffee Company. We started as a speciality coffee house, and good coffee is still at the heart of what we do. The space has grown since then, but the coffee has not changed.</p>
+      </div>
+      <div class="space-images">
+        <div class="space-placeholder lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The Hackney winter garden with natural light and greenery"></div>
+        <div class="space-placeholder lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The Hackney bar area with exposed brick"></div>
       </div>
     </div>
-  </section>
+  </Section>
 
-  <!-- ==================== SECTION 2: THE SPACE ==================== -->
-  <section class="the-space fade-in">
-    <div class="container">
-      <div class="the-space-inner">
-        <div class="the-space-text">
-          <div class="section-label">The Space</div>
-          <h2>A Proper Cafe-Bar In East London</h2>
-          <p>We are at 503 Hackney Road, London E2 9ED, right between Bethnal Green and Cambridge Heath. The building is a former Victorian brewery with high ceilings, exposed brick, a skylit winter garden and a covered courtyard terrace.</p>
-          <p>It is a nice place to sit with a laptop, meet someone for coffee, or come for drinks after work. Free wifi, plenty of plug sockets, and a good atmosphere all day.</p>
-          <p>Dogs are welcome. You do not need to book. Just walk in.</p>
-          <p class="history-note">Some of you might remember us as the Hackney Coffee Company. We started as a speciality coffee house, and good coffee is still at the heart of what we do. The space has grown since then, but the coffee has not changed.</p>
-        </div>
-        <div class="the-space-images">
-          <div class="space-placeholder lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The Hackney winter garden with natural light and greenery"></div>
-          <div class="space-placeholder lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The Hackney bar area with exposed brick"></div>
-        </div>
+  <!-- ==================== WHAT WE SERVE ==================== -->
+  <Section bg="light" border="bottom" id="menu">
+    <SectionHeader
+      eyebrow="The Menu"
+      heading="What We Serve"
+    />
+    <div class="serve-grid">
+      <div class="serve-category">
+        <h3>Coffee and Drinks</h3>
+        <p>Speciality coffee made properly. Espresso, flat whites, long blacks, oat milk as standard. We also do teas, fresh juices and soft drinks.</p>
+        <p>We also serve natural wines by the glass, beers on tap and soft drinks. For cocktails and evening dining, check out our <a href="/supper-club/">Supper Club</a> nights.</p>
+        <p class="serve-highlight">We make a good Negroni.</p>
+      </div>
+      <div class="serve-category">
+        <h3>Food</h3>
+        <p>Light bites through the day. Pastries in the morning, seasonal snacks and bar food as the day goes on.</p>
+        <p>Nothing complicated, just well-made food to go with your drink.</p>
+        <p>Our in-house kitchen is led by Chef Marco Mannoni. Seasonal menus, locally sourced ingredients, modern European cooking.</p>
       </div>
     </div>
-  </section>
+    <a href="/private-events/" class="btn btn-outline-dark">Explore Events</a>
+  </Section>
 
-  <!-- ==================== SECTION 3: WHAT WE SERVE ==================== -->
-  <section class="serve fade-in" id="menu">
-    <div class="container">
-      <div class="serve-header">
-        <div class="section-label">The Menu</div>
-        <h2>What We Serve</h2>
+  <!-- ==================== OPENING HOURS ==================== -->
+  <Section bg="dark" padding="standard">
+    <div class="hours-inner">
+      <SectionHeader
+        eyebrow="Opening Hours"
+        heading="Opening Hours"
+        align="center"
+      />
+
+      <div class="hours-table">
+        <div class="hours-row"><span>Monday</span><span>Closed</span></div>
+        <div class="hours-row"><span>Tuesday</span><span>8am - 4pm</span></div>
+        <div class="hours-row"><span>Wednesday</span><span>8am - 5pm</span></div>
+        <div class="hours-row"><span>Thursday</span><span>8am - 5pm</span></div>
+        <div class="hours-row"><span>Friday</span><span>8am - 5pm</span></div>
+        <div class="hours-row"><span>Saturday</span><span>9am - 5pm</span></div>
+        <div class="hours-row"><span>Sunday</span><span>9am - 4pm</span></div>
       </div>
 
-      <div class="serve-grid">
-        <div class="serve-category">
-          <h3>Coffee & Drinks</h3>
-          <p>Speciality coffee made properly. Espresso, flat whites, long blacks, oat milk as standard. We also do teas, fresh juices and soft drinks.</p>
-          <p>We also serve natural wines by the glass, beers on tap and soft drinks. For cocktails and evening dining, check out our <a href="/supper-club/" style="color:var(--fired-brick);text-decoration:underline;">Supper Club</a> nights.</p>
-          <p class="serve-highlight">We make a good Negroni.</p>
-        </div>
-        <div class="serve-category">
-          <h3>Food</h3>
-          <p>Light bites through the day. Pastries in the morning, seasonal snacks and bar food as the day goes on.</p>
-          <p>Nothing complicated, just well-made food to go with your drink.</p>
-          <p>Our in-house kitchen is led by Chef Marco Mannoni. Seasonal menus, locally sourced ingredients, modern European cooking.</p>
-        </div>
-      </div>
+      <p class="hours-note">On days when the venue is booked for a private event, the cafe-bar may close earlier than usual. Check Google Maps for today's live hours before heading over.</p>
 
-      <a href="/private-events/" class="btn btn-outline-dark">Explore Events</a>
+      <a href="https://maps.app.goo.gl/RwT31Y6tmXPzyqGQ9" target="_blank" rel="noopener" class="btn btn-primary-dark">Check Today's Hours on Google</a>
     </div>
-  </section>
+  </Section>
 
-  <!-- ==================== SECTION 4: OPENING HOURS ==================== -->
-  <section class="hours fade-in">
-    <div class="container">
-      <div class="hours-inner">
-        <div class="section-label" style="color:var(--dusty-coral);">Opening Hours</div>
-        <h2>Opening Hours</h2>
+  <!-- ==================== FIND US ==================== -->
+  <Section bg="light" border="top">
+    <div class="find-us-grid">
+      <div class="find-us-details">
+        <SectionHeader
+          eyebrow="Location"
+          heading="Find Us"
+        />
+        <div class="find-us-address">503 Hackney Road<br>London, E2 9ED</div>
 
-        <div class="hours-table">
-          <div class="hours-row"><span>Monday</span><span>Closed</span></div>
-          <div class="hours-row"><span>Tuesday</span><span>8 am – 4 pm</span></div>
-          <div class="hours-row"><span>Wednesday</span><span>8 am – 5 pm</span></div>
-          <div class="hours-row"><span>Thursday</span><span>8 am – 5 pm</span></div>
-          <div class="hours-row"><span>Friday</span><span>8 am – 5 pm</span></div>
-          <div class="hours-row"><span>Saturday</span><span>9 am – 5 pm</span></div>
-          <div class="hours-row"><span>Sunday</span><span>9 am – 4 pm</span></div>
-        </div>
+        <ul class="transport-list">
+          <li>Cambridge Heath Overground - 2 minute walk</li>
+          <li>Bethnal Green Underground (Central line) - 8 minute walk</li>
+          <li>Bus routes 106, 254 and D6 stop directly outside</li>
+        </ul>
 
-        <div class="hours-note">
-          <p>On days when the venue is booked for a private event, the cafe-bar may close earlier than usual. Check Google Maps for today's live hours before heading over.</p>
-        </div>
+        <p class="parking-note">No customer parking on site, but Hackney Road has free parking from 7pm onwards.</p>
 
-        <a href="https://maps.app.goo.gl/RwT31Y6tmXPzyqGQ9" target="_blank" rel="noopener" class="btn btn-outline">Check Today's Hours on Google</a>
+        <a href="https://maps.app.goo.gl/RwT31Y6tmXPzyqGQ9" target="_blank" rel="noopener" class="btn btn-primary">Get Directions</a>
       </div>
-    </div>
-  </section>
-
-  <!-- ==================== SECTION 5: FIND US ==================== -->
-  <section class="find-us fade-in">
-    <div class="container">
-      <div class="find-us-inner">
-        <div class="find-us-details">
-          <div class="section-label">Location</div>
-          <h2>Find Us</h2>
-          <div class="find-us-address">503 Hackney Road<br>London, E2 9ED</div>
-
-          <ul class="transport-list">
-            <li>Cambridge Heath Overground - 2 minute walk</li>
-            <li>Bethnal Green Underground (Central line) - 8 minute walk</li>
-            <li>Bus routes 106, 254 and D6 stop directly outside</li>
-          </ul>
-
-          <p class="parking-note">No customer parking on site, but Hackney Road has free parking from 7pm onwards.</p>
-
-          <a href="https://maps.app.goo.gl/RwT31Y6tmXPzyqGQ9" target="_blank" rel="noopener" class="btn btn-primary">Get Directions</a>
-        </div>
-        <div class="find-us-map">
-          <span class="map-placeholder-text">Map - coming soon</span>
-        </div>
+      <div class="find-us-map">
+        <span class="map-placeholder-text">Map - coming soon</span>
       </div>
     </div>
-  </section>
+  </Section>
 
-  <!-- ==================== SECTION 6: FAQs ==================== -->
-  <section class="faqs fade-in">
-    <div class="container">
-      <div class="faqs-header">
-        <div class="section-label">FAQs</div>
-        <h2>Frequently Asked Questions</h2>
-      </div>
+  <!-- ==================== FAQs ==================== -->
+  <Section bg="light" border="top">
+    <SectionHeader
+      eyebrow="FAQs"
+      heading="Frequently Asked Questions"
+    />
+    <FAQ items={cafeFaqs} />
+  </Section>
 
-      <div class="faq-list">
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Is The Hackney cafe-bar dog friendly?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">Yes. Dogs are welcome inside and on the terrace.</div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Do I need to book a table?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">No. The cafe-bar is walk-in only. Just turn up.</div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>What are the opening hours?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">We're open Tuesday to Sunday (closed Mondays). Weekdays from 8am, weekends from 9am. Hours may change when the venue hosts a private event, so check Google Maps for today's live hours.</div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Is this the same place as Hackney Coffee Company?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">Yes. We started as the Hackney Coffee Company and rebranded to The Hackney. Same building, same coffee, same team.</div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Can I work from the cafe?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">Yes. We have free wifi, plug sockets, and plenty of space during the day. Lots of freelancers and remote workers use us as a regular spot.</div>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Where exactly is The Hackney cafe-bar?</span>
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">503 Hackney Road, London E2 9ED. Two minutes walk from Cambridge Heath Overground, eight minutes from Bethnal Green Underground on the Central line.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== SECTION 7: CROSS-SELL ==================== -->
-  <section class="cross-sell">
-    <div class="container">
-      <div class="section-label">More Than A Cafe</div>
+  <!-- ==================== CROSS-SELL ==================== -->
+  <Section bg="olive" padding="standard">
+    <div class="cross-sell-inner">
+      <p class="eyebrow">More Than A Cafe</p>
       <h2>Planning Something Special?</h2>
       <p class="cross-sell-body">From intimate weddings to private parties, The Hackney hosts it all. Same building, same team, same attention to detail.</p>
       <div class="cross-sell-buttons">
-        <a href="/weddings/" class="btn btn-primary">Explore Weddings</a>
-        <a href="/private-events/" class="btn btn-outline">Explore Events</a>
+        <a href="/weddings/" class="btn btn-primary-dark">Explore Weddings</a>
+        <a href="/private-events/" class="btn btn-outline-dark">Explore Events</a>
       </div>
     </div>
-  </section>
+  </Section>
 
-  <!-- ==================== FOOTER ==================== -->
-  
-
-  <!-- ==================== JAVASCRIPT ==================== -->
-
-<style is:global>
-    /* ==================== PAGE-SPECIFIC STYLES ==================== */
-    .hero {
-      position: relative;
-      height: 70vh;
-      min-height: 500px;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background: var(--brewery-dark);
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      z-index: 1;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 700px;
-      margin-inline: auto;
-      text-align: center;
-    }
-
-    .hero .container { width: 100%; }
-
-    .eyebrow {
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--dusty-coral);
-      margin-bottom: 24px;
-    }
-
-    .hero h1 {
-      color: #fff;
-      margin-bottom: 20px;
-    }
-
-    .hero-sub {
-      color: #fff;
-      font-size: 20px;
-      line-height: 1.5;
-      margin-bottom: 36px;
-      max-width: 560px;
-      margin-inline: auto;
-    }
-
+  <style>
     /* ==================== THE SPACE ==================== */
-    .the-space {
-      padding: 100px 0;
-    }
-
-    .the-space-inner {
+    .space-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 60px;
       align-items: start;
     }
 
-    .the-space-text h2 {
-      margin-bottom: 24px;
-    }
-
-    .the-space-text p {
+    .space-text p {
       font-size: 17px;
       line-height: 1.7;
       margin-bottom: 16px;
     }
 
-    .the-space-text p:last-of-type {
-      margin-bottom: 0;
-    }
-
-    .the-space-images {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .space-placeholder {
-      aspect-ratio: 4/3;
-      background: #3D2117;
-    }
-
-    .space-placeholder:nth-child(2) { background: #4A3228; }
-
     .history-note {
-      font-family: var(--font-heading);
-      font-size: 18px;
       font-style: italic;
-      color: var(--brewery-dark);
       opacity: 0.75;
       margin-top: 24px;
     }
 
-    /* ==================== WHAT WE SERVE ==================== */
-    .serve {
-      padding: 100px 0;
-      border-top: 1px solid rgba(44,24,16,0.06);
+    .space-images {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .serve-header {
-      max-width: 600px;
-      margin-bottom: 48px;
+    .space-placeholder {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background-color: var(--brewery-dark);
+      border: 1px solid rgba(44, 24, 16, 0.08);
     }
 
-    .serve-header h2 {
-      margin-bottom: 16px;
-    }
-
+    /* ==================== SERVE ==================== */
     .serve-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -338,10 +187,8 @@ import Base from '../layouts/Base.astro';
     }
 
     .serve-category h3 {
-      font-size: 22px;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid var(--fired-brick);
+      font-size: 20px;
+      margin-bottom: 16px;
     }
 
     .serve-category p {
@@ -350,237 +197,122 @@ import Base from '../layouts/Base.astro';
       margin-bottom: 12px;
     }
 
+    .serve-category a {
+      color: var(--forest-olive);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
     .serve-highlight {
       font-family: var(--font-heading);
-      font-size: 18px;
+      font-size: 20px;
       font-style: italic;
-      color: var(--brewery-dark);
-      opacity: 0.8;
+      color: var(--fired-brick);
+      margin-top: 16px;
     }
 
-    /* ==================== OPENING HOURS ==================== */
-    .hours {
-      padding: 80px 0;
-      background: var(--brewery-dark);
-    }
-
+    /* ==================== HOURS ==================== */
     .hours-inner {
-      max-width: 700px;
-    }
-
-    .hours h2 {
-      color: #fff;
-      margin-bottom: 24px;
-    }
-
-    .hours p {
-      color: rgba(255,255,255,0.7);
-      font-size: 18px;
-      line-height: 1.7;
-      margin-bottom: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: center;
     }
 
     .hours-table {
-      max-width: 360px;
-      margin-bottom: 28px;
+      margin: 2rem 0;
     }
 
     .hours-row {
       display: flex;
       justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.8);
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(245, 240, 232, 0.1);
       font-size: 16px;
-    }
-
-    .hours-row span:first-child {
-      font-family: var(--font-heading);
-      font-weight: 600;
-      color: #fff;
+      color: var(--warm-canvas);
     }
 
     .hours-note {
-      background: rgba(255,255,255,0.06);
-      padding: 24px 28px;
-      border-left: 4px solid var(--fired-brick);
-      margin-top: 28px;
-      margin-bottom: 28px;
-    }
-
-    .hours-note p {
-      font-size: 16px;
-      margin-bottom: 0;
-    }
-
-    .hours .btn-outline {
-      margin-top: 8px;
+      font-size: 14px;
+      opacity: 0.6;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      color: var(--warm-canvas);
     }
 
     /* ==================== FIND US ==================== */
-    .find-us {
-      padding: 100px 0;
-    }
-
-    .find-us-inner {
+    .find-us-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 60px;
       align-items: start;
     }
 
-    .find-us-details h2 {
-      margin-bottom: 24px;
-    }
-
     .find-us-address {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 28px;
-      line-height: 1.5;
+      font-family: var(--font-heading);
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 24px;
     }
 
     .transport-list {
       list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 28px;
+      margin-bottom: 16px;
     }
 
     .transport-list li {
-      font-size: 16px;
+      padding: 8px 0;
       padding-left: 20px;
       position: relative;
+      font-size: 15px;
+      line-height: 1.5;
     }
 
     .transport-list li::before {
       content: '';
       position: absolute;
       left: 0;
-      top: 9px;
+      top: 14px;
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--fired-brick);
+      background: var(--dusty-coral);
     }
 
     .parking-note {
-      font-size: 15px;
-      opacity: 0.7;
-      margin-bottom: 28px;
+      font-size: 14px;
+      opacity: 0.6;
+      margin-bottom: 24px;
     }
 
     .find-us-map {
+      width: 100%;
       aspect-ratio: 4/3;
-      background: #3D2117;
+      background: var(--brewery-dark);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .map-placeholder-text {
-      color: rgba(255,255,255,0.3);
-      font-family: var(--font-body);
+      color: rgba(255, 255, 255, 0.4);
       font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-weight: 500;
-    }
-
-    /* ==================== FAQs ==================== */
-    .faqs {
-      padding: 100px 0;
-      border-top: 1px solid rgba(44,24,16,0.06);
-    }
-
-    .faqs-header {
-      max-width: 600px;
-      margin-bottom: 48px;
-    }
-
-    .faqs-header h2 { margin-bottom: 16px; }
-
-    .faq-list {
-      max-width: 800px;
-    }
-
-    .faq-item {
-      border-bottom: 1px solid rgba(44,24,16,0.1);
-    }
-
-    .faq-question {
-      width: 100%;
-      background: none;
-      border: none;
-      padding: 24px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      text-align: left;
       font-family: var(--font-body);
-      font-size: 16px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      color: var(--brewery-dark);
-      gap: 16px;
-    }
-
-    .faq-question:hover {
-      color: var(--fired-brick);
-    }
-
-    .faq-icon {
-      font-size: 24px;
-      font-weight: 300;
-      flex-shrink: 0;
-      transition: transform 0.3s ease;
-      font-family: var(--font-body);
-    }
-
-    .faq-item.open .faq-icon {
-      transform: rotate(45deg);
-    }
-
-    .faq-answer {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.35s ease, padding 0.35s ease;
-    }
-
-    .faq-item.open .faq-answer {
-      max-height: 300px;
-    }
-
-    .faq-answer-inner {
-      padding: 0 0 24px;
-      font-size: 16px;
-      line-height: 1.65;
-      opacity: 0.8;
     }
 
     /* ==================== CROSS-SELL ==================== */
-    .cross-sell {
-      padding: 80px 0;
-      background: var(--brewery-dark);
+    .cross-sell-inner {
       text-align: center;
-    }
-
-    .cross-sell .section-label {
-      color: rgba(255,255,255,0.5);
-    }
-
-    .cross-sell h2 {
-      color: #fff;
-      margin-bottom: 20px;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     .cross-sell-body {
-      color: rgba(255,255,255,0.7);
       font-size: 18px;
-      max-width: 500px;
-      margin: 0 auto 36px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      color: var(--warm-canvas);
+      opacity: 0.9;
     }
 
     .cross-sell-buttons {
@@ -590,43 +322,12 @@ import Base from '../layouts/Base.astro';
       flex-wrap: wrap;
     }
 
-    /* ==================== SCROLL ANIMATIONS ==================== */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
-      .the-space-inner {
-        grid-template-columns: 1fr;
-        gap: 36px;
-      }
-
-      .serve-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-
-      .find-us-inner {
-        grid-template-columns: 1fr;
-        gap: 36px;
-      }
-
-      .cross-sell-buttons {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      body {
-        padding-bottom: 52px;
-      }
+      .space-grid { grid-template-columns: 1fr; gap: 40px; }
+      .serve-grid { grid-template-columns: 1fr; gap: 40px; }
+      .find-us-grid { grid-template-columns: 1fr; gap: 40px; }
+      .cross-sell-buttons { flex-direction: column; align-items: center; }
     }
   </style>
 </Base>

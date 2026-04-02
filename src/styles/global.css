@@ -339,7 +339,6 @@ img {
   background-color: var(--brewery-dark);
   color: var(--warm-canvas);
   padding-block: var(--space-xl) var(--space-lg);
-  margin-top: var(--space-xl);
   position: relative;
 }
 
