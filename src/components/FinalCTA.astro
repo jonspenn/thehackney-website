@@ -55,7 +55,7 @@ function resolveHref(href: string): string {
     <h2>{heading}</h2>
     {body && <p class="final-cta-body">{body}</p>}
     <div class="final-cta-buttons">
-      <a href={resolveHref(primaryCTA.href)} class="btn btn-primary-dark">{primaryCTA.label}</a>
+      <a href={resolveHref(primaryCTA.href)} class="btn btn-primary">{primaryCTA.label}</a>
       {secondaryCTA && <a href={resolveHref(secondaryCTA.href)} class="btn btn-outline">{secondaryCTA.label}</a>}
     </div>
     {(phone || whatsapp) && (
@@ -78,18 +78,18 @@ function resolveHref(href: string): string {
 
 <style>
   .final-cta {
-    background: var(--brewery-dark);
-    padding: 80px 0;
+    background: var(--warm-canvas);
+    border-top: 1px solid rgba(44, 24, 16, 0.08);
+    padding: 72px 0;
     text-align: center;
   }
 
-  /* Override global p { max-width: 65ch } which left-aligns p tags */
   .final-cta p {
     max-width: none;
   }
 
   .final-cta h2 {
-    color: #fff;
+    color: var(--brewery-dark);
     margin-bottom: 20px;
   }
 
@@ -99,7 +99,7 @@ function resolveHref(href: string): string {
   }
 
   .final-cta-body {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(44, 24, 16, 0.7);
     font-size: 18px;
     max-width: 600px;
     margin: 0 auto 36px;
@@ -112,15 +112,14 @@ function resolveHref(href: string): string {
     flex-wrap: wrap;
   }
 
-  /* On dark backgrounds, outline buttons get light borders */
   .final-cta .btn-outline {
-    color: var(--warm-canvas);
-    border-color: rgba(245, 240, 232, 0.3);
+    color: var(--brewery-dark);
+    border-color: rgba(44, 24, 16, 0.25);
   }
 
   .final-cta .btn-outline:hover {
-    background-color: rgba(245, 240, 232, 0.1);
-    color: #fff;
+    background-color: rgba(44, 24, 16, 0.05);
+    border-color: rgba(44, 24, 16, 0.4);
   }
 
   .final-cta-contact {
@@ -129,32 +128,32 @@ function resolveHref(href: string): string {
   }
 
   .final-cta-contact-line {
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(44, 24, 16, 0.45);
     font-size: 14px;
     margin-bottom: 8px;
     width: 100%;
   }
 
   .final-cta-contact-line a {
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(44, 24, 16, 0.65);
     text-decoration: underline;
     text-underline-offset: 3px;
   }
 
   .final-cta-contact-line a:hover {
-    color: #fff;
+    color: var(--brewery-dark);
   }
 
   .final-cta-contact-line .whatsapp-link {
-    color: var(--dusty-coral);
+    color: var(--forest-olive);
   }
 
   .final-cta-contact-line .whatsapp-link:hover {
-    color: #fff;
+    color: var(--brewery-dark);
   }
 
   .final-cta-note {
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(44, 24, 16, 0.4);
     font-size: 14px;
     margin-top: 16px;
     width: 100%;
@@ -162,7 +161,7 @@ function resolveHref(href: string): string {
 
   @media (max-width: 768px) {
     .final-cta {
-      padding: 64px 0;
+      padding: 56px 0;
     }
 
     .final-cta-buttons {
