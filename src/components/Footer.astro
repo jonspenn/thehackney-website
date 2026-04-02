@@ -8,7 +8,7 @@ const currentYear = new Date().getFullYear();
       <a href="/" class="footer-logo">
         <img src="/images/the-hackney-logo-white.webp" alt="The Hackney" />
       </a>
-      <p class="footer-address">503 Hackney Road, London E2 9ED</p>
+      <p class="footer-address"><a href="https://www.google.com/maps/dir//The+Hackney,+503+Hackney+Road,+London+E2+9ED,+United+Kingdom/@51.5325459,-0.0584213,17z/" target="_blank" rel="noopener">503 Hackney Road, London E2 9ED</a></p>
       <p class="footer-phone"><a href="tel:+442079611604">+44 20 7961 1604</a></p>
       <div class="footer-social">
         <a href="https://instagram.com/thehackney.co" target="_blank" rel="noopener" aria-label="Instagram">
@@ -84,19 +84,21 @@ const currentYear = new Date().getFullYear();
     line-height: 1.65;
   }
 
-  .footer-phone {
-    margin-top: 4px;
-  }
-
+  .footer-address a,
   .footer-phone a {
     color: rgba(245, 240, 232, 0.7);
     text-decoration: none;
     transition: opacity 0.2s ease;
   }
 
+  .footer-address a:hover,
   .footer-phone a:hover {
     opacity: 1;
     color: var(--warm-canvas);
+  }
+
+  .footer-phone {
+    margin-top: 4px;
   }
 
   .footer-social {
