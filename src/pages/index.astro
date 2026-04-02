@@ -35,7 +35,7 @@ import FinalCTA from '../components/FinalCTA.astro';
   ]} />
 
   <!-- ==================== VENUE INTRODUCTION ==================== -->
-  <Section bg="light" padding="standard">
+  <Section bg="light" padding="standard" border="bottom">
     <ContentBlock
       image="/images/hackney-wedding-first-dance-guests-venue.webp"
       alt="First dance at a Hackney wedding with guests watching"
@@ -120,7 +120,7 @@ import FinalCTA from '../components/FinalCTA.astro';
   </Section>
 
   <!-- ==================== PRICING ==================== -->
-  <Section bg="light" padding="standard">
+  <Section bg="light" padding="standard" border="top">
     <SectionHeader
       eyebrow="Investment"
       heading="Honest Pricing. No Hidden Fees."
@@ -145,7 +145,7 @@ import FinalCTA from '../components/FinalCTA.astro';
   ]} />
 
   <!-- ==================== THE TEAM ==================== -->
-  <Section bg="light" padding="standard" class="team-section">
+  <Section bg="light" padding="standard" border="top" class="team-section">
     <SectionHeader
       eyebrow="The Team"
       heading="The People Who Make It Happen."
@@ -191,9 +191,8 @@ import FinalCTA from '../components/FinalCTA.astro';
   .pull-quote {
     font-family: var(--font-heading);
     font-size: clamp(28px, 3.5vw, 40px);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: 1.15;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
     color: var(--brewery-dark);
     margin-bottom: 2rem;
   }
@@ -240,7 +239,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     display: flex;
     align-items: flex-end;
     padding: 1.5rem;
-    border-top: 3px solid transparent;
+    border: 1px solid rgba(44, 24, 16, 0.12);
     transition: border-color 0.3s ease;
     background-size: cover;
     background-position: center;
@@ -262,7 +261,7 @@ import FinalCTA from '../components/FinalCTA.astro';
   }
 
   .occasion-card:hover {
-    border-top-color: var(--dusty-coral);
+    border-color: var(--dusty-coral);
     color: inherit;
   }
 
@@ -310,6 +309,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     margin-bottom: 1.25rem;
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(44, 24, 16, 0.08);
   }
 
   .team-card-photo::after {

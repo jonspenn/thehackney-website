@@ -107,6 +107,16 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
     z-index: 1;
   }
 
+  /* Inset frame - subtle border that contains the hero */
+  .hero-section::after {
+    content: '';
+    position: absolute;
+    inset: 1rem;
+    border: 1px solid rgba(245, 240, 232, 0.15);
+    z-index: 2;
+    pointer-events: none;
+  }
+
   .hero-section .container {
     width: 100%;
     position: relative;

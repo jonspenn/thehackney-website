@@ -8,6 +8,7 @@
  * Props:
  *   bg      - 'light' (Warm Canvas), 'dark' (Brewery Dark), 'olive' (Forest Olive), 'image' (for custom bg)
  *   padding - 'standard' (96px), 'compact' (64px), 'none' (0)
+ *   border  - 'top', 'bottom', 'both', 'none' (adds subtle 1px divider lines)
  *   id      - optional HTML id for anchor links
  *   class   - additional classes passed through
  *   full    - if true, content goes full-width (no container). Used for photo breaks, edge-to-edge grids
@@ -16,6 +17,7 @@
 interface Props {
   bg?: 'light' | 'dark' | 'olive' | 'image';
   padding?: 'standard' | 'compact' | 'none';
+  border?: 'top' | 'bottom' | 'both' | 'none';
   id?: string;
   full?: boolean;
   class?: string;
@@ -24,6 +26,7 @@ interface Props {
 const {
   bg = 'light',
   padding = 'standard',
+  border = 'none',
   id,
   full = false,
   class: className = ''
@@ -31,10 +34,11 @@ const {
 
 const paddingClass = padding === 'standard' ? 'section' : padding === 'compact' ? 'section-compact' : '';
 const bgClass = `section-bg-${bg}`;
+const borderClass = border !== 'none' ? `section-border-${border}` : '';
 ---
 
 <section
-  class:list={[paddingClass, bgClass, className]}
+  class:list={[paddingClass, bgClass, borderClass, className]}
   id={id}
 >
   {full ? (
@@ -47,6 +51,7 @@ const bgClass = `section-bg-${bg}`;
 </section>
 
 <style>
+  /* === Backgrounds === */
   .section-bg-light {
     background-color: var(--warm-canvas);
     color: var(--brewery-dark);
@@ -87,5 +92,38 @@ const bgClass = `section-bg-${bg}`;
   .section-bg-image {
     position: relative;
     color: var(--warm-canvas);
+  }
+
+  /* === Section borders (visual dividers) === */
+  .section-border-top {
+    border-top: 1px solid rgba(44, 24, 16, 0.08);
+  }
+
+  .section-border-bottom {
+    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
+  }
+
+  .section-border-both {
+    border-top: 1px solid rgba(44, 24, 16, 0.08);
+    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
+  }
+
+  /* Dark/olive section borders use lighter dividers */
+  .section-bg-dark.section-border-top,
+  .section-bg-dark.section-border-both {
+    border-top-color: rgba(245, 240, 232, 0.1);
+  }
+  .section-bg-dark.section-border-bottom,
+  .section-bg-dark.section-border-both {
+    border-bottom-color: rgba(245, 240, 232, 0.1);
+  }
+
+  .section-bg-olive.section-border-top,
+  .section-bg-olive.section-border-both {
+    border-top-color: rgba(245, 240, 232, 0.1);
+  }
+  .section-bg-olive.section-border-bottom,
+  .section-bg-olive.section-border-both {
+    border-bottom-color: rgba(245, 240, 232, 0.1);
   }
 </style>

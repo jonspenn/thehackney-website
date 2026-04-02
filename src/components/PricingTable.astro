@@ -52,13 +52,14 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
 
   .pricing-table-card {
     background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(44, 24, 16, 0.08);
+    border: 1px solid rgba(44, 24, 16, 0.12);
     padding: 2.5rem 2rem;
-    transition: box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   .pricing-table-card:hover {
-    box-shadow: 0 8px 32px rgba(44, 24, 16, 0.08);
+    border-color: var(--dusty-coral);
+    box-shadow: 0 8px 32px rgba(44, 24, 16, 0.06);
   }
 
   .pricing-table-card h3 {
