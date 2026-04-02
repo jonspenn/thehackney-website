@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import FinalCTA from '../../components/FinalCTA.astro';
 
 const posts = (await getCollection('journal', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -83,16 +84,13 @@ const schema = JSON.stringify({
   </section>
 
   <!-- CTA -->
-  <section class="journal-cta section" style="background-color: var(--brewery-dark); color: var(--warm-canvas);">
-    <div class="container" style="text-align: center;">
-      <p class="eyebrow" style="color: var(--dusty-coral);">Your Celebration</p>
-      <h2 style="color: var(--warm-canvas); margin-bottom: var(--space-md);">Start Planning Your Day</h2>
-      <p style="color: var(--warm-canvas); opacity: 0.85; max-width: 50ch; margin-inline: auto; margin-bottom: var(--space-lg);">
-        Whether it's a wedding, a birthday, or a corporate away day - check if your date is available.
-      </p>
-      <a href="/check-your-date/?utm_source=website&utm_medium=journal&utm_campaign=cta" class="btn btn-primary" style="background-color: var(--dusty-coral);">Check Your Date</a>
-    </div>
-  </section>
+  <FinalCTA
+    eyebrow="Your Celebration"
+    heading="Start Planning Your Day"
+    body="Whether it's a wedding, a birthday, or a corporate away day - check if your date is available."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    utmCampaign="journal"
+  />
 </Base>
 
 <style>

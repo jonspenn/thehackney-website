@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import FinalCTA from '../../components/FinalCTA.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('journal', ({ data }) => !data.draft);
@@ -107,16 +108,13 @@ const schema = JSON.stringify({
   </article>
 
   <!-- CTA -->
-  <section class="section" style="background-color: var(--brewery-dark); color: var(--warm-canvas);">
-    <div class="container" style="text-align: center;">
-      <p class="eyebrow" style="color: var(--dusty-coral);">Visit Us</p>
-      <h2 style="color: var(--warm-canvas); margin-bottom: var(--space-md);">See The Building For Yourself</h2>
-      <p style="color: var(--warm-canvas); opacity: 0.85; max-width: 50ch; margin-inline: auto; margin-bottom: var(--space-lg);">
-        Book a tour with Hugo and experience 170 years of Hackney Road history in person.
-      </p>
-      <a href="/check-your-date/?utm_source=website&utm_medium=journal&utm_campaign=post_cta" class="btn btn-primary" style="background-color: var(--dusty-coral);">Check Your Date</a>
-    </div>
-  </section>
+  <FinalCTA
+    eyebrow="Visit Us"
+    heading="See The Building For Yourself"
+    body="Book a tour with Hugo and experience 170 years of Hackney Road history in person."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    utmCampaign="journal-post"
+  />
 </Base>
 
 <style>
