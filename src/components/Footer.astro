@@ -63,7 +63,7 @@ const currentYear = new Date().getFullYear();
     grid-template-columns: 1fr auto;
     gap: 64px;
     align-items: start;
-    padding: 56px 0 48px;
+    padding-block: 56px 48px;
   }
 
   /* ---- Brand column ---- */
@@ -113,6 +113,14 @@ const currentYear = new Date().getFullYear();
     opacity: 0.5;
     transition: opacity 0.2s ease;
     display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer-social svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
   }
 
   .footer-social a:hover {
@@ -161,15 +169,15 @@ const currentYear = new Date().getFullYear();
     .footer-inner {
       grid-template-columns: 1fr;
       gap: 32px;
-      padding: 40px 0 32px;
+      padding-block: 40px 32px;
     }
 
     .footer-nav {
-      gap: 40px;
+      gap: 32px;
     }
 
     .footer-social {
-      flex-wrap: wrap;
+      gap: 16px;
     }
   }
 </style>
