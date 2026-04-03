@@ -29,11 +29,10 @@ import FinalCTA from '../components/FinalCTA.astro';
   ]} />
 
   <!-- ==================== EVENT TYPES ==================== -->
-  <Section bg="light" border="bottom">
+  <Section bg="light" padding="compact" border="bottom">
     <SectionHeader
       eyebrow="What We Host"
       heading="Events We Host"
-      align="center"
     />
     <div class="event-grid">
       <div class="event-card fade-in">
@@ -56,7 +55,7 @@ import FinalCTA from '../components/FinalCTA.astro';
   </Section>
 
   <!-- ==================== THE SPACE ==================== -->
-  <Section bg="light" border="bottom">
+  <Section bg="light" padding="compact" border="bottom">
     <div class="space-grid">
       <div class="space-text">
         <SectionHeader
@@ -76,11 +75,10 @@ import FinalCTA from '../components/FinalCTA.astro';
   </Section>
 
   <!-- ==================== WHAT'S INCLUDED ==================== -->
-  <Section bg="light" border="bottom">
+  <Section bg="light" padding="compact" border="bottom">
     <SectionHeader
       eyebrow="Everything Included"
       heading="What Is Included"
-      align="center"
     />
     <div class="included-grid">
       <div class="included-item">
@@ -111,7 +109,7 @@ import FinalCTA from '../components/FinalCTA.astro';
   </Section>
 
   <!-- ==================== PRICING ==================== -->
-  <Section bg="light" border="top">
+  <Section bg="light" padding="compact" border="top">
     <PricingTable
       eyebrow="Investment"
       heading="Pricing"
@@ -140,6 +138,7 @@ import FinalCTA from '../components/FinalCTA.astro';
       position: relative;
       height: 50vh;
       min-height: 400px;
+      padding-top: var(--header-height, 96px);
       background-color: var(--forest-olive);
       display: flex;
       align-items: center;
@@ -184,7 +183,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     }
 
     .event-card {
-      padding: 40px 30px;
+      padding: 28px 24px;
       border: 1px solid rgba(44, 24, 16, 0.1);
       border-top: 3px solid var(--forest-olive);
       transition: border-color 0.2s ease, transform 0.2s ease;
@@ -248,7 +247,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     }
 
     .included-item {
-      padding: 40px 30px;
+      padding: 28px 24px;
       border-left: 4px solid var(--forest-olive);
     }
 
