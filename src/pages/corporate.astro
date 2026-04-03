@@ -186,17 +186,20 @@ import FinalCTA from '../components/FinalCTA.astro';
     .event-card {
       padding: 40px 30px;
       border: 1px solid rgba(44, 24, 16, 0.1);
+      border-top: 3px solid var(--forest-olive);
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
     .event-card:hover {
-      border-color: var(--dusty-coral);
+      border-color: var(--forest-olive);
+      border-top-color: var(--forest-olive);
       transform: translateY(-4px);
     }
 
     .event-card h3 {
       font-size: 20px;
       margin-bottom: 12px;
+      color: var(--mid-olive);
     }
 
     .event-card p {
@@ -246,12 +249,13 @@ import FinalCTA from '../components/FinalCTA.astro';
 
     .included-item {
       padding: 40px 30px;
-      border-left: 4px solid var(--fired-brick);
+      border-left: 4px solid var(--forest-olive);
     }
 
     .included-item h3 {
       font-size: 20px;
       margin-bottom: 12px;
+      color: var(--mid-olive);
     }
 
     .included-item p {

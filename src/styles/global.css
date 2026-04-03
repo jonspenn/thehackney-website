@@ -20,7 +20,7 @@
   --color-bg: var(--warm-canvas);
   --color-text: var(--brewery-dark);
   --color-accent: var(--dusty-coral);
-  --color-cta-light: var(--forest-olive);   /* CTA on light backgrounds */
+  --color-cta-light: var(--mid-olive);       /* CTA on light backgrounds - brighter green for pop */
   --color-cta-dark: var(--dusty-coral);     /* CTA on dark backgrounds */
   --color-eyebrow: var(--dusty-coral);      /* Eyebrow labels */
   --color-quote: var(--fired-brick);        /* Quote text, warm highlight */
@@ -164,7 +164,7 @@ a:hover {
 }
 
 .btn-primary:hover {
-  background-color: var(--brewery-dark);
+  background-color: var(--forest-olive);
   color: var(--warm-canvas);
 }
 

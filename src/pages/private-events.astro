@@ -176,15 +176,17 @@ import FinalCTA from '../components/FinalCTA.astro';
     .event-card {
       padding: 40px 30px;
       border: 1px solid rgba(44, 24, 16, 0.1);
+      border-top: 3px solid var(--forest-olive);
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
     .event-card:hover {
-      border-color: var(--dusty-coral);
+      border-color: var(--forest-olive);
+      border-top-color: var(--forest-olive);
       transform: translateY(-4px);
     }
 
-    .event-card h3 { font-size: 20px; margin-bottom: 12px; }
+    .event-card h3 { font-size: 20px; margin-bottom: 12px; color: var(--mid-olive); }
     .event-card p { font-size: 16px; line-height: 1.6; opacity: 0.85; }
 
     /* ==================== THE SPACE ==================== */
@@ -224,10 +226,10 @@ import FinalCTA from '../components/FinalCTA.astro';
 
     .included-item {
       padding: 40px 30px;
-      border-left: 4px solid var(--fired-brick);
+      border-left: 4px solid var(--forest-olive);
     }
 
-    .included-item h3 { font-size: 20px; margin-bottom: 12px; }
+    .included-item h3 { font-size: 20px; margin-bottom: 12px; color: var(--mid-olive); }
     .included-item p { font-size: 15px; line-height: 1.7; opacity: 0.85; }
 
     /* ==================== PRICING NOTE ==================== */
