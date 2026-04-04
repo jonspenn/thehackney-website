@@ -181,6 +181,21 @@ function StepDate({ data, setData, onNext }) {
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-label">When are you thinking?</div>
+        <div className="wq-year-row">
+          {YEARS.map(y => (
+            <button
+              key={y}
+              type="button"
+              className={`wq-year ${data.year === y ? "wq-year--selected" : ""}`}
+              onClick={() => handleYearSelect(y)}
+            >
+              {y}
+            </button>
+          ))}
+        </div>
+      </FadeIn>
+      <FadeIn delay={250}>
+        <div className="wq-label" style={{ marginTop: 28 }}>Month</div>
         <div className="wq-month-grid">
           {MONTHS.map(m => {
             const disabled = isMonthDisabled(m);
@@ -196,21 +211,6 @@ function StepDate({ data, setData, onNext }) {
               </button>
             );
           })}
-        </div>
-      </FadeIn>
-      <FadeIn delay={250}>
-        <div className="wq-label" style={{ marginTop: 28 }}>Year</div>
-        <div className="wq-year-row">
-          {YEARS.map(y => (
-            <button
-              key={y}
-              type="button"
-              className={`wq-year ${data.year === y ? "wq-year--selected" : ""}`}
-              onClick={() => handleYearSelect(y)}
-            >
-              {y}
-            </button>
-          ))}
         </div>
       </FadeIn>
       <FadeIn delay={350}>
