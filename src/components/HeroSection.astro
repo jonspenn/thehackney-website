@@ -148,11 +148,7 @@ const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
     padding: var(--space-section) 0;
   }
 
-  /* Fixed-height heroes on solid backgrounds need header offset */
-  .hero-section.hero-bg-olive,
-  .hero-section.hero-bg-dark:not(.hero-auto) {
-    padding-top: var(--header-height, 96px);
-  }
+  /* Solid-bg heroes: no extra header offset needed (body padding-top handles it) */
 
   /* === Background image === */
   .hero-section-bg {
