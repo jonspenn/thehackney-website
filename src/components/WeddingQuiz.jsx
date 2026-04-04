@@ -28,10 +28,11 @@ const URGENCY_OPTIONS = [
 
 const GUEST_OPTIONS = [
   { label: "Under 20", value: "under-20", sublabel: "Intimate & personal", tag: "intimate" },
-  { label: "20 - 40", value: "20-40", sublabel: "Intimate & personal", tag: "intimate" },
-  { label: "40 - 60", value: "40-60", sublabel: "Our sweet spot", tag: "classic" },
-  { label: "60 - 80", value: "60-80", sublabel: "A lively celebration", tag: "celebration" },
-  { label: "80+", value: "80+", sublabel: "Standing receptions up to 120", tag: "large" },
+  { label: "20 - 40", value: "20-40", sublabel: "Cosy & relaxed", tag: "intimate" },
+  { label: "40 - 60", value: "40-60", sublabel: "Our sweet spot - max seated", tag: "classic" },
+  { label: "60 - 80", value: "60-80", sublabel: "Evening reception style", tag: "standing" },
+  { label: "80 - 100", value: "80-100", sublabel: "Standing reception - our max capacity", tag: "standing" },
+  { label: "Over 100", value: "100+", sublabel: "We may not be the right fit", tag: "over-capacity" },
 ];
 
 const BUDGET_OPTIONS = [
