@@ -7,7 +7,7 @@ const BRAND = {
   forestOlive: "#2E4009",
   firedBrick: "#8C472E",
   dustyCoral: "#BF7256",
-  signalGreen: "#28A745",
+  confirmGreen: "#2E4009", /* forest-olive - replaces off-brand #28A745 */
   midOlive: "#49590E",
   mahogany: "#40160C",
 };
@@ -432,7 +432,7 @@ function StepConfirmation({ data }) {
       <FadeIn>
         <div className="wq-confirm-icon">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <circle cx="16" cy="16" r="16" fill={BRAND.signalGreen}/>
+            <circle cx="16" cy="16" r="16" fill={BRAND.confirmGreen}/>
             <path d="M10 16L14 20L22 12" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
