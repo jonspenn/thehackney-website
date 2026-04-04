@@ -31,8 +31,8 @@ const GUEST_OPTIONS = [
   { label: "20 - 40", value: "20-40", sublabel: "Cosy & relaxed", tag: "intimate" },
   { label: "40 - 60", value: "40-60", sublabel: "Our sweet spot - max seated", tag: "classic" },
   { label: "60 - 80", value: "60-80", sublabel: "Evening reception style", tag: "standing" },
-  { label: "80 - 100", value: "80-100", sublabel: "Standing reception - our max capacity", tag: "standing" },
-  { label: "Over 100", value: "100+", sublabel: "We may not be the right fit", tag: "over-capacity" },
+  { label: "80 - 110", value: "80-110", sublabel: "Standing reception - our max capacity", tag: "standing" },
+  { label: "Over 110", value: "110+", sublabel: "We may not be the right fit", tag: "over-capacity" },
 ];
 
 const BUDGET_OPTIONS = [
