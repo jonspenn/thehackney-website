@@ -145,11 +145,10 @@ function StepWelcome({ onStart }) {
   );
 }
 
-function StepDate({ data, setData, onNext, onBack }) {
+function StepDate({ data, setData, onNext }) {
   const canProceed = data.month && data.year;
   return (
     <div className="wq-step">
-      <BackButton onClick={onBack} />
       <FadeIn>
         <h2 className="wq-heading">When are you thinking?</h2>
         <p className="wq-subtext">Even a rough idea helps us check availability</p>
@@ -490,7 +489,7 @@ function StepConfirmation({ data }) {
 /* ─── Main component ─── */
 
 export default function WeddingQuiz() {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [data, setData] = useState({
     month: "", year: "",
@@ -509,7 +508,7 @@ export default function WeddingQuiz() {
   }
 
   function goBack() {
-    setStep(s => Math.max(0, s - 1));
+    setStep(s => Math.max(1, s - 1));
   }
 
   async function handleSubmit() {
@@ -551,8 +550,8 @@ export default function WeddingQuiz() {
         <ProgressDots current={step - 1} total={TOTAL_STEPS} />
       )}
 
-      {step === 0 && <StepWelcome onStart={goNext} />}
-      {step === 1 && <StepDate data={data} setData={setData} onNext={goNext} onBack={goBack} />}
+      {/* Welcome step removed - hero CTA "Plan Your Wedding" replaces it */}
+      {step === 1 && <StepDate data={data} setData={setData} onNext={goNext} />}
       {step === 2 && <StepUrgency data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 3 && <StepGuests data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 4 && <StepBudget data={data} setData={setData} onNext={goNext} onBack={goBack} />}
