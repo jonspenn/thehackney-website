@@ -44,7 +44,7 @@ const BUDGET_OPTIONS = [
 
 const STYLE_OPTIONS = [
   { label: "Relaxed standing reception", value: "standing" },
-  { label: "Seated dinner with all the details", value: "seated" },
+  { label: "Wedding breakfast - the full sit-down", value: "seated" },
   { label: "Ceremony & celebration - the full day", value: "full-day" },
   { label: "Still exploring - show me everything", value: "exploring" },
 ];
