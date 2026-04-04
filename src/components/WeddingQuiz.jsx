@@ -20,10 +20,10 @@ const MONTHS = [
 const YEARS = ["2026","2027","2028","Not sure yet"];
 
 const URGENCY_OPTIONS = [
-  { label: "Just starting to look around", value: "browsing", sublabel: "No rush - gathering ideas" },
-  { label: "Comparing a few venues", value: "comparing", sublabel: "Shortlisting our favourites" },
-  { label: "Ready to book - just need the right venue", value: "ready", sublabel: "Let's make it happen" },
-  { label: "We have a date in mind and need to move fast", value: "asap", sublabel: "Time-sensitive - help us lock it in" },
+  { label: "Just starting to look around", value: "browsing" },
+  { label: "Comparing a few venues", value: "comparing" },
+  { label: "Ready to book - just need the right venue", value: "ready" },
+  { label: "We have a date in mind and need to move fast", value: "asap" },
 ];
 
 const GUEST_OPTIONS = [
