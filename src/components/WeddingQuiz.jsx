@@ -441,6 +441,9 @@ function StepConfirmation({ data }) {
         <h2 className="wq-heading">
           It's on its way{data.firstName ? `, ${data.firstName}` : ""}
         </h2>
+        <p className="wq-subtext" style={{ maxWidth: "none", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
+          Look out for an email from <strong style={{ color: "var(--brewery-dark)", opacity: 1 }}>hello@thehackney.co</strong> within the next few minutes. If it does not arrive, check your spam or promotions folder.
+        </p>
       </FadeIn>
 
       {/* Hot lead - prominent tour CTA */}
