@@ -464,8 +464,8 @@ function StepConfirmation({ data }) {
           <div className="wq-confirm-card">
             <h3 className="wq-confirm-card__title">What happens next</h3>
             <p>Check your inbox - your personalised guide is on its way. Over the next couple of weeks, we'll send you a few helpful emails with real wedding stories, planning tips, and everything you need to know about The Hackney.</p>
-            <a href={tourUrl} className="wq-link" style={{ marginTop: 12, display: "inline-block" }}>
-              Or skip ahead - book a free tour now
+            <a href={tourUrl} className="wq-btn wq-btn--primary" style={{ marginTop: 16 }}>
+              Book a Free Tour
             </a>
           </div>
         </FadeIn>
