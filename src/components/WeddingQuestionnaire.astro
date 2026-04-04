@@ -17,8 +17,9 @@ import WeddingQuiz from './WeddingQuiz.jsx';
 <style is:global>
   /* ==================== WEDDING QUESTIONNAIRE ==================== */
   .questionnaire {
-    padding: 120px 0;
+    padding: 60px 0 80px;
     border-top: 1px solid rgba(44,24,16,0.06);
+    scroll-margin-top: var(--header-height, 96px);
   }
 
   /* ── Container ── */
@@ -60,7 +61,7 @@ import WeddingQuiz from './WeddingQuiz.jsx';
 
   .wq-step--welcome {
     text-align: center;
-    padding: 40px 0;
+    padding: 20px 0;
   }
 
   .wq-step--confirmation {
@@ -452,11 +453,7 @@ import WeddingQuiz from './WeddingQuiz.jsx';
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .questionnaire {
-      padding: 80px 0;
-    }
-
-    .wq-step--welcome {
-      padding: 20px 0;
+      padding: 48px 0 64px;
     }
 
     .wq-month-grid {
