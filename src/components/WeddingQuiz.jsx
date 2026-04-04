@@ -146,6 +146,32 @@ function StepWelcome({ onStart }) {
 }
 
 function StepDate({ data, setData, onNext }) {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonthIndex = now.getMonth(); // 0-based (0 = Jan)
+
+  function isMonthDisabled(monthAbbr) {
+    if (!data.year || data.year === "Not sure yet") return false;
+    const selectedYear = parseInt(data.year, 10);
+    if (selectedYear > currentYear) return false;
+    if (selectedYear < currentYear) return true;
+    // Same year: disable months before current month
+    const monthIndex = MONTHS.indexOf(monthAbbr);
+    return monthIndex < currentMonthIndex;
+  }
+
+  function handleYearSelect(y) {
+    // If switching to current year and selected month is in the past, clear it
+    let newMonth = data.month;
+    if (y !== "Not sure yet" && parseInt(y, 10) === currentYear && data.month) {
+      const monthIndex = MONTHS.indexOf(data.month);
+      if (monthIndex < currentMonthIndex) {
+        newMonth = "";
+      }
+    }
+    setData({ ...data, year: y, month: newMonth });
+  }
+
   const canProceed = data.month && data.year;
   return (
     <div className="wq-step">
@@ -156,16 +182,20 @@ function StepDate({ data, setData, onNext }) {
       <FadeIn delay={150}>
         <div className="wq-label">When are you thinking?</div>
         <div className="wq-month-grid">
-          {MONTHS.map(m => (
-            <button
-              key={m}
-              type="button"
-              className={`wq-month ${data.month === m ? "wq-month--selected" : ""}`}
-              onClick={() => setData({ ...data, month: m })}
-            >
-              {m}
-            </button>
-          ))}
+          {MONTHS.map(m => {
+            const disabled = isMonthDisabled(m);
+            return (
+              <button
+                key={m}
+                type="button"
+                className={`wq-month ${data.month === m ? "wq-month--selected" : ""} ${disabled ? "wq-month--disabled" : ""}`}
+                onClick={() => !disabled && setData({ ...data, month: m })}
+                disabled={disabled}
+              >
+                {m}
+              </button>
+            );
+          })}
         </div>
       </FadeIn>
       <FadeIn delay={250}>
@@ -176,7 +206,7 @@ function StepDate({ data, setData, onNext }) {
               key={y}
               type="button"
               className={`wq-year ${data.year === y ? "wq-year--selected" : ""}`}
-              onClick={() => setData({ ...data, year: y })}
+              onClick={() => handleYearSelect(y)}
             >
               {y}
             </button>
