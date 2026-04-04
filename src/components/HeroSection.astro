@@ -193,6 +193,12 @@ const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
     max-width: none;
   }
 
+  /* Strip bottom margin from the last visible element so flex centering
+     aligns to the actual text, not invisible trailing space */
+  .hero-section-content > :last-child {
+    margin-bottom: 0;
+  }
+
   .hero-section-content :global(.eyebrow) {
     color: var(--dusty-coral);
     margin-bottom: 1.5rem;
