@@ -1,33 +1,50 @@
 ---
 /**
- * HeroSection - Full-viewport hero with image background
+ * HeroSection - Unified hero component for all pages.
  *
- * Three height variants based on page importance:
+ * Background variants:
+ *   image   - Full image with overlay (homepage, weddings, about, cafe-bar, music-guidelines)
+ *   olive   - Solid Forest Olive background (corporate, private-events)
+ *   dark    - Solid Brewery Dark background (supper-club)
+ *   light   - Light background with dark text (journal, contact)
+ *
+ * Height variants:
  *   full    - 100vh (homepage)
- *   mid     - 70vh  (subpages: weddings, corporate, private events)
- *   compact - 50vh  (utility pages: contact, check-your-date)
+ *   mid     - 70vh  (subpages: weddings, about, cafe-bar)
+ *   compact - 50vh  (corporate, private-events, supper-club)
+ *   auto    - Padding-based, no fixed height (journal, contact)
+ *
+ * Alignment:
+ *   center  - Centered text (default)
+ *   left    - Left-aligned text (supper-club, journal)
  *
  * Props:
- *   image    - path to background image
- *   alt      - accessible description of the image
- *   eyebrow  - uppercase label (e.g. location, page type)
- *   heading  - the h1 text
- *   subtext  - paragraph below heading
- *   cta      - { label, href, utm } for primary CTA button
- *   note     - small text below CTA (e.g. "Free. No obligation.")
- *   height   - 'full' | 'mid' | 'compact'
- *   overlay  - overlay opacity 0-1 (default 0.35)
+ *   image       - path to background image (required for bg='image', optional for bg='dark')
+ *   alt         - accessible description of the image
+ *   eyebrow     - uppercase label
+ *   heading     - the h1 text (supports HTML via set:html)
+ *   subtext     - paragraph below heading
+ *   cta         - { label, href, utm } for primary CTA button
+ *   secondaryCta - { label, href } for secondary CTA button
+ *   note        - small text below CTA
+ *   height      - 'full' | 'mid' | 'compact' | 'auto'
+ *   bg          - 'image' | 'olive' | 'dark' | 'light'
+ *   align       - 'center' | 'left'
+ *   overlay     - overlay opacity 0-1 (default 0.45, only for image/dark bg)
  */
 
 interface Props {
-  image: string;
-  alt: string;
+  image?: string;
+  alt?: string;
   eyebrow?: string;
   heading: string;
   subtext?: string;
   cta?: { label: string; href: string; utm?: string };
+  secondaryCta?: { label: string; href: string };
   note?: string;
-  height?: 'full' | 'mid' | 'compact';
+  height?: 'full' | 'mid' | 'compact' | 'auto';
+  bg?: 'image' | 'olive' | 'dark' | 'light';
+  align?: 'center' | 'left';
   overlay?: number;
 }
 
@@ -38,49 +55,81 @@ const {
   heading,
   subtext,
   cta,
+  secondaryCta,
   note,
   height = 'full',
+  bg = 'image',
+  align = 'center',
   overlay = 0.45
 } = Astro.props;
 
-const heightMap = {
+const heightMap: Record<string, string> = {
   full: '100vh',
   mid: '70vh',
-  compact: '50vh'
+  compact: '50vh',
+  auto: 'auto'
 };
 
-const minHeightMap = {
+const minHeightMap: Record<string, string> = {
   full: '600px',
   mid: '450px',
-  compact: '350px'
+  compact: '350px',
+  auto: '0'
 };
 
+const bgColorMap: Record<string, string> = {
+  image: 'var(--forest-olive)',
+  olive: 'var(--forest-olive)',
+  dark: 'var(--brewery-dark)',
+  light: 'var(--warm-canvas)'
+};
+
+const isLight = bg === 'light';
+const hasImage = (bg === 'image' || bg === 'dark') && image;
+const hasOverlay = hasImage;
+const isAuto = height === 'auto';
+
 const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&utm_campaign=${cta.utm}` : cta.href) : '';
+const ctaClass = isLight ? 'btn btn-primary' : 'btn btn-primary-dark';
+const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
 ---
 
 <section
-  class="hero-section"
-  style={`--hero-height: ${heightMap[height]}; --hero-min-height: ${minHeightMap[height]}; --hero-overlay: ${overlay}`}
+  class:list={[
+    'hero-section',
+    `hero-bg-${bg}`,
+    `hero-align-${align}`,
+    { 'hero-auto': isAuto }
+  ]}
+  style={`--hero-height: ${heightMap[height]}; --hero-min-height: ${minHeightMap[height]}; --hero-overlay: ${overlay}; --hero-bg-color: ${bgColorMap[bg]}`}
 >
-  <div
-    class="hero-section-bg"
-    role="img"
-    aria-label={alt}
-    style={`background-image: url('${image}');`}
-  ></div>
-  <div class="hero-section-overlay"></div>
+  {hasImage && (
+    <div
+      class="hero-section-bg"
+      role="img"
+      aria-label={alt || ''}
+      style={`background-image: url('${image}');`}
+    ></div>
+  )}
+  {hasOverlay && <div class="hero-section-overlay"></div>}
   <div class="container">
     <div class="hero-section-content">
       {eyebrow && <p class="eyebrow">{eyebrow}</p>}
       <h1 set:html={heading} />
       {subtext && <p class="hero-section-sub">{subtext}</p>}
-      {cta && <a href={ctaHref} class="btn btn-primary-dark">{cta.label}</a>}
+      {(cta || secondaryCta) && (
+        <div class="hero-section-ctas">
+          {cta && <a href={ctaHref} class={ctaClass}>{cta.label}</a>}
+          {secondaryCta && <a href={secondaryCta.href} class={secondaryCtaClass}>{secondaryCta.label}</a>}
+        </div>
+      )}
       {note && <p class="hero-section-note">{note}</p>}
     </div>
   </div>
 </section>
 
 <style>
+  /* === Base hero === */
   .hero-section {
     position: relative;
     height: var(--hero-height, 100vh);
@@ -88,10 +137,24 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--forest-olive);
+    background-color: var(--hero-bg-color, var(--forest-olive));
     overflow: hidden;
   }
 
+  /* Auto-height heroes (journal, contact) use padding instead of fixed height */
+  .hero-section.hero-auto {
+    height: auto;
+    min-height: 0;
+    padding: var(--space-section) 0;
+  }
+
+  /* Fixed-height heroes on solid backgrounds need header offset */
+  .hero-section.hero-bg-olive,
+  .hero-section.hero-bg-dark:not(.hero-auto) {
+    padding-top: var(--header-height, 96px);
+  }
+
+  /* === Background image === */
   .hero-section-bg {
     position: absolute;
     inset: 0;
@@ -103,22 +166,31 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
   .hero-section-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(44, 24, 16, var(--hero-overlay, 0.35));
+    background: rgba(44, 24, 16, var(--hero-overlay, 0.45));
     z-index: 1;
   }
 
+  /* === Content container === */
   .hero-section .container {
     width: 100%;
     position: relative;
     z-index: 2;
   }
 
-  .hero-section-content {
+  /* Center-aligned (default) */
+  .hero-align-center .hero-section-content {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
   }
 
+  /* Left-aligned */
+  .hero-align-left .hero-section-content {
+    max-width: 700px;
+    text-align: left;
+  }
+
+  /* === Typography - dark backgrounds (image, olive, dark) === */
   .hero-section-content :global(.eyebrow) {
     color: var(--dusty-coral);
     margin-bottom: 1.5rem;
@@ -131,11 +203,27 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
 
   .hero-section-sub {
     color: var(--warm-canvas);
+    font-size: 1.125rem;
+    line-height: 1.65;
+    margin-bottom: 2.25rem;
+    opacity: 0.95;
+  }
+
+  .hero-align-center .hero-section-sub {
+    max-width: 560px;
+    margin-inline: auto;
+    margin-bottom: 2.25rem;
+  }
+
+  .hero-align-left .hero-section-sub {
+    max-width: 540px;
+  }
+
+  /* Image heroes get slightly larger subtext */
+  .hero-bg-image .hero-section-sub {
     font-size: 1.25rem;
     line-height: 1.5;
-    margin-bottom: 2.25rem;
     max-width: 500px;
-    margin-inline: auto;
   }
 
   .hero-section-note {
@@ -144,6 +232,32 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
     margin-top: 0.875rem;
   }
 
+  /* === Typography - light background overrides === */
+  .hero-bg-light .hero-section-content h1 {
+    color: var(--brewery-dark);
+  }
+
+  .hero-bg-light .hero-section-sub {
+    color: var(--brewery-dark);
+    opacity: 0.8;
+  }
+
+  .hero-bg-light .hero-section-note {
+    color: rgba(44, 24, 16, 0.5);
+  }
+
+  /* === CTA buttons === */
+  .hero-section-ctas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hero-align-center .hero-section-ctas {
+    justify-content: center;
+  }
+
+  /* === Responsive === */
   @media (max-width: 768px) {
     .hero-section-content h1 {
       font-size: 2.25rem;
@@ -151,6 +265,10 @@ const ctaHref = cta ? (cta.utm ? `${cta.href}?utm_source=website&utm_medium=cta&
 
     .hero-section-sub {
       font-size: 1.0625rem;
+    }
+
+    .hero-section.hero-auto {
+      padding: var(--space-section-compact) 0;
     }
   }
 </style>

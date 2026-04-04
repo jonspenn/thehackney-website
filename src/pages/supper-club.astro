@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import HeroSection from '../components/HeroSection.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 ---
@@ -7,20 +8,16 @@ import SectionHeader from '../components/SectionHeader.astro';
 <Base title="Supper Club East London | Guest Chef Dinners at The Hackney, E2" description="Supper club nights at The Hackney - guest chef dinners, live music and paired wines inside a restored 1856 brewery on Hackney Road. Sign up for upcoming dates.">
 
   <!-- ==================== HERO ==================== -->
-  <section class="sc-hero">
-    <div class="sc-hero-bg lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="Supper club dinner at The Hackney with candlelit tables and guests"></div>
-    <div class="container">
-      <div class="sc-hero-content">
-        <p class="eyebrow">Supper Club - East London E2</p>
-        <h1>Guest Chef Dinners In A Restored 1856 Brewery.</h1>
-        <p class="sc-hero-sub">Multi-course menus, paired wines, live music and no phones. A new dining series at The Hackney.</p>
-        <div class="sc-hero-ctas">
-          <a href="#signup" class="btn btn-primary-dark">Get On The List</a>
-          <a href="#upcoming" class="btn btn-outline-dark">See Upcoming Dates</a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <HeroSection
+    bg="dark"
+    height="compact"
+    align="left"
+    eyebrow="Supper Club - East London E2"
+    heading="Guest Chef Dinners In A Restored 1856 Brewery."
+    subtext="Multi-course menus, paired wines, live music and no phones. A new dining series at The Hackney."
+    cta={{ label: "Get On The List", href: "#signup" }}
+    secondaryCta={{ label: "See Upcoming Dates", href: "#upcoming" }}
+  />
 
   <!-- ==================== THE CONCEPT ==================== -->
   <Section bg="light" border="bottom">
@@ -214,53 +211,6 @@ import SectionHeader from '../components/SectionHeader.astro';
   </Section>
 
   <style>
-    /* ==================== HERO ==================== */
-    .sc-hero {
-      position: relative;
-      min-height: 85vh;
-      display: flex;
-      align-items: center;
-      background: var(--brewery-dark);
-      overflow: hidden;
-    }
-
-    .sc-hero-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: var(--brewery-dark);
-      opacity: 0.45;
-    }
-
-    .sc-hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 700px;
-      padding-top: 72px;
-    }
-
-    .sc-hero-content h1 {
-      font-size: clamp(40px, 6vw, 68px);
-      color: var(--warm-canvas);
-      margin-bottom: 24px;
-    }
-
-    .sc-hero-sub {
-      color: rgba(245, 240, 232, 0.7);
-      font-size: 18px;
-      max-width: 540px;
-      margin-bottom: 36px;
-      line-height: 1.65;
-    }
-
-    .sc-hero-ctas {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
     /* ==================== THE CONCEPT ==================== */
     .concept-inner {
       max-width: 720px;

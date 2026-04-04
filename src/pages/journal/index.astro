@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import HeroSection from '../../components/HeroSection.astro';
 import { getCollection } from 'astro:content';
 import FinalCTA from '../../components/FinalCTA.astro';
 
@@ -31,13 +32,14 @@ const schema = JSON.stringify({
   schema={schema}
 >
   <!-- Hero -->
-  <section class="journal-hero section">
-    <div class="container">
-      <p class="eyebrow">Journal</p>
-      <h1>Stories From Hackney Road</h1>
-      <p class="journal-intro">Heritage, weddings, and life at a restored 1856 brewery in the heart of East London.</p>
-    </div>
-  </section>
+  <HeroSection
+    bg="light"
+    height="auto"
+    align="left"
+    eyebrow="Journal"
+    heading="Stories From Hackney Road"
+    subtext="Heritage, weddings, and life at a restored 1856 brewery in the heart of East London."
+  />
 
   <!-- Posts -->
   <section class="journal-list section">
@@ -94,27 +96,6 @@ const schema = JSON.stringify({
 </Base>
 
 <style>
-  .journal-hero {
-    padding-block: var(--space-lg) var(--space-sm);
-  }
-
-  .journal-hero .eyebrow {
-    color: var(--dusty-coral);
-    margin-bottom: var(--space-xs, 0.5rem);
-  }
-
-  .journal-hero h1 {
-    font-size: clamp(1.75rem, 4vw, 2.75rem);
-    margin-bottom: var(--space-xs, 0.5rem);
-  }
-
-  .journal-intro {
-    font-size: 1.125rem;
-    max-width: 50ch;
-    color: var(--brewery-dark);
-    opacity: 0.8;
-  }
-
   .journal-list {
     padding-top: var(--space-md);
   }
@@ -238,10 +219,6 @@ const schema = JSON.stringify({
   }
 
   @media (max-width: 768px) {
-    .journal-hero {
-      padding-block: var(--space-lg) var(--space-sm);
-    }
-
     .journal-list {
       padding-top: var(--space-sm);
     }

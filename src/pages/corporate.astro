@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import HeroSection from '../components/HeroSection.astro';
 import ProofBar from '../components/ProofBar.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
@@ -10,15 +11,13 @@ import FinalCTA from '../components/FinalCTA.astro';
 <Base title="Corporate Events Venue East London | The Hackney, E2" description="Host your corporate event at The Hackney. Conferences, team days, product launches, brand activations. 60 seated, 100 standing. Exclusively yours. Past clients include Adidas, Spotify, Samsung.">
 
   <!-- ==================== HERO ==================== -->
-  <section class="corp-hero">
-    <div class="container">
-      <div class="corp-hero-content">
-        <p class="eyebrow">Corporate Events at The Hackney</p>
-        <h1>Your event. <span style="white-space: nowrap;">Our brewery.</span></h1>
-        <p class="corp-hero-sub">Conferences, team days, product launches, brand activations. A unique venue with professional capabilities and the kind of backdrop that stays memorable long after the event ends.</p>
-      </div>
-    </div>
-  </section>
+  <HeroSection
+    bg="olive"
+    height="compact"
+    eyebrow="Corporate Events at The Hackney"
+    heading='Your event. <span style="white-space: nowrap;">Our brewery.</span>'
+    subtext="Conferences, team days, product launches, brand activations. A unique venue with professional capabilities and the kind of backdrop that stays memorable long after the event ends."
+  />
 
   <!-- ==================== SOCIAL PROOF BAR ==================== -->
   <ProofBar stats={[
@@ -133,48 +132,6 @@ import FinalCTA from '../components/FinalCTA.astro';
   />
 
   <style>
-    /* ==================== HERO (olive, no image) ==================== */
-    .corp-hero {
-      position: relative;
-      height: 50vh;
-      min-height: 400px;
-      padding-top: var(--header-height, 96px);
-      background-color: var(--forest-olive);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      overflow: hidden;
-    }
-
-    .corp-hero .container {
-      width: 100%;
-    }
-
-    .corp-hero-content {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .corp-hero-content :global(.eyebrow) {
-      color: var(--dusty-coral);
-      margin-bottom: 1.5rem;
-    }
-
-    .corp-hero-content h1 {
-      color: var(--warm-canvas);
-      margin-bottom: 1.25rem;
-    }
-
-    .corp-hero-sub {
-      color: var(--warm-canvas);
-      font-size: 1.125rem;
-      line-height: 1.65;
-      opacity: 0.95;
-      max-width: 560px;
-      margin-inline: auto;
-    }
-
     /* ==================== EVENT TYPES GRID ==================== */
     .event-grid {
       display: grid;

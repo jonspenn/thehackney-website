@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import HeroSection from '../components/HeroSection.astro';
 import ProofBar from '../components/ProofBar.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
@@ -10,15 +11,13 @@ import FinalCTA from '../components/FinalCTA.astro';
 <Base title="Private Events Venue East London | The Hackney, E2" description="Host your private celebration at The Hackney. Birthday parties, anniversaries, baby showers, engagement parties. 60 seated, 100 standing. Exclusively yours.">
 
   <!-- ==================== HERO ==================== -->
-  <section class="pe-hero">
-    <div class="container">
-      <div class="pe-hero-content">
-        <p class="eyebrow">Private Events at The Hackney</p>
-        <h1>Your celebration. <span style="white-space: nowrap;">Our brewery.</span></h1>
-        <p class="pe-hero-sub">Birthdays, anniversaries, baby showers, engagement parties - celebrate the moments that matter inside a restored 1856 brewery. The whole venue is yours.</p>
-      </div>
-    </div>
-  </section>
+  <HeroSection
+    bg="olive"
+    height="compact"
+    eyebrow="Private Events at The Hackney"
+    heading='Your celebration. <span style="white-space: nowrap;">Our brewery.</span>'
+    subtext="Birthdays, anniversaries, baby showers, engagement parties - celebrate the moments that matter inside a restored 1856 brewery. The whole venue is yours."
+  />
 
   <!-- ==================== SOCIAL PROOF BAR ==================== -->
   <ProofBar stats={[
@@ -125,46 +124,6 @@ import FinalCTA from '../components/FinalCTA.astro';
   />
 
   <style>
-    /* ==================== HERO (olive, no image) ==================== */
-    .pe-hero {
-      position: relative;
-      height: 50vh;
-      min-height: 400px;
-      padding-top: var(--header-height, 96px);
-      background-color: var(--forest-olive);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      overflow: hidden;
-    }
-
-    .pe-hero .container { width: 100%; }
-
-    .pe-hero-content {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .pe-hero-content :global(.eyebrow) {
-      color: var(--dusty-coral);
-      margin-bottom: 1.5rem;
-    }
-
-    .pe-hero-content h1 {
-      color: var(--warm-canvas);
-      margin-bottom: 1.25rem;
-    }
-
-    .pe-hero-sub {
-      color: var(--warm-canvas);
-      font-size: 1.125rem;
-      line-height: 1.65;
-      opacity: 0.95;
-      max-width: 560px;
-      margin-inline: auto;
-    }
-
     /* ==================== EVENT TYPES ==================== */
     .event-grid {
       display: grid;

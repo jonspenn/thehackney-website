@@ -9,6 +9,7 @@ interface Props {
   ogImage?: string;
   schema?: string;
   pageType?: string;
+  preloadImage?: string;
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   ogImage,
   schema,
   pageType = 'general',
+  preloadImage,
 } = Astro.props;
 ---
 
@@ -49,10 +51,16 @@ const {
     <meta property="og:url" content={Astro.url} />
     <link rel="canonical" href={`https://thehackney-website.pages.dev${Astro.url.pathname}`} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} type="image/webp" />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap"
+      as="style"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <!-- Organization Schema -->
@@ -79,9 +87,6 @@ const {
     </script>
     <!-- Page-specific Schema -->
     {schema && <script type="application/ld+json" set:html={schema} />}
-    <!-- HubSpot Forms -->
-    <script charset="utf-8" type="text/javascript" src="//js-eu1.hsforms.net/forms/embed/v2.js"></script>
-    <script charset="utf-8" type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"></script>
     <title>{title} - The Hackney</title>
   </head>
   <body>
