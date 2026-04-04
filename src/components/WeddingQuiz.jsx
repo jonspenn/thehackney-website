@@ -338,7 +338,7 @@ function StepStyle({ data, setData, onNext, onBack }) {
 }
 
 function StepCapture({ data, setData, onNext, onBack, submitting }) {
-  const canSubmit = data.firstName?.trim() && data.email?.trim();
+  const canSubmit = data.firstName?.trim() && data.email?.trim() && data.phone?.trim();
 
   const summaryPills = [
     data.month && data.year ? `${data.month} ${data.year}` : null,
@@ -352,8 +352,8 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
     <div className="wq-step">
       <BackButton onClick={onBack} />
       <FadeIn>
-        <h2 className="wq-heading">Your personalised guide is ready</h2>
-        <p className="wq-subtext">Tell us where to send it</p>
+        <h2 className="wq-heading">Almost done - where should we send your quote?</h2>
+        <p className="wq-subtext">We'll get back to you within 24 hours with availability and pricing for your date.</p>
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-summary">
@@ -376,19 +376,6 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
             />
           </div>
           <div className="wq-field">
-            <label className="wq-field__label" htmlFor="wq-lname">
-              Last name <span className="wq-field__optional">(optional)</span>
-            </label>
-            <input
-              id="wq-lname"
-              type="text"
-              className="wq-field__input"
-              placeholder="Your last name"
-              value={data.lastName || ""}
-              onChange={e => setData({ ...data, lastName: e.target.value })}
-            />
-          </div>
-          <div className="wq-field">
             <label className="wq-field__label" htmlFor="wq-email">Email</label>
             <input
               id="wq-email"
@@ -400,9 +387,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
             />
           </div>
           <div className="wq-field">
-            <label className="wq-field__label" htmlFor="wq-phone">
-              Phone <span className="wq-field__optional">(optional)</span>
-            </label>
+            <label className="wq-field__label" htmlFor="wq-phone">Mobile</label>
             <input
               id="wq-phone"
               type="tel"
@@ -411,6 +396,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
               value={data.phone || ""}
               onChange={e => setData({ ...data, phone: e.target.value })}
             />
+            <p className="wq-field__note">For WhatsApp updates on availability and pricing</p>
           </div>
           <button
             onClick={onNext}
@@ -418,10 +404,10 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
             type="button"
             disabled={!canSubmit || submitting}
           >
-            {submitting ? "Sending..." : "Send My Guide"}
+            {submitting ? "Sending..." : "Get My Quote"}
           </button>
           <p className="wq-hint" style={{ marginTop: 12, textAlign: "left" }}>
-            We'll email your personalised pricing guide and a few helpful follow-ups. No spam, ever. Unsubscribe anytime.
+            We'll send your personalised quote and a few helpful follow-ups. No spam, ever. Unsubscribe anytime.
           </p>
         </div>
       </FadeIn>
