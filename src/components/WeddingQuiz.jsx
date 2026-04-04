@@ -36,10 +36,8 @@ const GUEST_OPTIONS = [
 
 const BUDGET_OPTIONS = [
   { label: "Under \u00A35,000", value: "under-5k", fit: "low" },
-  { label: "\u00A35,000 - \u00A310,000", value: "5k-10k", fit: "moderate" },
-  { label: "\u00A310,000 - \u00A315,000", value: "10k-15k", fit: "good" },
-  { label: "\u00A315,000 - \u00A320,000", value: "15k-20k", fit: "great" },
-  { label: "\u00A320,000+", value: "20k+", fit: "premium" },
+  { label: "\u00A35,000 - \u00A310,000", value: "5k-10k", fit: "good" },
+  { label: "\u00A310,000 - \u00A320,000", value: "10k-20k", fit: "great" },
   { label: "Not sure yet", value: "unsure", fit: "unknown" },
 ];
 
