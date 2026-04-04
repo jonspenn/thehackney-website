@@ -37,7 +37,7 @@ This is something you cannot fake in a windowless banqueting suite. The transiti
 
 Brewery venues tend to be smaller than hotels and conference centres. That is a feature, not a limitation.
 
-At The Hackney, the capacity is 60 seated and 110 standing. The entire venue is exclusively yours - ceremony, drinks reception, dinner, and dancing all happen in the same connected space. No shuttling guests between rooms. No sharing the building with a conference on the floor above.
+At The Hackney, the capacity is 60 seated and 100 standing. The entire venue is exclusively yours - ceremony, drinks reception, dinner, and dancing all happen in the same connected space. No shuttling guests between rooms. No sharing the building with a conference on the floor above.
 
 Exclusive hire also means one team runs your entire day. Our events team, our in-house kitchen led by Chef Marco Mannoni, our bar - everyone works together because there is nothing else happening. The difference between this and a hotel managing three events simultaneously is obvious from the first phone call.
 
