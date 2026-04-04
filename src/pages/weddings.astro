@@ -77,7 +77,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     eyebrow="Wedding Venue - Hackney Road, East London E2"
     heading="Your Wedding. Your Way. One Team. One Place."
     subtext="An 1856 brewery in the heart of East London. Exclusive hire. In-house kitchen. Every detail handled by a single dedicated team - from the first call to the last dance."
-    cta={{ label: "Check Your Date", href: "/check-your-date/", utm: "weddings" }}
+    cta={{ label: "Plan Your Wedding", href: "#questionnaire" }}
     note="2026 dates filling fast - check availability now"
     height="mid"
   />
@@ -90,7 +90,10 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     { number: "98", label: "NPS score - 98% would recommend" }
   ]} />
 
-  <!-- ==================== SECTION 3: WHAT MAKES US DIFFERENT ==================== -->
+  <!-- ==================== SECTION 3: WEDDING QUESTIONNAIRE ==================== -->
+  <WeddingQuestionnaire />
+
+  <!-- ==================== SECTION 4: WHAT MAKES US DIFFERENT ==================== -->
   <Section bg="light" border="bottom">
     <SectionHeader
       eyebrow="Why The Hackney"
@@ -195,9 +198,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     alt="Wedding couple standing between long dinner tables with pampas grass and Edison bulbs at The Hackney"
     position="center 40%"
   />
-
-  <!-- ==================== SECTION 5.5: WEDDING QUESTIONNAIRE ==================== -->
-  <WeddingQuestionnaire />
 
   <!-- ==================== SECTION 6: PRICING ==================== -->
   <Section bg="light" border="top" id="pricing">
@@ -369,7 +369,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
 
     <div class="section-cta-center">
-      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Start Planning Yours - Check Your Date</a>
+      <a href="#questionnaire" class="btn btn-primary">Start Planning Yours</a>
     </div>
   </Section>
 
@@ -416,20 +416,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
 
     <div class="section-cta-center">
-      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings" class="btn btn-primary">Check Your Date - It Takes 30 Seconds</a>
+      <a href="#questionnaire" class="btn btn-primary">Start Here - It Takes 30 Seconds</a>
     </div>
   </Section>
 
-  <!-- ==================== SECTION 10: FAQs ==================== -->
-  <Section bg="light" border="top">
-    <SectionHeader
-      eyebrow="FAQs"
-      heading="Questions Couples Ask Us"
-    />
-    <FAQ items={faqItems} />
-  </Section>
-
-  <!-- ==================== SECTION 11: BROCHURE DOWNLOAD ==================== -->
+  <!-- ==================== BROCHURE DOWNLOAD ==================== -->
   <Section bg="light" border="top" id="brochure" class="brochure-section">
     <SectionHeader
       eyebrow="Wedding Brochure"
@@ -462,6 +453,15 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
+  <!-- ==================== FAQs ==================== -->
+  <Section bg="light" border="top">
+    <SectionHeader
+      eyebrow="FAQs"
+      heading="Questions Couples Ask Us"
+    />
+    <FAQ items={faqItems} />
+  </Section>
+
   <!-- ==================== SECTION 12: FINAL CTA ==================== -->
   <FinalCTA
     eyebrow="Start Here"
@@ -476,7 +476,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
   <!-- ==================== STICKY MOBILE CTA ==================== -->
   <div class="sticky-cta" id="stickyCta">
-    <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings">Check Your Date</a>
+    <a href="#questionnaire">Plan Your Wedding</a>
   </div>
 
   <style>
