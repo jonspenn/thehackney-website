@@ -150,11 +150,11 @@ function StepDate({ data, setData, onNext }) {
   return (
     <div className="wq-step">
       <FadeIn>
-        <h2 className="wq-heading">When are you thinking?</h2>
-        <p className="wq-subtext">Even a rough idea helps us check availability</p>
+        <h2 className="wq-heading">Tell us about your dream day</h2>
+        <p className="wq-subtext">Six quick questions. We'll send you a personalised wedding guide with pricing, menus, and availability for your date.</p>
       </FadeIn>
       <FadeIn delay={150}>
-        <div className="wq-label">Month</div>
+        <div className="wq-label">When are you thinking?</div>
         <div className="wq-month-grid">
           {MONTHS.map(m => (
             <button
