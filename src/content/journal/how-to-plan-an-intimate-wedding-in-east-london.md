@@ -25,11 +25,11 @@ This is where most couples get it wrong. A venue built for 200 guests will feel 
 
 When viewing spaces, think about:
 
-- **Capacity as atmosphere, not limit.** A room that holds 60 seated and 100 standing gives you flexibility. At 30 guests, you can open up the layout and let the space breathe. At 55, the room feels full without feeling cramped.
+- **Capacity as atmosphere, not limit.** A room that holds 60 seated and 110 standing gives you flexibility. At 30 guests, you can open up the layout and let the space breathe. At 55, the room feels full without feeling cramped.
 - **One space, not many.** Large venues spread guests across multiple rooms. For an intimate wedding, you want everyone together - ceremony, dinner, dancing - in one connected space.
 - **Character over size.** Exposed brick, skylights, high ceilings - these details do the decorating for you. At smaller numbers, guests notice the building. At 200, they notice the crowd.
 
-The Hackney seats 60 and holds 100 standing. The whole venue is exclusively yours for the day - no other events, no shared spaces, no compromise. It is a [restored 1856 brewery](/journal/the-history-of-503-hackney-road/) with the kind of character that works harder at smaller numbers.
+The Hackney seats 60 and holds 110 standing. The whole venue is exclusively yours for the day - no other events, no shared spaces, no compromise. It is a [restored 1856 brewery](/journal/the-history-of-503-hackney-road/) with the kind of character that works harder at smaller numbers.
 
 ## Rethink the traditional format
 
