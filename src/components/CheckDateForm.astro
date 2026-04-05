@@ -252,15 +252,12 @@ import CheckDateForm from './CheckDateForm.jsx';
 
   /* Booked dates */
   .ac-cell--booked {
-    background: rgba(44,24,16,0.06);
+    background: rgba(44,24,16,0.08);
     cursor: not-allowed;
-    overflow: hidden;
   }
 
   .ac-cell--booked .ac-cell__num {
     opacity: 0.25;
-    text-decoration: line-through;
-    text-decoration-color: rgba(44,24,16,0.3);
   }
 
   /* Held / enquired dates */
@@ -292,17 +289,7 @@ import CheckDateForm from './CheckDateForm.jsx';
   }
 
   .ac-cell__indicator--booked {
-    inset: 15%;
-    width: 70%;
-    height: 70%;
-    border: none;
-    background: linear-gradient(
-      to top right,
-      transparent calc(50% - 0.5px),
-      rgba(44,24,16,0.2) calc(50% - 0.5px),
-      rgba(44,24,16,0.2) calc(50% + 0.5px),
-      transparent calc(50% + 0.5px)
-    );
+    bottom: 4px;
   }
 
   .ac-cell__indicator--held {

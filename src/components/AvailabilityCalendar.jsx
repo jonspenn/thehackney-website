@@ -250,9 +250,7 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
               aria-label={`${cell.day} ${MONTH_NAMES[viewMonth]} ${viewYear}${cell.isBooked ? " - booked" : cell.isHeld ? " - enquired" : cell.isAvailable ? " - available" : ""}`}
             >
               <span className="ac-cell__num">{cell.day}</span>
-              {cell.isBooked && (
-                <span className="ac-cell__indicator ac-cell__indicator--booked" aria-hidden="true" />
-              )}
+              {/* No indicator needed - booked styling handles it via CSS */}
               {cell.isHeld && (
                 <span className="ac-cell__indicator ac-cell__indicator--held" />
               )}
@@ -274,9 +272,7 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
       {/* Legend */}
       <div className="ac-legend">
         <LegendItem colour="rgba(46,64,9,0.12)" label="Available" />
-        <LegendItem colour="rgba(44,24,16,0.06)" border="1px solid rgba(44,24,16,0.1)" label="Booked" icon={
-          <span style={{ width: "1px", height: "16px", background: "rgba(44,24,16,0.3)", transform: "rotate(-45deg)", display: "block" }} />
-        } />
+        <LegendItem colour="rgba(44,24,16,0.08)" border="1px solid rgba(44,24,16,0.1)" label="Booked" />
         <LegendItem colour="rgba(191,114,86,0.15)" border="1px solid rgba(191,114,86,0.25)" label="Enquired" />
       </div>
 
