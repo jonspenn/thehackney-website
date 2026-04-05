@@ -251,11 +251,7 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
             >
               <span className="ac-cell__num">{cell.day}</span>
               {cell.isBooked && (
-                <span className="ac-cell__indicator ac-cell__indicator--booked">
-                  <svg className="ac-cell__line" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
-                    <line x1="0" y1="100" x2="100" y2="0" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
-                </span>
+                <span className="ac-cell__indicator ac-cell__indicator--booked" aria-hidden="true" />
               )}
               {cell.isHeld && (
                 <span className="ac-cell__indicator ac-cell__indicator--held" />
@@ -279,9 +275,7 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
       <div className="ac-legend">
         <LegendItem colour="rgba(46,64,9,0.12)" label="Available" />
         <LegendItem colour="rgba(44,24,16,0.06)" border="1px solid rgba(44,24,16,0.1)" label="Booked" icon={
-          <svg width="14" height="14" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
-            <line x1="0" y1="100" x2="100" y2="0" stroke="rgba(44,24,16,0.3)" strokeWidth="8"/>
-          </svg>
+          <span style={{ width: "1px", height: "16px", background: "rgba(44,24,16,0.3)", transform: "rotate(-45deg)", display: "block" }} />
         } />
         <LegendItem colour="rgba(191,114,86,0.15)" border="1px solid rgba(191,114,86,0.25)" label="Enquired" />
       </div>

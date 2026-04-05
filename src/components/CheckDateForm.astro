@@ -292,15 +292,17 @@ import CheckDateForm from './CheckDateForm.jsx';
   }
 
   .ac-cell__indicator--booked {
-    inset: 0;
-    color: rgba(44,24,16,0.18);
-  }
-
-  .ac-cell__line {
-    position: absolute;
-    inset: 6px;
-    width: calc(100% - 12px);
-    height: calc(100% - 12px);
+    inset: 15%;
+    width: 70%;
+    height: 70%;
+    border: none;
+    background: linear-gradient(
+      to top right,
+      transparent calc(50% - 0.5px),
+      rgba(44,24,16,0.2) calc(50% - 0.5px),
+      rgba(44,24,16,0.2) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    );
   }
 
   .ac-cell__indicator--held {
