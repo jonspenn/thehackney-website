@@ -28,9 +28,8 @@ const BRAND = {
   midOlive: "#49590E",
 };
 
-/* ─── HubSpot meeting links ─── */
-const HUBSPOT_TOUR = "https://meetings-eu1.hubspot.com/bookings-team/book-a-venue-tour";
-const HUBSPOT_CALL = "https://meetings-eu1.hubspot.com/bookings-team/book-a-discovery-call";
+/* ─── Internal booking page ─── */
+const BOOKACALL_PAGE = "/bookacall";
 
 const WHATSAPP_NUMBER = "442079611604";
 
@@ -60,18 +59,12 @@ function formatDate(dateStr) {
   });
 }
 
-/* Build HubSpot meeting URL with optional context */
-function buildMeetingUrl(baseUrl, { date, eventType } = {}) {
-  const url = new URL(baseUrl);
-  // Pre-fill won't work for custom form questions, but if there's
-  // a HubSpot property mapped we get it for free. Always worth passing.
-  if (date) {
-    url.searchParams.set("event_date", formatDate(date));
-  }
-  if (eventType && EVENT_LABELS[eventType]) {
-    url.searchParams.set("event_type", EVENT_LABELS[eventType]);
-  }
-  return url.toString();
+/* Build internal booking page URL with date + hash anchor */
+function buildBookingUrl(hash, { date } = {}) {
+  let url = BOOKACALL_PAGE;
+  if (date) url += `?date=${date}`;
+  url += `#${hash}`;
+  return url;
 }
 
 /* WhatsApp icon */
@@ -136,9 +129,9 @@ export default function CheckDateForm({ eventType }) {
     setSelectedDate("");
   }
 
-  // Build HubSpot URLs with date + event type context
-  const tourUrl = buildMeetingUrl(HUBSPOT_TOUR, { date: selectedDate, eventType });
-  const callUrl = buildMeetingUrl(HUBSPOT_CALL, { date: selectedDate, eventType });
+  // Build internal booking page URLs with date context
+  const tourUrl = buildBookingUrl("tour", { date: selectedDate });
+  const callUrl = buildBookingUrl("call", { date: selectedDate });
 
   // WhatsApp fallback message
   const eventLabel = eventType ? `for a ${EVENT_LABELS[eventType]}` : "for an event";
@@ -175,8 +168,6 @@ export default function CheckDateForm({ eventType }) {
               <a
                 href={tourUrl}
                 className="wq-btn wq-btn--primary"
-                target="_blank"
-                rel="noopener"
                 onClick={() => pushEvent("book_tour_click", {
                   context: "date-selected",
                   date: selectedDate,
@@ -190,8 +181,6 @@ export default function CheckDateForm({ eventType }) {
               <a
                 href={callUrl}
                 className="wq-btn wq-btn--outline"
-                target="_blank"
-                rel="noopener"
                 onClick={() => pushEvent("book_call_click", {
                   context: "date-selected",
                   date: selectedDate,
