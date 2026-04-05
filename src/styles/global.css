@@ -93,9 +93,12 @@ p {
   margin-bottom: var(--space-md);
 }
 
-/* Readable line length for body text in content sections only */
-.container > p,
-.container > div > p {
+/* Readable line length for body text only.
+   :not([class]) ensures styled paragraphs (centred intros, captions, etc.)
+   are not constrained. This avoids the recurring centering bug where
+   paragraphs with text-align: center were still capped at 65ch. */
+.container > p:not([class]),
+.container > div > p:not([class]) {
   max-width: 65ch;
 }
 
