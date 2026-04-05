@@ -1,0 +1,241 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroSection from '../components/HeroSection.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+---
+
+<Base
+  title="Book a Tour or Call"
+  description="Book a venue tour or discovery call with The Hackney. See the restored 1856 brewery in person or chat with our team about your event."
+  pageType="conversion"
+>
+
+  <!-- Hero - compact, light bg, no image needed -->
+  <HeroSection
+    bg="light"
+    height="auto"
+    align="center"
+    eyebrow="Next Step"
+    heading="Let's make it happen"
+    subtext="You're one step closer. Choose how you'd like to connect with us."
+  />
+
+  <!-- Primary: Book a Venue Tour -->
+  <Section bg="light" padding="standard" id="tour">
+    <div class="booking-card booking-card--primary fade-in">
+      <div class="booking-card__content">
+        <p class="eyebrow">Recommended</p>
+        <h2>Book a venue tour</h2>
+        <p class="booking-card__body">
+          Nothing beats seeing the space in person. Walk through the brewery, ask questions,
+          and start picturing your day. Tours run 7 days a week and take around 30 minutes.
+        </p>
+        <ul class="booking-card__details">
+          <li>Meet Hugo, our General Manager</li>
+          <li>See the ceremony and reception spaces</li>
+          <li>Talk through your ideas, dates, and budget</li>
+          <li>No obligation - just a chance to see if we're the right fit</li>
+        </ul>
+      </div>
+      <div class="booking-card__action">
+        <!-- Placeholder: replace with Hugo's calendar embed (Calendly / Cal.com / custom) -->
+        <div class="booking-placeholder">
+          <div class="booking-placeholder__icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <p class="booking-placeholder__text">Calendar booking will appear here</p>
+          <p class="booking-placeholder__note">Waiting on booking tool setup</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Secondary: Book a Discovery Call -->
+  <Section bg="light" padding="standard" border="top" id="call">
+    <div class="booking-card booking-card--secondary fade-in">
+      <div class="booking-card__content">
+        <p class="eyebrow">Prefer to Chat First?</p>
+        <h2>Book a discovery call</h2>
+        <p class="booking-card__body">
+          Not ready to visit just yet? Jump on a quick call with our team.
+          We'll answer your questions, talk availability, and help you decide
+          if The Hackney is right for your day.
+        </p>
+        <ul class="booking-card__details">
+          <li>15-minute video or phone call</li>
+          <li>No pressure, no hard sell</li>
+          <li>Get answers before committing to a visit</li>
+        </ul>
+      </div>
+      <div class="booking-card__action">
+        <!-- Placeholder: replace with call booking embed (Calendly / Cal.com / custom) -->
+        <div class="booking-placeholder">
+          <div class="booking-placeholder__icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"></path>
+            </svg>
+          </div>
+          <p class="booking-placeholder__text">Call booking will appear here</p>
+          <p class="booking-placeholder__note">Waiting on booking tool setup</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Fallback contact -->
+  <Section bg="light" padding="compact" border="top">
+    <div class="contact-fallback">
+      <p>
+        Rather just get in touch?
+        Email us at <a href="mailto:bookings@thehackney.co">bookings@thehackney.co</a>
+        or <a href="https://wa.me/442079611604" class="whatsapp-link">message us on WhatsApp</a>.
+      </p>
+    </div>
+  </Section>
+
+</Base>
+
+<style>
+  /* === Booking Cards === */
+  .booking-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .booking-card__content {
+    padding-right: var(--space-lg);
+  }
+
+  .booking-card__content h2 {
+    margin-bottom: 1rem;
+  }
+
+  .booking-card__body {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: rgba(44, 24, 16, 0.8);
+    margin-bottom: 1.5rem;
+    max-width: 50ch;
+  }
+
+  .booking-card__details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .booking-card__details li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: rgba(44, 24, 16, 0.7);
+  }
+
+  .booking-card__details li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--forest-olive);
+  }
+
+  .booking-card--secondary .booking-card__details li::before {
+    background-color: var(--dusty-coral);
+  }
+
+  /* === Placeholder (replaced with real embed later) === */
+  .booking-placeholder {
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px dashed rgba(44, 24, 16, 0.12);
+    border-radius: 8px;
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  .booking-placeholder__icon {
+    color: rgba(44, 24, 16, 0.2);
+  }
+
+  .booking-placeholder__text {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: rgba(44, 24, 16, 0.4);
+    margin-bottom: 0;
+  }
+
+  .booking-placeholder__note {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: rgba(44, 24, 16, 0.25);
+    margin-bottom: 0;
+  }
+
+  /* === Fallback Contact === */
+  .contact-fallback {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-fallback p {
+    color: rgba(44, 24, 16, 0.5);
+    font-size: 0.9375rem;
+  }
+
+  .contact-fallback a {
+    color: var(--dusty-coral);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .contact-fallback a:hover {
+    color: var(--brewery-dark);
+  }
+
+  .contact-fallback .whatsapp-link {
+    color: var(--forest-olive);
+  }
+
+  .contact-fallback .whatsapp-link:hover {
+    color: var(--brewery-dark);
+  }
+
+  /* === Responsive === */
+  @media (max-width: 768px) {
+    .booking-card {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+    }
+
+    .booking-card__content {
+      padding-right: 0;
+    }
+
+    .booking-placeholder {
+      min-height: 240px;
+    }
+  }
+</style>
