@@ -2,12 +2,11 @@
  * Cloudflare Pages Function: /api/availability
  *
  * Proxies Google Calendar API to return booked and held dates.
- * Strips all PII (event titles, descriptions, attendees) and returns
- * only date strings so the public calendar never exposes client info.
+ * Uses the freebusy endpoint which works with "free/busy only" calendar sharing,
+ * ensuring no PII (event titles, descriptions, attendees) is ever accessible.
  *
  * Query params:
  *   start  - YYYY-MM-DD (defaults to 1st of current month)
- *   end    - YYYY-MM-DD (defaults to last day of month +2)
  *   months - number of months to fetch (default 3, max 6)
  *
  * Environment variables (set in Cloudflare Pages dashboard):
@@ -20,7 +19,7 @@
 
 const CALENDAR_BOOKINGS = "c_v2a5l8vh2qenad1lm0ejd8hq7s@group.calendar.google.com";
 const CALENDAR_HELD = "c_88tt7mkoclpc8fjo2dfgickmvc@group.calendar.google.com";
-const GCAL_BASE = "https://www.googleapis.com/calendar/v3/calendars";
+const GCAL_FREEBUSY = "https://www.googleapis.com/calendar/v3/freeBusy";
 
 // CORS - allow same-origin and the dev preview domain
 const CORS_HEADERS = {
@@ -40,49 +39,31 @@ function jsonResponse(data, status = 200, cacheSeconds = 3600) {
   });
 }
 
-/** Extract YYYY-MM-DD from an all-day event's date or dateTime field */
-function extractDates(event) {
-  const start = event.start?.date || event.start?.dateTime?.split("T")[0];
-  const end = event.end?.date || event.end?.dateTime?.split("T")[0];
-  if (!start) return [];
-
-  // All-day events: start is inclusive, end is exclusive
-  // Single-day event: start=2026-04-12, end=2026-04-13 -> just 2026-04-12
-  // Multi-day event: start=2026-04-12, end=2026-04-14 -> 2026-04-12, 2026-04-13
-  const dates = [];
-  const current = new Date(start + "T00:00:00Z");
-  const endDate = end ? new Date(end + "T00:00:00Z") : new Date(current.getTime() + 86400000);
-
-  while (current < endDate) {
-    dates.push(current.toISOString().split("T")[0]);
-    current.setUTCDate(current.getUTCDate() + 1);
-  }
-  return dates;
-}
-
-async function fetchCalendarEvents(calendarId, apiKey, timeMin, timeMax) {
-  const url = new URL(`${GCAL_BASE}/${encodeURIComponent(calendarId)}/events`);
-  url.searchParams.set("key", apiKey);
-  url.searchParams.set("timeMin", timeMin);
-  url.searchParams.set("timeMax", timeMax);
-  url.searchParams.set("singleEvents", "true");
-  url.searchParams.set("maxResults", "200");
-  url.searchParams.set("fields", "items(start,end,status)"); // Only fetch dates + status - no PII
-  url.searchParams.set("orderBy", "startTime");
-
-  const resp = await fetch(url.toString());
-  if (!resp.ok) {
-    const text = await resp.text();
-    throw new Error(`Google Calendar API error ${resp.status}: ${text}`);
-  }
-
-  const data = await resp.json();
+/**
+ * Convert freebusy time ranges into an array of YYYY-MM-DD date strings.
+ * Each busy period has a start and end datetime - we extract all dates covered.
+ */
+function busyPeriodsToDateStrings(busyPeriods) {
   const dates = new Set();
 
-  for (const event of data.items || []) {
-    if (event.status === "cancelled") continue;
-    for (const d of extractDates(event)) {
-      dates.add(d);
+  for (const period of busyPeriods) {
+    const start = new Date(period.start);
+    const end = new Date(period.end);
+
+    // Walk through each day the busy period covers
+    const current = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
+    const endDay = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()));
+
+    // If end time is exactly midnight, the last day is the day before
+    // If end time is after midnight, include that day too
+    const endHour = end.getUTCHours();
+    const endMin = end.getUTCMinutes();
+    const endSec = end.getUTCSeconds();
+    const endIsExactlyMidnight = endHour === 0 && endMin === 0 && endSec === 0;
+
+    while (current < endDay || (!endIsExactlyMidnight && current.getTime() === endDay.getTime())) {
+      dates.add(current.toISOString().split("T")[0]);
+      current.setUTCDate(current.getUTCDate() + 1);
     }
   }
 
@@ -117,10 +98,35 @@ export async function onRequestGet(context) {
   const timeMax = end.toISOString();
 
   try {
-    const [booked, held] = await Promise.all([
-      fetchCalendarEvents(CALENDAR_BOOKINGS, apiKey, timeMin, timeMax),
-      fetchCalendarEvents(CALENDAR_HELD, apiKey, timeMin, timeMax),
-    ]);
+    // Use freebusy endpoint - works with "free/busy only" calendar sharing
+    // No event details (titles, descriptions) are ever returned
+    const freebusyUrl = `${GCAL_FREEBUSY}?key=${apiKey}`;
+    const resp = await fetch(freebusyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        timeMin,
+        timeMax,
+        items: [
+          { id: CALENDAR_BOOKINGS },
+          { id: CALENDAR_HELD },
+        ],
+      }),
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`Google Calendar API error ${resp.status}: ${text}`);
+    }
+
+    const data = await resp.json();
+    const calendars = data.calendars || {};
+
+    const bookedBusy = calendars[CALENDAR_BOOKINGS]?.busy || [];
+    const heldBusy = calendars[CALENDAR_HELD]?.busy || [];
+
+    const booked = busyPeriodsToDateStrings(bookedBusy);
+    const held = busyPeriodsToDateStrings(heldBusy);
 
     return jsonResponse({
       booked,
