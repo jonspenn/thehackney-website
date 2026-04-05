@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import UtilityHeader from '../components/UtilityHeader.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import FinalCTA from '../components/FinalCTA.astro';
@@ -73,15 +74,12 @@ const creditPhotographers = [
   description="Meet the photographers whose work captures The Hackney. From bold documentary style to timeless elegance - find a photographer for your wedding or event at our restored 1856 brewery."
 >
 
-  <!-- ==================== INTRO ==================== -->
-  <Section bg="light" padding="standard">
-    <SectionHeader
-      eyebrow="Photographers"
-      heading="The People Behind The Photos"
-      align="center"
-    />
-    <p class="intro-text">Every image on this site and in our printed brochures was captured by one of the photographers below. If you are planning a wedding or event at The Hackney and need a photographer, this is where we would start.</p>
-  </Section>
+  <!-- ==================== HEADER ==================== -->
+  <UtilityHeader
+    eyebrow="Photographers"
+    heading="The People Behind The Photos"
+    intro="Every image on this site and in our printed brochures was captured by one of the photographers below. If you are planning a wedding or event at The Hackney and need a photographer, this is where we would start."
+  />
 
   <!-- ==================== FEATURED PHOTOGRAPHERS ==================== -->
   <Section bg="light" border="top">
@@ -176,16 +174,6 @@ const creditPhotographers = [
 </Base>
 
 <style>
-  /* === Intro === */
-  .intro-text {
-    text-align: center;
-    max-width: 680px;
-    margin: 0 auto;
-    font-size: 1.125rem;
-    line-height: 1.65;
-    color: rgba(44, 24, 16, 0.75);
-  }
-
   /* === Featured Grid (2-col) === */
   .featured-grid {
     display: grid;

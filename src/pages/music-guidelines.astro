@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import HeroSection from '../components/HeroSection.astro';
+import UtilityHeader from '../components/UtilityHeader.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import FinalCTA from '../components/FinalCTA.astro';
@@ -11,13 +11,10 @@ import FinalCTA from '../components/FinalCTA.astro';
   description="Music policies, DJ setup, live music rules and professional audio equipment at The Hackney. Everything your DJ or band needs to know before your event."
 >
 
-<HeroSection
-  image="/images/hackney-wedding-first-dance-guests-venue.webp"
-  alt="Guests celebrating on the dance floor at The Hackney"
-  eyebrow="Your event"
-  heading="Music guidelines"
-  subtext="Everything your DJ, band or musician needs to know about performing at The Hackney - from our sound system to noise policies."
-  height="compact"
+<UtilityHeader
+  eyebrow="Your Event"
+  heading="Music Guidelines"
+  intro="Everything your DJ, band or musician needs to know about performing at The Hackney - from our sound system to noise policies."
 />
 
 <!-- Key Policies -->
@@ -196,7 +193,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     padding: 2rem;
     border: 1px solid rgba(64, 22, 12, 0.06);
     border-top: 3px solid var(--forest-olive);
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   .policy-card h3 {
@@ -292,7 +289,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     background: rgba(44, 24, 16, 0.03);
     border: 1px solid rgba(64, 22, 12, 0.06);
     border-top: 3px solid var(--mid-olive);
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   .kit-card h3 {
@@ -330,7 +327,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     padding: 2rem;
     background: rgba(44, 24, 16, 0.03);
     border: 1px solid rgba(64, 22, 12, 0.06);
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   .dj-desk-info h3 {

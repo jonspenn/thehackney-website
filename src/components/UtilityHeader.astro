@@ -1,0 +1,59 @@
+---
+/**
+ * UtilityHeader - Lightweight header for utility/resource pages
+ *
+ * Used on operational pages (photographers, music guidelines, directions, etc.)
+ * that serve people already in the funnel rather than attracting new visitors.
+ * No hero image, no proof bar - just a clean eyebrow + heading + intro.
+ *
+ * Props:
+ *   eyebrow  - uppercase label (e.g. "Resources", "For Your DJ")
+ *   heading  - the page title (h1)
+ *   intro    - 1-2 sentence description
+ */
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+}
+
+const { eyebrow, heading, intro } = Astro.props;
+---
+
+<section class="utility-header">
+  <div class="container">
+    {eyebrow && <p class="eyebrow utility-header-eyebrow">{eyebrow}</p>}
+    <h1>{heading}</h1>
+    {intro && <p class="utility-header-intro">{intro}</p>}
+  </div>
+</section>
+
+<style>
+  .utility-header {
+    background-color: var(--warm-canvas);
+    padding: 64px 0 48px;
+    text-align: center;
+  }
+
+  .utility-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    color: var(--brewery-dark);
+    margin-bottom: 0;
+    line-height: 1.2;
+  }
+
+  .utility-header-eyebrow {
+    margin-bottom: 12px;
+  }
+
+  .utility-header-intro {
+    max-width: 640px;
+    margin: 16px auto 0;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: rgba(44, 24, 16, 0.7);
+  }
+</style>

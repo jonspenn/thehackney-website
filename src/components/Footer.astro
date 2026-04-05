@@ -37,6 +37,11 @@ const currentYear = new Date().getFullYear();
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
       <a href="/journal/">Journal</a>
+    </nav>
+    <nav class="footer-nav-col">
+      <span class="footer-col-label">Resources</span>
+      <a href="/photographers/">Photographers</a>
+      <a href="/music-guidelines/">Music Guidelines</a>
       <a href="/privacy/">Privacy Policy</a>
     </nav>
 
@@ -58,8 +63,8 @@ const currentYear = new Date().getFullYear();
 
   .footer-inner {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 64px;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 48px;
     align-items: start;
     padding-block: 56px 48px;
   }
@@ -146,6 +151,15 @@ const currentYear = new Date().getFullYear();
     opacity: 1;
   }
 
+  .footer-col-label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-canvas);
+    opacity: 0.4;
+    margin-bottom: 4px;
+  }
+
   /* ---- Bottom bar ---- */
   .footer-bottom {
     padding: 20px 0;
@@ -163,7 +177,7 @@ const currentYear = new Date().getFullYear();
   @media (max-width: 768px) {
     .footer-inner {
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 32px 24px;
       padding-block: 40px 32px;
     }
 
