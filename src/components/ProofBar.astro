@@ -1,7 +1,7 @@
 ---
 /**
  * ProofBar - Social proof stats strip.
- * Warm Canvas background, big numbers, compact padding.
+ * Warm Canvas background, bordered card per stat, consistent visual weight.
  *
  * Usage:
  *   <ProofBar
@@ -39,43 +39,43 @@ const { stats } = Astro.props;
   .proof-bar {
     background: var(--warm-canvas);
     border-bottom: 1px solid rgba(44, 24, 16, 0.08);
-    padding: 32px 0;
+    padding: 40px 0;
   }
 
   .proof-bar-inner {
     display: grid;
     grid-template-columns: repeat(var(--stat-cols, 4), 1fr);
-    gap: 24px;
+    gap: 20px;
     text-align: center;
-    align-items: start;
   }
 
   .proof-stat {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(44, 24, 16, 0.12);
+    border-radius: 4px;
+    padding: 28px 16px;
+    min-height: 120px;
   }
 
   .proof-stat-number {
     font-family: var(--font-heading);
-    font-size: clamp(28px, 3.2vw, 40px);
+    font-size: clamp(22px, 2.4vw, 30px);
     font-weight: 700;
     color: var(--brewery-dark);
     letter-spacing: 0.02em;
-    line-height: 1.15;
-    min-height: 2.4em;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    line-height: 1.25;
     text-align: center;
   }
 
   .proof-stat-label {
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--dusty-coral);
-    margin-top: 8px;
+    margin-top: 10px;
     font-weight: 500;
     line-height: 1.4;
   }
@@ -83,11 +83,12 @@ const { stats } = Astro.props;
   @media (max-width: 768px) {
     .proof-bar-inner {
       grid-template-columns: repeat(2, 1fr);
-      gap: 32px;
+      gap: 16px;
     }
 
-    .proof-stat-number {
-      min-height: 2.4em;
+    .proof-stat {
+      min-height: 100px;
+      padding: 24px 12px;
     }
   }
 </style>
