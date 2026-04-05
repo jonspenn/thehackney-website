@@ -14,17 +14,17 @@ import FinalCTA from '../components/FinalCTA.astro';
   <HeroSection
     bg="olive"
     height="compact"
-    eyebrow="Corporate Events at The Hackney"
-    heading='Your event. <span style="white-space: nowrap;">Our brewery.</span>'
-    subtext="Conferences, team days, product launches, brand activations. A unique venue with professional capabilities and the kind of backdrop that stays memorable long after the event ends."
+    heading='Your Event.<br>Our Brewery.'
+    cta={{ label: "Check Availability", href: "/check-your-date/?type=corporate", utm: "corporate-hero" }}
+    note="Exclusive hire from half-day to full-day"
   />
 
   <!-- ==================== SOCIAL PROOF BAR ==================== -->
   <ProofBar stats={[
-    { number: "200+", label: "Events hosted" },
-    { number: "4.6", label: "Google rating" },
-    { number: "Exclusive", label: "Venue hire" },
-    { number: "In-house", label: "Kitchen & bar" }
+    { number: "Adidas, Spotify, Samsung", label: "Brands we've hosted" },
+    { number: "Exclusive Hire", label: "The whole venue, just for you" },
+    { number: "100 Standing", label: "60 seated capacity" },
+    { number: "In-House Catering", label: "Kitchen, bar and service team" }
   ]} />
 
   <!-- ==================== EVENT TYPES ==================== -->

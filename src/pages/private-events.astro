@@ -14,17 +14,17 @@ import FinalCTA from '../components/FinalCTA.astro';
   <HeroSection
     bg="olive"
     height="compact"
-    eyebrow="Private Events at The Hackney"
-    heading='Your celebration. <span style="white-space: nowrap;">Our brewery.</span>'
-    subtext="Birthdays, anniversaries, baby showers, engagement parties - celebrate the moments that matter inside a restored 1856 brewery. The whole venue is yours."
+    heading='Your Celebration.<br>Our Brewery.'
+    cta={{ label: "Check Availability", href: "/check-your-date/?type=private", utm: "private-hero" }}
+    note="Birthdays, anniversaries, baby showers and more"
   />
 
   <!-- ==================== SOCIAL PROOF BAR ==================== -->
   <ProofBar stats={[
-    { number: "200+", label: "Events hosted" },
-    { number: "4.6", label: "Google rating" },
-    { number: "Exclusive", label: "Venue hire" },
-    { number: "In-house", label: "Kitchen & bar" }
+    { number: "Exclusive Hire", label: "The whole venue, just for you" },
+    { number: "In-House Catering", label: "Food, drinks and service included" },
+    { number: "60 Seated", label: "Up to 100 standing" },
+    { number: "Hackney Road E2", label: "2 min from Cambridge Heath" }
   ]} />
 
   <!-- ==================== EVENT TYPES ==================== -->
