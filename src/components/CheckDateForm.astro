@@ -3,7 +3,7 @@
  * CheckDateForm.astro
  * Astro wrapper for the Check Your Date qualifying form React island.
  * Three screens max for any path: event type > form > confirmation/calendar.
- * Reuses wq- CSS classes from WeddingQuestionnaire for shared tokens.
+ * Includes all wq- shared CSS (same tokens as WeddingQuestionnaire).
  */
 import CheckDateForm from './CheckDateForm.jsx';
 ---
@@ -27,6 +27,300 @@ import CheckDateForm from './CheckDateForm.jsx';
     scroll-margin-top: calc(var(--header-height, 96px) + 2rem);
   }
 
+  /* ── Step layout ── */
+  .cd .wq-step {
+    position: relative;
+  }
+
+  .cd .wq-step--confirmation {
+    text-align: center;
+    padding: 40px 0;
+  }
+
+  /* ── Typography ── */
+  .cd .wq-eyebrow {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin-bottom: 16px;
+  }
+
+  .cd .wq-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--brewery-dark);
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+  }
+
+  .cd .wq-subtext {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--brewery-dark);
+    opacity: 0.7;
+    margin: 0 0 32px;
+    max-width: 440px;
+  }
+
+  .cd .wq-step--confirmation .wq-subtext {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cd .wq-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dusty-coral);
+    margin-bottom: 12px;
+  }
+
+  .cd .wq-hint {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--brewery-dark);
+    opacity: 0.4;
+    margin-top: 14px;
+  }
+
+  /* ── Buttons ── */
+  .cd .wq-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 14px 40px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  }
+
+  .cd .wq-btn--primary {
+    background: var(--mid-olive);
+    color: #fff;
+  }
+
+  .cd .wq-btn--primary:hover {
+    background: var(--forest-olive);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(46,64,9,0.25);
+  }
+
+  .cd .wq-btn--primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .cd .wq-btn--outline {
+    background: transparent;
+    color: var(--forest-olive);
+    border: 1.5px solid var(--forest-olive);
+    padding: 12px 36px;
+  }
+
+  .cd .wq-btn--outline:hover {
+    background: rgba(46,64,9,0.06);
+  }
+
+  .cd .wq-btn--full {
+    width: 100%;
+  }
+
+  /* ── Back button ── */
+  .cd .wq-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--brewery-dark);
+    opacity: 0.5;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 24px;
+    transition: opacity 0.2s;
+  }
+
+  .cd .wq-back:hover {
+    opacity: 0.8;
+  }
+
+  /* ── Selection cards ── */
+  .cd .wq-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cd .wq-card {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 16px 20px;
+    border: 1.5px solid rgba(44,24,16,0.10);
+    border-radius: 2px;
+    background: rgba(255,255,255,0.6);
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .cd .wq-card:hover {
+    border-color: rgba(44,24,16,0.22);
+    background: rgba(255,255,255,0.85);
+  }
+
+  .cd .wq-card--selected {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.05);
+  }
+
+  .cd .wq-card--selected:hover {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.07);
+  }
+
+  .cd .wq-card__text {
+    flex: 1;
+  }
+
+  .cd .wq-card__label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--brewery-dark);
+    line-height: 1.3;
+  }
+
+  .cd .wq-card__sublabel {
+    font-size: 13px;
+    color: var(--brewery-dark);
+    opacity: 0.5;
+    margin-top: 2px;
+  }
+
+  .cd .wq-card__check {
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--forest-olive);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+
+  /* ── Form fields ── */
+  .cd .wq-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cd .wq-field__label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--brewery-dark);
+  }
+
+  .cd .wq-field__optional {
+    font-size: 11px;
+    color: var(--dusty-coral);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .cd .wq-field__input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(44,24,16,0.15);
+    border-radius: 2px;
+    background: var(--warm-canvas);
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--brewery-dark);
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+
+  .cd .wq-field__input:focus {
+    outline: none;
+    border-color: var(--forest-olive);
+  }
+
+  .cd .wq-field__input::placeholder {
+    color: rgba(44,24,16,0.3);
+  }
+
+  .cd .wq-field__note {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--dusty-coral);
+    margin-top: 6px;
+  }
+
+  /* ── Confirmation cards ── */
+  .cd .wq-confirm-icon {
+    margin-bottom: 20px;
+  }
+
+  .cd .wq-confirm-card {
+    background: rgba(44,24,16,0.025);
+    border: 1px solid rgba(44,24,16,0.06);
+    border-radius: 2px;
+    padding: 28px;
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  .cd .wq-confirm-card p {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--brewery-dark);
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .cd .wq-confirm-card__title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--brewery-dark);
+    margin: 0 0 12px;
+  }
+
+  .cd .wq-confirm-card--hot {
+    background: rgba(46,64,9,0.04);
+    border-color: rgba(46,64,9,0.15);
+  }
+
   /* ── Info box (private celebration pricing note) ── */
   .cd-info-box {
     background: rgba(46,64,9,0.04);
@@ -45,7 +339,7 @@ import CheckDateForm from './CheckDateForm.jsx';
   }
 
   /* ── Toggle buttons (seated/standing) ── */
-  .wq-toggle {
+  .cd .wq-toggle {
     flex: 1;
     padding: 12px 16px;
     border: 1.5px solid rgba(44,24,16,0.10);
@@ -60,26 +354,26 @@ import CheckDateForm from './CheckDateForm.jsx';
     text-align: center;
   }
 
-  .wq-toggle:hover {
+  .cd .wq-toggle:hover {
     border-color: rgba(44,24,16,0.22);
     background: rgba(255,255,255,0.85);
   }
 
-  .wq-toggle--active {
+  .cd .wq-toggle--active {
     border-color: var(--forest-olive);
     background: rgba(46,64,9,0.08);
     color: var(--forest-olive);
   }
 
   /* ── Select dropdown styling ── */
-  .wq-field__input[type="date"],
-  select.wq-field__input {
+  .cd .wq-field__input[type="date"],
+  .cd select.wq-field__input {
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
   }
 
-  select.wq-field__input {
+  .cd select.wq-field__input {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%232C1810' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
@@ -107,6 +401,10 @@ import CheckDateForm from './CheckDateForm.jsx';
   @media (max-width: 768px) {
     .check-date-section {
       padding: 48px 0 64px;
+    }
+
+    .cd .wq-confirm-card {
+      padding: 20px;
     }
 
     .cd-meetings-embed .meetings-iframe-container,

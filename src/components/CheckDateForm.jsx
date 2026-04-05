@@ -669,38 +669,13 @@ export default function CheckDateForm() {
       pushEvent("check_date_qualified", { event_type: data.eventType });
     }
 
-    /* ── HubSpot Forms API submission ── */
-    try {
-      const portalId = "25870094";
-      const formId = "6966c5ba-2f16-4229-ab5b-7fe24774fad6"; // Contact form - update if separate form created
-      const hubspotPayload = {
-        fields: [
-          { name: "firstname", value: data.firstName },
-          { name: "email", value: data.email },
-          { name: "phone", value: data.phone || "" },
-          { name: "company", value: data.company || "" },
-          { name: "message", value: buildHubSpotMessage(data) },
-        ],
-        context: {
-          pageUri: window.location.href,
-          pageName: "Check Your Date",
-        },
-      };
-
-      // Add GCLID if available
-      if (tracking.gclid) {
-        hubspotPayload.fields.push({ name: "cookie__gclid", value: tracking.gclid });
-      }
-
-      await fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(hubspotPayload),
-      });
-    } catch (err) {
-      console.error("[CheckDateForm] HubSpot submission failed:", err);
-      // Don't block the flow - still show confirmation
-    }
+    /* ── PLACEHOLDER: Klaviyo or Brevo submission ── */
+    /* HubSpot is NOT used for form capture on this page.
+       HubSpot = CRM + meetings/deals only.
+       Top-of-funnel form data goes to Klaviyo/Brevo (platform TBD).
+       When decided, replace this block with the chosen platform's API call.
+       The payload object above has all the fields ready to map. */
+    console.log("[CheckDateForm] Ready for Klaviyo/Brevo integration. Payload:", payload);
 
     setSubmitting(false);
     goTo("confirmation");
@@ -750,14 +725,9 @@ export default function CheckDateForm() {
   );
 }
 
-/* ─── Helper: build message string for HubSpot ─── */
-function buildHubSpotMessage(data) {
-  const parts = [`Event type: ${data.eventType}`];
-  if (data.corporateType) parts.push(`Corporate type: ${data.corporateType}`);
-  if (data.occasion) parts.push(`Occasion: ${data.occasion}`);
-  if (data.eventDate) parts.push(`Date: ${data.eventDate}`);
-  if (data.guestCount) parts.push(`Guests: ${data.guestCount}`);
-  if (data.eventType === "corporate" && data.format) parts.push(`Format: ${data.format}`);
-  parts.push("Source: Check Your Date form (new site)");
-  return parts.join("\n");
-}
+/* ─── Note on form submission ─── */
+/* Form data goes to Klaviyo or Brevo (top-of-funnel nurture platform, TBD).
+   HubSpot is used ONLY for:
+   - Meetings embed (booking a discovery call with Hugo)
+   - CRM deal tracking (post-tour pipeline)
+   See prd-check-your-date.md and the Klaviyo vs Brevo decision in TASKS.md. */
