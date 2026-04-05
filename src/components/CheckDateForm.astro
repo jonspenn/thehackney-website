@@ -1,0 +1,117 @@
+---
+/**
+ * CheckDateForm.astro
+ * Astro wrapper for the Check Your Date qualifying form React island.
+ * Three screens max for any path: event type > form > confirmation/calendar.
+ * Reuses wq- CSS classes from WeddingQuestionnaire for shared tokens.
+ */
+import CheckDateForm from './CheckDateForm.jsx';
+---
+
+<section class="check-date-section" id="check-your-date">
+  <div class="container">
+    <CheckDateForm client:load />
+  </div>
+</section>
+
+<style is:global>
+  /* ==================== CHECK DATE FORM ==================== */
+  .check-date-section {
+    padding: 60px 0 80px;
+    scroll-margin-top: var(--header-height, 96px);
+  }
+
+  .cd {
+    max-width: 580px;
+    margin: 0 auto;
+    scroll-margin-top: calc(var(--header-height, 96px) + 2rem);
+  }
+
+  /* ── Info box (private celebration pricing note) ── */
+  .cd-info-box {
+    background: rgba(46,64,9,0.04);
+    border: 1px solid rgba(46,64,9,0.12);
+    border-radius: 2px;
+    padding: 16px 20px;
+  }
+
+  .cd-info-box p {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--brewery-dark);
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  /* ── Toggle buttons (seated/standing) ── */
+  .wq-toggle {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1.5px solid rgba(44,24,16,0.10);
+    border-radius: 2px;
+    background: rgba(255,255,255,0.6);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brewery-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .wq-toggle:hover {
+    border-color: rgba(44,24,16,0.22);
+    background: rgba(255,255,255,0.85);
+  }
+
+  .wq-toggle--active {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.08);
+    color: var(--forest-olive);
+  }
+
+  /* ── Select dropdown styling ── */
+  .wq-field__input[type="date"],
+  select.wq-field__input {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+
+  select.wq-field__input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%232C1810' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  /* ── HubSpot meetings embed in confirmation ── */
+  .cd-meetings-embed {
+    margin-top: 16px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .cd-meetings-embed .meetings-iframe-container {
+    min-height: 650px;
+  }
+
+  .cd-meetings-embed iframe {
+    width: 100%;
+    min-height: 650px;
+    border: none;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .check-date-section {
+      padding: 48px 0 64px;
+    }
+
+    .cd-meetings-embed .meetings-iframe-container,
+    .cd-meetings-embed iframe {
+      min-height: 550px;
+    }
+  }
+</style>
