@@ -21,7 +21,7 @@
   --color-text: var(--brewery-dark);
   --color-accent: var(--dusty-coral);
   --color-cta-light: var(--mid-olive);       /* CTA on light backgrounds - brighter green for pop */
-  --color-cta-dark: var(--dusty-coral);     /* CTA on dark backgrounds */
+  --color-cta-dark: var(--mid-olive);       /* CTA on dark backgrounds - brighter green for visibility */
   --color-eyebrow: var(--dusty-coral);      /* Eyebrow labels */
   --color-quote: var(--fired-brick);        /* Quote text, warm highlight */
   --color-success: var(--signal-green);
@@ -173,15 +173,15 @@ a:hover {
   color: var(--warm-canvas);
 }
 
-/* Primary CTA on dark backgrounds: Dusty Coral */
+/* Primary CTA on dark backgrounds: Mid Olive (brighter green) */
 .btn-primary-dark {
   background-color: var(--color-cta-dark);
   color: var(--warm-canvas);
 }
 
 .btn-primary-dark:hover {
-  background-color: var(--warm-canvas);
-  color: var(--brewery-dark);
+  background-color: var(--forest-olive);
+  color: var(--warm-canvas);
 }
 
 /* Outline on light backgrounds */
