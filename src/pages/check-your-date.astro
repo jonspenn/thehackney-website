@@ -11,9 +11,9 @@ import CheckDateForm from '../components/CheckDateForm.astro';
 >
 
 <UtilityHeader
-  eyebrow="Check Your Date"
-  heading="See if your date is available"
-  intro="Tell us what you're planning and we'll check availability. Takes 60 seconds. No obligation."
+  eyebrow="Availability"
+  heading="Check your date"
+  intro="Browse our calendar to see what's available. Select a date that works and book a tour of the space."
 />
 
 <CheckDateForm />
@@ -28,15 +28,15 @@ import CheckDateForm from '../components/CheckDateForm.astro';
         <ol class="cd-steps">
           <li>
             <span class="cd-step-num">1</span>
-            <p><strong>We check your date</strong> and get back to you within 24 hours</p>
+            <p><strong>Find your date</strong> - browse the calendar and pick an available date</p>
           </li>
           <li>
             <span class="cd-step-num">2</span>
-            <p><strong>15-minute call with Hugo</strong> to answer your questions</p>
+            <p><strong>Book a venue tour</strong> - see the space in person with Hugo, no obligation</p>
           </li>
           <li>
             <span class="cd-step-num">3</span>
-            <p><strong>See the space</strong> - book a tour, no obligation</p>
+            <p><strong>We'll hold your date</strong> - love it? We reserve it while you decide</p>
           </li>
         </ol>
       </div>
@@ -63,6 +63,11 @@ import CheckDateForm from '../components/CheckDateForm.astro';
 </Base>
 
 <style>
+  /* ==================== TIGHTER HEADER SPACING ==================== */
+  .utility-header {
+    padding-bottom: 24px;
+  }
+
   /* ==================== TRUST SECTION ==================== */
   .cd-trust {
     padding: 0 0 80px;

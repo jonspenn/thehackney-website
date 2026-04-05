@@ -4,20 +4,30 @@
  * Astro wrapper for the Check Your Date availability calendar.
  * The calendar is the primary element - users see availability instantly.
  * Clicking an available date surfaces CTAs to get in touch.
+ *
+ * Props:
+ *   eventType - "wedding" | "corporate" | "private" | undefined
+ *              Passed through to the React component for context-aware CTAs.
  */
 import CheckDateForm from './CheckDateForm.jsx';
+
+interface Props {
+  eventType?: "wedding" | "corporate" | "private";
+}
+
+const { eventType } = Astro.props;
 ---
 
 <section class="check-date-section" id="check-your-date">
   <div class="container">
-    <CheckDateForm client:load />
+    <CheckDateForm client:load eventType={eventType} />
   </div>
 </section>
 
 <style is:global>
   /* ==================== CHECK DATE FORM ==================== */
   .check-date-section {
-    padding: 60px 0 80px;
+    padding: 24px 0 80px;
     scroll-margin-top: var(--header-height, 96px);
   }
 
@@ -437,9 +447,28 @@ import CheckDateForm from './CheckDateForm.jsx';
     gap: 10px;
   }
 
+  .cd-date-result__whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--brewery-dark);
+    opacity: 0.5;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .cd-date-result__whatsapp:hover {
+    opacity: 0.75;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
   .cd-date-result__change {
     display: inline-block;
-    margin-top: 16px;
+    margin-top: 10px;
     font-family: var(--font-body);
     font-size: 13px;
     color: var(--brewery-dark);
