@@ -46,6 +46,8 @@ interface Props {
   bg?: 'image' | 'olive' | 'dark' | 'light';
   align?: 'center' | 'left';
   overlay?: number;
+  /** Wraps text in a semi-transparent dark panel instead of full overlay */
+  textPanel?: boolean;
 }
 
 const {
@@ -60,8 +62,12 @@ const {
   height = 'full',
   bg = 'image',
   align = 'center',
-  overlay = 0.45
+  overlay = 0.45,
+  textPanel = false
 } = Astro.props;
+
+// When text panel is active, reduce overlay to let image breathe
+const effectiveOverlay = textPanel ? 0.15 : overlay;
 
 const heightMap: Record<string, string> = {
   full: '100vh',
@@ -101,7 +107,7 @@ const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
     `hero-align-${align}`,
     { 'hero-auto': isAuto }
   ]}
-  style={`--hero-height: ${heightMap[height]}; --hero-min-height: ${minHeightMap[height]}; --hero-overlay: ${overlay}; --hero-bg-color: ${bgColorMap[bg]}`}
+  style={`--hero-height: ${heightMap[height]}; --hero-min-height: ${minHeightMap[height]}; --hero-overlay: ${effectiveOverlay}; --hero-bg-color: ${bgColorMap[bg]}`}
 >
   {hasImage && (
     <div
@@ -113,18 +119,35 @@ const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
   )}
   {hasOverlay && <div class="hero-section-overlay"></div>}
   <div class="container">
-    <div class="hero-section-content">
-      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-      <h1 set:html={heading} />
-      {subtext && <p class="hero-section-sub">{subtext}</p>}
-      {(cta || secondaryCta) && (
-        <div class="hero-section-ctas">
-          {cta && <a href={ctaHref} class={ctaClass}>{cta.label}</a>}
-          {secondaryCta && <a href={secondaryCta.href} class={secondaryCtaClass}>{secondaryCta.label}</a>}
+    {textPanel ? (
+      <div class="hero-section-panel">
+        <div class="hero-section-content">
+          {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+          <h1 set:html={heading} />
+          {subtext && <p class="hero-section-sub">{subtext}</p>}
+          {(cta || secondaryCta) && (
+            <div class="hero-section-ctas">
+              {cta && <a href={ctaHref} class={ctaClass}>{cta.label}</a>}
+              {secondaryCta && <a href={secondaryCta.href} class={secondaryCtaClass}>{secondaryCta.label}</a>}
+            </div>
+          )}
+          {note && <p class="hero-section-note">{note}</p>}
         </div>
-      )}
-      {note && <p class="hero-section-note">{note}</p>}
-    </div>
+      </div>
+    ) : (
+      <div class="hero-section-content">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        <h1 set:html={heading} />
+        {subtext && <p class="hero-section-sub">{subtext}</p>}
+        {(cta || secondaryCta) && (
+          <div class="hero-section-ctas">
+            {cta && <a href={ctaHref} class={ctaClass}>{cta.label}</a>}
+            {secondaryCta && <a href={secondaryCta.href} class={secondaryCtaClass}>{secondaryCta.label}</a>}
+          </div>
+        )}
+        {note && <p class="hero-section-note">{note}</p>}
+      </div>
+    )}
   </div>
 </section>
 
@@ -149,6 +172,28 @@ const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
   }
 
   /* Solid-bg heroes: no extra header offset needed (body padding-top handles it) */
+
+  /* === Text panel (editorial overlay) === */
+  .hero-section-panel {
+    background: rgba(44, 24, 16, 0.75);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 4px;
+    padding: 3rem 3.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-section-panel .hero-section-content {
+    max-width: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section-panel {
+      padding: 2rem 1.5rem;
+      margin: 0 1rem;
+    }
+  }
 
   /* === Background image === */
   .hero-section-bg {
