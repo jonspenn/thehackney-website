@@ -19,7 +19,7 @@ import Section from '../components/Section.astro';
   </div>
 
   <!-- Primary: Book a Venue Tour -->
-  <Section bg="light" padding="compact" id="tour">
+  <Section bg="light" padding="none" id="tour" class="bookacall-tour">
     <div class="booking-card booking-card--primary fade-in">
       <div class="booking-card__content">
         <p class="eyebrow">Recommended</p>
@@ -111,7 +111,11 @@ import Section from '../components/Section.astro';
   .bookacall-hero {
     background-color: var(--warm-canvas);
     text-align: center;
-    padding: 48px 0 24px;
+    padding: 40px 0 0;
+  }
+
+  .bookacall-hero :global(.eyebrow) {
+    text-align: center;
   }
 
   .bookacall-hero h1 {
@@ -125,6 +129,10 @@ import Section from '../components/Section.astro';
     line-height: 1.65;
     max-width: 500px;
     margin: 0 auto;
+  }
+
+  :global(.bookacall-tour) {
+    padding: 24px 0 48px;
   }
 
   /* === Booking Cards === */
