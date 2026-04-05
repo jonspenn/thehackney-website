@@ -20,8 +20,6 @@ interface Props {
 
 const { stats } = Astro.props;
 
-// Detect text-based stats (contain spaces or are longer than 5 chars)
-const isTextStat = (num: string) => num.includes(' ') || num.length > 5;
 ---
 
 <section class="proof-bar">
@@ -29,7 +27,7 @@ const isTextStat = (num: string) => num.includes(' ') || num.length > 5;
     <div class="proof-bar-inner" style={`--stat-cols: ${stats.length};`}>
       {stats.map((stat) => (
         <div class="proof-stat fade-in">
-          <div class:list={["proof-stat-number", { "proof-stat-text": isTextStat(stat.number) }]}>{stat.number}</div>
+          <div class="proof-stat-number">{stat.number}</div>
           <div class="proof-stat-label">{stat.label}</div>
         </div>
       ))}
@@ -49,35 +47,46 @@ const isTextStat = (num: string) => num.includes(' ') || num.length > 5;
     grid-template-columns: repeat(var(--stat-cols, 4), 1fr);
     gap: 24px;
     text-align: center;
+    align-items: start;
+  }
+
+  .proof-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .proof-stat-number {
     font-family: var(--font-heading);
-    font-size: clamp(36px, 4vw, 52px);
-    font-weight: 800;
+    font-size: clamp(28px, 3.2vw, 40px);
+    font-weight: 700;
     color: var(--brewery-dark);
     letter-spacing: 0.02em;
-    line-height: 1;
-  }
-
-  .proof-stat-text {
-    font-size: clamp(22px, 2.8vw, 32px);
-    font-weight: 700;
+    line-height: 1.15;
+    min-height: 48px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
   }
 
   .proof-stat-label {
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--dusty-coral);
-    margin-top: 6px;
+    margin-top: 8px;
     font-weight: 500;
+    line-height: 1.4;
   }
 
   @media (max-width: 768px) {
     .proof-bar-inner {
       grid-template-columns: repeat(2, 1fr);
       gap: 32px;
+    }
+
+    .proof-stat-number {
+      min-height: 40px;
     }
   }
 </style>
