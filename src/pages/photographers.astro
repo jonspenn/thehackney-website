@@ -1,0 +1,350 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+
+const featuredPhotographers = [
+  {
+    name: "This Modern Revelry",
+    style: "Bold, edgy, documentary style with dynamic lighting and editorial-worthy shots. If you want photography that feels modern and cinematic, they are a perfect match for The Hackney.",
+    website: "https://thismodernrevelry.com/",
+    instagram: "thismodernrevelry",
+    focus: "Weddings"
+  },
+  {
+    name: "Ollie Hinds Photography",
+    style: "Natural documentary style with real attention to detail. Ollie captures the emotion and energy of the day without ever making it feel staged. One of our most trusted photographers.",
+    website: "https://olliehindsphotography.com/",
+    instagram: "olliehindsphotography",
+    focus: "Weddings and Events"
+  }
+];
+
+const weddingPhotographers = [
+  {
+    name: "Grace Pham Photography",
+    style: "Artistic and elegant. Strong attention to light and composition with a timeless, emotional feel.",
+    website: "https://www.gracephamphotography.com/",
+    focus: "Weddings and Events"
+  },
+  {
+    name: "Taylor Hughes Photography",
+    style: "Timeless, elegant storytelling with a warm, professional approach and meticulous attention to detail.",
+    website: "https://www.taylorhughesphotography.com/",
+    focus: "Weddings"
+  },
+  {
+    name: "Elizabeth Jayne Weddings",
+    style: "Elegant, light-filled images with a classic approach and artistic vision. Detail-led and beautifully composed.",
+    website: "https://www.elizabethjayneweddings.com/",
+    focus: "Weddings"
+  },
+  {
+    name: "Mark Horton Photography",
+    style: "Classic elegance blended with modern storytelling. Natural, light-filled shots that capture authentic emotion.",
+    website: "https://www.markhortonphotos.com/",
+    focus: "Weddings"
+  },
+  {
+    name: "Lisa Jane Photography",
+    style: "Intimate and authentic. A storytelling approach with a creative eye for detail and emotive, natural moments.",
+    focus: "Weddings"
+  },
+  {
+    name: "Costa Weddings",
+    style: "Authentic, emotional moments captured with a natural, artistic style at unique venues across London.",
+    focus: "Weddings"
+  }
+];
+
+const creditPhotographers = [
+  {
+    name: "Owen Williams Photography",
+    style: "Reportage-style corporate and event photography with editorial polish.",
+    website: "https://www.owenwilliamsphoto.com/",
+    focus: "Corporate Events"
+  }
+];
+---
+
+<Base
+  title="Photographers | Wedding & Event Photography at The Hackney, East London"
+  description="Meet the photographers whose work captures The Hackney. From bold documentary style to timeless elegance - find a photographer for your wedding or event at our restored 1856 brewery."
+>
+
+  <!-- ==================== INTRO ==================== -->
+  <Section bg="light" padding="standard">
+    <SectionHeader
+      eyebrow="Photographers"
+      heading="The People Behind The Photos"
+      align="center"
+    />
+    <p class="intro-text">Every image on this site and in our printed brochures was captured by one of the photographers below. If you are planning a wedding or event at The Hackney and need a photographer, this is where we would start.</p>
+  </Section>
+
+  <!-- ==================== FEATURED PHOTOGRAPHERS ==================== -->
+  <Section bg="light" border="top">
+    <SectionHeader
+      eyebrow="Recommended"
+      heading="Photographers We Love Working With"
+    />
+    <div class="featured-grid">
+      {featuredPhotographers.map((photographer) => (
+        <div class="featured-card">
+          <div class="featured-card-content">
+            <h3>{photographer.name}</h3>
+            <p class="photographer-focus">{photographer.focus}</p>
+            <p class="photographer-style">{photographer.style}</p>
+            <div class="photographer-links">
+              {photographer.website && (
+                <a href={photographer.website} target="_blank" rel="noopener noreferrer" class="photographer-link">
+                  Visit Website
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              )}
+              {photographer.instagram && (
+                <a href={`https://www.instagram.com/${photographer.instagram}/`} target="_blank" rel="noopener noreferrer" class="photographer-link">
+                  @{photographer.instagram}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- ==================== WEDDING PHOTOGRAPHERS ==================== -->
+  <Section bg="light" border="top">
+    <SectionHeader
+      eyebrow="Wedding Photography"
+      heading="More Talented Photographers Who Have Shot Here"
+    />
+    <div class="photographer-grid">
+      {weddingPhotographers.map((photographer) => (
+        <div class="photographer-card">
+          <h3>{photographer.name}</h3>
+          <p class="photographer-style">{photographer.style}</p>
+          <div class="photographer-links">
+            {photographer.website && (
+              <a href={photographer.website} target="_blank" rel="noopener noreferrer" class="photographer-link">
+                Visit Website
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- ==================== CREDITS ==================== -->
+  <Section bg="light" border="top" padding="compact">
+    <div class="credits-section">
+      <h3 class="credits-heading">Event and Corporate Photography</h3>
+      <p class="credits-intro">Photography from corporate events and brand activations at The Hackney.</p>
+      <div class="credits-list">
+        {creditPhotographers.map((photographer) => (
+          <div class="credit-item">
+            <span class="credit-name">{photographer.name}</span>
+            <span class="credit-style"> - {photographer.style}</span>
+            {photographer.website && (
+              <a href={photographer.website} target="_blank" rel="noopener noreferrer" class="photographer-link credit-link">
+                Website
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+      <p class="credits-note">Photography in our printed brochures is also by the photographers listed on this page.</p>
+    </div>
+  </Section>
+
+  <!-- ==================== FINAL CTA ==================== -->
+  <FinalCTA
+    eyebrow="Planning Your Wedding?"
+    heading="See the space in person"
+    body="Book a tour with Hugo and see how The Hackney photographs in real life."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    secondaryCTA={{ label: "Back to Weddings", href: "/weddings/" }}
+    whatsapp={true}
+    utmCampaign="photographers"
+  />
+
+</Base>
+
+<style>
+  /* === Intro === */
+  .intro-text {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+    font-size: 1.125rem;
+    line-height: 1.65;
+    color: rgba(44, 24, 16, 0.75);
+  }
+
+  /* === Featured Grid (2-col) === */
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    margin-top: 32px;
+  }
+
+  .featured-card {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px solid rgba(44, 24, 16, 0.10);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .featured-card-content {
+    padding: 36px 32px;
+  }
+
+  .featured-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--brewery-dark);
+    margin-bottom: 6px;
+  }
+
+  .photographer-focus {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin-bottom: 16px;
+  }
+
+  .photographer-style {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(44, 24, 16, 0.75);
+    margin-bottom: 20px;
+  }
+
+  .photographer-links {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .photographer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dusty-coral);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .photographer-link:hover {
+    color: var(--brewery-dark);
+  }
+
+  .photographer-link svg {
+    flex-shrink: 0;
+  }
+
+  /* === Photographer Grid (3-col) === */
+  .photographer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .photographer-card {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px solid rgba(44, 24, 16, 0.10);
+    border-radius: 2px;
+    padding: 28px 24px;
+  }
+
+  .photographer-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--brewery-dark);
+    margin-bottom: 12px;
+  }
+
+  /* === Credits === */
+  .credits-section {
+    max-width: 800px;
+  }
+
+  .credits-heading {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--brewery-dark);
+    margin-bottom: 8px;
+  }
+
+  .credits-intro {
+    font-size: 0.9375rem;
+    color: rgba(44, 24, 16, 0.65);
+    margin-bottom: 20px;
+  }
+
+  .credits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .credit-item {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: rgba(44, 24, 16, 0.75);
+  }
+
+  .credit-name {
+    font-weight: 500;
+    color: var(--brewery-dark);
+  }
+
+  .credit-link {
+    margin-left: 12px;
+    font-size: 13px;
+  }
+
+  .credits-note {
+    font-size: 0.875rem;
+    color: rgba(44, 24, 16, 0.5);
+    font-style: italic;
+    border-top: 1px solid rgba(44, 24, 16, 0.08);
+    padding-top: 20px;
+  }
+
+  /* === Responsive === */
+  @media (max-width: 900px) {
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .photographer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .photographer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .featured-card-content {
+      padding: 28px 24px;
+    }
+  }
+</style>
