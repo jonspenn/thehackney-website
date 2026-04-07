@@ -584,8 +584,12 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     .space-feature h3 {
-      font-size: 18px;
-      margin-bottom: 10px;
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 2.4vw, 30px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--brewery-dark);
+      margin-bottom: 14px;
     }
 
     .space-feature p {
