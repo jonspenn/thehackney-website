@@ -227,6 +227,7 @@ import SectionHeader from '../components/SectionHeader.astro';
 
   :global(.bookacall-tabs-section) {
     padding-top: 24px !important;
+    padding-bottom: 24px !important;
   }
 
   /* === Tab navigation === */
@@ -351,9 +352,16 @@ import SectionHeader from '../components/SectionHeader.astro';
     background-color: var(--forest-olive);
   }
 
-  /* === HubSpot embed container === */
+  /* === HubSpot embed container ===
+     HubSpot's MeetingsEmbedCode.js auto-resizes the iframe to fit
+     its content. We don't set a min-height so there's no empty
+     reserved space below the calendar before time slots are shown. */
   .meetings-iframe-container {
-    min-height: 580px;
+    width: 100%;
+  }
+
+  .meetings-iframe-container iframe {
+    display: block;
   }
 
   /* === Fallback Contact === */
