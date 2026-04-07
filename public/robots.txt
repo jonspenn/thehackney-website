@@ -1,4 +1,80 @@
+# The Hackney - robots.txt
+# Public site is fully crawlable by default.
+# /reports/* is an internal dashboard - blocked from all crawlers,
+# search engines, and AI training bots.
+
 User-agent: *
 Allow: /
+Disallow: /reports/
+Disallow: /api/click-stats
+Disallow: /api/track-click
+
+# AI training crawlers - explicitly blocked from /reports/*
+# (also blocked from the rest of the site for /reports/* via the wildcard above,
+# but listed here so the intent is unmistakable and bots that respect their own
+# named user-agent rules over the wildcard still honour the disallow).
+
+User-agent: GPTBot
+Disallow: /reports/
+
+User-agent: ChatGPT-User
+Disallow: /reports/
+
+User-agent: OAI-SearchBot
+Disallow: /reports/
+
+User-agent: Google-Extended
+Disallow: /reports/
+
+User-agent: GoogleOther
+Disallow: /reports/
+
+User-agent: ClaudeBot
+Disallow: /reports/
+
+User-agent: Claude-Web
+Disallow: /reports/
+
+User-agent: anthropic-ai
+Disallow: /reports/
+
+User-agent: PerplexityBot
+Disallow: /reports/
+
+User-agent: Perplexity-User
+Disallow: /reports/
+
+User-agent: CCBot
+Disallow: /reports/
+
+User-agent: cohere-ai
+Disallow: /reports/
+
+User-agent: Bytespider
+Disallow: /reports/
+
+User-agent: Amazonbot
+Disallow: /reports/
+
+User-agent: Applebot-Extended
+Disallow: /reports/
+
+User-agent: FacebookBot
+Disallow: /reports/
+
+User-agent: meta-externalagent
+Disallow: /reports/
+
+User-agent: DiffBot
+Disallow: /reports/
+
+User-agent: ImagesiftBot
+Disallow: /reports/
+
+User-agent: Omgilibot
+Disallow: /reports/
+
+User-agent: YouBot
+Disallow: /reports/
 
 Sitemap: https://thehackney-website.pages.dev/sitemap-index.xml

@@ -1,0 +1,18 @@
+# Cloudflare Pages headers file
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# Internal report pages - block ALL search engine and AI bot indexing
+# at the HTTP-header level. This is the strongest signal because it
+# applies even to bots that ignore robots.txt.
+/reports/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, nocache
+  Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0
+  Referrer-Policy: no-referrer
+
+# Internal API endpoints used only by the report dashboard
+/api/click-stats
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+  Cache-Control: private, no-store
+
+/api/track-click
+  X-Robots-Tag: noindex, nofollow
