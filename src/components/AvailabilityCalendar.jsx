@@ -46,6 +46,28 @@ function isSameDay(a, b) {
   return a && b && a === b;
 }
 
+/**
+ * Fire-and-forget click tracking for Phase 1 of prd-dynamic-pricing.md.
+ * Posts the clicked date to /api/track-click which writes to D1. We never
+ * await the result, never surface errors, and never block the user flow.
+ * If the endpoint is down, the calendar still works exactly as before.
+ */
+function trackDateClick(dateString) {
+  try {
+    fetch("/api/track-click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        date: dateString,
+        referrer: document.referrer || window.location.pathname,
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    /* no-op */
+  }
+}
+
 /** Legend item */
 function LegendItem({ colour, border, label, icon }) {
   return (
@@ -173,6 +195,7 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
 
   function handleDateClick(cell) {
     if (!cell.isAvailable) return;
+    trackDateClick(cell.dateStr);
     if (onSelectDate) onSelectDate(cell.dateStr);
   }
 
