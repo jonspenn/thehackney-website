@@ -17,7 +17,16 @@ const MONTHS = [
   "Jan","Feb","Mar","Apr","May","Jun",
   "Jul","Aug","Sep","Oct","Nov","Dec"
 ];
-const YEARS = ["2026","2027","2028","Not sure yet"];
+
+/* Year list auto-rolls every Jan 1 - shows current year + next 2 years.
+   Couples can always book at least 2 full years ahead. No annual code change. */
+const _currentYearForList = new Date().getFullYear();
+const YEARS = [
+  String(_currentYearForList),
+  String(_currentYearForList + 1),
+  String(_currentYearForList + 2),
+  "Not sure yet",
+];
 
 const URGENCY_OPTIONS = [
   { label: "Just starting to look around", value: "browsing" },
@@ -42,14 +51,19 @@ const BUDGET_OPTIONS = [
   { label: "Not sure yet", value: "unsure", fit: "unknown" },
 ];
 
-const STYLE_OPTIONS = [
-  { label: "Relaxed standing reception", value: "standing" },
-  { label: "Wedding breakfast - the full sit-down", value: "seated" },
-  { label: "Ceremony & celebration - the full day", value: "full-day" },
-  { label: "Still exploring - show me everything", value: "exploring" },
-];
+/* Style step removed - it was the weakest qualifier (couples often don't know yet)
+   and we already capture format intent via guest count. Cutting it shortened the
+   funnel from 6 steps to 5. */
 
-const TOTAL_STEPS = 6;
+/* New funnel order:
+   1. Date - hook them with the most concrete question
+   2. Urgency - gauge intent
+   3. Guests - qualify capacity fit
+   4. Capture - email + first name (phone optional). Lead is captured here.
+   5. Budget - asked AFTER capture so it can't kill the lead. Skippable.
+   6. Confirmation
+*/
+const TOTAL_STEPS = 5;
 
 /* ─── Shared components ─── */
 
@@ -118,32 +132,6 @@ function BackButton({ onClick }) {
 
 /* ─── Step components ─── */
 
-function StepWelcome({ onStart }) {
-  return (
-    <div className="wq-step wq-step--welcome">
-      <FadeIn>
-        <div className="wq-eyebrow">The Hackney, London</div>
-      </FadeIn>
-      <FadeIn delay={150}>
-        <h2 className="wq-heading">Let's start planning your wedding</h2>
-      </FadeIn>
-      <FadeIn delay={300}>
-        <p className="wq-subtext">
-          Answer a few quick questions and we'll send you a personalised guide
-          tailored to your day - including pricing, menus, and everything
-          we include as standard.
-        </p>
-      </FadeIn>
-      <FadeIn delay={450}>
-        <button onClick={onStart} className="wq-btn wq-btn--primary" type="button">
-          Get Started
-        </button>
-        <p className="wq-hint">Takes about 60 seconds</p>
-      </FadeIn>
-    </div>
-  );
-}
-
 function StepDate({ data, setData, onNext }) {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -175,8 +163,8 @@ function StepDate({ data, setData, onNext }) {
   return (
     <div className="wq-step">
       <FadeIn>
-        <h2 className="wq-heading">Tell us about your dream day</h2>
-        <p className="wq-subtext">Six quick questions. We'll send you a personalised wedding guide with pricing, menus, and availability for your date.</p>
+        <h2 className="wq-heading">Let's start with your date</h2>
+        <p className="wq-subtext">Five quick questions. We'll send you a personalised wedding guide with pricing, menus, and availability for your date.</p>
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-label">When are you thinking?</div>
@@ -283,60 +271,6 @@ function StepGuests({ data, setData, onNext, onBack }) {
   );
 }
 
-function StepBudget({ data, setData, onNext, onBack }) {
-  return (
-    <div className="wq-step">
-      <BackButton onClick={onBack} />
-      <FadeIn>
-        <h2 className="wq-heading">What's your budget?</h2>
-        <p className="wq-subtext">No judgement - this helps us tailor the right options for you</p>
-      </FadeIn>
-      <FadeIn delay={150}>
-        <div className="wq-cards">
-          {BUDGET_OPTIONS.map(opt => (
-            <SelectionCard
-              key={opt.value}
-              label={opt.label}
-              selected={data.budget === opt.value}
-              onClick={() => {
-                setData({ ...data, budget: opt.value, budgetFit: opt.fit });
-                setTimeout(onNext, 300);
-              }}
-            />
-          ))}
-        </div>
-      </FadeIn>
-    </div>
-  );
-}
-
-function StepStyle({ data, setData, onNext, onBack }) {
-  return (
-    <div className="wq-step">
-      <BackButton onClick={onBack} />
-      <FadeIn>
-        <h2 className="wq-heading">What's your vibe?</h2>
-        <p className="wq-subtext">This helps us send you the most relevant pricing and ideas</p>
-      </FadeIn>
-      <FadeIn delay={150}>
-        <div className="wq-cards">
-          {STYLE_OPTIONS.map(opt => (
-            <SelectionCard
-              key={opt.value}
-              label={opt.label}
-              selected={data.style === opt.value}
-              onClick={() => {
-                setData({ ...data, style: opt.value });
-                setTimeout(onNext, 300);
-              }}
-            />
-          ))}
-        </div>
-      </FadeIn>
-    </div>
-  );
-}
-
 function StepCapture({ data, setData, onNext, onBack, submitting }) {
   /* Phone is optional - requiring it tanks form completion ~25-50% per UX research.
      First name + email is enough to qualify and follow up. */
@@ -346,15 +280,13 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
     data.month && data.year ? `${data.month} ${data.year}` : null,
     URGENCY_OPTIONS.find(o => o.value === data.urgency)?.label,
     GUEST_OPTIONS.find(o => o.value === data.guests)?.label ? `${GUEST_OPTIONS.find(o => o.value === data.guests)?.label} guests` : null,
-    BUDGET_OPTIONS.find(o => o.value === data.budget)?.label,
-    STYLE_OPTIONS.find(o => o.value === data.style)?.label,
   ].filter(Boolean);
 
   return (
     <div className="wq-step">
       <BackButton onClick={onBack} />
       <FadeIn>
-        <h2 className="wq-heading">Almost done - where should we send your quote?</h2>
+        <h2 className="wq-heading">Where should we send your guide?</h2>
         <p className="wq-subtext">We'll get back to you within 24 hours with availability and pricing for your date.</p>
       </FadeIn>
       <FadeIn delay={150}>
@@ -411,9 +343,48 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
             {submitting ? "Sending..." : "Get Your Wedding Guide"}
           </button>
           <p className="wq-hint" style={{ marginTop: 12, textAlign: "left" }}>
-            We'll send your personalised quote and a few helpful follow-ups. No spam, ever. Unsubscribe anytime.
+            We'll send your personalised guide and a few helpful follow-ups. No spam, ever. Unsubscribe anytime.
           </p>
         </div>
+      </FadeIn>
+    </div>
+  );
+}
+
+/* Budget step - now AFTER capture, fully optional. The lead is already saved.
+   This step refines the lead but never blocks it. */
+function StepBudget({ data, setData, onNext, onBack }) {
+  return (
+    <div className="wq-step">
+      <BackButton onClick={onBack} />
+      <FadeIn>
+        <h2 className="wq-heading">One last thing - what's your rough budget?</h2>
+        <p className="wq-subtext">Optional - it just helps us send you the right options. No judgement.</p>
+      </FadeIn>
+      <FadeIn delay={150}>
+        <div className="wq-cards">
+          {BUDGET_OPTIONS.map(opt => (
+            <SelectionCard
+              key={opt.value}
+              label={opt.label}
+              selected={data.budget === opt.value}
+              onClick={() => {
+                setData({ ...data, budget: opt.value, budgetFit: opt.fit });
+                setTimeout(onNext, 300);
+              }}
+            />
+          ))}
+        </div>
+      </FadeIn>
+      <FadeIn delay={300}>
+        <button
+          onClick={onNext}
+          className="wq-btn wq-btn--outline"
+          type="button"
+          style={{ marginTop: 20 }}
+        >
+          Skip this question
+        </button>
       </FadeIn>
     </div>
   );
@@ -479,7 +450,7 @@ function StepConfirmation({ data }) {
       {isLarge && (
         <FadeIn delay={isBrowser || isHot ? 450 : 300}>
           <div className="wq-confirm-card wq-confirm-card--amber">
-            <p>With 80+ guests, our seated capacity is a snug fit - but standing receptions work beautifully for larger groups. Your guide includes both options.</p>
+            <p>With 100+ guests, our seated capacity is a snug fit - but standing receptions work beautifully for larger groups. Your guide includes both options.</p>
           </div>
         </FadeIn>
       )}
@@ -510,15 +481,16 @@ function StepConfirmation({ data }) {
 
 /* ─── Main component ─── */
 
-/* Step number → human-readable name for tracking. Keeps GA4 reports legible. */
+/* Step number → human-readable name for tracking. Keeps GA4 reports legible.
+   New ordering: Date → Urgency → Guests → Capture → Budget → Confirmation.
+   Budget moved to AFTER capture so it can't kill the lead. */
 const STEP_NAMES = {
   1: "date",
   2: "urgency",
   3: "guests",
-  4: "budget",
-  5: "style",
-  6: "capture",
-  7: "confirmation",
+  4: "capture",
+  5: "budget",
+  6: "confirmation",
 };
 
 function pushDL(payload) {
@@ -536,7 +508,6 @@ export default function WeddingQuiz() {
     urgency: "",
     guests: "", guestTag: "",
     budget: "", budgetFit: "",
-    style: "",
     firstName: "", email: "", phone: "",
   });
 
@@ -550,10 +521,12 @@ export default function WeddingQuiz() {
     });
   }, []);
 
-  /* Fire wedding_quiz_abandon if user leaves before completing */
+  /* Fire wedding_quiz_abandon if user leaves before completing.
+     "Completed" means lead is captured (step 4 submission), so abandons
+     after that point are not counted as lost leads. */
   useEffect(() => {
     function handleUnload() {
-      if (!completed && step >= 1 && step <= 6) {
+      if (!completed && step >= 1 && step <= 5) {
         pushDL({
           event: "wedding_quiz_abandon",
           last_step: step,
@@ -584,7 +557,7 @@ export default function WeddingQuiz() {
     setStep(s => Math.max(1, s - 1));
   }
 
-  async function handleSubmit() {
+  async function handleCaptureSubmit() {
     setSubmitting(true);
     /* ── PLACEHOLDER: Replace with real endpoint when platform is chosen ── */
     const payload = {
@@ -594,42 +567,40 @@ export default function WeddingQuiz() {
       wedding_date: data.month && data.year ? `${data.month} ${data.year}` : "",
       booking_urgency: data.urgency,
       guest_count: data.guests,
-      budget_range: data.budget,
-      wedding_style: data.style,
     };
-    console.log("[WeddingQuiz] Submission payload:", payload);
+    console.log("[WeddingQuiz] Capture payload:", payload);
 
-    /* Push event to dataLayer for GTM tracking */
+    /* The lead is officially captured at this point - mark as completed
+       so beforeunload doesn't fire abandon. Budget step is post-capture. */
     pushDL({
       event: "wedding_quiz_complete",
       quiz_urgency: data.urgency,
       quiz_guests: data.guests,
-      quiz_budget: data.budget,
-      quiz_style: data.style,
     });
 
     /* Simulate a brief delay for the real API call */
     await new Promise(r => setTimeout(r, 600));
     setSubmitting(false);
-    setCompleted(true); /* Suppress abandon event from beforeunload listener */
+    setCompleted(true);
     goNext();
   }
 
   return (
     <div className="wq" id="wedding-quiz">
-      {/* Hide dots on Step 1 - showing "1 of 6" before they engage feels like a chore */}
-      {step > 1 && step < 7 && (
+      {/* Hide dots on Step 1 - showing "1 of 5" before they engage feels like a chore */}
+      {step > 1 && step < 6 && (
         <ProgressDots current={step - 1} total={TOTAL_STEPS} />
       )}
 
-      {/* Welcome step removed - hero CTA "Plan Your Wedding" replaces it */}
+      {/* Welcome step removed - hero CTA "Plan Your Wedding" replaces it.
+          Style step removed - weakest qualifier, already implied by guests.
+          Budget moved AFTER capture so it can't kill the lead. */}
       {step === 1 && <StepDate data={data} setData={setData} onNext={goNext} />}
       {step === 2 && <StepUrgency data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 3 && <StepGuests data={data} setData={setData} onNext={goNext} onBack={goBack} />}
-      {step === 4 && <StepBudget data={data} setData={setData} onNext={goNext} onBack={goBack} />}
-      {step === 5 && <StepStyle data={data} setData={setData} onNext={goNext} onBack={goBack} />}
-      {step === 6 && <StepCapture data={data} setData={setData} onNext={handleSubmit} onBack={goBack} submitting={submitting} />}
-      {step === 7 && <StepConfirmation data={data} />}
+      {step === 4 && <StepCapture data={data} setData={setData} onNext={handleCaptureSubmit} onBack={goBack} submitting={submitting} />}
+      {step === 5 && <StepBudget data={data} setData={setData} onNext={goNext} onBack={goBack} />}
+      {step === 6 && <StepConfirmation data={data} />}
     </div>
   );
 }
