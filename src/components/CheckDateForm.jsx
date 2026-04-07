@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AvailabilityCalendar from "./AvailabilityCalendar.jsx";
 
 /**
@@ -116,6 +116,7 @@ function FadeIn({ children, delay = 0 }) {
 
 export default function CheckDateForm({ eventType }) {
   const [selectedDate, setSelectedDate] = useState("");
+  const resultRef = useRef(null);
 
   function handleSelectDate(dateStr) {
     setSelectedDate(dateStr);
@@ -128,6 +129,22 @@ export default function CheckDateForm({ eventType }) {
   function handleClear() {
     setSelectedDate("");
   }
+
+  // When a date is selected, smooth-scroll the result panel into view so
+  // the CTAs are visible without the user having to scroll. The result
+  // appears below the calendar and would otherwise be below the fold on
+  // most desktop viewports. Offset accounts for the sticky site header.
+  useEffect(() => {
+    if (!selectedDate || !resultRef.current) return;
+    // Wait one frame so the FadeIn has mounted before we measure.
+    const t = requestAnimationFrame(() => {
+      const HEADER_OFFSET = 96; // sticky header height + breathing room
+      const rect = resultRef.current.getBoundingClientRect();
+      const top = rect.top + window.pageYOffset - HEADER_OFFSET;
+      window.scrollTo({ top, behavior: "smooth" });
+    });
+    return () => cancelAnimationFrame(t);
+  }, [selectedDate]);
 
   // Build internal booking page URLs with date context
   const tourUrl = buildBookingUrl("tour", { date: selectedDate });
@@ -151,7 +168,7 @@ export default function CheckDateForm({ eventType }) {
       {/* When a date is selected, show the CTAs */}
       {selectedDate && (
         <FadeIn>
-          <div className="cd-date-result">
+          <div className="cd-date-result" ref={resultRef}>
             <div className="cd-date-result__status">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="12" fill={BRAND.forestOlive}/>
