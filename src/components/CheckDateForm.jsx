@@ -128,6 +128,16 @@ export default function CheckDateForm({ eventType }) {
 
   function handleClear() {
     setSelectedDate("");
+    pushEvent("check_date_clear", { context: "check-different-date" });
+    // Scroll the calendar back into view so the user lands somewhere intentional
+    // rather than being left in empty space where the result panel used to be.
+    requestAnimationFrame(() => {
+      const cal = document.getElementById("check-date-form");
+      if (!cal) return;
+      const HEADER_OFFSET = 96;
+      const top = cal.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
+      window.scrollTo({ top, behavior: "smooth" });
+    });
   }
 
   // When a date is selected, smooth-scroll the result panel into view so
