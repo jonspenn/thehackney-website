@@ -9,6 +9,23 @@ import PhotoStrip from '../components/PhotoStrip.astro';
 import FAQ from '../components/FAQ.astro';
 import FinalCTA from '../components/FinalCTA.astro';
 import WeddingQuestionnaire from '../components/WeddingQuestionnaire.astro';
+import {
+  getLowestCombo,
+  getLowestTotal,
+  getSeasons,
+  formatFrom,
+} from '../data/wedding-pricing';
+
+// Pricing for Section 7 - sourced from src/data/wedding-pricing.json
+// (single source of truth, will become a database call later).
+const PRICING_YEAR = 2026;
+const lowestCombo = getLowestCombo(PRICING_YEAR);
+const seasonRows = getSeasons().map((season) => ({
+  ...season,
+  sunThu: formatFrom(getLowestTotal(PRICING_YEAR, season.id, 'sun-thu')),
+  fri: formatFrom(getLowestTotal(PRICING_YEAR, season.id, 'fri')),
+  sat: formatFrom(getLowestTotal(PRICING_YEAR, season.id, 'sat')),
+}));
 
 // FAQ items used by both the FAQ component (rendering + schema) and the page schema
 const faqItems = [
@@ -200,17 +217,17 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   <Section bg="light" border="top" id="pricing">
     <SectionHeader
       eyebrow="Pricing"
-      heading="2026 Pricing By Season"
+      heading={`${PRICING_YEAR} Pricing By Season`}
     />
 
     <div class="pricing-hook">
       <div class="pricing-hook-label">Weddings From</div>
-      <div class="pricing-hook-amount">&pound;5,000</div>
-      <div class="pricing-hook-breakdown">Venue hire &pound;1,000 &nbsp;+&nbsp; minimum spend &pound;4,000</div>
-      <div class="pricing-hook-context">Winter weddings, any day of the week</div>
+      <div class="pricing-hook-amount">&pound;{lowestCombo.total.toLocaleString('en-GB')}</div>
+      <div class="pricing-hook-breakdown">Venue hire &pound;{lowestCombo.hire.toLocaleString('en-GB')} &nbsp;+&nbsp; minimum spend &pound;{lowestCombo.min.toLocaleString('en-GB')}</div>
+      <div class="pricing-hook-context">{lowestCombo.context}</div>
     </div>
 
-    <p class="pricing-intro">Every Hackney wedding is venue hire plus a minimum spend on food, drinks and extras. Here is what 2026 weddings start at, by season and day of the week.</p>
+    <p class="pricing-intro">Every Hackney wedding is venue hire plus a minimum spend on food, drinks and extras. Here is what {PRICING_YEAR} weddings start at, by season and day of the week.</p>
 
     <div class="pricing-table-wrap">
       <table class="pricing-table pricing-season-table">
@@ -223,30 +240,14 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Winter<br><span class="pricing-period">Jan - Mar</span></td>
-            <td>From &pound;5,000</td>
-            <td>From &pound;5,000</td>
-            <td class="total">From &pound;5,000</td>
-          </tr>
-          <tr>
-            <td>Spring<br><span class="pricing-period">Apr - May</span></td>
-            <td>From &pound;5,000</td>
-            <td>From &pound;7,000</td>
-            <td class="total">From &pound;8,250</td>
-          </tr>
-          <tr>
-            <td>Summer<br><span class="pricing-period">Jun - Sep</span></td>
-            <td>From &pound;5,000</td>
-            <td>From &pound;7,000</td>
-            <td class="total">From &pound;8,350</td>
-          </tr>
-          <tr>
-            <td>Autumn<br><span class="pricing-period">Oct - Nov</span></td>
-            <td>From &pound;5,000</td>
-            <td>From &pound;6,500</td>
-            <td class="total">From &pound;8,000</td>
-          </tr>
+          {seasonRows.map((row) => (
+            <tr>
+              <td>{row.label}<br><span class="pricing-period">{row.period}</span></td>
+              <td>{row.sunThu}</td>
+              <td>{row.fri}</td>
+              <td class="total">{row.sat}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
       <p class="pricing-table-note">All prices "from" and exclude VAT. December dates available - festive pricing in the full guide.</p>
