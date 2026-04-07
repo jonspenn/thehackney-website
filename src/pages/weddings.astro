@@ -379,43 +379,43 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     { src: "/images/hackney-wedding-bride-laughing-dinner-pink-flowers.webp", alt: "Bride laughing at dinner table with pink flowers at The Hackney" }
   ]} />
 
-  <!-- ==================== SECTION 9: PLANNING PROCESS ==================== -->
+  <!-- ==================== SECTION 11: PLANNING PROCESS ==================== -->
   <Section bg="light" border="top">
     <SectionHeader
       eyebrow="How It Works"
-      heading="From First Call To Last Dance"
+      heading="From First Click To Last Dance"
     />
 
     <div class="process-steps">
       <div class="process-step">
         <div class="process-step-number">01</div>
         <h3>Check Your Date</h3>
-        <p>Use our quick form to tell us your preferred date, guest count, and what you are looking for. We will get back to you within 24 hours.</p>
+        <p>See your date instantly on our live calendar. Pricing for every season, availability you can see at a glance. No forms, no waiting.</p>
       </div>
       <div class="process-step">
         <div class="process-step-number">02</div>
-        <h3>Discovery Call</h3>
-        <p>A 15-minute call with Hugo to see if we are the right fit. No pressure, no hard sell - just an honest conversation about your wedding.</p>
+        <h3>Have Questions First? <span class="process-step-optional">(optional)</span></h3>
+        <p>If there is anything you would like to talk through before visiting, book a call with Hugo, our General Manager. Otherwise, skip straight to the tour.</p>
       </div>
       <div class="process-step">
         <div class="process-step-number">03</div>
         <h3>Visit The Venue</h3>
-        <p>If it is a match, we will invite you in to see the space in person and talk through how your wedding would work in the building.</p>
+        <p>Come and walk the space with Hugo. He will show you every corner of the building, talk you through how the day flows, and answer everything on your mind.</p>
       </div>
       <div class="process-step">
         <div class="process-step-number">04</div>
         <h3>Your Proposal</h3>
-        <p>A detailed proposal based on everything you have discussed - your menu, drinks, timeline, extras. One document, one total.</p>
+        <p>One document, one total. Your full proposal covering menu, drinks, timeline, and every extra. Nothing buried, nothing hidden.</p>
       </div>
       <div class="process-step">
         <div class="process-step-number">05</div>
         <h3>Secure Your Date</h3>
-        <p>A deposit secures your date. From there, your dedicated events team guides you through every decision until the big day.</p>
+        <p>A deposit holds your date and unlocks your dedicated events team. From that moment until the last dance, we handle every decision with you.</p>
       </div>
     </div>
 
     <div class="section-cta-center">
-      <a href="#questionnaire" class="btn btn-primary">Start Here - It Takes 30 Seconds</a>
+      <a href="/check-your-date/" class="btn btn-primary" data-cta-section="planning-process">Check Your Date</a>
     </div>
   </Section>
 
@@ -874,6 +874,18 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       font-size: 18px;
       letter-spacing: 0;
       margin-bottom: 8px;
+    }
+
+    .process-step-optional {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--dusty-coral);
+      margin-left: 4px;
+      vertical-align: middle;
     }
 
     .process-step p {

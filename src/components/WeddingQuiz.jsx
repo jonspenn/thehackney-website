@@ -425,7 +425,7 @@ function StepConfirmation({ data }) {
       {isHot && (
         <FadeIn delay={300}>
           <div className="wq-confirm-card wq-confirm-card--hot">
-            <p>Since you're ready to move, skip the emails and book a free venue tour directly with Hugo, our Events Manager.</p>
+            <p>Since you're ready to move, skip the emails and book a free venue tour directly with Hugo, our General Manager.</p>
             <a href={tourUrl} className="wq-btn wq-btn--primary" style={{ marginTop: 16 }}>
               Book a Free Tour
             </a>
