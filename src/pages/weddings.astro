@@ -40,35 +40,51 @@ const seasonRows = getSeasons().map((season) => {
 const faqItems = [
   {
     question: "How many guests can the venue hold?",
-    answer: "Up to 60 seated for dinner and up to 100 for standing receptions. We are an intimate venue - if you are planning for more than 60 seated guests, we are probably not the right fit, but we are happy to recommend alternatives."
+    answer: "Up to 60 seated for dinner and up to 100 for a standing reception. We are an intimate venue. If you are planning more than 60 seated, we are probably not the right fit, but we are happy to recommend other venues we trust. A little wriggle on the standing number for the right event - just ask."
   },
   {
-    question: "Can we hold our ceremony here?",
-    answer: "Yes - but it will be a celebratory ceremony, not the legal bit. Humanist celebrations, symbolic services, and personal vows all work beautifully in the space. Most couples do the legal paperwork at a registry office beforehand (Hackney Town Hall is ten minutes away) and then have the ceremony they actually want here with all their guests. It keeps the day flowing and means no transfers between locations."
+    question: "How far in advance should we book?",
+    answer: "Most couples book 12 to 18 months ahead, and peak season Saturdays (May to September) often go a year or more in advance. That said, we keep dates open across the year and last-minute weddings do happen here - if you are getting married this year and your date is on the calendar, get in touch. Whether you are planning two years out or two months out, the answer starts the same way: check your date."
+  },
+  {
+    question: "What is included in the venue hire fee?",
+    answer: "Exclusive hire of the entire building, your dedicated on-day coordinator, full events team and all staffing, furniture, decor, tableware basics, and our built-in sound and lighting system. Food and drinks are charged on top against your minimum spend. See the Everything Included section above for the full list."
   },
   {
     question: "What time does the venue open and close?",
-    answer: "Standard hire runs from 3pm. Music finishes at 11pm and guests depart by 11:30pm. If you would like an earlier start - for getting-ready time, a morning ceremony, or a longer reception - earlier access is available from £170 for a 2pm start."
+    answer: "Standard hire runs from 3pm. Music finishes at 11pm and guests depart by 11:30pm. The garden terrace closes to guests at 9pm. If you would like an earlier start - for getting-ready time, a morning ceremony, or a longer reception - earlier access is available, just ask and we will share the current rate."
   },
   {
-    question: "Is there a curfew for music?",
-    answer: "Music runs until 11pm. Our built-in sound system covers the full space - you can bring your own playlist, hire a DJ, or book a live band. No need for external speakers or AV hire."
+    question: "Can we hold our ceremony here?",
+    answer: "Yes, but it will be a celebratory ceremony, not the legal one. The Hackney is not licensed for legal weddings. Most couples do the legal paperwork at a registry office beforehand - Hackney Town Hall is ten minutes away, or Islington, Marylebone and Clissold House are all popular - then have the ceremony they actually want here, with all their guests. Humanist celebrations, blessings, symbolic services and personal vows all work beautifully. With smaller weddings the same room is reset for the reception afterwards."
   },
   {
     question: "Can we bring our own suppliers?",
-    answer: "Our food, drinks, and coordination are all in-house - that is what makes the model work. For flowers, photography, entertainment, and other personal touches, you are welcome to bring whoever you like. We work with external suppliers regularly and are happy to recommend trusted partners."
+    answer: "Food and drinks are in-house, and that is what makes the all-in model work - one team, one timeline, one bill. Flowers, stationery and tableware are also available as in-house options if you want them handled under one roof - just mention it when you enquire. For everything else - photography, music, cake, hair and makeup - bring whoever you like. We work with a long list of suppliers we trust and are happy to recommend."
+  },
+  {
+    question: "Are there any restrictions on decorations or confetti?",
+    answer: "We are a confetti-free venue. The dyes stain the tables and floors, so we ask couples to skip it. You are welcome to bring your own flowers, balloons or other decorations - we just ask that you choose plastic-free or recyclable options where you can. If you want to drop off decorations the day before, talk to your events coordinator and we can usually arrange it."
+  },
+  {
+    question: "Are children and dogs welcome?",
+    answer: "Yes to both. Children are very welcome and we have highchairs available. Well-behaved dogs are happy here too - lots of couples bring theirs as ring-bearers."
   },
   {
     question: "Do you cater for dietary requirements?",
     answer: "Absolutely. Our kitchen handles vegetarian, vegan, gluten-free, halal, kosher, and other dietary needs as standard. Just let us know during planning and we will build it into your menu."
   },
   {
-    question: "What is included in the venue hire fee?",
-    answer: "Exclusive hire of the entire building, your dedicated on-day coordinator, full events team, all staffing, furniture, decor, tableware basics, and our built-in sound and lighting system. See the Everything Included section above for the full list."
+    question: "Is the venue accessible?",
+    answer: "Honest answer: not fully. The Hackney is a Victorian brewery with a protected facade, which means there is a 15cm step at the entrance and the pavement outside is too narrow for a permanent ramp. The doorway is wide enough for a wheelchair or buggy with a little help. We do not currently have accessible toilets on site. If accessibility matters for any of your guests, please tell us up front and we will be straight with you about whether we can make it work."
   },
   {
-    question: "How far in advance should we book?",
-    answer: "Most couples book 8-9 months ahead of their wedding date. Peak season Saturdays (May - September) fill fastest. If you have a specific date in mind, check availability sooner rather than later."
+    question: "Where is the venue and how do guests get there?",
+    answer: "We are on Hackney Road in East London (E2 9ED). Cambridge Heath overground is a one-minute walk and Bethnal Green tube on the Central line is five to seven minutes away. There is no on-site customer parking, but parking on Hackney Road is free from 7pm to 8am, and metered parking is available on nearby roads before 7pm."
+  },
+  {
+    question: "Can we have a DJ, live band or our own playlist?",
+    answer: "All three. Our built-in sound system covers the whole venue and connects directly to Spotify, so you can bring a playlist and we will play it. DJs are welcome. Live bands work too, but we have noise restrictions because of our neighbours - acoustic groups up to a quartet, with finish times by 10pm. See our Music Policy page for the detail."
   }
 ];
 
@@ -433,8 +449,8 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   <!-- ==================== SECTION 11: FAQs ==================== -->
   <Section bg="light" border="top">
     <SectionHeader
-      eyebrow="FAQs"
-      heading="Questions Couples Ask Us"
+      eyebrow="Before You Visit"
+      heading="What Couples Want To Know First"
     />
     <FAQ items={faqItems} />
   </Section>
