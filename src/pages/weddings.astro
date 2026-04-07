@@ -182,6 +182,44 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
+  <!-- ==================== SECTION 4B: THE DETAILS, ALSO IN-HOUSE ==================== -->
+  <!-- Added 2026-04-07. Extends the in-house narrative from Section 4 to cover
+       flowers, stationery and tableware - three revenue lines that previously
+       had no presence on the new wedding page. Flowers leads (priority growth
+       target for 2026 per Jon). Soft brochure CTA at the bottom routes to the
+       questionnaire (one funnel, not two). Positioned as reassurance not
+       decision - the goal is to plant the in-house seed and reinforce the
+       one-team narrative, not to push a configurator on the booking page. -->
+  <Section bg="light" border="bottom">
+    <SectionHeader
+      eyebrow="The Finishing Touches"
+      heading="The Details, Also In-House"
+    />
+    <div class="details-intro">
+      <p>Most venues hand you a supplier list. We have an in-house design team for the things that matter most on the day. Choose what you want, leave what you don't - it all runs through the same one team and one bill.</p>
+    </div>
+
+    <div class="details-grid">
+      <div class="details-card">
+        <h3>Flowers</h3>
+        <p>Six seasonal collections, from wild and natural to bold colour. Bridal bouquets, buttonholes, table centrepieces, statement installations - including our signature wall arrangements and the fireplace piece couples remember from their tours.</p>
+      </div>
+      <div class="details-card">
+        <h3>Stationery</h3>
+        <p>Nine design collections, from contemporary minimalism to floral and chic. Save the dates, invitations, menus, place cards, signage. Designed and printed by our team, customisable to your day.</p>
+      </div>
+      <div class="details-card">
+        <h3>Tableware</h3>
+        <p>Three curated tablescape packages - from refined and simple to gold-charger statement. Linen, crockery, glassware, cutlery, candlelight, all chosen by our team to suit the room and the season.</p>
+      </div>
+    </div>
+
+    <div class="details-cta">
+      <p>Full collections, photos and pricing are inside our wedding brochure.</p>
+      <a href="#questionnaire" class="btn btn-primary" data-cta-section="details-extras">Send Me The Brochure</a>
+    </div>
+  </Section>
+
   <!-- ==================== SECTION 5: THE SPACE ==================== -->
   <Section bg="light" border="bottom">
     <SectionHeader
@@ -665,6 +703,67 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       line-height: 1.7;
     }
 
+    /* ==================== THE DETAILS, ALSO IN-HOUSE ==================== */
+    /* Section 4B - flowers / stationery / tableware in-house extras.
+       Mirrors the included-grid pattern from Section 4 so the visual
+       language is consistent: three text-led cards under a shared header,
+       reinforced footer block with a soft brochure CTA. Cards are NOT
+       interactive (no shadows, no border-radius beyond the standard 2px)
+       because the goal is reassurance, not selection. */
+    .details-intro {
+      max-width: 760px;
+      margin-bottom: 36px;
+    }
+
+    .details-intro p {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .details-card h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(22px, 2.2vw, 28px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--brewery-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--forest-olive);
+    }
+
+    .details-card p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--brewery-dark);
+    }
+
+    .details-cta {
+      background: rgba(44, 24, 16, 0.03);
+      padding: 28px 40px;
+      border-left: 4px solid var(--forest-olive);
+      max-width: 880px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 28px;
+      justify-content: space-between;
+    }
+
+    .details-cta p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+      flex: 1;
+      min-width: 240px;
+    }
+
     /* ==================== PRICING ==================== */
     /* Big "from £5,000" hook - the visual moment of the pricing section.
        Sized large for impact, single primary number, supporting breakdown
@@ -1084,6 +1183,10 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       .included-grid {
         grid-template-columns: 1fr 1fr;
       }
+
+      .details-grid {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
     @media (max-width: 768px) {
@@ -1098,6 +1201,18 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       .included-grid {
         grid-template-columns: 1fr;
         gap: 40px;
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .details-cta {
+        padding: 24px 28px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
       }
 
       .process-steps {
