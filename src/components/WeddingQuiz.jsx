@@ -338,7 +338,9 @@ function StepStyle({ data, setData, onNext, onBack }) {
 }
 
 function StepCapture({ data, setData, onNext, onBack, submitting }) {
-  const canSubmit = data.firstName?.trim() && data.email?.trim() && data.phone?.trim();
+  /* Phone is optional - requiring it tanks form completion ~25-50% per UX research.
+     First name + email is enough to qualify and follow up. */
+  const canSubmit = data.firstName?.trim() && data.email?.trim();
 
   const summaryPills = [
     data.month && data.year ? `${data.month} ${data.year}` : null,
@@ -387,7 +389,9 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
             />
           </div>
           <div className="wq-field">
-            <label className="wq-field__label" htmlFor="wq-phone">Mobile</label>
+            <label className="wq-field__label" htmlFor="wq-phone">
+              Mobile <span className="wq-field__optional">(optional)</span>
+            </label>
             <input
               id="wq-phone"
               type="tel"
@@ -404,7 +408,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
             type="button"
             disabled={!canSubmit || submitting}
           >
-            {submitting ? "Sending..." : "Get My Quote"}
+            {submitting ? "Sending..." : "Get Your Wedding Guide"}
           </button>
           <p className="wq-hint" style={{ marginTop: 12, textAlign: "left" }}>
             We'll send your personalised quote and a few helpful follow-ups. No spam, ever. Unsubscribe anytime.
@@ -419,7 +423,7 @@ function StepConfirmation({ data }) {
   const isHot = (data.urgency === "ready" || data.urgency === "asap")
     && ["good","great","premium"].includes(data.budgetFit)
     && data.guestTag !== "large";
-  const isLarge = data.guests === "80+";
+  const isLarge = data.guests === "100+";
   const isLowBudget = data.budgetFit === "low";
   const isBrowser = data.urgency === "browsing" || data.urgency === "comparing";
 
@@ -442,7 +446,7 @@ function StepConfirmation({ data }) {
           It's on its way{data.firstName ? `, ${data.firstName}` : ""}
         </h2>
         <p className="wq-subtext" style={{ maxWidth: "none", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
-          Look out for an email from <strong style={{ color: "var(--brewery-dark)", opacity: 1 }}>bookings@thehackney.co</strong> within the next few minutes. If it does not arrive, check your spam or promotions folder.
+          Look out for an email from <strong style={{ color: "var(--brewery-dark)", opacity: 1 }}>hello@thehackney.co</strong> within the next few minutes. If it does not arrive, check your spam or promotions folder.
         </p>
       </FadeIn>
 
@@ -506,20 +510,71 @@ function StepConfirmation({ data }) {
 
 /* ─── Main component ─── */
 
+/* Step number → human-readable name for tracking. Keeps GA4 reports legible. */
+const STEP_NAMES = {
+  1: "date",
+  2: "urgency",
+  3: "guests",
+  4: "budget",
+  5: "style",
+  6: "capture",
+  7: "confirmation",
+};
+
+function pushDL(payload) {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    window.dataLayer.push(payload);
+  }
+}
+
 export default function WeddingQuiz() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [data, setData] = useState({
     month: "", year: "",
     urgency: "",
     guests: "", guestTag: "",
     budget: "", budgetFit: "",
     style: "",
-    firstName: "", lastName: "", email: "", phone: "",
+    firstName: "", email: "", phone: "",
   });
 
+  /* Fire wedding_quiz_start once on mount + wedding_quiz_step for the first step */
+  useEffect(() => {
+    pushDL({ event: "wedding_quiz_start" });
+    pushDL({
+      event: "wedding_quiz_step",
+      step_number: 1,
+      step_name: STEP_NAMES[1],
+    });
+  }, []);
+
+  /* Fire wedding_quiz_abandon if user leaves before completing */
+  useEffect(() => {
+    function handleUnload() {
+      if (!completed && step >= 1 && step <= 6) {
+        pushDL({
+          event: "wedding_quiz_abandon",
+          last_step: step,
+          last_step_name: STEP_NAMES[step],
+        });
+      }
+    }
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, [step, completed]);
+
   function goNext() {
-    setStep(s => s + 1);
+    setStep(s => {
+      const next = s + 1;
+      pushDL({
+        event: "wedding_quiz_step",
+        step_number: next,
+        step_name: STEP_NAMES[next],
+      });
+      return next;
+    });
     /* Scroll the questionnaire section into view on step change */
     const el = document.getElementById("wedding-quiz");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -534,7 +589,6 @@ export default function WeddingQuiz() {
     /* ── PLACEHOLDER: Replace with real endpoint when platform is chosen ── */
     const payload = {
       first_name: data.firstName,
-      last_name: data.lastName,
       email: data.email,
       phone: data.phone,
       wedding_date: data.month && data.year ? `${data.month} ${data.year}` : "",
@@ -546,25 +600,25 @@ export default function WeddingQuiz() {
     console.log("[WeddingQuiz] Submission payload:", payload);
 
     /* Push event to dataLayer for GTM tracking */
-    if (typeof window !== "undefined" && window.dataLayer) {
-      window.dataLayer.push({
-        event: "wedding_quiz_complete",
-        quiz_urgency: data.urgency,
-        quiz_guests: data.guests,
-        quiz_budget: data.budget,
-        quiz_style: data.style,
-      });
-    }
+    pushDL({
+      event: "wedding_quiz_complete",
+      quiz_urgency: data.urgency,
+      quiz_guests: data.guests,
+      quiz_budget: data.budget,
+      quiz_style: data.style,
+    });
 
     /* Simulate a brief delay for the real API call */
     await new Promise(r => setTimeout(r, 600));
     setSubmitting(false);
+    setCompleted(true); /* Suppress abandon event from beforeunload listener */
     goNext();
   }
 
   return (
     <div className="wq" id="wedding-quiz">
-      {step > 0 && step < 7 && (
+      {/* Hide dots on Step 1 - showing "1 of 6" before they engage feels like a chore */}
+      {step > 1 && step < 7 && (
         <ProgressDots current={step - 1} total={TOTAL_STEPS} />
       )}
 
