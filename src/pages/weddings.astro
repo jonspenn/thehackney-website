@@ -92,22 +92,55 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   <!-- ==================== SECTION 3: WEDDING QUESTIONNAIRE ==================== -->
   <WeddingQuestionnaire />
 
-  <!-- ==================== SECTION 4: WHAT MAKES US DIFFERENT ==================== -->
-  <Section bg="light" border="bottom">
+  <!-- ==================== SECTION 4: ONE TEAM. ONE BILL. NOTHING EXTRA. ==================== -->
+  <!-- Merged from former Sections 4 (value prop) and 6 (everything included) on 2026-04-07.
+       Anchor id="included" preserved for any external links still pointing to /weddings/#included. -->
+  <Section bg="light" border="bottom" id="included">
     <SectionHeader
       eyebrow="Why The Hackney"
-      heading="One Team. Not Twenty Vendors."
+      heading="One Team. One Bill. Nothing Extra."
     />
     <div class="different-body">
-      <p>Most wedding venues hand you a list of approved suppliers and wish you luck. You end up coordinating a caterer, a florist, a bar team, a DJ, a coordinator - each with their own timeline, their own invoice, and their own idea of how your day should run.</p>
-      <p>We do it differently.</p>
+      <p>Most wedding venues hand you a list of approved suppliers. You end up coordinating a caterer, a florist, a bar team and a planner - four timelines, four invoices, four different ideas of how your day should run.</p>
       <p>At The Hackney, everything is in-house. Our kitchen prepares your menu. Our bar team pours your drinks. Our events team plans your day. Our coordinator runs it on the morning. One team who know the building, know each other, and know exactly how to make your wedding feel effortless.</p>
-      <p>No hidden costs. No surprise invoices. No chasing five different suppliers the week before your wedding. Just one conversation, one team, and one bill at the end.</p>
-      <a href="#included" class="btn btn-primary">See What Is Included</a>
+    </div>
+
+    <div class="included-grid">
+      <div class="included-category">
+        <h3>Your Dedicated Team</h3>
+        <ul class="included-list">
+          <li>Personal on-day coordinator from setup to send-off</li>
+          <li>Dedicated events team for planning in the months before</li>
+          <li>All staffing costs included - kitchen, bar, front of house</li>
+          <li>Five-star service with no service charge added</li>
+        </ul>
+      </div>
+      <div class="included-category">
+        <h3>The Venue, Fully Equipped</h3>
+        <ul class="included-list">
+          <li>Exclusive hire of the entire building</li>
+          <li>All furniture and decor - tables, chairs, linens, glassware</li>
+          <li>Built-in sound and lighting system</li>
+          <li>The space set up and styled to your brief</li>
+        </ul>
+      </div>
+      <div class="included-category">
+        <h3>Planning Support</h3>
+        <ul class="included-list">
+          <li>Bespoke planning form tailored to your wedding</li>
+          <li>Menu tasting for you and your partner</li>
+          <li>Timeline planning and supplier coordination</li>
+          <li>Everything managed through one point of contact</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="included-promise">
+      <p><strong>The price we quote is the price you pay.</strong> No surprise staffing invoice. No service charge on top. No discovery that "venue hire" did not include the tables. One team, one conversation, one bill.</p>
     </div>
   </Section>
 
-  <!-- ==================== SECTION 4: THE SPACE ==================== -->
+  <!-- ==================== SECTION 5: THE SPACE ==================== -->
   <Section bg="light" border="bottom">
     <SectionHeader
       eyebrow="The Venue"
@@ -148,57 +181,14 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
-  <!-- ==================== SECTION 5: EVERYTHING INCLUDED ==================== -->
-  <Section bg="light" border="bottom" id="included">
-    <SectionHeader
-      eyebrow="What You Get"
-      heading="Transparent Pricing. No Surprises."
-      subtext="Every Hackney wedding includes everything you need to host your day - your team, your venue, and your planning support. Here is what comes as standard."
-    />
-
-    <div class="included-grid">
-      <div class="included-category">
-        <h3>Your Dedicated Team</h3>
-        <ul class="included-list">
-          <li>Personal on-day coordinator from setup to send-off</li>
-          <li>Dedicated events team for planning in the months before</li>
-          <li>All staffing costs included - kitchen, bar, front of house</li>
-          <li>Five-star service with no service charge added</li>
-        </ul>
-      </div>
-      <div class="included-category">
-        <h3>The Venue, Fully Equipped</h3>
-        <ul class="included-list">
-          <li>Exclusive hire of the entire building</li>
-          <li>All furniture and decor - tables, chairs, linens, glassware</li>
-          <li>Built-in sound and lighting system</li>
-          <li>The space set up and styled to your brief</li>
-        </ul>
-      </div>
-      <div class="included-category">
-        <h3>Planning Support</h3>
-        <ul class="included-list">
-          <li>Bespoke planning form tailored to your wedding</li>
-          <li>Menu tasting for you and your partner</li>
-          <li>Timeline planning and supplier coordination</li>
-          <li>Everything managed through one point of contact</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="included-promise">
-      <p><strong>What this means in practice:</strong> You will not receive a surprise staffing invoice. You will not be charged a service fee on top of your food and drink bill. You will not discover that "venue hire" does not include tables, or that lighting is an extra. The price we quote is the price you pay.</p>
-    </div>
-  </Section>
-
-  <!-- ==================== PHOTO BREAK: VENUE ATMOSPHERE ==================== -->
+  <!-- ==================== SECTION 6: PHOTO BREAK - VENUE ATMOSPHERE ==================== -->
   <PhotoBreak
     image="/images/hackney-wedding-couple-between-tables-pampas-edison-bulbs.webp"
     alt="Wedding couple standing between long dinner tables with pampas grass and Edison bulbs at The Hackney"
     position="center 40%"
   />
 
-  <!-- ==================== SECTION 6: PRICING ==================== -->
+  <!-- ==================== SECTION 7: PRICING ==================== -->
   <Section bg="light" border="top" id="pricing">
     <SectionHeader
       eyebrow="Pricing"
@@ -311,6 +301,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   </Section>
 
   <!-- ==================== SECTION 8: REAL WEDDINGS ==================== -->
+  <!-- TODO: blocked on real wedding content - placeholder copy + stock images for now -->
   <Section bg="light">
     <SectionHeader
       eyebrow="Real Weddings"
@@ -372,14 +363,14 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
-  <!-- ==================== PHOTO STRIP: WEDDING DETAILS ==================== -->
+  <!-- ==================== SECTION 9: PHOTO STRIP - WEDDING DETAILS ==================== -->
   <PhotoStrip images={[
     { src: "/images/hackney-wedding-table-detail-candles-gold-chargers-eucalyptus.webp", alt: "Wedding table detail with candles, gold chargers and eucalyptus at The Hackney" },
     { src: "/images/hackney-wedding-ceremony-celebration-colourful-flowers.webp", alt: "Wedding ceremony celebration with colourful flowers at The Hackney" },
     { src: "/images/hackney-wedding-bride-laughing-dinner-pink-flowers.webp", alt: "Bride laughing at dinner table with pink flowers at The Hackney" }
   ]} />
 
-  <!-- ==================== SECTION 11: PLANNING PROCESS ==================== -->
+  <!-- ==================== SECTION 10: PLANNING PROCESS ==================== -->
   <Section bg="light" border="top">
     <SectionHeader
       eyebrow="How It Works"
@@ -419,7 +410,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
-  <!-- ==================== BROCHURE DOWNLOAD ==================== -->
+  <!-- ==================== SECTION 11: BROCHURE DOWNLOAD ==================== -->
   <Section bg="light" border="top" id="brochure" class="brochure-section">
     <SectionHeader
       eyebrow="Wedding Brochure"
@@ -452,7 +443,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
-  <!-- ==================== FAQs ==================== -->
+  <!-- ==================== SECTION 12: FAQs ==================== -->
   <Section bg="light" border="top">
     <SectionHeader
       eyebrow="FAQs"
@@ -461,7 +452,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     <FAQ items={faqItems} />
   </Section>
 
-  <!-- ==================== SECTION 12: FINAL CTA ==================== -->
+  <!-- ==================== SECTION 13: FINAL CTA ==================== -->
   <FinalCTA
     eyebrow="Start Here"
     heading="Ready To Check Your Date?"
