@@ -28,70 +28,103 @@ import SectionHeader from '../components/SectionHeader.astro';
     <SectionHeader
       eyebrow="Next Step"
       heading="Let's make it happen"
-      subtext="You're one step closer. Choose how you'd like to connect with us."
+      subtext="Choose how you'd like to connect with us."
       align="center"
     />
   </Section>
 
-  <script is:inline>
-    (function() {
-      var params = new URLSearchParams(window.location.search);
-      var date = params.get('date');
-      if (date) {
-        try {
-          var d = new Date(date + 'T00:00:00');
-          var formatted = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-          document.getElementById('date-context-text').textContent = formatted + ' looks available at The Hackney';
-          document.getElementById('date-context').style.display = 'block';
-        } catch(e) {}
-      }
-    })();
-  </script>
+  <!-- Tab navigation + booking panels -->
+  <Section bg="light" padding="compact" class="bookacall-tabs-section">
+    <div class="bk-tabs" role="tablist" aria-label="Booking options">
+      <button
+        type="button"
+        role="tab"
+        id="bk-tab-tour"
+        class="bk-tab is-active"
+        aria-selected="true"
+        aria-controls="bk-panel-tour"
+        data-tab="tour"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span>Book a venue tour</span>
+        <span class="bk-tab__badge">Recommended</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        id="bk-tab-call"
+        class="bk-tab"
+        aria-selected="false"
+        aria-controls="bk-panel-call"
+        data-tab="call"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+        <span>Book a discovery call</span>
+      </button>
+    </div>
 
-  <!-- Primary: Book a Venue Tour -->
-  <Section bg="light" padding="compact" id="tour">
-    <div class="booking-card booking-card--primary fade-in">
-      <div class="booking-card__content">
-        <p class="eyebrow">Recommended</p>
-        <h2>Book a venue tour</h2>
-        <p class="booking-card__body">
-          Nothing beats seeing the space in person. Walk through the brewery, ask questions,
-          and start picturing your day. Tours run 7 days a week and take around 30 minutes.
-        </p>
-        <ul class="booking-card__details">
-          <li>Meet Hugo, our General Manager</li>
-          <li>See the ceremony and reception spaces</li>
-          <li>Talk through your ideas, dates, and budget</li>
-          <li>No obligation - just a chance to see if we're the right fit</li>
-        </ul>
-      </div>
-      <div class="booking-card__action">
-        <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/bookings-team/book-a-venue-tour?embed=true"></div>
-        <script type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js" is:inline></script>
+    <!-- Tour panel -->
+    <div
+      id="bk-panel-tour"
+      class="bk-panel is-active"
+      role="tabpanel"
+      aria-labelledby="bk-tab-tour"
+      tabindex="0"
+    >
+      <div class="booking-card">
+        <div class="booking-card__content">
+          <h2>See The Hackney in person</h2>
+          <p class="booking-card__body">
+            Nothing beats walking through the brewery, asking questions, and starting to picture your day.
+            Tours run 7 days a week and take around 30 minutes.
+          </p>
+          <ul class="booking-card__details">
+            <li>Meet Hugo, our General Manager</li>
+            <li>See the ceremony and reception spaces</li>
+            <li>Talk through your ideas, dates, and budget</li>
+            <li>No obligation - just a chance to see if we're the right fit</li>
+          </ul>
+        </div>
+        <div class="booking-card__action">
+          <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/bookings-team/book-a-venue-tour?embed=true"></div>
+          <script type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js" is:inline></script>
+        </div>
       </div>
     </div>
-  </Section>
 
-  <!-- Secondary: Book a Discovery Call -->
-  <Section bg="light" padding="compact" border="top" id="call">
-    <div class="booking-card booking-card--secondary fade-in">
-      <div class="booking-card__content">
-        <p class="eyebrow">Prefer to Chat First?</p>
-        <h2>Book a discovery call</h2>
-        <p class="booking-card__body">
-          Not ready to visit just yet? Jump on a quick call with our team.
-          We'll answer your questions, talk availability, and help you decide
-          if The Hackney is right for your day.
-        </p>
-        <ul class="booking-card__details">
-          <li>15-minute video or phone call</li>
-          <li>No pressure, no hard sell</li>
-          <li>Get answers before committing to a visit</li>
-        </ul>
-      </div>
-      <div class="booking-card__action">
-        <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/bookings-team/book-a-discovery-call?embed=true"></div>
-        <script type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js" is:inline></script>
+    <!-- Call panel -->
+    <div
+      id="bk-panel-call"
+      class="bk-panel"
+      role="tabpanel"
+      aria-labelledby="bk-tab-call"
+      tabindex="0"
+      hidden
+    >
+      <div class="booking-card">
+        <div class="booking-card__content">
+          <h2>Quick chat first?</h2>
+          <p class="booking-card__body">
+            Not ready to visit just yet? Jump on a quick call with our team.
+            We'll answer your questions, talk availability, and help you decide if The Hackney is right for your day.
+          </p>
+          <ul class="booking-card__details">
+            <li>15-minute video or phone call</li>
+            <li>No pressure, no hard sell</li>
+            <li>Get answers before committing to a visit</li>
+          </ul>
+        </div>
+        <div class="booking-card__action">
+          <div class="meetings-iframe-container" data-src="https://meetings-eu1.hubspot.com/bookings-team/book-a-discovery-call?embed=true"></div>
+          <script type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js" is:inline></script>
+        </div>
       </div>
     </div>
   </Section>
@@ -112,6 +145,61 @@ import SectionHeader from '../components/SectionHeader.astro';
       </div>
     </div>
   </Section>
+
+  <!-- Page-level scripts: date context + tab switching -->
+  <script is:inline>
+    (function() {
+      // === Date context banner ===
+      var params = new URLSearchParams(window.location.search);
+      var date = params.get('date');
+      if (date) {
+        try {
+          var d = new Date(date + 'T00:00:00');
+          var formatted = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          document.getElementById('date-context-text').textContent = formatted + ' looks available at The Hackney';
+          document.getElementById('date-context').style.display = 'block';
+        } catch(e) {}
+      }
+
+      // === Tab switching ===
+      var tabs = document.querySelectorAll('.bk-tab');
+      var panels = {
+        tour: document.getElementById('bk-panel-tour'),
+        call: document.getElementById('bk-panel-call')
+      };
+      var tabButtons = {
+        tour: document.getElementById('bk-tab-tour'),
+        call: document.getElementById('bk-tab-call')
+      };
+
+      function activateTab(name) {
+        Object.keys(panels).forEach(function(key) {
+          var isActive = key === name;
+          panels[key].classList.toggle('is-active', isActive);
+          panels[key].hidden = !isActive;
+          tabButtons[key].classList.toggle('is-active', isActive);
+          tabButtons[key].setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      }
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var name = tab.getAttribute('data-tab');
+          activateTab(name);
+          // Update hash without scrolling
+          if (history.replaceState) {
+            history.replaceState(null, '', '#' + name);
+          }
+        });
+      });
+
+      // === Activate tab from URL hash on load ===
+      var hash = (window.location.hash || '').replace('#', '');
+      if (hash === 'call') {
+        activateTab('call');
+      }
+    })();
+  </script>
 
 </Base>
 
@@ -135,6 +223,80 @@ import SectionHeader from '../components/SectionHeader.astro';
   /* === Hero override: tighter bottom padding for conversion page === */
   :global(.bookacall-hero) {
     padding-bottom: 0 !important;
+  }
+
+  :global(.bookacall-tabs-section) {
+    padding-top: 24px !important;
+  }
+
+  /* === Tab navigation === */
+  .bk-tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    max-width: 1080px;
+    margin: 0 auto 32px;
+    border-bottom: 1px solid rgba(44, 24, 16, 0.12);
+    flex-wrap: wrap;
+  }
+
+  .bk-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: rgba(44, 24, 16, 0.55);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    margin-bottom: -1px;
+  }
+
+  .bk-tab:hover {
+    color: var(--brewery-dark);
+  }
+
+  .bk-tab.is-active {
+    color: var(--brewery-dark);
+    border-bottom-color: var(--forest-olive);
+  }
+
+  .bk-tab svg {
+    flex-shrink: 0;
+    color: currentColor;
+  }
+
+  .bk-tab__badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--forest-olive);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+    margin-left: 4px;
+  }
+
+  /* === Tab panels === */
+  .bk-panel {
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .bk-panel.is-active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* === Booking Cards === */
@@ -187,10 +349,6 @@ import SectionHeader from '../components/SectionHeader.astro';
     height: 6px;
     border-radius: 50%;
     background-color: var(--forest-olive);
-  }
-
-  .booking-card--secondary .booking-card__details li::before {
-    background-color: var(--dusty-coral);
   }
 
   /* === HubSpot embed container === */
@@ -257,8 +415,13 @@ import SectionHeader from '../components/SectionHeader.astro';
       padding-right: 0;
     }
 
-    .booking-placeholder {
-      min-height: 240px;
+    .bk-tab {
+      padding: 14px 16px;
+      font-size: 0.875rem;
+    }
+
+    .bk-tab__badge {
+      display: none;
     }
   }
 </style>
