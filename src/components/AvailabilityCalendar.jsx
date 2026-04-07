@@ -148,9 +148,10 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
   const canGoPrev = viewYear > today.getFullYear() ||
     (viewYear === today.getFullYear() && viewMonth > today.getMonth());
 
-  // Don't allow more than 18 months ahead
-  const maxDate = new Date(today);
-  maxDate.setMonth(maxDate.getMonth() + 18);
+  // Show through December of (current year + 2). Couples can always book
+  // at least 2 full years ahead, and the calendar auto-rolls each 1 Jan -
+  // no annual code change needed.
+  const maxDate = new Date(today.getFullYear() + 2, 11, 31);
   const canGoNext = new Date(viewYear, viewMonth + 1, 1) <= maxDate;
 
   // Build calendar grid
