@@ -271,11 +271,23 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
-  <!-- ==================== SECTION 6: PHOTO BREAK - VENUE ATMOSPHERE ==================== -->
+  <!-- ==================== SECTION 6: PHOTO BREAK + VALUE-JUSTIFIER QUOTE ==================== -->
+  <!-- Rebuilt 2026-04-07. Was a silent mood photo (couple between tables). Now does
+       two jobs: (1) emotional peak moment immediately before pricing, (2) value-
+       justifier pull-quote from a real couple so the price feels earned. The quote
+       is a lightly-trimmed verbatim lift from Rosemary Anstead's wedding feedback
+       form (1 Nov 2024 wedding) - source CSV at sales & marketing/reporting/
+       exports/google-forms/wedding-feedback-responses.csv row 12. Image swapped
+       to first-dance-with-guests because it shows BOTH the room "put together"
+       (matches the quote) AND a peak emotional moment (the "best day" payoff).
+       Uses the new quote-overlay variant of <PhotoBreak> - homepage usage stays
+       silent. -->
   <PhotoBreak
-    image="/images/hackney-wedding-couple-between-tables-pampas-edison-bulbs.webp"
-    alt="Wedding couple standing between long dinner tables with pampas grass and Edison bulbs at The Hackney"
-    position="center 40%"
+    image="/images/hackney-wedding-first-dance-guests-venue.webp"
+    alt="Wedding first dance with guests gathered around at The Hackney"
+    position="center 50%"
+    quote="It felt far more put together than weddings of friends who paid triple the amount. Absolutely the best day."
+    attribution="Rosemary, married November 2024"
   />
 
   <!-- ==================== SECTION 7: PRICING ==================== -->

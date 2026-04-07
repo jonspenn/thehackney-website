@@ -3,11 +3,24 @@
  * PhotoBreak - Full-bleed edge-to-edge photo section.
  * Creates visual breathing room between content sections.
  *
+ * Optional `quote` + `attribution` props turn the section into an
+ * overlay-quote PhotoBreak: a real couple testimonial set in Cormorant
+ * Garamond over a dark gradient on the photo. Used on /weddings/ Section 6
+ * to land a value-justifier quote immediately before the pricing reveal.
+ *
  * Usage:
  *   <PhotoBreak
  *     image="/images/hackney-wedding-couple.webp"
  *     alt="Wedding couple at The Hackney"
  *     position="center 40%"
+ *   />
+ *
+ *   <PhotoBreak
+ *     image="/images/hackney-wedding-first-dance-guests-venue.webp"
+ *     alt="Wedding first dance with guests at The Hackney"
+ *     position="center 50%"
+ *     quote="It felt far more put together than weddings of friends who paid triple the amount. Absolutely the best day."
+ *     attribution="Rosemary, married November 2024"
  *   />
  */
 
@@ -18,6 +31,10 @@ interface Props {
   position?: string;
   /** CSS height value. Default: "60vh" */
   height?: string;
+  /** Optional pull-quote. When set, the photo gets a dark overlay + serif quote treatment. */
+  quote?: string;
+  /** Optional attribution line. Renders below the quote with an em-dash prefix. */
+  attribution?: string;
 }
 
 const {
@@ -25,16 +42,29 @@ const {
   alt,
   position = 'center center',
   height = '60vh',
+  quote,
+  attribution,
 } = Astro.props;
 ---
 
-<section class="photo-break">
+<section class={`photo-break${quote ? ' photo-break-with-quote' : ''}`}>
   <div
     class="photo-break-image"
     style={`background-image: url('${image}'); background-position: ${position}; --photo-height: ${height};`}
     role="img"
     aria-label={alt}
-  ></div>
+  >
+    {quote && (
+      <div class="photo-break-overlay">
+        <figure class="photo-break-quote-figure">
+          <blockquote class="photo-break-quote">{quote}</blockquote>
+          {attribution && (
+            <figcaption class="photo-break-attribution">- {attribution}</figcaption>
+          )}
+        </figure>
+      </div>
+    )}
+  </div>
 </section>
 
 <style>
@@ -48,12 +78,87 @@ const {
     height: var(--photo-height, 60vh);
     min-height: 350px;
     background-size: cover;
+    position: relative;
+  }
+
+  /* Quote variant - dark gradient overlay + Cormorant Garamond serif quote.
+     The gradient is anchored bottom-heavy so the photo composition reads
+     in the upper third while the quote sits in the lower third. */
+  .photo-break-with-quote .photo-break-image {
+    min-height: 420px;
+  }
+
+  .photo-break-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(44, 24, 16, 0.10) 0%,
+      rgba(44, 24, 16, 0.35) 45%,
+      rgba(44, 24, 16, 0.78) 100%
+    );
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 32px 56px;
+  }
+
+  .photo-break-quote-figure {
+    max-width: 760px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .photo-break-quote {
+    font-family: var(--font-heading, 'Cormorant Garamond', serif);
+    font-size: clamp(22px, 2.6vw, 34px);
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--warm-canvas, #F5F0E8);
+    margin: 0 0 18px;
+    quotes: '\201C' '\201D';
+  }
+
+  .photo-break-quote::before {
+    content: open-quote;
+  }
+
+  .photo-break-quote::after {
+    content: close-quote;
+  }
+
+  .photo-break-attribution {
+    font-family: var(--font-body, 'DM Sans', sans-serif);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--warm-canvas, #F5F0E8);
+    opacity: 0.85;
+    margin: 0;
   }
 
   @media (max-width: 768px) {
     .photo-break-image {
       height: 40vh;
       min-height: 250px;
+    }
+
+    .photo-break-with-quote .photo-break-image {
+      height: 56vh;
+      min-height: 380px;
+    }
+
+    .photo-break-overlay {
+      padding: 0 24px 36px;
+    }
+
+    .photo-break-quote {
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    .photo-break-attribution {
+      font-size: 13px;
     }
   }
 </style>
