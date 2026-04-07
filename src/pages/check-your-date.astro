@@ -44,16 +44,20 @@ import CheckDateForm from '../components/CheckDateForm.astro';
       <!-- Social proof -->
       <div class="cd-trust-box cd-trust-box--stats">
         <div class="cd-stat">
-          <span class="cd-stat-number">4.6</span>
-          <span class="cd-stat-label">Google Rating</span>
-        </div>
-        <div class="cd-stat">
-          <span class="cd-stat-number">98</span>
-          <span class="cd-stat-label">NPS Score</span>
-        </div>
-        <div class="cd-stat">
           <span class="cd-stat-number">400+</span>
-          <span class="cd-stat-label">Events Hosted</span>
+          <span class="cd-stat-label">Weddings managed</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Everything Included</span>
+          <span class="cd-stat-label">Venue, food, drinks, team</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Exclusive Hire</span>
+          <span class="cd-stat-label">The whole venue, just for you</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number">4.9 ★</span>
+          <span class="cd-stat-label">Couple rating on Hitched</span>
         </div>
       </div>
     </div>
@@ -146,18 +150,26 @@ import CheckDateForm from '../components/CheckDateForm.astro';
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 24px;
+    gap: 20px;
     text-align: center;
   }
 
   .cd-stat-number {
     display: block;
     font-family: var(--font-heading);
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--forest-olive);
-    line-height: 1;
-    margin-bottom: 4px;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  /* Text-style number (e.g. "Everything Included") - smaller so longer
+     phrases fit on a single line in the side panel */
+  .cd-stat-number--text {
+    font-size: 17px;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
   }
 
   .cd-stat-label {
