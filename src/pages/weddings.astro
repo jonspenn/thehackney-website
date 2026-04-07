@@ -173,8 +173,18 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       heading="An 1856 Brewery. Yours For The Day."
       subtext="The Hackney is a converted Victorian brewery on Hackney Road in East London - exposed brick, original timber beams, and industrial character that photographs beautifully without needing to dress it up."
     />
-    <p class="space-intro">The venue is yours exclusively. No shared spaces, no other events running alongside yours, no strangers wandering through your reception. From 3pm until 11:30pm, the entire building belongs to you and your guests.</p>
-    <div class="space-capacity">Up to 60 guests seated / 100 standing</div>
+    <p class="space-intro">The venue is yours exclusively. No shared spaces, no other events running alongside yours, no strangers wandering through your reception. Standard hire runs from 3pm, with music until 11pm and guests away by 11:30pm. Earlier start times are available if you want a longer day.</p>
+    <div class="space-capacity">
+      <div class="capacity-stat">
+        <div class="capacity-number">60</div>
+        <div class="capacity-label">Guests seated</div>
+      </div>
+      <div class="capacity-stat">
+        <div class="capacity-number">100</div>
+        <div class="capacity-label">Standing reception</div>
+        <div class="capacity-note">A little more for the right event. Just ask.</div>
+      </div>
+    </div>
 
     <div class="space-gallery">
       <div class="space-image">
@@ -470,15 +480,52 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       margin-bottom: 12px;
     }
 
+    /* Stat block treatment - big serif numbers replace the old single-line
+       capacity caption. Two stats sit side by side with the standing one
+       carrying a small italic flex note ("a little more for the right event"). */
     .space-capacity {
+      display: flex;
+      gap: 64px;
+      align-items: flex-start;
+      margin-top: 28px;
+      margin-bottom: 56px;
+      padding: 32px 0;
+      border-top: 1px solid rgba(44, 24, 16, 0.12);
+      border-bottom: 1px solid rgba(44, 24, 16, 0.12);
+    }
+
+    .capacity-stat {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+
+    .capacity-number {
+      font-family: var(--font-heading);
+      font-size: clamp(64px, 9vw, 96px);
+      font-weight: 600;
+      line-height: 1;
+      color: var(--forest-olive);
+      margin-bottom: 10px;
+    }
+
+    .capacity-label {
       font-family: var(--font-body);
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: var(--forest-olive);
       font-weight: 500;
-      margin-top: 16px;
-      margin-bottom: 48px;
+      color: var(--brewery-dark);
+      margin-bottom: 6px;
+    }
+
+    .capacity-note {
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--brewery-dark);
+      opacity: 0.6;
+      font-style: italic;
+      max-width: 240px;
     }
 
     .space-gallery {
@@ -1045,6 +1092,12 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
       .included-promise {
         padding: 28px;
+      }
+
+      .space-capacity {
+        flex-direction: column;
+        gap: 28px;
+        padding: 24px 0;
       }
 
       .sticky-cta {
