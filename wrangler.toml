@@ -6,21 +6,11 @@ compatibility_date = "2024-09-23"
 bucket = "./dist"
 
 # D1 binding for Phase 1 of prd-dynamic-pricing.md.
-#
-# PARKED 2026-04-07: Cannot create the D1 database without auth on the
-# jonspenn@gmail.com Cloudflare account (jon needs his iPhone for 2FA).
-# Until then, /functions/api/track-click.js gracefully no-ops on missing
-# env.DB and returns 204, so the calendar UX is unaffected.
-#
-# To finish wiring up:
-#   1. `npx wrangler d1 create hackney-date-tracking` (or create in dashboard)
-#   2. Paste the database_id below
-#   3. Uncomment this block
-#   4. `npx wrangler d1 execute hackney-date-tracking --remote --file=./migrations/0001_create_date_clicks.sql`
-#   5. Push - tracking starts immediately on next deploy
-#
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "hackney-date-tracking"
-# database_id = "REPLACE_AFTER_WRANGLER_D1_CREATE"
-# migrations_dir = "migrations"
+# Database created 2026-04-07 in Cloudflare dashboard on the
+# jonspenn@gmail.com account. Powers anonymous date-click tracking on
+# /check-your-date so we can calibrate dynamic pricing later.
+[[d1_databases]]
+binding = "DB"
+database_name = "hackney-date-tracking"
+database_id = "5ae562a1-44f6-4327-a096-b83baf0a44c8"
+migrations_dir = "migrations"
