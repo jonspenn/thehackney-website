@@ -270,17 +270,6 @@ const { eventType } = Astro.props;
     opacity: 0.25;
   }
 
-  /* Held / enquired dates */
-  .ac-cell--held {
-    background: rgba(191,114,86,0.08);
-    cursor: not-allowed;
-  }
-
-  .ac-cell--held .ac-cell__num {
-    opacity: 0.5;
-    color: var(--dusty-coral);
-  }
-
   /* Past dates */
   .ac-cell--past {
     cursor: not-allowed;
@@ -288,26 +277,6 @@ const { eventType } = Astro.props;
 
   .ac-cell--past .ac-cell__num {
     opacity: 0.2;
-  }
-
-  /* ── Indicators (booked line, held dot) ── */
-  .ac-cell__indicator {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .ac-cell__indicator--booked {
-    bottom: 4px;
-  }
-
-  .ac-cell__indicator--held {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--dusty-coral);
-    opacity: 0.6;
   }
 
   /* ── Loading state ── */

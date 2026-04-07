@@ -4,17 +4,19 @@ import { useState, useEffect, useCallback } from "react";
  * AvailabilityCalendar.jsx
  *
  * Month-view calendar showing venue availability from Google Calendar.
- * Fetches booked/held dates from /api/availability (Cloudflare Pages Function).
+ * Fetches booked dates from /api/availability (Cloudflare Pages Function),
+ * which proxies the public-facing Bookings calendar only. The internal
+ * "Enquiries & Held Dates" calendar is intentionally NOT exposed - it tracks
+ * tentative holds for the team and must not be visible to website visitors.
  * Clicking an available date calls onSelectDate(YYYY-MM-DD).
  *
  * States per date cell:
  *   - past:      greyed out, not clickable
- *   - booked:    marked with X indicator, not clickable
- *   - held:      marked as "enquired", not clickable
+ *   - booked:    grey background, faded number, not clickable
  *   - available: green-tinted, clickable
  *   - selected:  solid green highlight (the date user clicked)
  *
- * Privacy: Only date availability status is fetched.
+ * Privacy: Only date availability status is fetched via the freebusy endpoint.
  * Event titles and descriptions never leave the server.
  */
 
@@ -70,7 +72,6 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [booked, setBooked] = useState(new Set());
-  const [held, setHeld] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -90,7 +91,6 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
       if (data.error) throw new Error(data.error);
 
       setBooked(new Set(data.booked || []));
-      setHeld(new Set(data.held || []));
     } catch (err) {
       console.error("[AvailabilityCalendar]", err);
       setError("Unable to load availability right now. Please try again in a moment.");
@@ -149,10 +149,9 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
     const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const isPast = dateStr < todayStr;
     const isBooked = booked.has(dateStr);
-    const isHeld = held.has(dateStr);
     const isSelected = isSameDay(dateStr, selectedDate);
     const isToday = dateStr === todayStr;
-    const isAvailable = !isPast && !isBooked && !isHeld;
+    const isAvailable = !isPast && !isBooked;
 
     // Day of week (0=Mon, 5=Sat, 6=Sun)
     const dow = (firstDayOfWeek + d - 1) % 7;
@@ -165,7 +164,6 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
       dateStr,
       isPast,
       isBooked,
-      isHeld,
       isSelected,
       isToday,
       isAvailable,
@@ -231,7 +229,6 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
           let cellClass = "ac-cell ac-cell--day";
           if (cell.isPast) cellClass += " ac-cell--past";
           else if (cell.isBooked) cellClass += " ac-cell--booked";
-          else if (cell.isHeld) cellClass += " ac-cell--held";
           else cellClass += " ac-cell--available";
 
           if (cell.isSelected) cellClass += " ac-cell--selected";
@@ -247,13 +244,10 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
               onClick={() => handleDateClick(cell)}
               disabled={!clickable}
               type="button"
-              aria-label={`${cell.day} ${MONTH_NAMES[viewMonth]} ${viewYear}${cell.isBooked ? " - booked" : cell.isHeld ? " - enquired" : cell.isAvailable ? " - available" : ""}`}
+              aria-label={`${cell.day} ${MONTH_NAMES[viewMonth]} ${viewYear}${cell.isBooked ? " - booked" : cell.isAvailable ? " - available" : ""}`}
             >
               <span className="ac-cell__num">{cell.day}</span>
               {/* No indicator needed - booked styling handles it via CSS */}
-              {cell.isHeld && (
-                <span className="ac-cell__indicator ac-cell__indicator--held" />
-              )}
             </button>
           );
         })}
@@ -273,7 +267,6 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
       <div className="ac-legend">
         <LegendItem colour="rgba(46,64,9,0.12)" label="Available" />
         <LegendItem colour="rgba(44,24,16,0.08)" border="1px solid rgba(44,24,16,0.1)" label="Booked" />
-        <LegendItem colour="rgba(191,114,86,0.15)" border="1px solid rgba(191,114,86,0.25)" label="Enquired" />
       </div>
 
       {/* Prompt to select */}

@@ -1,9 +1,14 @@
 /**
  * Cloudflare Pages Function: /api/availability
  *
- * Proxies Google Calendar API to return booked and held dates.
- * Uses the freebusy endpoint which works with "free/busy only" calendar sharing,
- * ensuring no PII (event titles, descriptions, attendees) is ever accessible.
+ * Proxies Google Calendar API to return booked dates from the public-facing
+ * Bookings calendar. Uses the freebusy endpoint which works with "free/busy
+ * only" calendar sharing, ensuring no PII (event titles, descriptions,
+ * attendees) is ever accessible.
+ *
+ * Only the Bookings calendar is exposed publicly. The internal "Enquiries
+ * & Held Dates" calendar is intentionally NOT included - it tracks tentative
+ * holds for the team and must not be visible to website visitors.
  *
  * Query params:
  *   start  - YYYY-MM-DD (defaults to 1st of current month)
@@ -12,13 +17,11 @@
  * Environment variables (set in Cloudflare Pages dashboard):
  *   GOOGLE_CALENDAR_API_KEY - restricted API key for Calendar read-only
  *
- * Calendar IDs (hardcoded - these are shared/public within the org):
- *   Bookings:              c_v2a5l8vh2qenad1lm0ejd8hq7s@group.calendar.google.com
- *   Enquiries & Held Dates: c_88tt7mkoclpc8fjo2dfgickmvc@group.calendar.google.com
+ * Calendar IDs:
+ *   Bookings: c_v2a5l8vh2qenad1lm0ejd8hq7s@group.calendar.google.com
  */
 
 const CALENDAR_BOOKINGS = "c_v2a5l8vh2qenad1lm0ejd8hq7s@group.calendar.google.com";
-const CALENDAR_HELD = "c_88tt7mkoclpc8fjo2dfgickmvc@group.calendar.google.com";
 const GCAL_FREEBUSY = "https://www.googleapis.com/calendar/v3/freeBusy";
 
 // CORS - allow same-origin and the dev preview domain
@@ -109,7 +112,6 @@ export async function onRequestGet(context) {
         timeMax,
         items: [
           { id: CALENDAR_BOOKINGS },
-          { id: CALENDAR_HELD },
         ],
       }),
     });
@@ -123,14 +125,10 @@ export async function onRequestGet(context) {
     const calendars = data.calendars || {};
 
     const bookedBusy = calendars[CALENDAR_BOOKINGS]?.busy || [];
-    const heldBusy = calendars[CALENDAR_HELD]?.busy || [];
-
     const booked = busyPeriodsToDateStrings(bookedBusy);
-    const held = busyPeriodsToDateStrings(heldBusy);
 
     return jsonResponse({
       booked,
-      held,
       range: {
         start: start.toISOString().split("T")[0],
         end: end.toISOString().split("T")[0],
