@@ -189,115 +189,105 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   />
 
   <!-- ==================== SECTION 7: PRICING ==================== -->
+  <!-- Rebuilt 2026-04-07 around the lead-capture play.
+       Previous 6-row "season summary" table had stale numbers that didn't match
+       the live brochure rate card. New approach (per Bridebook 2026 market data):
+       - Big "From £5,000" hook satisfies the 88% who expect pricing online
+       - Simple 4-row 2026 season table = "indicative pricing" the 41% accept
+       - Pivot to 2027/2028 brochure form because 86% of current shoppers are
+         planning 2027+ weddings (avg engagement-to-wedding = 23.8 months)
+       - Brochure form merged in here from old standalone Section 11. -->
   <Section bg="light" border="top" id="pricing">
     <SectionHeader
       eyebrow="Pricing"
-      heading="What A Hackney Wedding Costs"
-      subtext="We believe you should know what your wedding costs before you enquire - not after three emails and a phone call. Here is how our pricing works."
+      heading="2026 Pricing By Season"
     />
 
-    <div class="pricing-how">
-      <h3>How It Works</h3>
-      <p>Every wedding has two parts:</p>
-      <ol>
-        <li><strong>Venue hire fee</strong> - This secures exclusive use of the building, your dedicated team, all furniture, decor, sound and lighting. It varies by day of the week and time of year.</li>
-        <li><strong>Minimum spend on food, drinks, and extras</strong> - This is the minimum you will spend on catering, drinks packages, flowers, tableware, and any additional services. Most couples spend above the minimum because they want to - not because they have to.</li>
-      </ol>
+    <div class="pricing-hook">
+      <div class="pricing-hook-label">Weddings From</div>
+      <div class="pricing-hook-amount">&pound;5,000</div>
+      <div class="pricing-hook-breakdown">Venue hire &pound;1,000 &nbsp;+&nbsp; minimum spend &pound;4,000</div>
+      <div class="pricing-hook-context">Winter weddings, any day of the week</div>
     </div>
 
+    <p class="pricing-intro">Every Hackney wedding is venue hire plus a minimum spend on food, drinks and extras. Here is what 2026 weddings start at, by season and day of the week.</p>
+
     <div class="pricing-table-wrap">
-      <table class="pricing-table">
+      <table class="pricing-table pricing-season-table">
         <thead>
           <tr>
-            <th></th>
-            <th>Venue Hire</th>
-            <th>Min. Spend</th>
-            <th>Total From</th>
+            <th>Season</th>
+            <th>Sun - Thu</th>
+            <th>Friday</th>
+            <th>Saturday</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Off-Peak<br><span class="pricing-period">Jan - Mar, any day</span></td>
-            <td>From &pound;1,000</td>
-            <td>From &pound;4,000</td>
-            <td class="total">From &pound;5,000</td>
-          </tr>
-          <tr>
-            <td>Mid-Season<br><span class="pricing-period">Apr, Oct - Dec, Sun - Thu</span></td>
-            <td>From &pound;2,000</td>
-            <td>From &pound;3,000</td>
-            <td class="total">From &pound;5,000</td>
-          </tr>
-          <tr>
-            <td>Mid-Season<br><span class="pricing-period">Apr, Oct - Dec, Fri - Sat</span></td>
-            <td>From &pound;2,000</td>
-            <td>From &pound;4,500</td>
-            <td class="total">From &pound;6,500</td>
-          </tr>
-          <tr>
-            <td>Peak Season<br><span class="pricing-period">May - Sep, Sun - Thu</span></td>
-            <td>From &pound;2,000</td>
-            <td>From &pound;3,000</td>
-            <td class="total">From &pound;5,000</td>
-          </tr>
-          <tr>
-            <td>Peak Season<br><span class="pricing-period">May - Sep, Friday</span></td>
-            <td>From &pound;2,000</td>
+            <td>Winter<br><span class="pricing-period">Jan - Mar</span></td>
             <td>From &pound;5,000</td>
-            <td class="total">From &pound;7,000</td>
+            <td>From &pound;5,000</td>
+            <td class="total">From &pound;5,000</td>
           </tr>
           <tr>
-            <td>Peak Season<br><span class="pricing-period">May - Sep, Saturday</span></td>
-            <td>From &pound;2,850</td>
-            <td>From &pound;5,500</td>
+            <td>Spring<br><span class="pricing-period">Apr - May</span></td>
+            <td>From &pound;5,000</td>
+            <td>From &pound;7,000</td>
+            <td class="total">From &pound;8,250</td>
+          </tr>
+          <tr>
+            <td>Summer<br><span class="pricing-period">Jun - Sep</span></td>
+            <td>From &pound;5,000</td>
+            <td>From &pound;7,000</td>
             <td class="total">From &pound;8,350</td>
+          </tr>
+          <tr>
+            <td>Autumn<br><span class="pricing-period">Oct - Nov</span></td>
+            <td>From &pound;5,000</td>
+            <td>From &pound;6,500</td>
+            <td class="total">From &pound;8,000</td>
           </tr>
         </tbody>
       </table>
-      <p class="pricing-table-note">All prices exclude VAT. Full rate card available in our wedding brochure.</p>
+      <p class="pricing-table-note">All prices "from" and exclude VAT. December dates available - festive pricing in the full guide.</p>
     </div>
 
-    <div class="pricing-extras">
-      <h3>What Does The Minimum Spend Cover?</h3>
-      <div class="extras-grid">
-        <div class="extra-item">
-          <span>Canapes</span>
-          <span class="extra-price">From &pound;16pp</span>
+    <!-- Pivot to brochure capture: most couples shopping right now want 2027+ -->
+    <div class="pricing-pivot">
+      <h3>Planning A 2027 Or 2028 Wedding?</h3>
+      <p>Most couples book us 12 to 24 months out. If you are planning further ahead, we will email and WhatsApp the full pricing guide straight to you - every date, every option, every number.</p>
+    </div>
+
+    <form class="pricing-form" id="brochure" data-form="brochure-download">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="brochure-firstName">First name</label>
+          <input type="text" id="brochure-firstName" name="firstName" placeholder="Your first name" required>
         </div>
-        <div class="extra-item">
-          <span>Three-course seated dinner</span>
-          <span class="extra-price">From &pound;65pp</span>
-        </div>
-        <div class="extra-item">
-          <span>Sharing-style feast</span>
-          <span class="extra-price">From &pound;70pp</span>
-        </div>
-        <div class="extra-item">
-          <span>Unlimited drinks packages</span>
-          <span class="extra-price">From &pound;18pp/hr</span>
-        </div>
-        <div class="extra-item">
-          <span>Champagne packages</span>
-          <span class="extra-price">From &pound;30pp/hr</span>
-        </div>
-        <div class="extra-item">
-          <span>Flower packages</span>
-          <span class="extra-price">From &pound;550</span>
-        </div>
-        <div class="extra-item">
-          <span>Tableware and styling</span>
-          <span class="extra-price">From &pound;6pp</span>
+        <div class="form-group">
+          <label for="brochure-email">Email address</label>
+          <input type="email" id="brochure-email" name="email" placeholder="you@email.com" required>
         </div>
       </div>
-    </div>
-
-    <div class="pricing-example">
-      <p>For a Saturday wedding in peak season with 50 guests, a three-course dinner, four hours of unlimited drinks, and a flower package, the total is approximately &pound;8,350 + food and drink spend. That is one invoice, from one team, with no hidden extras.</p>
-    </div>
-
-    <div class="pricing-cta">
-      <a href="#brochure" class="btn btn-primary">Download Our Full Pricing Guide</a>
-    </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="brochure-mobile">Mobile number</label>
+          <input type="tel" id="brochure-mobile" name="mobile" placeholder="07..." required>
+        </div>
+        <div class="form-group">
+          <label for="brochure-year">Wedding year <span class="form-optional">(optional)</span></label>
+          <select id="brochure-year" name="weddingYear">
+            <option value="">Select a year</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="not-sure">Not sure yet</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary pricing-form-submit">Get The Full Pricing Guide</button>
+      <p class="pricing-form-note">We will send the guide immediately by email and WhatsApp. No phone calls. No sales pitch. Just every date, every option, every number. Unsubscribe any time.</p>
+    </form>
   </Section>
 
   <!-- ==================== SECTION 8: REAL WEDDINGS ==================== -->
@@ -410,40 +400,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
-  <!-- ==================== SECTION 11: BROCHURE DOWNLOAD ==================== -->
-  <Section bg="light" border="top" id="brochure" class="brochure-section">
-    <SectionHeader
-      eyebrow="Wedding Brochure"
-      heading="Get Our Wedding Brochure"
-    />
-    <div class="brochure-inner">
-      <div class="brochure-content">
-        <p>Everything you need in one place - the full rate card, sample menus, what is included, and how the day works. Download it now and share it with your partner.</p>
-      </div>
-      <div class="brochure-form">
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input type="text" id="firstName" placeholder="Your first name">
-        </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" placeholder="you@email.com">
-        </div>
-        <div class="form-group">
-          <label for="partnerName">Partner's Name <span class="form-optional">(optional)</span></label>
-          <input type="text" id="partnerName" placeholder="Their first name">
-        </div>
-        <div class="form-group">
-          <label for="weddingDate">Preferred Wedding Date <span class="form-optional">(optional)</span></label>
-          <input type="text" id="weddingDate" placeholder="e.g. June 2027">
-        </div>
-        <button class="btn btn-primary">Download The Brochure</button>
-        <p class="brochure-form-note">We will send you the brochure immediately. You may also receive a small number of helpful emails about planning your Hackney wedding. You can unsubscribe at any time.</p>
-      </div>
-    </div>
-  </Section>
-
-  <!-- ==================== SECTION 12: FAQs ==================== -->
+  <!-- ==================== SECTION 11: FAQs ==================== -->
   <Section bg="light" border="top">
     <SectionHeader
       eyebrow="FAQs"
@@ -452,7 +409,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     <FAQ items={faqItems} />
   </Section>
 
-  <!-- ==================== SECTION 13: FINAL CTA ==================== -->
+  <!-- ==================== SECTION 12: FINAL CTA ==================== -->
   <FinalCTA
     eyebrow="Start Here"
     heading="Ready To Check Your Date?"
@@ -622,55 +579,79 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     /* ==================== PRICING ==================== */
-    .pricing-how {
-      max-width: 700px;
-      margin-bottom: 48px;
+    /* Big "from £5,000" hook - the visual moment of the pricing section.
+       Sized large for impact, single primary number, supporting breakdown
+       underneath. Centred for emphasis. */
+    .pricing-hook {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 40px;
+      padding: 48px 32px;
+      background: rgba(73, 89, 14, 0.04);
+      border: 1px solid rgba(73, 89, 14, 0.12);
+      border-radius: 2px;
     }
 
-    .pricing-how h3 {
-      font-size: 20px;
+    .pricing-hook-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--dusty-coral);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .pricing-hook-amount {
+      font-family: var(--font-heading);
+      font-size: clamp(72px, 12vw, 128px);
+      font-weight: 600;
+      line-height: 1;
+      color: var(--forest-olive);
       margin-bottom: 16px;
     }
 
-    .pricing-how p {
+    .pricing-hook-breakdown {
+      font-family: var(--font-body);
+      font-size: clamp(15px, 1.6vw, 18px);
+      color: var(--brewery-dark);
+      margin-bottom: 8px;
+    }
+
+    .pricing-hook-context {
+      font-family: var(--font-body);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brewery-dark);
+      opacity: 0.55;
+    }
+
+    .pricing-intro {
+      max-width: 720px;
+      margin: 0 auto 32px;
       font-size: 16px;
       line-height: 1.7;
-      margin-bottom: 12px;
-    }
-
-    .pricing-how ol {
-      list-style: none;
-      counter-reset: pricing-step;
-      margin-bottom: 12px;
-    }
-
-    .pricing-how ol li {
-      counter-increment: pricing-step;
-      padding-left: 32px;
-      position: relative;
-      margin-bottom: 12px;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    .pricing-how ol li::before {
-      content: counter(pricing-step) ".";
-      position: absolute;
-      left: 0;
-      font-family: var(--font-body);
-      font-weight: 700;
-      color: var(--forest-olive);
+      text-align: center;
     }
 
     .pricing-table-wrap {
-      margin-bottom: 48px;
+      margin: 0 auto 64px;
       overflow-x: auto;
+      max-width: 800px;
     }
 
     .pricing-table {
       width: 100%;
       max-width: 800px;
       border-collapse: collapse;
+    }
+
+    /* Season table variant - 4 cols (Season / Sun-Thu / Fri / Sat),
+       Saturday column right-aligned and emphasised as the most-asked figure. */
+    .pricing-season-table th:not(:first-child),
+    .pricing-season-table td:not(:first-child) {
+      text-align: right;
     }
 
     .pricing-table th,
@@ -721,52 +702,104 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       font-style: italic;
     }
 
-    .pricing-extras {
-      max-width: 700px;
-      margin-bottom: 48px;
+    /* Pivot block - the bridge between "here is 2026" and the brochure capture
+       form. Asks couples planning further out for their email/mobile. */
+    .pricing-pivot {
+      max-width: 720px;
+      margin: 64px auto 28px;
+      text-align: center;
+      padding-top: 48px;
+      border-top: 1px solid rgba(44, 24, 16, 0.08);
     }
 
-    .pricing-extras h3 {
-      font-size: 20px;
-      margin-bottom: 20px;
+    .pricing-pivot h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(26px, 3.2vw, 36px);
+      font-weight: 600;
+      color: var(--brewery-dark);
+      margin-bottom: 16px;
+      line-height: 1.2;
     }
 
-    .extras-grid {
+    .pricing-pivot p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--brewery-dark);
+      opacity: 0.85;
+    }
+
+    /* Inline brochure-capture form. Two-column on desktop, stacks on mobile.
+       Lives inside Section 7 - merged from the old standalone Section 11.
+       Form is currently a placeholder POST until Klaviyo/Brevo wiring lands. */
+    .pricing-form {
+      max-width: 720px;
+      margin: 0 auto;
+      background: rgba(44, 24, 16, 0.025);
+      border: 1px solid rgba(44, 24, 16, 0.08);
+      border-radius: 2px;
+      padding: 36px 40px;
+    }
+
+    .pricing-form .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px 48px;
+      gap: 20px;
+      margin-bottom: 18px;
     }
 
-    .extra-item {
+    .pricing-form .form-group {
       display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(44, 24, 16, 0.06);
-      font-size: 15px;
+      flex-direction: column;
     }
 
-    .extra-price {
+    .pricing-form label {
       font-family: var(--font-body);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       font-weight: 500;
-      color: var(--forest-olive);
-      white-space: nowrap;
+      color: var(--brewery-dark);
+      margin-bottom: 8px;
     }
 
-    .pricing-example {
-      background: rgba(44, 24, 16, 0.03);
-      padding: 36px 40px;
-      border-left: 4px solid var(--forest-olive);
-      max-width: 800px;
-      margin-bottom: 36px;
+    .pricing-form .form-optional {
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 11px;
+      opacity: 0.5;
+      font-weight: 400;
     }
 
-    .pricing-example p {
-      font-size: 17px;
-      line-height: 1.7;
+    .pricing-form input,
+    .pricing-form select {
+      font-family: var(--font-body);
+      font-size: 15px;
+      padding: 12px 14px;
+      background: var(--warm-canvas);
+      border: 1px solid rgba(44, 24, 16, 0.15);
+      border-radius: 2px;
+      color: var(--brewery-dark);
+      transition: border-color 0.15s ease;
     }
 
-    .pricing-cta {
-      margin-top: 36px;
+    .pricing-form input:focus,
+    .pricing-form select:focus {
+      outline: none;
+      border-color: var(--forest-olive);
+    }
+
+    .pricing-form-submit {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .pricing-form-note {
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 16px;
+      color: var(--brewery-dark);
+      opacity: 0.6;
+      text-align: center;
     }
 
     /* ==================== REAL WEDDINGS ==================== */
@@ -885,81 +918,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       opacity: 0.75;
     }
 
-    /* ==================== BROCHURE DOWNLOAD ==================== */
-    .brochure-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: start;
-    }
-
-    .brochure-content p {
-      font-size: 18px;
-      line-height: 1.7;
-      margin-bottom: 8px;
-    }
-
-    .brochure-form {
-      background: rgba(255, 255, 255, 0.5);
-      padding: 40px;
-      border: 1px solid rgba(44, 24, 16, 0.08);
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      font-family: var(--font-body);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: var(--brewery-dark);
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid rgba(44, 24, 16, 0.15);
-      background: var(--warm-canvas);
-      font-family: var(--font-body);
-      font-size: 16px;
-      color: var(--brewery-dark);
-      transition: border-color 0.2s;
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--forest-olive);
-    }
-
-    .form-group input::placeholder {
-      color: rgba(44, 24, 16, 0.35);
-    }
-
-    .form-optional {
-      font-size: 11px;
-      color: var(--dusty-coral);
-      font-weight: 400;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-
-    .brochure-form .btn {
-      width: 100%;
-      margin-top: 4px;
-    }
-
-    .brochure-form-note {
-      font-size: 13px;
-      opacity: 0.5;
-      margin-top: 16px;
-      line-height: 1.5;
-    }
-
     /* ==================== STICKY MOBILE CTA ==================== */
     .sticky-cta {
       display: none;
@@ -1027,10 +985,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         gap: 36px;
       }
 
-      .extras-grid {
-        grid-template-columns: 1fr;
-      }
-
       .wedding-story {
         grid-template-columns: 1fr;
         gap: 24px;
@@ -1040,16 +994,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         direction: ltr;
       }
 
-      .brochure-inner {
-        grid-template-columns: 1fr;
-        gap: 36px;
-      }
-
-      .brochure-form {
-        padding: 28px;
-      }
-
-      .pricing-example,
       .included-promise {
         padding: 28px;
       }
