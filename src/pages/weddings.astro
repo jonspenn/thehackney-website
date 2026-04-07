@@ -387,7 +387,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   </Section>
 
   <!-- ==================== SECTION 8: REAL WEDDINGS ==================== -->
-  <!-- TODO: blocked on real wedding content - placeholder copy + stock images for now -->
   <Section bg="light">
     <SectionHeader
       eyebrow="Real Weddings"
@@ -395,53 +394,38 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     />
 
     <div class="wedding-stories">
-      <div class="wedding-story">
+      <article class="wedding-story">
         <div class="wedding-story-image">
-          <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-wedding-couple-portrait-exposed-brick.webp" data-bg-pos="center top" role="img" aria-label="Wedding couple portrait against exposed brick wall at The Hackney"></div>
+          <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-real-wedding-charlotte-stephen-winter-garden-pink-installation.webp" data-bg-pos="center center" role="img" aria-label="Charlotte and Stephen in the Winter Garden at The Hackney, dressed with hot pink florals and disco balls"></div>
         </div>
         <div class="wedding-story-content">
-          <h3>A Winter Wedding For 45 Guests</h3>
-          <p class="wedding-story-quote">"We looked at twelve venues before we found The Hackney. Every other place gave us a supplier list and said good luck. Here, everything was handled by one team. On the day, we did not have to think about a single thing."</p>
-          <ul class="wedding-story-details">
-            <li>45 guests</li>
-            <li>December</li>
-            <li>Candlelit dinner</li>
-            <li>Sharing platters</li>
-          </ul>
+          <h3>Charlotte &amp; Stephen</h3>
+          <p class="wedding-story-meta">August 2024</p>
+          <p class="wedding-story-credit">Photography by This Modern Revelry</p>
         </div>
-      </div>
+      </article>
 
-      <div class="wedding-story">
+      <article class="wedding-story">
         <div class="wedding-story-image">
-          <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-wedding-couple-east-london-streets.webp" data-bg-pos="center center" role="img" aria-label="Wedding couple walking through East London streets near The Hackney"></div>
+          <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-real-wedding-verity-andy-long-table-feast.webp" data-bg-pos="center center" role="img" aria-label="Verity and Andy's wedding guests at the long table feast at The Hackney"></div>
         </div>
         <div class="wedding-story-content">
-          <h3>A Summer Celebration For 58 Guests</h3>
-          <p class="wedding-story-quote">"The building is stunning - we barely needed any decoration. The exposed brick and the beams did all the work. And having the ceremony and reception in the same place meant no rushing around."</p>
-          <ul class="wedding-story-details">
-            <li>58 guests</li>
-            <li>July</li>
-            <li>Three-course dinner</li>
-            <li>Champagne reception</li>
-          </ul>
+          <h3>Verity &amp; Andy</h3>
+          <p class="wedding-story-meta">June 2024</p>
+          <p class="wedding-story-credit">Photography by Ollie Hinds</p>
         </div>
-      </div>
+      </article>
 
-      <div class="wedding-story">
+      <article class="wedding-story">
         <div class="wedding-story-image">
-          <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-wedding-couple-london-bus.webp" data-bg-pos="center center" role="img" aria-label="Wedding couple with vintage red London bus outside The Hackney"></div>
+          <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-real-wedding-kate-james-brewery-toast.webp" data-bg-pos="center center" role="img" aria-label="Kate and James toasting at the head of the long table at The Hackney"></div>
         </div>
         <div class="wedding-story-content">
-          <h3>An Intimate Spring Wedding For 30 Guests</h3>
-          <p class="wedding-story-quote">"We wanted something small and personal - not a massive venue where we would feel lost. The Hackney was exactly the right size. And the fact that everything was included meant we could plan the whole thing in eight weeks."</p>
-          <ul class="wedding-story-details">
-            <li>30 guests</li>
-            <li>April</li>
-            <li>Sharing-style feast</li>
-            <li>Evening drinks</li>
-          </ul>
+          <h3>Kate &amp; James</h3>
+          <p class="wedding-story-meta">August 2023</p>
+          <p class="wedding-story-credit">Photography by This Modern Revelry</p>
         </div>
-      </div>
+      </article>
     </div>
 
     <div class="section-cta-center">
@@ -1031,71 +1015,70 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
     /* ==================== REAL WEDDINGS ==================== */
     .wedding-stories {
-      display: flex;
-      flex-direction: column;
-      gap: 80px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
     }
 
     .wedding-story {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items: center;
-    }
-
-    .wedding-story:nth-child(even) {
-      direction: rtl;
-    }
-
-    .wedding-story:nth-child(even) > * {
-      direction: ltr;
+      display: flex;
+      flex-direction: column;
     }
 
     .wedding-story-image {
-      aspect-ratio: 4/3;
+      aspect-ratio: 2/3;
       overflow: hidden;
       border: 1px solid rgba(44, 24, 16, 0.08);
+      border-radius: 2px;
+      background-color: #3D2117;
     }
 
     .wedding-story-image-bg {
       width: 100%;
       height: 100%;
+      background-size: cover;
+      background-position: center center;
     }
 
-    .wedding-story:nth-child(1) .wedding-story-image-bg { background-color: #3D2117; }
-    .wedding-story:nth-child(2) .wedding-story-image-bg { background-color: var(--forest-olive); }
-    .wedding-story:nth-child(3) .wedding-story-image-bg { background-color: #4A3228; }
+    .wedding-story-content {
+      padding-top: 20px;
+    }
 
     .wedding-story-content h3 {
-      font-size: 20px;
-      margin-bottom: 16px;
-    }
-
-    .wedding-story-quote {
       font-family: var(--font-heading);
-      font-size: 20px;
-      font-style: italic;
-      font-weight: 400;
-      line-height: 1.5;
-      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.2;
       color: var(--brewery-dark);
-      opacity: 0.85;
+      margin: 0 0 8px;
     }
 
-    .wedding-story-details {
-      list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 24px;
-    }
-
-    .wedding-story-details li {
-      font-size: 13px;
+    .wedding-story-meta {
       font-family: var(--font-body);
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       color: var(--dusty-coral);
       font-weight: 500;
+      margin: 0 0 12px;
+    }
+
+    .wedding-story-credit {
+      font-family: var(--font-body);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--brewery-dark);
+      opacity: 0.55;
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      .wedding-stories {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        max-width: 480px;
+        margin: 0 auto;
+      }
     }
 
     .section-cta-center {
