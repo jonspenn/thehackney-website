@@ -263,10 +263,12 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
         </div>
       )}
 
-      {/* Legend */}
+      {/* Legend - swatches use stronger opacities than the cells so they
+          are distinguishable at 14px (the cells rely on the bold green
+          number for visual signal, which the small swatches don't have) */}
       <div className="ac-legend">
-        <LegendItem colour="rgba(46,64,9,0.12)" label="Available" />
-        <LegendItem colour="rgba(44,24,16,0.08)" border="1px solid rgba(44,24,16,0.1)" label="Booked" />
+        <LegendItem colour="rgba(46,64,9,0.28)" border="1px solid rgba(46,64,9,0.4)" label="Available" />
+        <LegendItem colour="rgba(44,24,16,0.14)" border="1px solid rgba(44,24,16,0.2)" label="Booked" />
       </div>
 
       {/* Prompt to select */}
