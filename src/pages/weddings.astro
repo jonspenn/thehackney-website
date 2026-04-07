@@ -11,21 +11,30 @@ import FinalCTA from '../components/FinalCTA.astro';
 import WeddingQuestionnaire from '../components/WeddingQuestionnaire.astro';
 import {
   getLowestCombo,
-  getLowestTotal,
+  getLowestBreakdown,
   getSeasons,
-  formatFrom,
 } from '../data/wedding-pricing';
 
 // Pricing for Section 7 - sourced from src/data/wedding-pricing.json
 // (single source of truth, will become a database call later).
 const PRICING_YEAR = 2026;
 const lowestCombo = getLowestCombo(PRICING_YEAR);
-const seasonRows = getSeasons().map((season) => ({
-  ...season,
-  sunThu: formatFrom(getLowestTotal(PRICING_YEAR, season.id, 'sun-thu')),
-  fri: formatFrom(getLowestTotal(PRICING_YEAR, season.id, 'fri')),
-  sat: formatFrom(getLowestTotal(PRICING_YEAR, season.id, 'sat')),
-}));
+const gbp = (n: number) => `£${n.toLocaleString('en-GB')}`;
+const seasonRows = getSeasons().map((season) => {
+  const cell = (dayType: 'sun-thu' | 'fri' | 'sat') => {
+    const b = getLowestBreakdown(PRICING_YEAR, season.id, dayType);
+    return {
+      total: `From ${gbp(b.total)}`,
+      breakdown: `${gbp(b.hire)} hire + ${gbp(b.min)} min spend`,
+    };
+  };
+  return {
+    ...season,
+    sunThu: cell('sun-thu'),
+    fri: cell('fri'),
+    sat: cell('sat'),
+  };
+});
 
 // FAQ items used by both the FAQ component (rendering + schema) and the page schema
 const faqItems = [
@@ -243,9 +252,18 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
           {seasonRows.map((row) => (
             <tr>
               <td>{row.label}<br><span class="pricing-period">{row.period}</span></td>
-              <td>{row.sunThu}</td>
-              <td>{row.fri}</td>
-              <td class="total">{row.sat}</td>
+              <td>
+                <span class="cell-total">{row.sunThu.total}</span>
+                <span class="cell-breakdown">{row.sunThu.breakdown}</span>
+              </td>
+              <td>
+                <span class="cell-total">{row.fri.total}</span>
+                <span class="cell-breakdown">{row.fri.breakdown}</span>
+              </td>
+              <td class="total">
+                <span class="cell-total">{row.sat.total}</span>
+                <span class="cell-breakdown">{row.sat.breakdown}</span>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -695,6 +713,35 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       font-weight: 700;
       color: var(--forest-olive);
       font-size: 16px;
+    }
+
+    /* Each price cell is two stacked spans: the bold "From £X" total
+       and a smaller hire+min spend breakdown beneath it. */
+    .pricing-season-table td:not(:first-child) {
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+
+    .pricing-season-table .cell-total {
+      display: block;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--brewery-dark);
+    }
+
+    .pricing-season-table .total .cell-total {
+      color: var(--forest-olive);
+      font-weight: 700;
+    }
+
+    .pricing-season-table .cell-breakdown {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.6;
+      margin-top: 2px;
     }
 
     .pricing-table-note {

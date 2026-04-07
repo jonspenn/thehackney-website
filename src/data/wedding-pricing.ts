@@ -61,15 +61,16 @@ export function formatFrom(amount: number): string {
 }
 
 /**
- * For a given year + season + dayType, return the lowest total
- * (venue hire + minimum spend) across the months in that season.
- * This is what we display in the season summary table on /weddings/.
+ * For a given year + season + dayType, return the cheapest single
+ * row (hire + min spend coming from the same month). This is what
+ * we display in the season summary table on /weddings/ - both the
+ * total and the breakdown.
  */
-export function getLowestTotal(
+export function getLowestBreakdown(
   year: number,
   seasonId: Season["id"],
   dayType: DayType
-): number {
+): { total: number; hire: number; min: number } {
   const card = getRateCard(year);
   const season = seasons.find((s) => s.id === seasonId);
   if (!season) throw new Error(`Unknown season ${seasonId}`);
@@ -81,14 +82,33 @@ export function getLowestTotal(
       `No rows for ${year} ${seasonId} ${dayType} - check wedding-pricing.json`
     );
   }
-  return Math.min(...matches.map((r) => r.hire + r.min));
+  const lowest = matches.reduce((a, b) =>
+    a.hire + a.min <= b.hire + b.min ? a : b
+  );
+  return { total: lowest.hire + lowest.min, hire: lowest.hire, min: lowest.min };
+}
+
+/** Convenience wrapper if a caller only needs the total. */
+export function getLowestTotal(
+  year: number,
+  seasonId: Season["id"],
+  dayType: DayType
+): number {
+  return getLowestBreakdown(year, seasonId, dayType).total;
 }
 
 /**
  * The "From £X" hook at the top of Section 7. Returns the cheapest
  * single (month, day-type) combo for the year - hire + min spend
- * coming from the same row, not synthetic mins. Includes context so
- * we can describe it honestly ("Winter weddings, any day of the week").
+ * coming from the same row, not synthetic mins.
+ *
+ * Context label is chosen to be the most compelling true framing of
+ * the lowest price. The strongest story is "any day of the week" - so
+ * we look for the largest contiguous month range where ALL THREE
+ * standard day types (Sat, Fri, Sun-Thu) tie at the lowest total. If
+ * one exists, the label uses that window. Otherwise we fall back to
+ * describing the cheapest Saturday combo, since Saturday is the
+ * day couples most want to know about.
  */
 export function getLowestCombo(year: number): {
   total: number;
@@ -106,26 +126,42 @@ export function getLowestCombo(year: number): {
   for (const row of standardRows) {
     if (row.hire + row.min < lowest.hire + lowest.min) lowest = row;
   }
-  // Build a human-readable context label by collapsing all rows that
-  // share the lowest total.
   const lowestTotal = lowest.hire + lowest.min;
-  const matchingRows = standardRows.filter(
-    (r) => r.hire + r.min === lowestTotal
-  );
-  const months = [...new Set(matchingRows.map((r) => r.month))].sort(
-    (a, b) => a - b
-  );
-  const dayTypes = [...new Set(matchingRows.map((r) => r.dayType))];
-  const monthLabel = describeMonthRange(months);
-  const dayLabel =
-    dayTypes.length === 3
-      ? "any day of the week"
-      : dayTypes.map(describeDayType).join(" or ");
+
+  // Find every month where all three standard day types hit the lowest
+  // total. That's the "any day of the week" window.
+  const allDayTypeMonths: number[] = [];
+  for (let m = 1; m <= 12; m++) {
+    const monthRows = standardRows.filter((r) => r.month === m);
+    if (
+      monthRows.length === 3 &&
+      monthRows.every((r) => r.hire + r.min === lowestTotal)
+    ) {
+      allDayTypeMonths.push(m);
+    }
+  }
+
+  let context: string;
+  if (allDayTypeMonths.length > 0) {
+    context = `${describeMonthRange(allDayTypeMonths)} weddings, any day of the week`;
+  } else {
+    // Fall back: describe the cheapest Saturday window.
+    const satRows = standardRows.filter((r) => r.dayType === "sat");
+    const lowestSat = satRows.reduce((a, b) =>
+      a.hire + a.min <= b.hire + b.min ? a : b
+    );
+    const lowestSatTotal = lowestSat.hire + lowestSat.min;
+    const satMonths = satRows
+      .filter((r) => r.hire + r.min === lowestSatTotal)
+      .map((r) => r.month);
+    context = `${describeMonthRange(satMonths)} Saturdays`;
+  }
+
   return {
     total: lowestTotal,
     hire: lowest.hire,
     min: lowest.min,
-    context: `${monthLabel} weddings, ${dayLabel}`,
+    context,
   };
 }
 
@@ -151,7 +187,7 @@ function describeMonthRange(months: number[]): string {
     (m, i) => i === 0 || m === sorted[i - 1] + 1
   );
   if (isContiguous) {
-    if (sorted[0] >= 1 && sorted[sorted.length - 1] <= 3) return "Winter";
+    if (sorted[0] >= 1 && sorted[sorted.length - 1] <= 3) return "Off-peak";
     return `${names[sorted[0] - 1]} - ${names[sorted[sorted.length - 1] - 1]}`;
   }
   return sorted.map((m) => names[m - 1]).join(", ");

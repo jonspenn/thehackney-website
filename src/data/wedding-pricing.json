@@ -185,7 +185,7 @@
     }
   },
   "seasons": [
-    { "id": "winter", "label": "Winter", "period": "Jan - Mar", "months": [1, 2, 3] },
+    { "id": "winter", "label": "Off-Peak", "period": "Jan - Mar", "months": [1, 2, 3] },
     { "id": "spring", "label": "Spring", "period": "Apr - May", "months": [4, 5] },
     { "id": "summer", "label": "Summer", "period": "Jun - Sep", "months": [6, 7, 8, 9] },
     { "id": "autumn", "label": "Autumn", "period": "Oct - Nov", "months": [10, 11] }
