@@ -16,8 +16,11 @@ import WeddingQuiz from './WeddingQuiz.jsx';
 
 <style is:global>
   /* ==================== WEDDING QUESTIONNAIRE ==================== */
+  /* Bottom padding is intentionally 0 - the next Section component
+     supplies its own 96px top padding, so adding more here creates
+     a dead-space gap between Continue button and the next section. */
   .questionnaire {
-    padding: 60px 0 80px;
+    padding: 60px 0 0;
     border-top: 1px solid rgba(44,24,16,0.06);
     scroll-margin-top: var(--header-height, 96px);
   }
@@ -466,7 +469,7 @@ import WeddingQuiz from './WeddingQuiz.jsx';
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .questionnaire {
-      padding: 48px 0 64px;
+      padding: 48px 0 0;
     }
 
     .wq-month-grid {
