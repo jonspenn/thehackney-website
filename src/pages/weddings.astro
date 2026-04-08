@@ -490,14 +490,22 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   </Section>
 
   <!-- ==================== SECTION 12: FINAL CTA ==================== -->
+  <!-- Rewritten 2026-04-08. Previous copy promised a 24-hour manual callback,
+       which contradicted the self-serve story the rest of the page now sells
+       (live calendar + instant brochure + Eva-led planning once deposit lands).
+       Urgency note is data-backed: HubSpot export 7 Apr 2026 shows 21 of 22
+       peak-season 2026 Saturdays are already booked. Deliberately durable
+       phrasing ("almost fully booked") rather than a live count so copy
+       doesn't go stale between weekly updates. Phase 2: wire the /api/availability
+       endpoint into a dynamic counter. -->
   <FinalCTA
-    eyebrow="Start Here"
+    eyebrow="Ready When You Are"
     heading="Ready To Check Your Date?"
-    body="Tell us when you are thinking, how many guests, and what you are looking for. We will get back to you within 24 hours."
+    body="See every booked date for 2026, 2027 and 2028 on our live calendar. Find yours, book a tour, confirm with a deposit and your date is held - the calendar updates in real time."
     primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
     secondaryCTA={{ label: "Call Us", href: "tel:+442079611604" }}
     whatsapp={true}
-    note="2026 dates are filling fast. Saturday availability for peak season is limited."
+    note="Peak season 2026 is almost fully booked. 2027 and 2028 now booking."
     utmCampaign="weddings"
   />
 
