@@ -19,7 +19,7 @@ import {
 // (single source of truth, will become a database call later).
 const PRICING_YEAR = 2026;
 const lowestCombo = getLowestCombo(PRICING_YEAR);
-const gbp = (n: number) => `£${n.toLocaleString('en-GB')}`;
+const gbp = (n: number) => `Â£${n.toLocaleString('en-GB')}`;
 const seasonRows = getSeasons().map((season) => {
   const cell = (dayType: 'sun-thu' | 'fri' | 'sat') => {
     const b = getLowestBreakdown(PRICING_YEAR, season.id, dayType);
@@ -96,7 +96,7 @@ const localBusinessSchema = {
   "@id": "https://thehackney-website.pages.dev",
   "url": "https://thehackney-website.pages.dev/weddings/",
   "telephone": "+442079611604",
-  "priceRange": "£5,000-£18,000",
+  "priceRange": "Â£5,000-Â£18,000",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "503 Hackney Road",
@@ -128,7 +128,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     { number: "400+", label: "Weddings managed" },
     { number: "Everything Included", label: "Venue, food, drinks, team" },
     { number: "Exclusive Hire", label: "The whole venue, just for you" },
-    { number: "4.9 ★", label: "Couple rating on Hitched" }
+    { number: "4.9 â", label: "Couple rating on Hitched" }
   ]} />
 
   <!-- ==================== SECTION 3: WEDDING QUESTIONNAIRE ==================== -->
@@ -169,7 +169,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       <div class="included-category">
         <h3>Planning Support</h3>
         <ul class="included-list">
-          <li>Bespoke planning form tailored to your wedding</li>
+          <li>A planning form tailored to your wedding</li>
           <li>Menu tasting for you and your partner</li>
           <li>Timeline planning and supplier coordination</li>
           <li>Everything managed through one point of contact</li>
@@ -294,7 +294,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   <!-- Rebuilt 2026-04-07 around the lead-capture play.
        Previous 6-row "season summary" table had stale numbers that didn't match
        the live brochure rate card. New approach (per Bridebook 2026 market data):
-       - Big "From £5,000" hook satisfies the 88% who expect pricing online
+       - Big "From Â£5,000" hook satisfies the 88% who expect pricing online
        - Simple 4-row 2026 season table = "indicative pricing" the 41% accept
        - Pivot to 2027/2028 brochure form because 86% of current shoppers are
          planning 2027+ weddings (avg engagement-to-wedding = 23.8 months)
@@ -522,7 +522,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     heading="Ready To Check Your Date?"
     body="See every booked date for 2026, 2027 and 2028 on our live calendar. Find yours, book a tour, confirm with a deposit and your date is held - the calendar updates in real time."
     primaryCTA={{ label: "See The Calendar", href: "/check-your-date/" }}
-    note="Peak season 2026 is almost fully booked. 2027 and 2028 now booking."
+    note="Limited peak Saturdays remaining."
     utmCampaign="weddings"
   />
 
@@ -786,7 +786,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     /* ==================== PRICING ==================== */
-    /* Big "from £5,000" hook - the visual moment of the pricing section.
+    /* Big "from Â£5,000" hook - the visual moment of the pricing section.
        Sized large for impact, single primary number, supporting breakdown
        underneath. Centred for emphasis. */
     .pricing-hook {
@@ -902,7 +902,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       font-size: 16px;
     }
 
-    /* Each price cell is two stacked spans: the bold "From £X" total
+    /* Each price cell is two stacked spans: the bold "From Â£X" total
        and a smaller hire+min spend breakdown beneath it. */
     .pricing-season-table td:not(:first-child) {
       vertical-align: middle;
