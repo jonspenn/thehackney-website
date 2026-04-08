@@ -402,6 +402,10 @@ function StepConfirmation({ data }) {
     ? "/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz-urgent"
     : "/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz";
 
+  const dcUrl = isHot
+    ? "/bookacall/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz-urgent"
+    : "/bookacall/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz";
+
   return (
     <div className="wq-step wq-step--confirmation">
       <FadeIn>
@@ -426,9 +430,22 @@ function StepConfirmation({ data }) {
         <FadeIn delay={300}>
           <div className="wq-confirm-card wq-confirm-card--hot">
             <p>Since you're ready to move, skip the emails and book a free venue tour directly with Hugo, our General Manager.</p>
-            <a href={tourUrl} className="wq-btn wq-btn--primary" style={{ marginTop: 16 }}>
-              Book a Free Tour
-            </a>
+            <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
+              <a
+                href={dcUrl}
+                className="wq-btn wq-btn--primary"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "quiz_success_dc_click" })}
+              >
+                Book a Discovery Call
+              </a>
+              <a
+                href={tourUrl}
+                className="wq-btn wq-btn--outline"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "quiz_success_tour_click" })}
+              >
+                Book a Venue Tour
+              </a>
+            </div>
           </div>
         </FadeIn>
       )}
@@ -439,9 +456,22 @@ function StepConfirmation({ data }) {
           <div className="wq-confirm-card">
             <h3 className="wq-confirm-card__title">What happens next</h3>
             <p>Check your inbox - your personalised guide is on its way. Over the next couple of weeks, we'll send you a few helpful emails with real wedding stories, planning tips, and everything you need to know about The Hackney.</p>
-            <a href={tourUrl} className="wq-btn wq-btn--primary" style={{ marginTop: 16 }}>
-              Book a Free Tour
-            </a>
+            <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
+              <a
+                href={dcUrl}
+                className="wq-btn wq-btn--primary"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "quiz_success_dc_click" })}
+              >
+                Book a Discovery Call
+              </a>
+              <a
+                href={tourUrl}
+                className="wq-btn wq-btn--outline"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "quiz_success_tour_click" })}
+              >
+                Book a Venue Tour
+              </a>
+            </div>
           </div>
         </FadeIn>
       )}
@@ -469,9 +499,22 @@ function StepConfirmation({ data }) {
         <FadeIn delay={300}>
           <div className="wq-confirm-card">
             <p>Check your inbox - your personalised guide is on its way. If you'd like to see the space in person, book a free tour with Hugo.</p>
-            <a href={tourUrl} className="wq-btn wq-btn--outline" style={{ marginTop: 16 }}>
-              Book a Free Tour
-            </a>
+            <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
+              <a
+                href={dcUrl}
+                className="wq-btn wq-btn--outline"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "quiz_success_dc_click" })}
+              >
+                Book a Discovery Call
+              </a>
+              <a
+                href={tourUrl}
+                className="wq-btn wq-btn--outline"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "quiz_success_tour_click" })}
+              >
+                Book a Venue Tour
+              </a>
+            </div>
           </div>
         </FadeIn>
       )}
