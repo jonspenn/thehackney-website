@@ -117,7 +117,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     image="/images/hackney-wedding-venue-hero-amy-john-gallery-industrial.webp"
     alt="The Hackney wedding venue interior with long banquet tables, hanging greenery, disco balls and skylight"
     heading="One Team. One Place.<br>Your Whole Wedding."
-    cta={{ label: "Send Me The Pricing", href: "#questionnaire" }}
+    cta={{ label: "Send Me The Pricing", href: "/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=hero#questionnaire" }}
     note="Pricing for 2026, 2027 and 2028 - emailed to you in seconds."
     height="mid"
     textGradient={true}
@@ -130,6 +130,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     { number: "Exclusive Hire", label: "The whole venue, just for you" },
     { number: "4.9 â", label: "Couple rating on Hitched" }
   ]} />
+
+  <!-- Returning MQL persistent link - serves the 822 stuck Q1 2026 cohort -->
+  <div class="mql-return-link">
+    <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=mql-return">Already got our brochure? See your date &rarr;</a>
+  </div>
 
   <!-- ==================== SECTION 3: WEDDING QUESTIONNAIRE ==================== -->
   <WeddingQuestionnaire />
@@ -216,7 +221,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
     <div class="details-cta">
       <p>Full collections, photos and pricing are inside our wedding brochure.</p>
-      <a href="#questionnaire" class="btn btn-primary" data-cta-section="details-extras">Send Me The Brochure</a>
+      <a href="/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=section5-finishing-touches#questionnaire" class="btn btn-primary" data-cta-section="details-extras">Send Me The Brochure</a>
     </div>
   </Section>
 
@@ -431,7 +436,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
 
     <div class="section-cta-center">
-      <a href="#questionnaire" class="btn btn-primary">Start Planning Yours</a>
+      <a href="/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=section9-real-couples#questionnaire" class="btn btn-primary">Start Planning Yours</a>
     </div>
   </Section>
 
@@ -478,7 +483,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
 
     <div class="section-cta-center">
-      <a href="/check-your-date/" class="btn btn-primary" data-cta-section="planning-process">See The Calendar</a>
+      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=section11-how-it-works" class="btn btn-primary" data-cta-section="planning-process">See The Calendar</a>
     </div>
   </Section>
 
@@ -530,10 +535,27 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
   <!-- ==================== STICKY MOBILE CTA ==================== -->
   <div class="sticky-cta" id="stickyCta">
-    <a href="#questionnaire">Plan Your Wedding</a>
+    <a href="/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=sticky-mobile#questionnaire">Plan Your Wedding</a>
   </div>
 
   <style>
+  /* Returning MQL persistent link (P1 #12) */
+  .mql-return-link {
+    text-align: center;
+    padding: 0.85rem 1rem 0;
+    font-family: var(--font-sans, "DM Sans", sans-serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+  }
+  .mql-return-link a {
+    color: var(--dusty-coral, #BF7256);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .mql-return-link a:hover {
+    color: var(--fired-brick, #8C472E);
+  }
+
     /* ==================== DIFFERENT (Why The Hackney) ==================== */
     .different-body {
       max-width: 760px;
