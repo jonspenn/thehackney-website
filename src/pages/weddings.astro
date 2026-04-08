@@ -476,7 +476,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
 
     <div class="section-cta-center">
-      <a href="/check-your-date/" class="btn btn-primary" data-cta-section="planning-process">See If We're Free</a>
+      <a href="/check-your-date/" class="btn btn-primary" data-cta-section="planning-process">See The Calendar</a>
     </div>
   </Section>
 
@@ -491,20 +491,37 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
   <!-- ==================== SECTION 12: FINAL CTA ==================== -->
   <!-- Rewritten 2026-04-08. Previous copy promised a 24-hour manual callback,
-       which contradicted the self-serve story the rest of the page now sells
+       which contradicted the self-serve story the rest of the page sells
        (live calendar + instant brochure + Eva-led planning once deposit lands).
        Urgency note is data-backed: HubSpot export 7 Apr 2026 shows 21 of 22
        peak-season 2026 Saturdays are already booked. Deliberately durable
        phrasing ("almost fully booked") rather than a live count so copy
        doesn't go stale between weekly updates. Phase 2: wire the /api/availability
-       endpoint into a dynamic counter. -->
+       endpoint into a dynamic counter.
+
+       Second pass 2026-04-08: tightened three redundancies spotted on the
+       live deploy.
+       (1) Eyebrow "Ready When You Are" echoed the heading's "Ready" - swapped
+           to "Your Next Step" to function as a mode-switch signal without
+           repeating the heading's opening word.
+       (2) Primary button "Check Your Date" echoed both the heading AND the
+           sitewide nav CTA visible top-right. Swapped to "See The Calendar" -
+           different verb, concrete promise, continues the heading's thought
+           rather than restating it. Matches the Section 10 CTA for section-
+           level consistency while the nav keeps "Check Your Date" as the
+           canonical sitewide action label.
+       (3) "Call Us" secondary CTA and WhatsApp tertiary link removed entirely.
+           The whole page is built to automate the sales funnel - phone and
+           WhatsApp here contradict that thesis, and Section 7's brochure form
+           note already promises "No phone calls. No sales pitch." Leaving
+           a Call Us button five sections later was a direct trust violation.
+           Safety valve for the genuine-human-need segment still lives in
+           the sitewide footer and on /check-your-date/ itself. -->
   <FinalCTA
-    eyebrow="Ready When You Are"
+    eyebrow="Your Next Step"
     heading="Ready To Check Your Date?"
     body="See every booked date for 2026, 2027 and 2028 on our live calendar. Find yours, book a tour, confirm with a deposit and your date is held - the calendar updates in real time."
-    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
-    secondaryCTA={{ label: "Call Us", href: "tel:+442079611604" }}
-    whatsapp={true}
+    primaryCTA={{ label: "See The Calendar", href: "/check-your-date/" }}
     note="Peak season 2026 is almost fully booked. 2027 and 2028 now booking."
     utmCampaign="weddings"
   />
