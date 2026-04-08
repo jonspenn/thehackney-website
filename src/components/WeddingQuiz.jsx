@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-/* ─── Industrial Romance palette ─── */
+/* âââ Industrial Romance palette âââ */
 const BRAND = {
   warmCanvas: "#F5F0E8",
   breweryDark: "#2C1810",
@@ -12,7 +12,7 @@ const BRAND = {
   mahogany: "#40160C",
 };
 
-/* ─── Data constants ─── */
+/* âââ Data constants âââ */
 const MONTHS = [
   "Jan","Feb","Mar","Apr","May","Jun",
   "Jul","Aug","Sep","Oct","Nov","Dec"
@@ -65,7 +65,7 @@ const BUDGET_OPTIONS = [
 */
 const TOTAL_STEPS = 5;
 
-/* ─── Shared components ─── */
+/* âââ Shared components âââ */
 
 function FadeIn({ children, delay = 0 }) {
   const [visible, setVisible] = useState(false);
@@ -130,7 +130,7 @@ function BackButton({ onClick }) {
   );
 }
 
-/* ─── Step components ─── */
+/* âââ Step components âââ */
 
 function StepDate({ data, setData, onNext }) {
   const now = new Date();
@@ -249,7 +249,7 @@ function StepGuests({ data, setData, onNext, onBack }) {
       <BackButton onClick={onBack} />
       <FadeIn>
         <h2 className="wq-heading">How many guests?</h2>
-        <p className="wq-subtext">We're an intimate venue - perfect for 20 to 70 seated guests</p>
+        <p className="wq-subtext">We're an intimate venue - perfect for 20 to 60 seated guests</p>
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-cards">
@@ -479,10 +479,10 @@ function StepConfirmation({ data }) {
   );
 }
 
-/* ─── Main component ─── */
+/* âââ Main component âââ */
 
-/* Step number → human-readable name for tracking. Keeps GA4 reports legible.
-   New ordering: Date → Urgency → Guests → Capture → Budget → Confirmation.
+/* Step number â human-readable name for tracking. Keeps GA4 reports legible.
+   New ordering: Date â Urgency â Guests â Capture â Budget â Confirmation.
    Budget moved to AFTER capture so it can't kill the lead. */
 const STEP_NAMES = {
   1: "date",
@@ -559,7 +559,7 @@ export default function WeddingQuiz() {
 
   async function handleCaptureSubmit() {
     setSubmitting(true);
-    /* ── PLACEHOLDER: Replace with real endpoint when platform is chosen ── */
+    /* ââ PLACEHOLDER: Replace with real endpoint when platform is chosen ââ */
     const payload = {
       first_name: data.firstName,
       email: data.email,
