@@ -8,6 +8,11 @@
  * Garamond over a dark gradient on the photo. Used on /weddings/ Section 6
  * to land a value-justifier quote immediately before the pricing reveal.
  *
+ * `quotePosition` controls where the quote sits and where the dark gradient
+ * falls. Default is "bottom" (original behaviour). Use "top" to push the
+ * quote and gradient to the top of the image, leaving the lower portion
+ * unobscured so vivid photo content (e.g. colourful wedding party) pops.
+ *
  * Usage:
  *   <PhotoBreak
  *     image="/images/hackney-wedding-couple.webp"
@@ -16,11 +21,12 @@
  *   />
  *
  *   <PhotoBreak
- *     image="/images/hackney-wedding-first-dance-guests-venue.webp"
- *     alt="Wedding first dance with guests at The Hackney"
+ *     image="/images/hackney-wedding-confetti.webp"
+ *     alt="Wedding party confetti on Hackney Road"
  *     position="center 50%"
  *     quote="It felt far more put together than weddings of friends who paid triple the amount. Absolutely the best day."
  *     attribution="Rosemary, married November 2024"
+ *     quotePosition="top"
  *   />
  */
 
@@ -35,6 +41,8 @@ interface Props {
   quote?: string;
   /** Optional attribution line. Renders below the quote with an em-dash prefix. */
   attribution?: string;
+  /** Where the quote + dark gradient sit. "bottom" (default) or "top". */
+  quotePosition?: 'top' | 'bottom';
 }
 
 const {
@@ -44,10 +52,13 @@ const {
   height = '60vh',
   quote,
   attribution,
+  quotePosition = 'bottom',
 } = Astro.props;
+
+const quoteTopClass = quotePosition === 'top' ? ' photo-break-quote-top' : '';
 ---
 
-<section class={`photo-break${quote ? ' photo-break-with-quote' : ''}`}>
+<section class={`photo-break${quote ? ' photo-break-with-quote' : ''}${quoteTopClass}`}>
   <div
     class="photo-break-image"
     style={`background-image: url('${image}'); background-position: ${position}; --photo-height: ${height};`}
@@ -82,7 +93,7 @@ const {
   }
 
   /* Quote variant - dark gradient overlay + Cormorant Garamond serif quote.
-     The gradient is anchored bottom-heavy so the photo composition reads
+     Default (bottom): gradient is anchored bottom-heavy so the photo reads
      in the upper third while the quote sits in the lower third. */
   .photo-break-with-quote .photo-break-image {
     min-height: 420px;
@@ -101,6 +112,20 @@ const {
     align-items: flex-end;
     justify-content: center;
     padding: 0 32px 56px;
+  }
+
+  /* Top variant: flip the gradient so it's dark at top, clear at bottom.
+     Quote sits at the top, letting vibrant photo content below pop. */
+  .photo-break-quote-top .photo-break-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(44, 24, 16, 0.82) 0%,
+      rgba(44, 24, 16, 0.55) 40%,
+      rgba(44, 24, 16, 0.08) 70%,
+      rgba(44, 24, 16, 0) 100%
+    );
+    align-items: flex-start;
+    padding: 48px 32px 0;
   }
 
   .photo-break-quote-figure {
@@ -150,6 +175,10 @@ const {
 
     .photo-break-overlay {
       padding: 0 24px 36px;
+    }
+
+    .photo-break-quote-top .photo-break-overlay {
+      padding: 32px 24px 0;
     }
 
     .photo-break-quote {
