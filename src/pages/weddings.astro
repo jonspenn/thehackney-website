@@ -19,7 +19,7 @@ import {
 // (single source of truth, will become a database call later).
 const PRICING_YEAR = 2026;
 const lowestCombo = getLowestCombo(PRICING_YEAR);
-const gbp = (n: number) => `Â£${n.toLocaleString('en-GB')}`;
+const gbp = (n: number) => `ÃÂ£${n.toLocaleString('en-GB')}`;
 const seasonRows = getSeasons().map((season) => {
   const cell = (dayType: 'sun-thu' | 'fri' | 'sat') => {
     const b = getLowestBreakdown(PRICING_YEAR, season.id, dayType);
@@ -96,7 +96,7 @@ const localBusinessSchema = {
   "@id": "https://thehackney-website.pages.dev",
   "url": "https://thehackney-website.pages.dev/weddings/",
   "telephone": "+442079611604",
-  "priceRange": "Â£5,000-Â£18,000",
+  "priceRange": "ÃÂ£5,000-ÃÂ£18,000",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "503 Hackney Road",
@@ -117,7 +117,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     image="/images/hackney-wedding-venue-hero-amy-john-gallery-industrial.webp"
     alt="The Hackney wedding venue interior with long banquet tables, hanging greenery, disco balls and skylight"
     heading="One Team. One Place.<br>Your Whole Wedding."
-    cta={{ label: "Send Me The Pricing", href: "/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=hero#questionnaire" }}
+    cta={{ label: "Get Pricing For Your Date", href: "/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=hero#questionnaire" }}
     note="Pricing for 2026, 2027 and 2028 - emailed to you in seconds."
     height="mid"
     textGradient={true}
@@ -128,7 +128,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     { number: "400+", label: "Weddings managed" },
     { number: "Everything Included", label: "Venue, food, drinks, team" },
     { number: "Exclusive Hire", label: "The whole venue, just for you" },
-    { number: "4.9 â", label: "Couple rating on Hitched" }
+    { number: "4.9 Ã¢ÂÂ", label: "Couple rating on Hitched" }
   ]} />
 
   <!-- Returning MQL persistent link - serves the 822 stuck Q1 2026 cohort -->
@@ -221,7 +221,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
     <div class="details-cta">
       <p>Full collections, photos and pricing are inside our wedding brochure.</p>
-      <a href="/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=section5-finishing-touches#questionnaire" class="btn btn-primary" data-cta-section="details-extras">Send Me The Brochure</a>
+      <a href="/weddings/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=section5-finishing-touches#questionnaire" class="btn btn-primary" data-cta-section="details-extras">Get Your Personalised Guide</a>
     </div>
   </Section>
 
@@ -301,7 +301,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   <!-- Rebuilt 2026-04-07 around the lead-capture play.
        Previous 6-row "season summary" table had stale numbers that didn't match
        the live brochure rate card. New approach (per Bridebook 2026 market data):
-       - Big "From Â£5,000" hook satisfies the 88% who expect pricing online
+       - Big "From ÃÂ£5,000" hook satisfies the 88% who expect pricing online
        - Simple 4-row 2026 season table = "indicative pricing" the 41% accept
        - Pivot to 2027/2028 brochure form because 86% of current shoppers are
          planning 2027+ weddings (avg engagement-to-wedding = 23.8 months)
@@ -810,7 +810,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     /* ==================== PRICING ==================== */
-    /* Big "from Â£5,000" hook - the visual moment of the pricing section.
+    /* Big "from ÃÂ£5,000" hook - the visual moment of the pricing section.
        Sized large for impact, single primary number, supporting breakdown
        underneath. Centred for emphasis. */
     .pricing-hook {
@@ -926,7 +926,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       font-size: 16px;
     }
 
-    /* Each price cell is two stacked spans: the bold "From Â£X" total
+    /* Each price cell is two stacked spans: the bold "From ÃÂ£X" total
        and a smaller hire+min spend breakdown beneath it. */
     .pricing-season-table td:not(:first-child) {
       vertical-align: middle;
