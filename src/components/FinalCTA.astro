@@ -1,17 +1,29 @@
 ---
 /**
- * FinalCTA - Dark closing section used across the site.
+ * FinalCTA - Closing CTA section used across the site.
  * Replaces ~120 lines of duplicated CSS per page.
+ *
+ * Two variants:
+ *   - Default (no image): light background, dark text.
+ *   - Image variant: full-bleed background photo with dark overlay,
+ *     white text. Use for high-energy closers (e.g. champagne spray).
  *
  * Usage:
  *   <FinalCTA
  *     heading="Ready to see the space?"
  *     body="Tours run 7 days a week."
  *     primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
- *     secondaryCTA={{ label: "Download The Brochure", href: "/weddings/#brochure" }}
- *     phone={true}
- *     whatsapp={true}
  *     note="2026 dates are filling fast."
+ *   />
+ *
+ *   <FinalCTA
+ *     image="/images/hackney-wedding-party-champagne-spray-graffiti.webp"
+ *     imageAlt="Wedding party spraying champagne on Hackney Road"
+ *     imagePosition="center 55%"
+ *     heading="Ready To Check Your Date?"
+ *     body="See every booked date on our live calendar."
+ *     primaryCTA={{ label: "See The Calendar", href: "/check-your-date/" }}
+ *     note="Limited peak Saturdays remaining."
  *   />
  */
 
@@ -25,6 +37,12 @@ interface Props {
   note?: string;
   /** UTM campaign param appended to /check-your-date/ links */
   utmCampaign?: string;
+  /** Optional background image URL. Switches to dark overlay variant. */
+  image?: string;
+  /** Alt text for background image. Required when image is set. */
+  imageAlt?: string;
+  /** CSS background-position for the image. Default: "center center" */
+  imagePosition?: string;
 }
 
 const {
@@ -36,7 +54,12 @@ const {
   whatsapp = false,
   note,
   utmCampaign,
+  image,
+  imageAlt,
+  imagePosition = 'center center',
 } = Astro.props;
+
+const hasImage = !!image;
 
 // Append UTM params to check-your-date links if campaign specified
 function resolveHref(href: string): string {
@@ -47,8 +70,18 @@ function resolveHref(href: string): string {
 }
 ---
 
-<section class="final-cta">
-  <div class="container">
+<section class={`final-cta${hasImage ? ' final-cta-with-image' : ''}`}>
+  {hasImage && (
+    <div
+      class="final-cta-bg"
+      style={`background-image: url('${image}'); background-position: ${imagePosition};`}
+      role="img"
+      aria-label={imageAlt || ''}
+    >
+      <div class="final-cta-overlay"></div>
+    </div>
+  )}
+  <div class="container final-cta-content">
     {eyebrow && <div class="eyebrow final-cta-eyebrow">{eyebrow}</div>}
     <h2>{heading}</h2>
     {body && <p class="final-cta-body">{body}</p>}
@@ -68,12 +101,15 @@ function resolveHref(href: string): string {
 </section>
 
 <style>
+  /* ==================== DEFAULT (light) VARIANT ==================== */
   .final-cta {
     background: rgba(44, 24, 16, 0.04);
     border-top: 1px solid rgba(44, 24, 16, 0.08);
     border-bottom: 1px solid rgba(44, 24, 16, 0.08);
     padding: 72px 0;
     text-align: center;
+    position: relative;
+    overflow: hidden;
   }
 
   .final-cta h2 {
@@ -147,9 +183,87 @@ function resolveHref(href: string): string {
     width: 100%;
   }
 
+  /* ==================== IMAGE VARIANT ==================== */
+  .final-cta-with-image {
+    background: none;
+    border: none;
+    padding: 0;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .final-cta-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    z-index: 0;
+  }
+
+  .final-cta-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(44, 24, 16, 0.75) 0%,
+      rgba(44, 24, 16, 0.65) 50%,
+      rgba(44, 24, 16, 0.55) 100%
+    );
+  }
+
+  .final-cta-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Override text colours for image variant */
+  .final-cta-with-image h2 {
+    color: var(--warm-canvas, #F5F0E8);
+  }
+
+  .final-cta-with-image .final-cta-eyebrow {
+    color: var(--dusty-coral, #BF7256);
+  }
+
+  .final-cta-with-image .final-cta-body {
+    color: rgba(245, 240, 232, 0.85);
+  }
+
+  .final-cta-with-image .final-cta-note {
+    color: rgba(245, 240, 232, 0.6);
+  }
+
+  .final-cta-with-image .btn-outline {
+    color: var(--warm-canvas, #F5F0E8);
+    border-color: rgba(245, 240, 232, 0.35);
+  }
+
+  .final-cta-with-image .btn-outline:hover {
+    background-color: rgba(245, 240, 232, 0.1);
+    border-color: rgba(245, 240, 232, 0.5);
+  }
+
+  .final-cta-with-image .final-cta-contact-line {
+    color: rgba(245, 240, 232, 0.5);
+  }
+
+  .final-cta-with-image .final-cta-contact-line a {
+    color: rgba(245, 240, 232, 0.7);
+  }
+
+  .final-cta-with-image .final-cta-contact-line a:hover {
+    color: var(--warm-canvas, #F5F0E8);
+  }
+
   @media (max-width: 768px) {
     .final-cta {
       padding: 56px 0;
+    }
+
+    .final-cta-with-image {
+      min-height: 420px;
+      padding: 48px 0;
     }
 
     .final-cta-buttons {
