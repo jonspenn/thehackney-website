@@ -1,0 +1,104 @@
+---
+/**
+ * ProcessSteps - Numbered step-by-step process display.
+ *
+ * Extracted from weddings.astro Section 9 and corporate.astro Section 9.
+ * Canonical style follows the weddings treatment (large serif numbers,
+ * auto-column grid based on step count).
+ *
+ * Usage:
+ *   <ProcessSteps steps={[
+ *     { title: "Tell Us What You Need", description: "Fill in the enquiry form..." },
+ *     { title: "Visit The Venue", description: "Come and walk the space...", optional: true },
+ *     { title: "Your Proposal", description: "One document covering..." },
+ *     { title: "Confirm and Relax", description: "A deposit secures..." }
+ *   ]} />
+ */
+
+interface Step {
+  title: string;
+  /** Supports HTML (e.g. anchor tags). Rendered with set:html. */
+  description: string;
+  /** Shows an "Optional" label next to the step title */
+  optional?: boolean;
+}
+
+interface Props {
+  steps: Step[];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="process-steps" style={`--step-count: ${steps.length}`}>
+  {steps.map((step, i) => (
+    <div class="process-step">
+      <div class="process-step-number">{String(i + 1).padStart(2, '0')}</div>
+      <h3>
+        {step.title}
+        {step.optional && <span class="process-step-optional">Optional</span>}
+      </h3>
+      <p set:html={step.description} />
+    </div>
+  ))}
+</div>
+
+<style>
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(var(--step-count, 4), 1fr);
+    gap: 24px;
+    margin-bottom: 16px;
+  }
+
+  .process-step-number {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 600;
+    color: var(--forest-olive);
+    opacity: 0.25;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .process-step h3 {
+    font-family: var(--font-heading);
+    font-size: clamp(18px, 2.2vw, 24px);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--brewery-dark);
+    letter-spacing: 0;
+    margin-bottom: 10px;
+  }
+
+  .process-step-optional {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--dusty-coral);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .process-step p {
+    font-size: 15px;
+    line-height: 1.5;
+    opacity: 0.75;
+  }
+
+  @media (max-width: 1200px) {
+    .process-steps {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .process-steps {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+</style>

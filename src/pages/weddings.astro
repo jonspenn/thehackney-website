@@ -6,6 +6,8 @@ import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import PhotoBreak from '../components/PhotoBreak.astro';
 import PhotoStrip from '../components/PhotoStrip.astro';
+import IncludedGrid from '../components/IncludedGrid.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
 import FAQ from '../components/FAQ.astro';
 import FinalCTA from '../components/FinalCTA.astro';
 import WeddingQuestionnaire from '../components/WeddingQuestionnaire.astro';
@@ -151,39 +153,38 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       <p>At The Hackney, everything is in-house. Our kitchen prepares your menu. Our bar team pours your drinks. Our events team plans your day. Our coordinator runs it on the morning. One team who know the building, know each other, and know exactly how to make your wedding feel effortless.</p>
     </div>
 
-    <div class="included-grid">
-      <div class="included-category">
-        <h3>Your Dedicated Team</h3>
-        <ul class="included-list">
-          <li>Personal on-day coordinator from setup to send-off</li>
-          <li>Dedicated events team for planning in the months before</li>
-          <li>All staffing costs included - kitchen, bar, front of house</li>
-          <li>Five-star service with no service charge added</li>
-        </ul>
-      </div>
-      <div class="included-category">
-        <h3>The Venue, Fully Equipped</h3>
-        <ul class="included-list">
-          <li>Exclusive hire of the entire building</li>
-          <li>All furniture and decor - tables, chairs, linens, glassware</li>
-          <li>Built-in sound and lighting system</li>
-          <li>The space set up and styled to your brief</li>
-        </ul>
-      </div>
-      <div class="included-category">
-        <h3>Planning Support</h3>
-        <ul class="included-list">
-          <li>A planning form tailored to your wedding</li>
-          <li>Menu tasting for you and your partner</li>
-          <li>Timeline planning and supplier coordination</li>
-          <li>Everything managed through one point of contact</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="included-promise">
-      <p><strong>The price we quote is the price you pay.</strong> No surprise staffing invoice. No service charge on top. No discovery that "venue hire" did not include the tables. One team, one conversation, one bill.</p>
-    </div>
+    <IncludedGrid
+      categories={[
+        {
+          title: "Your Dedicated Team",
+          items: [
+            "Personal on-day coordinator from setup to send-off",
+            "Dedicated events team for planning in the months before",
+            "All staffing costs included - kitchen, bar, front of house",
+            "Five-star service with no service charge added"
+          ]
+        },
+        {
+          title: "The Venue, Fully Equipped",
+          items: [
+            "Exclusive hire of the entire building",
+            "All furniture and decor - tables, chairs, linens, glassware",
+            "Built-in sound and lighting system",
+            "The space set up and styled to your brief"
+          ]
+        },
+        {
+          title: "Planning Support",
+          items: [
+            "A planning form tailored to your wedding",
+            "Menu tasting for you and your partner",
+            "Timeline planning and supplier coordination",
+            "Everything managed through one point of contact"
+          ]
+        }
+      ]}
+      promise="<strong>The price we quote is the price you pay.</strong> No surprise staffing invoice. No service charge on top. No discovery that &quot;venue hire&quot; did not include the tables. One team, one conversation, one bill."
+    />
   </Section>
 
   <!-- ==================== SECTION 4B: THE DETAILS, ALSO IN-HOUSE ==================== -->
@@ -449,33 +450,29 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       heading="From First Click To Last Dance"
     />
 
-    <div class="process-steps">
-      <div class="process-step">
-        <div class="process-step-number">01</div>
-        <h3>Check Your Date</h3>
-        <p>See your date instantly on our live calendar. Pricing for every season, availability you can see at a glance. No forms, no waiting.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">02</div>
-        <h3>Have Questions First? <span class="process-step-optional">(optional)</span></h3>
-        <p>If there is anything you would like to talk through before visiting, <a href="/bookacall/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=section11-how-it-works">book a call with Hugo</a>, our General Manager. Otherwise, skip straight to the tour.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">03</div>
-        <h3>Visit The Venue</h3>
-        <p>Come and walk the space with Hugo. He will show you every corner of the building, talk you through how the day flows, and answer everything on your mind.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">04</div>
-        <h3>Your Proposal</h3>
-        <p>One document, one total. Your full proposal covering menu, drinks, timeline, and every extra. Nothing buried, nothing hidden.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">05</div>
-        <h3>Secure Your Date</h3>
-        <p>A deposit holds your date and unlocks your dedicated events team. From that moment until the last dance, we handle every decision with you.</p>
-      </div>
-    </div>
+    <ProcessSteps steps={[
+      {
+        title: "Check Your Date",
+        description: "See your date instantly on our live calendar. Pricing for every season, availability you can see at a glance. No forms, no waiting."
+      },
+      {
+        title: "Have Questions First?",
+        description: 'If there is anything you would like to talk through before visiting, <a href="/bookacall/?utm_source=website&utm_medium=cta&utm_campaign=weddings&utm_content=section11-how-it-works">book a call with Hugo</a>, our General Manager. Otherwise, skip straight to the tour.',
+        optional: true
+      },
+      {
+        title: "Visit The Venue",
+        description: "Come and walk the space with Hugo. He will show you every corner of the building, talk you through how the day flows, and answer everything on your mind."
+      },
+      {
+        title: "Your Proposal",
+        description: "One document, one total. Your full proposal covering menu, drinks, timeline, and every extra. Nothing buried, nothing hidden."
+      },
+      {
+        title: "Secure Your Date",
+        description: "A deposit holds your date and unlocks your dedicated events team. From that moment until the last dance, we handle every decision with you."
+      }
+    ]} />
 
     <div class="section-cta-center">
       <a href="/check-your-date/" class="btn btn-primary" data-cta-section="planning-process">See The Calendar</a>
@@ -678,56 +675,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       opacity: 0.85;
     }
 
-    /* ==================== EVERYTHING INCLUDED ==================== */
-    .included-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 48px;
-      margin-bottom: 48px;
-    }
-
-    .included-category h3 {
-      font-size: 18px;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid var(--forest-olive);
-    }
-
-    .included-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .included-list li {
-      padding-left: 24px;
-      position: relative;
-      font-size: 16px;
-    }
-
-    .included-list li::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 8px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--forest-olive);
-    }
-
-    .included-promise {
-      background: rgba(44, 24, 16, 0.03);
-      padding: 36px 40px;
-      border-left: 4px solid var(--forest-olive);
-      max-width: 800px;
-    }
-
-    .included-promise p {
-      font-size: 17px;
-      line-height: 1.7;
-    }
+    /* IncludedGrid styles now live in IncludedGrid.astro component */
 
     /* ==================== THE DETAILS, ALSO IN-HOUSE ==================== */
     /* Section 4B - flowers / stationery / tableware in-house extras.
@@ -1116,51 +1064,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       margin-top: 32px;
     }
 
-    /* ==================== PLANNING PROCESS ==================== */
-    .process-steps {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 24px;
-      margin-bottom: 16px;
-    }
-
-    .process-step-number {
-      font-family: var(--font-heading);
-      font-size: 48px;
-      font-weight: 600;
-      color: var(--forest-olive);
-      opacity: 0.25;
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-
-    .process-step h3 {
-      font-family: var(--font-heading);
-      font-size: clamp(22px, 2.2vw, 28px);
-      font-weight: 500;
-      line-height: 1.2;
-      color: var(--brewery-dark);
-      letter-spacing: 0;
-      margin-bottom: 10px;
-    }
-
-    .process-step-optional {
-      display: inline-block;
-      font-family: var(--font-body);
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--dusty-coral);
-      margin-left: 4px;
-      vertical-align: middle;
-    }
-
-    .process-step p {
-      font-size: 15px;
-      line-height: 1.5;
-      opacity: 0.75;
-    }
+    /* ProcessSteps styles now live in ProcessSteps.astro component */
 
     /* ==================== SCROLL ANIMATIONS ==================== */
     .fade-in {
@@ -1176,14 +1080,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 1200px) {
-      .process-steps {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .included-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
       .details-grid {
         grid-template-columns: 1fr 1fr;
       }
@@ -1198,11 +1094,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         grid-template-columns: 1fr;
       }
 
-      .included-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-
       .details-grid {
         grid-template-columns: 1fr;
         gap: 40px;
@@ -1213,11 +1104,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
-      }
-
-      .process-steps {
-        grid-template-columns: 1fr;
-        gap: 12px;
       }
 
       .wedding-story {
@@ -1231,10 +1117,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
       .wedding-story:nth-child(even) {
         direction: ltr;
-      }
-
-      .included-promise {
-        padding: 28px;
       }
 
       .space-capacity {

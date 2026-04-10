@@ -7,6 +7,8 @@ import SectionHeader from '../components/SectionHeader.astro';
 import FAQ from '../components/FAQ.astro';
 import FinalCTA from '../components/FinalCTA.astro';
 import PhotoBreak from '../components/PhotoBreak.astro';
+import IncludedGrid from '../components/IncludedGrid.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
 import CorporateQuestionnaire from '../components/CorporateQuestionnaire.astro';
 
 // Corporate FAQ items
@@ -116,39 +118,38 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       <p>Most corporate venues are one or the other. The Hackney gives you the choice - and you can mix and match. Hire the building and our bar team but bring your own caterer. Use our kitchen but manage the event yourself. Whatever your event needs, we fit around it.</p>
     </div>
 
-    <div class="included-grid">
-      <div class="included-category">
-        <h3>Full-Service</h3>
-        <ul class="included-list">
-          <li>Dedicated events manager from planning to breakdown</li>
-          <li>In-house kitchen - custom menus, breakfast to dinner</li>
-          <li>Full bar team with signature cocktails</li>
-          <li>All staffing, furniture, AV, and coordination</li>
-        </ul>
-      </div>
-      <div class="included-category">
-        <h3>Dry Hire</h3>
-        <ul class="included-list">
-          <li>Exclusive hire of the entire building, 9am to 11pm</li>
-          <li>All furniture, glassware, tableware included</li>
-          <li>Projector, screens, professional sound system, wifi</li>
-          <li>Bring your own caterers, suppliers, and production team</li>
-        </ul>
-      </div>
-      <div class="included-category">
-        <h3>Always Included</h3>
-        <ul class="included-list">
-          <li>Exclusive hire - the whole building, just for you</li>
-          <li>Flexible layouts - theatre, boardroom, banquet, standing</li>
-          <li>No service charge, no hidden extras</li>
-          <li>One clear price - the quote is the bill</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="included-promise">
-      <p><strong>The price we quote is the price you pay.</strong> Whether you choose full-service or dry hire, there are no surprise invoices, no service charges, and no discovering that "venue hire" did not include the tables.</p>
-    </div>
+    <IncludedGrid
+      categories={[
+        {
+          title: "Full-Service",
+          items: [
+            "Dedicated events manager from planning to breakdown",
+            "In-house kitchen - custom menus, breakfast to dinner",
+            "Full bar team with signature cocktails",
+            "All staffing, furniture, AV, and coordination"
+          ]
+        },
+        {
+          title: "Dry Hire",
+          items: [
+            "Exclusive hire of the entire building, 9am to 11pm",
+            "All furniture, glassware, tableware included",
+            "Projector, screens, professional sound system, wifi",
+            "Bring your own caterers, suppliers, and production team"
+          ]
+        },
+        {
+          title: "Always Included",
+          items: [
+            "Exclusive hire - the whole building, just for you",
+            "Flexible layouts - theatre, boardroom, banquet, standing",
+            "No service charge, no hidden extras",
+            "One clear price - the quote is the bill"
+          ]
+        }
+      ]}
+      promise='<strong>The price we quote is the price you pay.</strong> Whether you choose full-service or dry hire, there are no surprise invoices, no service charges, and no discovering that "venue hire" did not include the tables.'
+    />
   </Section>
 
   <!-- ==================== SECTION 6: EVENTS WE HOST ==================== -->
@@ -292,28 +293,24 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       heading="From First Enquiry To Event Day"
     />
 
-    <div class="process-steps">
-      <div class="process-step">
-        <div class="process-step-number">01</div>
-        <h3>Tell Us What You Need</h3>
-        <p>Fill in the enquiry form above or check availability on our live calendar. We will come back with a tailored proposal within 24 hours.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">02</div>
-        <h3>Visit The Venue</h3>
-        <p>Come and walk the space with Hugo, our General Manager. He will show you every corner of the building and talk you through how your event could work.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">03</div>
-        <h3>Your Proposal</h3>
-        <p>One document covering venue hire, catering, bar, AV, and every detail of your event. Clear pricing, no hidden costs, nothing buried in the small print.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-number">04</div>
-        <h3>Confirm and Relax</h3>
-        <p>A deposit secures your date. From that moment, your dedicated events manager handles every detail through to the last guest leaving.</p>
-      </div>
-    </div>
+    <ProcessSteps steps={[
+      {
+        title: "Tell Us What You Need",
+        description: "Fill in the enquiry form above or check availability on our live calendar. We will come back with a tailored proposal within 24 hours."
+      },
+      {
+        title: "Visit The Venue",
+        description: "Come and walk the space with Hugo, our General Manager. He will show you every corner of the building and talk you through how your event could work."
+      },
+      {
+        title: "Your Proposal",
+        description: "One document covering venue hire, catering, bar, AV, and every detail of your event. Clear pricing, no hidden costs, nothing buried in the small print."
+      },
+      {
+        title: "Confirm and Relax",
+        description: "A deposit secures your date. From that moment, your dedicated events manager handles every detail through to the last guest leaving."
+      }
+    ]} />
 
     <div class="section-cta-center">
       <a href="/check-your-date/?type=corporate&utm_source=website&utm_medium=cta&utm_campaign=corporate&utm_content=how-it-works" class="btn btn-primary">See The Calendar</a>
@@ -402,53 +399,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       margin-bottom: 1rem;
     }
 
-    .included-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .included-category h3 {
-      font-size: 1.15rem;
-      margin-bottom: 0.75rem;
-      color: var(--mid-olive);
-    }
-
-    .included-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .included-list li {
-      font-size: 15px;
-      line-height: 1.65;
-      padding: 6px 0;
-      padding-left: 1.25rem;
-      position: relative;
-    }
-
-    .included-list li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: var(--forest-olive);
-      font-weight: 700;
-    }
-
-    .included-promise {
-      text-align: center;
-      max-width: 680px;
-      margin: 0 auto;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(44, 24, 16, 0.08);
-    }
-
-    .included-promise p {
-      font-size: 17px;
-      line-height: 1.7;
-    }
+    /* IncludedGrid styles now live in IncludedGrid.astro component */
 
     /* ==================== EVENT TYPES GRID ==================== */
     .event-grid {
@@ -721,38 +672,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       margin-top: 12px;
     }
 
-    /* ==================== PROCESS STEPS (matches weddings) ==================== */
-    .process-steps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .process-step {
-      text-align: center;
-      padding: 0 0.5rem;
-    }
-
-    .process-step-number {
-      font-family: var(--font-heading);
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--forest-olive);
-      opacity: 0.3;
-      margin-bottom: 0.75rem;
-    }
-
-    .process-step h3 {
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .process-step p {
-      font-size: 14px;
-      line-height: 1.6;
-      opacity: 0.75;
-    }
+    /* ProcessSteps styles now live in ProcessSteps.astro component */
 
     .section-cta-center {
       text-align: center;
@@ -809,11 +729,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         align-items: flex-start;
       }
 
-      .included-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-
       .space-capacity {
         gap: 2rem;
       }
@@ -832,10 +747,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         gap: 16px;
       }
 
-      .process-steps {
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-      }
     }
   </style>
 </Base>

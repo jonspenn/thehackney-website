@@ -1,0 +1,124 @@
+---
+/**
+ * IncludedGrid - Three-column feature grid with checkmark-bullet lists and
+ * a bottom promise bar.
+ *
+ * Extracted from weddings.astro Section 4 and corporate.astro Section 5.
+ * Canonical style follows the weddings treatment (green dot bullets,
+ * border-bottom headings, left-bordered promise block).
+ *
+ * Usage:
+ *   <IncludedGrid
+ *     categories={[
+ *       { title: "Your Dedicated Team", items: ["Item one", "Item two"] },
+ *       { title: "The Venue", items: ["Item one", "Item two"] },
+ *       { title: "Planning Support", items: ["Item one", "Item two"] }
+ *     ]}
+ *     promise="<strong>The price we quote is the price you pay.</strong> No surprise invoices."
+ *   />
+ */
+
+interface Category {
+  title: string;
+  items: string[];
+}
+
+interface Props {
+  categories: Category[];
+  /** HTML string rendered inside the promise block. Supports <strong> tags. */
+  promise?: string;
+}
+
+const { categories, promise } = Astro.props;
+---
+
+<div class="included-grid">
+  {categories.map((cat) => (
+    <div class="included-category">
+      <h3>{cat.title}</h3>
+      <ul class="included-list">
+        {cat.items.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>
+
+{promise && (
+  <div class="included-promise">
+    <p set:html={promise} />
+  </div>
+)}
+
+<style>
+  .included-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+
+  .included-category h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--forest-olive);
+  }
+
+  .included-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .included-list li {
+    padding-left: 24px;
+    position: relative;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .included-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--forest-olive);
+  }
+
+  .included-promise {
+    background: rgba(44, 24, 16, 0.03);
+    padding: 36px 40px;
+    border-left: 4px solid var(--forest-olive);
+    max-width: 800px;
+  }
+
+  .included-promise p {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1200px) {
+    .included-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .included-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .included-promise {
+      padding: 28px;
+    }
+  }
+</style>
