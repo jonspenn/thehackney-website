@@ -50,6 +50,8 @@ interface Props {
   textPanel?: boolean;
   /** Bottom gradient: text anchors to bottom, image breathes at top */
   textGradient?: boolean;
+  /** CSS background-position for the hero image. Default: "center" */
+  position?: string;
 }
 
 const {
@@ -66,7 +68,8 @@ const {
   align = 'center',
   overlay = 0.45,
   textPanel = false,
-  textGradient = false
+  textGradient = false,
+  position = 'center'
 } = Astro.props;
 
 // When text panel is active, reduce overlay to let image breathe
@@ -119,7 +122,7 @@ const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
       class="hero-section-bg"
       role="img"
       aria-label={alt || ''}
-      style={`background-image: url('${image}');`}
+      style={`background-image: url('${image}'); background-position: ${position};`}
     ></div>
   )}
   {hasOverlay && !textGradient && <div class="hero-section-overlay"></div>}
