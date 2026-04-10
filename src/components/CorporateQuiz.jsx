@@ -29,10 +29,11 @@ const YEARS = [
 const EVENT_TYPE_OPTIONS = [
   { label: "Conference or Seminar", value: "conference", sublabel: "Presentations, panels, breakout sessions" },
   { label: "Team Day or Offsite", value: "team-day", sublabel: "Workshops, team meals, informal networking" },
-  { label: "Product Launch", value: "product-launch", sublabel: "Press events, brand reveals, showcases" },
+  { label: "Product Launch", value: "product-launch", sublabel: "Brand reveals, showcases, demos" },
+  { label: "Press or PR Event", value: "press-pr", sublabel: "Media gatherings, press lunches, industry dinners" },
   { label: "Brand Activation", value: "brand-activation", sublabel: "Experiential events, immersive experiences" },
-  { label: "Christmas Party", value: "christmas-party", sublabel: "The most in-demand booking of the year" },
-  { label: "Something else", value: "other", sublabel: "Tell us more in the next step" },
+  { label: "Photography or Film Shoot", value: "photo-film", sublabel: "Studio-style space with natural light" },
+  { label: "Something else", value: "other", sublabel: "Meetings, workshops, private dining - tell us more" },
 ];
 
 const GUEST_OPTIONS = [
@@ -394,8 +395,8 @@ function StepBudget({ data, setData, onNext, onBack }) {
 }
 
 function StepConfirmation({ data }) {
-  const isChristmas = data.eventType === "christmas-party";
   const isHighValue = ["great","premium"].includes(data.budgetFit);
+  const isPhotoFilm = data.eventType === "photo-film";
 
   const tourUrl = `/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
 
@@ -418,25 +419,24 @@ function StepConfirmation({ data }) {
         </p>
       </FadeIn>
 
-      {/* Christmas party - link to the dedicated page */}
-      {isChristmas && (
+      {/* Photo/film shoot - mention the Winter Garden specifically */}
+      {isPhotoFilm && (
         <FadeIn delay={300}>
           <div className="wq-confirm-card wq-confirm-card--hot">
-            <h3 className="wq-confirm-card__title">Christmas parties book fast</h3>
-            <p>December dates fill months in advance. While we put your proposal together, take a look at our Christmas party packages and past events.</p>
+            <p>Our Winter Garden is a studio-style space with floor-to-ceiling windows and abundant natural light - ideal for photography and film. We offer half-day and full-day dry hire. Your proposal will cover rates, access times, and everything you need.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
-                href="/christmas-parties/"
-                className="wq-btn wq-btn--primary"
-              >
-                Explore Christmas Parties
-              </a>
-              <a
                 href={tourUrl}
-                className="wq-btn wq-btn--outline"
+                className="wq-btn wq-btn--primary"
                 onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_tour_click" })}
               >
                 Book a Venue Tour
+              </a>
+              <a
+                href="https://wa.me/442079611604"
+                className="wq-btn wq-btn--outline"
+              >
+                Chat on WhatsApp
               </a>
             </div>
           </div>
@@ -444,7 +444,7 @@ function StepConfirmation({ data }) {
       )}
 
       {/* High-value lead - push towards a tour */}
-      {!isChristmas && isHighValue && (
+      {!isPhotoFilm && isHighValue && (
         <FadeIn delay={300}>
           <div className="wq-confirm-card wq-confirm-card--hot">
             <p>Want to see the space before your proposal arrives? Book a walkthrough with Hugo, our General Manager - he'll show you every corner and talk through how we'd set up your event.</p>
@@ -468,7 +468,7 @@ function StepConfirmation({ data }) {
       )}
 
       {/* Default confirmation */}
-      {!isChristmas && !isHighValue && (
+      {!isPhotoFilm && !isHighValue && (
         <FadeIn delay={300}>
           <div className="wq-confirm-card">
             <h3 className="wq-confirm-card__title">What happens next</h3>
