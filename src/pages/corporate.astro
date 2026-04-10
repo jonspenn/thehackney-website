@@ -4,134 +4,573 @@ import HeroSection from '../components/HeroSection.astro';
 import ProofBar from '../components/ProofBar.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
-import PricingTable from '../components/PricingTable.astro';
+import FAQ from '../components/FAQ.astro';
 import FinalCTA from '../components/FinalCTA.astro';
+
+// Corporate FAQ items
+const faqItems = [
+  {
+    question: "How many guests can the venue hold?",
+    answer: "Up to 60 seated for a formal dinner and up to 100 for a standing reception. The space reconfigures for presentations, workshops, dining, or networking. If you need more than 100 standing, we are probably not the right fit - but we are happy to recommend other venues."
+  },
+  {
+    question: "What is included in the venue hire?",
+    answer: "Exclusive hire of the entire building from 9am to 11pm, your dedicated events manager, full staffing, furniture, and our built-in sound and lighting system. Catering and bar are charged separately based on your requirements. See the Everything Included section above for the full breakdown."
+  },
+  {
+    question: "Can we bring our own caterers?",
+    answer: "Our kitchen and bar team are in-house - it is what makes the all-in service work. One team, one timeline, one bill. For everything else - AV equipment, entertainment, branding, external speakers - bring whoever you like."
+  },
+  {
+    question: "How far in advance should we book?",
+    answer: "It depends on the event. Christmas party dates and summer Fridays go earliest - book 3 to 6 months ahead for the best availability. Midweek and off-peak dates are often available at shorter notice. The calendar on our Check Your Date page shows live availability."
+  },
+  {
+    question: "Is there parking?",
+    answer: "There is no on-site parking. Hackney Road has metered parking during the day and free parking from 7pm to 8am. Several NCP car parks are within 10 minutes. The venue is a one-minute walk from Cambridge Heath Overground and five to seven minutes from Bethnal Green Underground (Central line)."
+  },
+  {
+    question: "Can we visit the venue before booking?",
+    answer: "Yes. We run venue tours with Hugo, our General Manager. He will walk you through every space and talk through how your event could work. Book a visit through our Check Your Date page or call us directly."
+  }
+];
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "The Hackney",
+  "description": "Corporate events venue in East London - conferences, team days, product launches, brand activations",
+  "@id": "https://thehackney-website.pages.dev",
+  "url": "https://thehackney-website.pages.dev/corporate/",
+  "telephone": "+442079611604",
+  "priceRange": "From £2,000 + VAT",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "503 Hackney Road",
+    "addressLocality": "London",
+    "postalCode": "E2 9ED",
+    "addressCountry": "GB"
+  }
+};
+
+const combinedSchema = JSON.stringify([localBusinessSchema]);
 ---
 
-<Base title="Corporate Events Venue East London | The Hackney, E2" description="Host your corporate event at The Hackney. Conferences, team days, product launches, brand activations. 60 seated, 100 standing. Exclusively yours. Past clients include Adidas, Spotify, Samsung.">
+<Base title="Corporate Events Venue East London | The Hackney, E2" description="Host your corporate event at The Hackney - a restored 1856 brewery on Hackney Road. Conferences, team days, product launches, brand activations. 60 seated, 100 standing. Exclusively yours. Trusted by Adidas, Spotify, Samsung, Coca-Cola." schema={combinedSchema}>
 
-  <!-- ==================== HERO ==================== -->
+  <!-- ==================== SECTION 1: HERO ==================== -->
   <HeroSection
     bg="olive"
     height="compact"
     heading='Your Event.<br>Our Brewery.'
-    cta={{ label: "Check Availability", href: "/check-your-date/?type=corporate", utm: "corporate-hero" }}
-    note="Exclusive hire from half-day to full-day"
+    cta={{ label: "Check Availability", href: "/check-your-date/?type=corporate", utm: "corporate" }}
+    note="Exclusive hire for up to 100 guests. Half-day and full-day packages."
   />
 
-  <!-- ==================== SOCIAL PROOF BAR ==================== -->
+  <!-- ==================== SECTION 2: SOCIAL PROOF BAR ==================== -->
   <ProofBar stats={[
     { number: "Adidas, Spotify, Samsung", label: "Brands we've hosted" },
     { number: "Exclusive Hire", label: "The whole venue, just for you" },
-    { number: "100 Standing", label: "60 seated capacity" },
-    { number: "In-House Catering", label: "Kitchen, bar and service team" }
+    { number: "100 Standing, 60 Seated", label: "Flexible layouts" },
+    { number: "In-House Catering & Bar", label: "One team, one invoice" }
   ]} />
 
-  <!-- ==================== EVENT TYPES ==================== -->
+  <!-- ==================== SECTION 3: LOGO STRIP ==================== -->
+  <Section bg="light" padding="compact" border="bottom">
+    <div class="logo-strip">
+      <p class="eyebrow logo-strip-eyebrow">Trusted by</p>
+      <div class="logo-strip-grid">
+        <div class="logo-strip-item">Adidas</div>
+        <div class="logo-strip-item">Spotify</div>
+        <div class="logo-strip-item">Samsung</div>
+        <div class="logo-strip-item">Coca-Cola</div>
+        <div class="logo-strip-item">Amazon Prime</div>
+        <div class="logo-strip-item">Diageo</div>
+        <div class="logo-strip-item">ITV</div>
+        <div class="logo-strip-item">Unilever</div>
+        <div class="logo-strip-item">Hilton</div>
+        <div class="logo-strip-item">Bacardi</div>
+        <div class="logo-strip-item">Sainsbury's</div>
+        <div class="logo-strip-item">Next</div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ==================== SECTION 4: ENQUIRY FORM (hot lane - early, like wedding quiz) ==================== -->
+  <Section bg="light" padding="compact" border="bottom" id="enquiry">
+    <SectionHeader
+      eyebrow="Get In Touch"
+      heading="Tell Us About Your Event"
+    />
+    <div class="enquiry-intro">
+      <p>Whether you have a date in mind or you are still exploring, tell us what you are planning and we will come back with a tailored proposal.</p>
+    </div>
+    <form class="enquiry-form" id="corporate-enquiry" data-form="corporate-enquiry">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="enquiry-name">Name</label>
+          <input type="text" id="enquiry-name" name="name" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label for="enquiry-company">Company</label>
+          <input type="text" id="enquiry-company" name="company" placeholder="Company name" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="enquiry-email">Work email</label>
+          <input type="email" id="enquiry-email" name="email" placeholder="you@company.com" required>
+        </div>
+        <div class="form-group">
+          <label for="enquiry-phone">Phone <span class="form-optional">(optional)</span></label>
+          <input type="tel" id="enquiry-phone" name="phone" placeholder="07...">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="enquiry-event-type">Event type</label>
+          <select id="enquiry-event-type" name="eventType" required>
+            <option value="">Select an event type</option>
+            <option value="conference">Conference or Seminar</option>
+            <option value="team-day">Team Day or Offsite</option>
+            <option value="product-launch">Product Launch</option>
+            <option value="brand-activation">Brand Activation</option>
+            <option value="christmas-party">Christmas Party</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="enquiry-guests">Guest count <span class="form-optional">(optional)</span></label>
+          <input type="number" id="enquiry-guests" name="guestCount" placeholder="e.g. 60" min="1" max="200">
+        </div>
+      </div>
+      <div class="form-row form-row-single">
+        <div class="form-group">
+          <label for="enquiry-date">Approximate date <span class="form-optional">(optional)</span></label>
+          <input type="text" id="enquiry-date" name="eventDate" placeholder="e.g. December 2026">
+        </div>
+      </div>
+      <div class="form-row form-row-single">
+        <div class="form-group">
+          <label for="enquiry-message">Anything else? <span class="form-optional">(optional)</span></label>
+          <textarea id="enquiry-message" name="message" rows="3" placeholder="Tell us about your event - format, requirements, anything that would help us put together the right proposal."></textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary enquiry-submit">Send Enquiry</button>
+      <p class="enquiry-note">We aim to respond with a tailored proposal within 24 hours. No obligation.</p>
+    </form>
+  </Section>
+
+  <!-- ==================== SECTION 5: ONE BOOKING. EVERYTHING HANDLED. ==================== -->
+  <Section bg="light" border="bottom" id="included">
+    <SectionHeader
+      eyebrow="Why The Hackney"
+      heading="One Booking. Everything Handled."
+    />
+    <div class="different-body">
+      <p>Most corporate venues hand you a list of approved suppliers. You end up coordinating a caterer, a bar team, an AV company and a planner - four timelines, four invoices, four chances for something to go wrong in front of your colleagues.</p>
+      <p>At The Hackney, everything is in-house. Our kitchen prepares your menu. Our bar team pours your drinks. Our events manager runs the day. One team who know the building, know each other, and know exactly how to make your event run seamlessly.</p>
+    </div>
+
+    <div class="included-grid">
+      <div class="included-category">
+        <h3>Your Dedicated Team</h3>
+        <ul class="included-list">
+          <li>Dedicated events manager from planning to breakdown</li>
+          <li>Full staffing - kitchen, bar, front of house</li>
+          <li>All staffing costs included in the price</li>
+          <li>No service charge, no hidden extras</li>
+        </ul>
+      </div>
+      <div class="included-category">
+        <h3>The Venue, Fully Equipped</h3>
+        <ul class="included-list">
+          <li>Exclusive hire of the entire building, 9am to 11pm</li>
+          <li>All furniture, glassware, tableware</li>
+          <li>Projector, screens, professional sound system, wifi</li>
+          <li>Flexible layouts - theatre, boardroom, banquet, standing</li>
+        </ul>
+      </div>
+      <div class="included-category">
+        <h3>Food and Drink</h3>
+        <ul class="included-list">
+          <li>Custom menus from our in-house kitchen</li>
+          <li>Three-course guest menus from £70 + VAT per person</li>
+          <li>Full bar with signature cocktails available</li>
+          <li>Breakfast, lunch, dinner, canapes, or grazing</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="included-promise">
+      <p><strong>The price we quote is the price you pay.</strong> No surprise staffing invoice. No service charge on top. No discovery that "venue hire" did not include the tables. One team, one conversation, one bill.</p>
+    </div>
+  </Section>
+
+  <!-- ==================== SECTION 6: EVENTS WE HOST ==================== -->
   <Section bg="light" padding="compact" border="bottom">
     <SectionHeader
       eyebrow="What We Host"
-      heading="Events We Host"
+      heading="From Boardrooms To Brand Launches"
     />
     <div class="event-grid">
       <div class="event-card fade-in">
         <h3>Conferences and Seminars</h3>
-        <p>From boardroom strategy sessions to multi-day conferences. Full AV and wifi, flexible layouts for breakout sessions, catering throughout.</p>
+        <p>Boardroom sessions, strategy days, and multi-day conferences. Full AV, flexible breakout layouts, and catering from breakfast through to evening.</p>
       </div>
       <div class="event-card fade-in">
         <h3>Team Days and Offsites</h3>
-        <p>Build culture and connection with your team. Flexible space for workshops, activities, team meals and informal collaboration.</p>
+        <p>Take your team out of the office and into a space that inspires. Workshops, team meals, and informal collaboration - all under one roof.</p>
       </div>
       <div class="event-card fade-in">
-        <h3>Product Launches</h3>
-        <p>Press events, experiential marketing, media launches. Professional AV, catering, flexible space, and a venue that photographs beautifully.</p>
+        <h3>Product Launches and Press Events</h3>
+        <p>A venue that photographs as well as it functions. Professional AV, in-house catering, and a backdrop that makes your launch the story.</p>
       </div>
       <div class="event-card fade-in">
         <h3>Brand Activations</h3>
-        <p>Experiential events that leave an impression. Past clients include Adidas, Spotify, Samsung, Coca-Cola, and ITV.</p>
+        <p>Experiential events in a space your audience will remember. Past activations include Adidas, Spotify, Samsung, and Coca-Cola.</p>
+      </div>
+      <div class="event-card event-card-christmas fade-in">
+        <h3>Christmas Parties</h3>
+        <p>The most in-demand corporate booking of the year. Two all-inclusive packages from £100 + VAT per person.</p>
+        <a href="/christmas-parties/" class="event-card-link">Explore Christmas Parties &rarr;</a>
       </div>
     </div>
   </Section>
 
-  <!-- ==================== THE SPACE ==================== -->
-  <Section bg="light" padding="compact" border="bottom">
-    <div class="space-grid">
-      <div class="space-text">
-        <SectionHeader
-          eyebrow="The Venue"
-          heading="The Space"
-        />
-        <p>A professionally restored 1856 brewery designed for events. Capacity 60 seated, 100 standing. The whole venue is exclusively yours - all day access, no other events, full control of the environment.</p>
-        <p>The industrial architecture - exposed brick walls, original timber beams, natural skylights, high ceilings - provides a distinctive backdrop that sets your event apart. Professional AV capabilities and wifi throughout.</p>
-        <div class="space-promise">
-          <p>Our in-house kitchen and service team mean consistent quality from start to finish. Custom catering, full bar, professional coordination. One team, one invoice, complete peace of mind.</p>
-        </div>
-      </div>
-      <div class="space-image">
-        <div class="space-placeholder" role="img" aria-label="Corporate event setup at The Hackney">Photo coming soon</div>
-      </div>
-    </div>
-  </Section>
-
-  <!-- ==================== WHAT'S INCLUDED ==================== -->
-  <Section bg="light" padding="compact" border="bottom">
+  <!-- ==================== SECTION 7: THE SPACE ==================== -->
+  <Section bg="light" border="bottom">
     <SectionHeader
-      eyebrow="Everything Included"
-      heading="What Is Included"
+      eyebrow="The Venue"
+      heading="Four Spaces. One Venue. Entirely Yours."
+      subtext="A restored 1856 brewery on Hackney Road, East London. The architecture does the heavy lifting - exposed brick, original timber beams, natural skylights, high ceilings."
     />
-    <div class="included-grid">
-      <div class="included-item">
-        <h3>Exclusive venue hire</h3>
-        <p>The entire space is yours. 60 seated, 100 standing. All-day access with no other events or disruptions.</p>
+    <p class="space-intro">Four interconnected areas adapt to your event: the main hall for presentations or dining, the bar for arrivals and networking, the winter garden for breakout sessions or drinks, and the covered terrace for fresh air without leaving the venue.</p>
+    <div class="space-capacity">
+      <div class="capacity-stat">
+        <div class="capacity-number">60</div>
+        <div class="capacity-label">Guests seated</div>
       </div>
-      <div class="included-item">
-        <h3>Professional catering</h3>
-        <p>Custom menus from our in-house kitchen. From breakfast through to evening service - full control over food and drink quality.</p>
+      <div class="capacity-stat">
+        <div class="capacity-number">100</div>
+        <div class="capacity-label">Standing reception</div>
       </div>
-      <div class="included-item">
-        <h3>Full bar service</h3>
-        <p>Professional bar team. Wine, beer, spirits, soft drinks, or branded cocktails. No corkage, no outside alcohol.</p>
+    </div>
+
+    <div class="space-details">
+      <div class="space-feature">
+        <h3>Exclusively Yours</h3>
+        <p>The whole building is yours for the day. No shared spaces, no other events, no surprises. Standard hire runs from 9am with music until 11pm and guests departing by 11:30pm.</p>
       </div>
-      <div class="included-item">
-        <h3>Event coordination</h3>
-        <p>Dedicated events manager handles everything on the day - setup, coordination, breakdown. One point of contact from planning to finish.</p>
+      <div class="space-feature">
+        <h3>Built For Events</h3>
+        <p>Professional AV is built into the venue - projector, screens, sound system, and wifi throughout. No need to hire external equipment. The space reconfigures from theatre-style presentations to long-table dinners to standing receptions.</p>
       </div>
-      <div class="included-item">
-        <h3>AV and tech</h3>
-        <p>Projector, screens, sound system and wifi. Professional setup for presentations, live streaming, or multimedia content.</p>
-      </div>
-      <div class="included-item">
-        <h3>Flexible space</h3>
-        <p>Layouts adapt to your needs - theatre style for presentations, breakout areas for workshops, dance floor for evening events.</p>
-      </div>
+    </div>
+
+    <div class="space-placeholder-container">
+      <div class="space-placeholder" role="img" aria-label="Corporate event setup at The Hackney">Photo coming soon</div>
     </div>
   </Section>
 
-  <!-- ==================== PRICING ==================== -->
-  <Section bg="light" padding="compact" border="top">
-    <PricingTable
+  <!-- ==================== SECTION 8: PRICING + BROCHURE DOWNLOAD ==================== -->
+  <Section bg="light" border="top" id="pricing">
+    <SectionHeader
       eyebrow="Investment"
       heading="Pricing"
-      tiers={[
-        { name: "Half Day", period: "Up to 5 hours", price: "From £2,500", description: "Venue hire + in-house team" },
-        { name: "Full Day", period: "All-day access", price: "From £4,500", description: "Venue hire + in-house team" },
-        { name: "Evening Events", period: "From 6pm", price: "From £3,000", description: "Venue hire + in-house team" }
-      ]}
     />
+
+    <div class="pricing-tiers">
+      <div class="pricing-tier">
+        <h3>Full Day Venue Hire</h3>
+        <div class="pricing-tier-price">&pound;2,000 + VAT</div>
+        <p>Exclusive hire of the entire venue, 9am to 11pm. All staffing, furniture, and AV included.</p>
+      </div>
+      <div class="pricing-tier">
+        <h3>Catering Buy-Out</h3>
+        <div class="pricing-tier-price">&pound;500 + VAT</div>
+        <p class="pricing-tier-optional">Optional</p>
+        <p>Bring our in-house kitchen into your event. Menu development, tasting, and full service.</p>
+      </div>
+      <div class="pricing-tier">
+        <h3>Bar Service Buy-Out</h3>
+        <div class="pricing-tier-price">&pound;500 + VAT</div>
+        <p class="pricing-tier-optional">Optional</p>
+        <p>Full bar team, premium spirits, wine, beer, soft drinks. Signature cocktails available.</p>
+      </div>
+    </div>
+
     <div class="pricing-note">
-      <p>Indicative pricing. Event complexity varies - get in touch for a detailed proposal and timeline for your specific requirements.</p>
+      <p>Three-course guest menus from £70 + VAT per person. All prices exclude VAT. Get in touch for a detailed proposal tailored to your event.</p>
+    </div>
+
+    <!-- Brochure download - warm/cold lane capture (same pattern as weddings pricing section) -->
+    <div class="pricing-pivot">
+      <h3>Want The Full Details?</h3>
+      <p>Our corporate brochure covers venue specs, catering options, past events, and everything you need to share with your team. Download it now.</p>
+    </div>
+
+    <form class="pricing-form" id="corporate-brochure" data-form="corporate-brochure-download">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="brochure-name">Name</label>
+          <input type="text" id="brochure-name" name="name" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label for="brochure-email">Work email</label>
+          <input type="email" id="brochure-email" name="email" placeholder="you@company.com" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary pricing-form-submit">Download The Corporate Brochure</button>
+      <p class="pricing-form-note">Sent instantly by email. No calls, no pitch.</p>
+    </form>
+  </Section>
+
+  <!-- ==================== SECTION 9: HOW IT WORKS ==================== -->
+  <Section bg="light" border="top">
+    <SectionHeader
+      eyebrow="How It Works"
+      heading="From First Enquiry To Event Day"
+    />
+
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="process-step-number">01</div>
+        <h3>Tell Us What You Need</h3>
+        <p>Fill in the enquiry form above or check availability on our live calendar. We will come back with a tailored proposal within 24 hours.</p>
+      </div>
+      <div class="process-step">
+        <div class="process-step-number">02</div>
+        <h3>Visit The Venue</h3>
+        <p>Come and walk the space with Hugo, our General Manager. He will show you every corner of the building and talk you through how your event could work.</p>
+      </div>
+      <div class="process-step">
+        <div class="process-step-number">03</div>
+        <h3>Your Proposal</h3>
+        <p>One document covering venue hire, catering, bar, AV, and every detail of your event. Clear pricing, no hidden costs, nothing buried in the small print.</p>
+      </div>
+      <div class="process-step">
+        <div class="process-step-number">04</div>
+        <h3>Confirm and Relax</h3>
+        <p>A deposit secures your date. From that moment, your dedicated events manager handles every detail through to the last guest leaving.</p>
+      </div>
+    </div>
+
+    <div class="section-cta-center">
+      <a href="/check-your-date/?type=corporate&utm_source=website&utm_medium=cta&utm_campaign=corporate&utm_content=how-it-works" class="btn btn-primary">See The Calendar</a>
     </div>
   </Section>
 
-  <!-- ==================== FINAL CTA ==================== -->
+  <!-- ==================== SECTION 10: FAQ ==================== -->
+  <Section bg="light" border="top" padding="compact">
+    <SectionHeader
+      eyebrow="Before You Enquire"
+      heading="What Corporate Clients Ask"
+    />
+    <FAQ items={faqItems} />
+  </Section>
+
+  <!-- ==================== SECTION 11: CHRISTMAS PARTIES TEASER ==================== -->
+  <Section bg="dark" padding="compact">
+    <div class="christmas-teaser">
+      <p class="eyebrow christmas-teaser-eyebrow">Seasonal</p>
+      <h2>Christmas At The Hackney</h2>
+      <p class="christmas-teaser-body">The most popular corporate booking of the year. Two all-inclusive packages - standing reception or seated dinner. Exclusive hire, in-house catering and bar, seasonal styling included.</p>
+      <a href="/christmas-parties/" class="btn btn-primary-dark">Explore Christmas Parties</a>
+    </div>
+  </Section>
+
+  <!-- ==================== SECTION 12: FINAL CTA ==================== -->
   <FinalCTA
     heading="Ready to book your event?"
-    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    body="Check availability on our live calendar or send us an enquiry."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/?type=corporate" }}
     whatsapp={true}
     utmCampaign="corporate"
   />
 
   <style>
+    /* ==================== LOGO STRIP ==================== */
+    .logo-strip {
+      text-align: center;
+    }
+
+    .logo-strip-eyebrow {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo-strip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px 32px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .logo-strip-item {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(44, 24, 16, 0.45);
+      padding: 8px 0;
+    }
+
+    /* ==================== ENQUIRY FORM ==================== */
+    .enquiry-intro {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    .enquiry-intro p {
+      font-size: 17px;
+      line-height: 1.7;
+      opacity: 0.8;
+    }
+
+    .enquiry-form {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-row-single {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--brewery-dark);
+      margin-bottom: 6px;
+    }
+
+    .form-optional {
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      opacity: 0.5;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(44, 24, 16, 0.15);
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.6);
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--brewery-dark);
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--forest-olive);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(44, 24, 16, 0.35);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .enquiry-submit {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .enquiry-note {
+      text-align: center;
+      font-size: 13px;
+      color: rgba(44, 24, 16, 0.5);
+      margin-top: 12px;
+    }
+
+    /* ==================== VALUE PROP (matches weddings Section 4) ==================== */
+    .different-body {
+      max-width: 680px;
+      margin: 0 auto 3rem;
+      text-align: center;
+    }
+
+    .different-body p {
+      font-size: 17px;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .included-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .included-category h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.75rem;
+      color: var(--mid-olive);
+    }
+
+    .included-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .included-list li {
+      font-size: 15px;
+      line-height: 1.65;
+      padding: 6px 0;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+
+    .included-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--forest-olive);
+      font-weight: 700;
+    }
+
+    .included-promise {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(44, 24, 16, 0.08);
+    }
+
+    .included-promise p {
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
     /* ==================== EVENT TYPES GRID ==================== */
     .event-grid {
       display: grid;
@@ -143,6 +582,7 @@ import FinalCTA from '../components/FinalCTA.astro';
       padding: 28px 24px;
       border: 1px solid rgba(44, 24, 16, 0.1);
       border-top: 3px solid var(--forest-olive);
+      border-radius: 2px;
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
@@ -164,29 +604,102 @@ import FinalCTA from '../components/FinalCTA.astro';
       opacity: 0.85;
     }
 
-    /* ==================== THE SPACE ==================== */
-    .space-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: start;
+    /* Christmas card spans full width as the 5th card */
+    .event-card-christmas {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      border-top-color: var(--fired-brick);
     }
 
-    .space-text p {
+    .event-card-christmas h3 {
+      color: var(--fired-brick);
+    }
+
+    .event-card-christmas p {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .event-card-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dusty-coral);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s ease;
+    }
+
+    .event-card-link:hover {
+      color: var(--fired-brick);
+    }
+
+    /* ==================== THE SPACE ==================== */
+    .space-intro {
       font-size: 17px;
       line-height: 1.7;
-      margin-bottom: 20px;
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+      text-align: center;
     }
 
-    .space-promise {
-      margin-top: 30px;
-      padding-top: 30px;
-      border-top: 1px solid rgba(44, 24, 16, 0.1);
+    .space-capacity {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .capacity-stat {
+      text-align: center;
+    }
+
+    .capacity-number {
+      font-family: var(--font-heading);
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--brewery-dark);
+      line-height: 1;
+    }
+
+    .capacity-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--dusty-coral);
+      margin-top: 8px;
+    }
+
+    .space-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .space-feature h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.75rem;
+      color: var(--mid-olive);
+    }
+
+    .space-feature p {
+      font-size: 16px;
+      line-height: 1.7;
+      opacity: 0.85;
+    }
+
+    .space-placeholder-container {
+      max-width: 720px;
+      margin: 0 auto;
     }
 
     .space-placeholder {
       width: 100%;
-      aspect-ratio: 4/3;
+      aspect-ratio: 16/9;
       background: var(--brewery-dark);
       display: flex;
       align-items: center;
@@ -194,44 +707,168 @@ import FinalCTA from '../components/FinalCTA.astro';
       color: rgba(255, 255, 255, 0.4);
       font-size: 14px;
       font-family: var(--font-body);
+      border-radius: 2px;
     }
 
-    /* ==================== WHAT'S INCLUDED ==================== */
-    .included-grid {
+    /* ==================== PRICING ==================== */
+    .pricing-tiers {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 40px;
+      gap: 24px;
+      margin-bottom: 2rem;
     }
 
-    .included-item {
-      padding: 28px 24px;
-      border-left: 4px solid var(--forest-olive);
+    .pricing-tier {
+      padding: 32px 24px;
+      border: 1.5px solid rgba(44, 24, 16, 0.1);
+      border-radius: 2px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.6);
     }
 
-    .included-item h3 {
-      font-size: 20px;
+    .pricing-tier h3 {
+      font-size: 1.1rem;
       margin-bottom: 12px;
       color: var(--mid-olive);
     }
 
-    .included-item p {
-      font-size: 15px;
-      line-height: 1.7;
-      opacity: 0.85;
+    .pricing-tier-price {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--brewery-dark);
+      margin-bottom: 12px;
     }
 
-    /* ==================== PRICING NOTE ==================== */
+    .pricing-tier-optional {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--dusty-coral);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .pricing-tier p {
+      font-size: 14px;
+      line-height: 1.6;
+      opacity: 0.75;
+    }
+
     .pricing-note {
       text-align: center;
-      margin-top: 2rem;
+      margin-bottom: 3rem;
       padding: 20px;
       background: rgba(44, 24, 16, 0.03);
+      border-radius: 2px;
     }
 
     .pricing-note p {
       font-size: 14px;
       font-style: italic;
       opacity: 0.7;
+    }
+
+    .pricing-pivot {
+      text-align: center;
+      max-width: 560px;
+      margin: 0 auto 2rem;
+    }
+
+    .pricing-pivot h3 {
+      margin-bottom: 0.75rem;
+    }
+
+    .pricing-pivot p {
+      font-size: 16px;
+      line-height: 1.65;
+      opacity: 0.8;
+    }
+
+    .pricing-form {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .pricing-form .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .pricing-form-submit {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .pricing-form-note {
+      text-align: center;
+      font-size: 13px;
+      color: rgba(44, 24, 16, 0.5);
+      margin-top: 12px;
+    }
+
+    /* ==================== PROCESS STEPS (matches weddings) ==================== */
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .process-step {
+      text-align: center;
+      padding: 0 0.5rem;
+    }
+
+    .process-step-number {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--forest-olive);
+      opacity: 0.3;
+      margin-bottom: 0.75rem;
+    }
+
+    .process-step h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .process-step p {
+      font-size: 14px;
+      line-height: 1.6;
+      opacity: 0.75;
+    }
+
+    .section-cta-center {
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    /* ==================== CHRISTMAS TEASER ==================== */
+    .christmas-teaser {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .christmas-teaser-eyebrow {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .christmas-teaser h2 {
+      margin-bottom: 16px;
+    }
+
+    .christmas-teaser-body {
+      font-size: 17px;
+      line-height: 1.7;
+      opacity: 0.85;
+      margin-bottom: 2rem;
     }
 
     /* ==================== SCROLL ANIMATIONS ==================== */
@@ -248,18 +885,49 @@ import FinalCTA from '../components/FinalCTA.astro';
 
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
       .event-grid {
         grid-template-columns: 1fr;
       }
 
-      .space-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
+      .event-card-christmas {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       .included-grid {
         grid-template-columns: 1fr;
-        gap: 30px;
+        gap: 1.5rem;
+      }
+
+      .space-capacity {
+        gap: 2rem;
+      }
+
+      .capacity-number {
+        font-size: 2.5rem;
+      }
+
+      .space-details {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .pricing-tiers {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .pricing-form .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .process-steps {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
       }
     }
   </style>
