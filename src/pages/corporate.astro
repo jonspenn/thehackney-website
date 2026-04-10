@@ -88,18 +88,18 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     <div class="logo-strip">
       <p class="eyebrow logo-strip-eyebrow">Trusted by</p>
       <div class="logo-strip-grid">
-        <div class="logo-strip-item">Adidas</div>
-        <div class="logo-strip-item">Spotify</div>
-        <div class="logo-strip-item">Samsung</div>
-        <div class="logo-strip-item">Coca-Cola</div>
-        <div class="logo-strip-item">Amazon Prime</div>
-        <div class="logo-strip-item">Diageo</div>
-        <div class="logo-strip-item">ITV</div>
-        <div class="logo-strip-item">Unilever</div>
-        <div class="logo-strip-item">Ocado</div>
-        <div class="logo-strip-item">Bacardi</div>
-        <div class="logo-strip-item">Sainsbury's</div>
-        <div class="logo-strip-item">Next</div>
+        <img class="logo-strip-item" src="/images/logos/adidas.svg" alt="Adidas" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/spotify.svg" alt="Spotify" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/samsung.svg" alt="Samsung" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/coca-cola.svg" alt="Coca-Cola" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/amazon.svg" alt="Amazon" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/diageo.svg" alt="Diageo" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/itv.svg" alt="ITV" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/unilever.svg" alt="Unilever" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/ocado.svg" alt="Ocado" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/bacardi.svg" alt="Bacardi" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/sainsburys.svg" alt="Sainsbury's" loading="lazy" />
+        <img class="logo-strip-item" src="/images/logos/next.svg" alt="Next" loading="lazy" />
       </div>
     </div>
   </Section>
@@ -377,13 +377,16 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     .logo-strip-item {
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: rgba(44, 24, 16, 0.45);
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+      filter: grayscale(100%) brightness(0) opacity(0.3);
+      transition: filter 0.3s ease;
       padding: 8px 0;
+    }
+
+    .logo-strip-item:hover {
+      filter: grayscale(100%) brightness(0) opacity(0.55);
     }
 
     /* ==================== ENQUIRY FORM CSS REMOVED ==================== */
