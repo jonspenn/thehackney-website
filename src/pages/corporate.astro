@@ -272,8 +272,8 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       </div>
     </div>
 
-    <div class="space-placeholder-container">
-      <div class="space-placeholder" role="img" aria-label="Corporate event setup at The Hackney">Photo coming soon</div>
+    <div class="space-image-container">
+      <img class="space-image" src="/images/hackney-canapes-wooden-board-corporate-catering.webp" alt="Canapes on wooden boards served at a corporate event at The Hackney" loading="lazy" />
     </div>
   </Section>
 
@@ -570,22 +570,15 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       opacity: 0.85;
     }
 
-    .space-placeholder-container {
+    .space-image-container {
       max-width: 720px;
       margin: 0 auto;
     }
 
-    .space-placeholder {
+    .space-image {
       width: 100%;
-      aspect-ratio: 16/9;
-      background: var(--brewery-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 14px;
-      font-family: var(--font-body);
       border-radius: 2px;
+      border: 1px solid rgba(44, 24, 16, 0.08);
     }
 
     /* ==================== PRICING ==================== */
