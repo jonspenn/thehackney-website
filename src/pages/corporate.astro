@@ -6,6 +6,7 @@ import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import FAQ from '../components/FAQ.astro';
 import FinalCTA from '../components/FinalCTA.astro';
+import CorporateQuestionnaire from '../components/CorporateQuestionnaire.astro';
 
 // Corporate FAQ items
 const faqItems = [
@@ -63,7 +64,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     bg="olive"
     height="compact"
     heading='Your Event.<br>Our Brewery.'
-    cta={{ label: "Check Availability", href: "/check-your-date/", utm: "corporate" }}
+    cta={{ label: "Get A Proposal", href: "/corporate/#questionnaire" }}
     note="Exclusive hire for up to 100 guests. Half-day and full-day packages."
   />
 
@@ -96,70 +97,12 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
-  <!-- ==================== SECTION 4: ENQUIRY FORM (hot lane - early, like wedding quiz) ==================== -->
-  <Section bg="light" padding="compact" border="bottom" id="enquiry">
-    <SectionHeader
-      eyebrow="Get In Touch"
-      heading="Tell Us About Your Event"
-    />
-    <div class="enquiry-intro">
-      <p>Whether you have a date in mind or you are still exploring, tell us what you are planning and we will come back with a tailored proposal.</p>
-    </div>
-    <form class="enquiry-form" id="corporate-enquiry" data-form="corporate-enquiry">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="enquiry-name">Name</label>
-          <input type="text" id="enquiry-name" name="name" placeholder="Your name" required>
-        </div>
-        <div class="form-group">
-          <label for="enquiry-company">Company</label>
-          <input type="text" id="enquiry-company" name="company" placeholder="Company name" required>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="enquiry-email">Work email</label>
-          <input type="email" id="enquiry-email" name="email" placeholder="you@company.com" required>
-        </div>
-        <div class="form-group">
-          <label for="enquiry-phone">Phone <span class="form-optional">(optional)</span></label>
-          <input type="tel" id="enquiry-phone" name="phone" placeholder="07...">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="enquiry-event-type">Event type</label>
-          <select id="enquiry-event-type" name="eventType" required>
-            <option value="">Select an event type</option>
-            <option value="conference">Conference or Seminar</option>
-            <option value="team-day">Team Day or Offsite</option>
-            <option value="product-launch">Product Launch</option>
-            <option value="brand-activation">Brand Activation</option>
-            <option value="christmas-party">Christmas Party</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="enquiry-guests">Guest count <span class="form-optional">(optional)</span></label>
-          <input type="number" id="enquiry-guests" name="guestCount" placeholder="e.g. 60" min="1" max="200">
-        </div>
-      </div>
-      <div class="form-row form-row-single">
-        <div class="form-group">
-          <label for="enquiry-date">Approximate date <span class="form-optional">(optional)</span></label>
-          <input type="text" id="enquiry-date" name="eventDate" placeholder="e.g. December 2026">
-        </div>
-      </div>
-      <div class="form-row form-row-single">
-        <div class="form-group">
-          <label for="enquiry-message">Anything else? <span class="form-optional">(optional)</span></label>
-          <textarea id="enquiry-message" name="message" rows="3" placeholder="Tell us about your event - format, requirements, anything that would help us put together the right proposal."></textarea>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary enquiry-submit">Send Enquiry</button>
-      <p class="enquiry-note">We aim to respond with a tailored proposal within 24 hours. No obligation.</p>
-    </form>
-  </Section>
+  <!-- ==================== SECTION 4: CORPORATE QUESTIONNAIRE (hot lane - early, like wedding quiz) ==================== -->
+  <!-- Interactive multi-step quiz matching WeddingQuestionnaire pattern:
+       Event Type → Guests → Date → Capture (name, company, email, phone) → Budget (optional)
+       Lead is captured at step 4 - budget step can't kill the lead.
+       Confirmation screen routes: Christmas → /christmas-parties/, high-value → venue tour, default → what happens next. -->
+  <CorporateQuestionnaire />
 
   <!-- ==================== SECTION 5: ONE BOOKING. EVERYTHING HANDLED. ==================== -->
   <Section bg="light" border="bottom" id="included">
@@ -419,96 +362,9 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       padding: 8px 0;
     }
 
-    /* ==================== ENQUIRY FORM ==================== */
-    .enquiry-intro {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto 2rem;
-    }
-
-    .enquiry-intro p {
-      font-size: 17px;
-      line-height: 1.7;
-      opacity: 0.8;
-    }
-
-    .enquiry-form {
-      max-width: 640px;
-      margin: 0 auto;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .form-row-single {
-      grid-template-columns: 1fr;
-    }
-
-    .form-group label {
-      display: block;
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--brewery-dark);
-      margin-bottom: 6px;
-    }
-
-    .form-optional {
-      font-weight: 400;
-      text-transform: none;
-      letter-spacing: 0;
-      opacity: 0.5;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid rgba(44, 24, 16, 0.15);
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.6);
-      font-family: var(--font-body);
-      font-size: 15px;
-      color: var(--brewery-dark);
-      transition: border-color 0.2s ease;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--forest-olive);
-    }
-
-    .form-group input::placeholder,
-    .form-group textarea::placeholder {
-      color: rgba(44, 24, 16, 0.35);
-    }
-
-    .form-group textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .enquiry-submit {
-      display: block;
-      width: 100%;
-      margin-top: 8px;
-    }
-
-    .enquiry-note {
-      text-align: center;
-      font-size: 13px;
-      color: rgba(44, 24, 16, 0.5);
-      margin-top: 12px;
-    }
+    /* ==================== ENQUIRY FORM CSS REMOVED ==================== */
+    /* Static form replaced by CorporateQuestionnaire (React island).
+       Quiz styles live in CorporateQuestionnaire.astro via .wq-* classes. */
 
     /* ==================== VALUE PROP (matches weddings Section 4) ==================== */
     .different-body {
@@ -797,6 +653,38 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       margin-bottom: 16px;
     }
 
+    .pricing-form .form-group label {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--brewery-dark);
+      margin-bottom: 6px;
+    }
+
+    .pricing-form .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(44, 24, 16, 0.15);
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.6);
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--brewery-dark);
+      transition: border-color 0.2s ease;
+    }
+
+    .pricing-form .form-group input:focus {
+      outline: none;
+      border-color: var(--forest-olive);
+    }
+
+    .pricing-form .form-group input::placeholder {
+      color: rgba(44, 24, 16, 0.35);
+    }
+
     .pricing-form-submit {
       display: block;
       width: 100%;
@@ -885,7 +773,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
-      .form-row {
+      .pricing-form .form-row {
         grid-template-columns: 1fr;
       }
 
@@ -919,10 +807,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       .pricing-tiers {
         grid-template-columns: 1fr;
         gap: 16px;
-      }
-
-      .pricing-form .form-row {
-        grid-template-columns: 1fr;
       }
 
       .process-steps {

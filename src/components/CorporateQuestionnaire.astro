@@ -1,0 +1,478 @@
+---
+/**
+ * CorporateQuestionnaire.astro
+ * Astro wrapper for the interactive corporate quiz React island.
+ * Placed on /corporate/ page after the logo strip section.
+ * Mirrors WeddingQuestionnaire.astro pattern - only this component ships JS.
+ *
+ * NOTE: The .wq-* styles are duplicated from WeddingQuestionnaire.astro
+ * because Astro scopes is:global styles per-page - /corporate/ won't have
+ * the wedding wrapper's styles. If the design system is ever extracted to
+ * a shared CSS file, remove the duplication here and in Wedding.
+ */
+import CorporateQuiz from './CorporateQuiz.jsx';
+---
+
+<section class="questionnaire fade-in" id="questionnaire">
+  <div class="container">
+    <CorporateQuiz client:load />
+  </div>
+</section>
+
+<style is:global>
+  /* ==================== QUESTIONNAIRE SHARED STYLES ==================== */
+  /* Duplicated from WeddingQuestionnaire.astro - see note in frontmatter */
+
+  .questionnaire {
+    padding: 60px 0 0;
+    border-top: 1px solid rgba(44,24,16,0.06);
+    scroll-margin-top: var(--header-height, 96px);
+  }
+
+  .wq {
+    max-width: 580px;
+    margin: 0 auto;
+    scroll-margin-top: calc(var(--header-height, 96px) + 2rem);
+  }
+
+  .wq-progress {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .wq-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: rgba(44,24,16,0.12);
+    transition: all 0.35s ease;
+  }
+
+  .wq-dot--active {
+    background: var(--forest-olive);
+  }
+
+  .wq-dot--current {
+    width: 28px;
+    background: var(--forest-olive);
+  }
+
+  .wq-step {
+    position: relative;
+  }
+
+  .wq-step--welcome {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .wq-step--confirmation {
+    text-align: center;
+    padding: 40px 0;
+  }
+
+  .wq-eyebrow {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin-bottom: 16px;
+  }
+
+  .wq-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--brewery-dark);
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+  }
+
+  .wq-subtext {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--brewery-dark);
+    opacity: 0.7;
+    margin: 0 0 32px;
+    max-width: 440px;
+  }
+
+  .wq-step--welcome .wq-subtext,
+  .wq-step--confirmation .wq-subtext {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .wq-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dusty-coral);
+    margin-bottom: 12px;
+  }
+
+  .wq-hint {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--brewery-dark);
+    opacity: 0.4;
+    margin-top: 14px;
+  }
+
+  .wq-btn {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 14px 40px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  }
+
+  .wq-btn--primary {
+    background: var(--mid-olive);
+    color: #fff;
+  }
+
+  .wq-btn--primary:hover {
+    background: var(--forest-olive);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(46,64,9,0.25);
+  }
+
+  .wq-btn--primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .wq-btn--outline {
+    background: transparent;
+    color: var(--forest-olive);
+    border: 1.5px solid var(--forest-olive);
+    padding: 12px 36px;
+  }
+
+  .wq-btn--outline:hover {
+    background: rgba(46,64,9,0.06);
+  }
+
+  .wq-btn--full {
+    width: 100%;
+  }
+
+  .wq-link {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--dusty-coral);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .wq-link:hover {
+    color: var(--fired-brick);
+  }
+
+  .wq-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--brewery-dark);
+    opacity: 0.5;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 24px;
+    transition: opacity 0.2s;
+  }
+
+  .wq-back:hover {
+    opacity: 0.8;
+  }
+
+  .wq-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .wq-card {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 16px 20px;
+    border: 1.5px solid rgba(44,24,16,0.10);
+    border-radius: 2px;
+    background: rgba(255,255,255,0.6);
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .wq-card:hover {
+    border-color: rgba(44,24,16,0.22);
+    background: rgba(255,255,255,0.85);
+  }
+
+  .wq-card--selected {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.05);
+  }
+
+  .wq-card--selected:hover {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.07);
+  }
+
+  .wq-card__text {
+    flex: 1;
+  }
+
+  .wq-card__label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--brewery-dark);
+    line-height: 1.3;
+  }
+
+  .wq-card__sublabel {
+    font-size: 13px;
+    color: var(--brewery-dark);
+    opacity: 0.5;
+    margin-top: 2px;
+  }
+
+  .wq-card__check {
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--forest-olive);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+
+  .wq-month-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .wq-month {
+    padding: 12px 8px;
+    border: 1.5px solid rgba(44,24,16,0.10);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.6);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brewery-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .wq-month:hover {
+    border-color: rgba(44,24,16,0.22);
+    background: rgba(255,255,255,0.85);
+  }
+
+  .wq-month--selected {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.08);
+    color: var(--forest-olive);
+  }
+
+  .wq-month--disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .wq-year-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .wq-year {
+    padding: 12px 8px;
+    border: 1.5px solid rgba(44,24,16,0.10);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.6);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brewery-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .wq-year:hover {
+    border-color: rgba(44,24,16,0.22);
+    background: rgba(255,255,255,0.85);
+  }
+
+  .wq-year--selected {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.08);
+    color: var(--forest-olive);
+  }
+
+  .wq-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding: 20px;
+    background: rgba(44,24,16,0.025);
+    border: 1px solid rgba(44,24,16,0.06);
+    border-radius: 2px;
+  }
+
+  .wq-pill {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(46,64,9,0.08);
+    border: 1px solid rgba(46,64,9,0.15);
+    border-radius: 20px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--forest-olive);
+  }
+
+  .wq-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .wq-field__label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--brewery-dark);
+  }
+
+  .wq-field__optional {
+    font-size: 11px;
+    color: var(--dusty-coral);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .wq-field__input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(44,24,16,0.15);
+    border-radius: 4px;
+    background: var(--warm-canvas);
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--brewery-dark);
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+
+  .wq-field__input:focus {
+    outline: none;
+    border-color: var(--forest-olive);
+  }
+
+  .wq-field__note {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--dusty-coral);
+    margin-top: 6px;
+  }
+
+  .wq-field__input::placeholder {
+    color: rgba(44,24,16,0.3);
+  }
+
+  .wq-confirm-icon {
+    margin-bottom: 20px;
+  }
+
+  .wq-confirm-card {
+    background: rgba(44,24,16,0.025);
+    border: 1px solid rgba(44,24,16,0.06);
+    border-radius: 2px;
+    padding: 28px;
+    margin-top: 24px;
+    text-align: left;
+  }
+
+  .wq-confirm-card p {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--brewery-dark);
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .wq-confirm-card__title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--brewery-dark);
+    margin: 0 0 12px;
+  }
+
+  .wq-confirm-card--hot {
+    background: rgba(46,64,9,0.04);
+    border-color: rgba(46,64,9,0.15);
+  }
+
+  .wq-confirm-card--amber {
+    background: rgba(191,114,86,0.06);
+    border-color: rgba(191,114,86,0.2);
+  }
+
+  @media (max-width: 768px) {
+    .questionnaire {
+      padding: 48px 0 48px;
+    }
+
+    .wq-month-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .wq-year-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .wq-confirm-card {
+      padding: 20px;
+    }
+  }
+</style>
