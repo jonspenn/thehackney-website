@@ -52,9 +52,10 @@ const BUDGET_OPTIONS = [
 ];
 
 /* Funnel order:
-   1. Event type - what are you planning
-   2. Guests - qualify capacity fit
-   3. Date - when are you thinking
+   1. Date - corporate buyers (especially agencies) come with a date locked in.
+      Leading with the most concrete question hooks them immediately.
+   2. Event type - what are you planning
+   3. Guests - qualify capacity fit
    4. Capture - name, company, email, phone (optional). Lead is captured here.
    5. Budget - asked AFTER capture so it can't kill the lead. Skippable.
    6. Confirmation
@@ -128,12 +129,13 @@ function BackButton({ onClick }) {
 
 /* ─── Step components ─── */
 
-function StepEventType({ data, setData, onNext }) {
+function StepEventType({ data, setData, onNext, onBack }) {
   return (
     <div className="wq-step">
+      <BackButton onClick={onBack} />
       <FadeIn>
         <h2 className="wq-heading">What are you planning?</h2>
-        <p className="wq-subtext">Five quick questions. We'll come back with a tailored proposal covering venue hire, catering, bar, and everything your event needs.</p>
+        <p className="wq-subtext">This helps us match you with the right package and team</p>
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-cards">
@@ -183,7 +185,7 @@ function StepGuests({ data, setData, onNext, onBack }) {
   );
 }
 
-function StepDate({ data, setData, onNext, onBack }) {
+function StepDate({ data, setData, onNext }) {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonthIndex = now.getMonth();
@@ -211,10 +213,9 @@ function StepDate({ data, setData, onNext, onBack }) {
   const canProceed = data.month && data.year;
   return (
     <div className="wq-step">
-      <BackButton onClick={onBack} />
       <FadeIn>
-        <h2 className="wq-heading">When are you thinking?</h2>
-        <p className="wq-subtext">Even a rough idea helps us check availability and prepare your proposal</p>
+        <h2 className="wq-heading">When is your event?</h2>
+        <p className="wq-subtext">Five quick questions. We'll come back with a tailored proposal covering venue hire, catering, bar, and everything your event needs.</p>
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-label">Year</div>
@@ -271,9 +272,9 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
   const eventLabel = EVENT_TYPE_OPTIONS.find(o => o.value === data.eventType)?.label;
   const guestLabel = GUEST_OPTIONS.find(o => o.value === data.guests)?.label;
   const summaryPills = [
+    data.month && data.year ? `${data.month} ${data.year}` : null,
     eventLabel,
     guestLabel ? `${guestLabel} guests` : null,
-    data.month && data.year ? `${data.month} ${data.year}` : null,
   ].filter(Boolean);
 
   return (
@@ -497,9 +498,9 @@ function StepConfirmation({ data }) {
 /* ─── Main component ─── */
 
 const STEP_NAMES = {
-  1: "event-type",
-  2: "guests",
-  3: "date",
+  1: "date",
+  2: "event-type",
+  3: "guests",
   4: "capture",
   5: "budget",
   6: "confirmation",
@@ -596,9 +597,9 @@ export default function CorporateQuiz() {
         <ProgressDots current={step - 1} total={TOTAL_STEPS} />
       )}
 
-      {step === 1 && <StepEventType data={data} setData={setData} onNext={goNext} />}
-      {step === 2 && <StepGuests data={data} setData={setData} onNext={goNext} onBack={goBack} />}
-      {step === 3 && <StepDate data={data} setData={setData} onNext={goNext} onBack={goBack} />}
+      {step === 1 && <StepDate data={data} setData={setData} onNext={goNext} />}
+      {step === 2 && <StepEventType data={data} setData={setData} onNext={goNext} onBack={goBack}/>}
+      {step === 3 && <StepGuests data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 4 && <StepCapture data={data} setData={setData} onNext={handleCaptureSubmit} onBack={goBack} submitting={submitting} />}
       {step === 5 && <StepBudget data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 6 && <StepConfirmation data={data} />}
