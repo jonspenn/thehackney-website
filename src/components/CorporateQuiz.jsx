@@ -13,18 +13,15 @@ const BRAND = {
 };
 
 /* ─── Data constants ─── */
-const MONTHS = [
+const MONTHS_FULL = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
+];
+const MONTHS_SHORT = [
   "Jan","Feb","Mar","Apr","May","Jun",
   "Jul","Aug","Sep","Oct","Nov","Dec"
 ];
-
-const _currentYearForList = new Date().getFullYear();
-const YEARS = [
-  String(_currentYearForList),
-  String(_currentYearForList + 1),
-  String(_currentYearForList + 2),
-  "Not sure yet",
-];
+const DAYS_OF_WEEK = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
 const EVENT_TYPE_OPTIONS = [
   { label: "Conference or Seminar", value: "conference", sublabel: "Presentations, panels, breakout sessions" },
@@ -186,83 +183,204 @@ function StepGuests({ data, setData, onNext, onBack }) {
   );
 }
 
+/* ─── Mini calendar helpers ─── */
+function getDaysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
+function getFirstDayOfWeek(year, month) {
+  // 0=Sun in JS, convert to Mon=0
+  const d = new Date(year, month, 1).getDay();
+  return d === 0 ? 6 : d - 1;
+}
+function formatDateDisplay(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr + "T12:00:00");
+  const day = d.getDate();
+  const suffix = [,"st","nd","rd"][day % 10 > 3 ? 0 : (day % 100 - day % 10 !== 10) * day % 10] || "th";
+  return `${MONTHS_FULL[d.getMonth()]} ${day}${suffix}, ${d.getFullYear()}`;
+}
+
+function MiniCalendar({ year, month, selectedDate, onSelect, today }) {
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfWeek(year, month);
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+  const cells = [];
+  // Blank cells before first day
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <div className="cq-cal">
+      <div className="cq-cal__header">
+        {MONTHS_FULL[month]} {year}
+      </div>
+      <div className="cq-cal__days">
+        {DAYS_OF_WEEK.map(d => (
+          <div key={d} className="cq-cal__dow">{d}</div>
+        ))}
+      </div>
+      <div className="cq-cal__grid">
+        {cells.map((day, i) => {
+          if (day === null) return <div key={`blank-${i}`} className="cq-cal__blank" />;
+          const dateStr = `${year}-${String(month + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+          const isPast = dateStr < todayStr;
+          const isSelected = dateStr === selectedDate;
+          const isToday = dateStr === todayStr;
+          return (
+            <button
+              key={dateStr}
+              type="button"
+              disabled={isPast}
+              className={`cq-cal__day${isSelected ? " cq-cal__day--selected" : ""}${isPast ? " cq-cal__day--past" : ""}${isToday ? " cq-cal__day--today" : ""}`}
+              onClick={() => !isPast && onSelect(dateStr)}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function StepDate({ data, setData, onNext }) {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonthIndex = now.getMonth();
+  const today = new Date();
+  const [showTextInput, setShowTextInput] = useState(false);
+  const [textDate, setTextDate] = useState("");
+  const [calPage, setCalPage] = useState(0); // 0 = months 0-1, 1 = months 2-3
 
-  function isMonthDisabled(monthAbbr) {
-    if (!data.year || data.year === "Not sure yet") return false;
-    const selectedYear = parseInt(data.year, 10);
-    if (selectedYear > currentYear) return false;
-    if (selectedYear < currentYear) return true;
-    const monthIndex = MONTHS.indexOf(monthAbbr);
-    return monthIndex < currentMonthIndex;
+  // Build 4 months from current month
+  const calMonths = [];
+  for (let i = 0; i < 4; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+    calMonths.push({ year: d.getFullYear(), month: d.getMonth() });
   }
 
-  function handleYearSelect(y) {
-    let newMonth = data.month;
-    if (y !== "Not sure yet" && parseInt(y, 10) === currentYear && data.month) {
-      const monthIndex = MONTHS.indexOf(data.month);
-      if (monthIndex < currentMonthIndex) {
-        newMonth = "";
-      }
-    }
-    setData({ ...data, year: y, month: newMonth });
+  function handleDateSelect(dateStr) {
+    const d = new Date(dateStr + "T12:00:00");
+    setData({
+      ...data,
+      eventDate: dateStr,
+      month: MONTHS_SHORT[d.getMonth()],
+      year: String(d.getFullYear()),
+    });
   }
 
-  const canProceed = data.month && data.year;
+  function handleTextSubmit() {
+    if (!textDate.trim()) return;
+    // Store the raw text - we'll parse what we can
+    setData({
+      ...data,
+      eventDate: "",
+      eventDateText: textDate.trim(),
+      month: "",
+      year: "",
+    });
+    onNext();
+  }
+
+  const canProceed = data.eventDate || data.eventDateText;
+  const displayMonths = calPage === 0 ? calMonths.slice(0, 2) : calMonths.slice(2, 4);
+
   return (
     <div className="wq-step">
       <FadeIn>
         <h2 className="wq-heading">When is your event?</h2>
         <p className="wq-subtext">Five quick questions. We'll come back with a tailored proposal covering venue hire, catering, bar, and everything your event needs.</p>
       </FadeIn>
-      <FadeIn delay={150}>
-        <div className="wq-label">Year</div>
-        <div className="wq-year-row">
-          {YEARS.map(y => (
-            <button
-              key={y}
-              type="button"
-              className={`wq-year ${data.year === y ? "wq-year--selected" : ""}`}
-              onClick={() => handleYearSelect(y)}
-            >
-              {y}
-            </button>
-          ))}
-        </div>
-      </FadeIn>
-      <FadeIn delay={250}>
-        <div className="wq-label" style={{ marginTop: 28 }}>Month</div>
-        <div className="wq-month-grid">
-          {MONTHS.map(m => {
-            const disabled = isMonthDisabled(m);
-            return (
-              <button
-                key={m}
-                type="button"
-                className={`wq-month ${data.month === m ? "wq-month--selected" : ""} ${disabled ? "wq-month--disabled" : ""}`}
-                onClick={() => !disabled && setData({ ...data, month: m })}
-                disabled={disabled}
-              >
-                {m}
+
+      {!showTextInput && (
+        <FadeIn delay={150}>
+          <div className="cq-cal-pair">
+            {displayMonths.map(({ year, month }) => (
+              <MiniCalendar
+                key={`${year}-${month}`}
+                year={year}
+                month={month}
+                selectedDate={data.eventDate}
+                onSelect={handleDateSelect}
+                today={today}
+              />
+            ))}
+          </div>
+          <div className="cq-cal-nav">
+            {calPage > 0 && (
+              <button type="button" className="cq-cal-nav__btn" onClick={() => setCalPage(0)}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7L9 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                {MONTHS_SHORT[calMonths[0].month]} - {MONTHS_SHORT[calMonths[1].month]}
               </button>
-            );
-          })}
-        </div>
-      </FadeIn>
-      <FadeIn delay={350}>
-        <button
-          onClick={onNext}
-          className="wq-btn wq-btn--primary"
-          type="button"
-          disabled={!canProceed}
-          style={{ marginTop: 32 }}
-        >
-          Continue
-        </button>
-      </FadeIn>
+            )}
+            {calPage < 1 && (
+              <button type="button" className="cq-cal-nav__btn cq-cal-nav__btn--right" onClick={() => setCalPage(1)}>
+                {MONTHS_SHORT[calMonths[2].month]} - {MONTHS_SHORT[calMonths[3].month]}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            )}
+          </div>
+          {data.eventDate && (
+            <div className="cq-cal-selected">
+              Selected: <strong>{formatDateDisplay(data.eventDate)}</strong>
+            </div>
+          )}
+          <div className="cq-date-alt">
+            <button type="button" className="cq-date-alt__link" onClick={() => setShowTextInput(true)}>
+              My date is further out or flexible
+            </button>
+          </div>
+        </FadeIn>
+      )}
+
+      {showTextInput && (
+        <FadeIn delay={100}>
+          <div className="wq-form" style={{ marginTop: 20 }}>
+            <div className="wq-field">
+              <label className="wq-field__label" htmlFor="cq-date-text">When are you thinking?</label>
+              <input
+                id="cq-date-text"
+                type="text"
+                className="wq-field__input"
+                placeholder='e.g. "September 2026" or "Q4 this year" or "flexible"'
+                value={textDate}
+                onChange={e => setTextDate(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleTextSubmit()}
+                autoFocus
+              />
+              <p className="wq-hint" style={{ marginTop: 8 }}>Any format works - we'll confirm exact dates in your proposal.</p>
+            </div>
+            <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+              <button
+                onClick={handleTextSubmit}
+                className="wq-btn wq-btn--primary"
+                type="button"
+                disabled={!textDate.trim()}
+              >
+                Continue
+              </button>
+              <button
+                onClick={() => setShowTextInput(false)}
+                className="wq-btn wq-btn--outline"
+                type="button"
+              >
+                Back to calendar
+              </button>
+            </div>
+          </div>
+        </FadeIn>
+      )}
+
+      {!showTextInput && (
+        <FadeIn delay={350}>
+          <button
+            onClick={onNext}
+            className="wq-btn wq-btn--primary"
+            type="button"
+            disabled={!canProceed}
+            style={{ marginTop: 24 }}
+          >
+            Continue
+          </button>
+        </FadeIn>
+      )}
     </div>
   );
 }
@@ -272,8 +390,15 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
 
   const eventLabel = EVENT_TYPE_OPTIONS.find(o => o.value === data.eventType)?.label;
   const guestLabel = GUEST_OPTIONS.find(o => o.value === data.guests)?.label;
+  const datePill = data.eventDate
+    ? formatDateDisplay(data.eventDate)
+    : data.eventDateText
+      ? data.eventDateText
+      : data.month && data.year
+        ? `${data.month} ${data.year}`
+        : null;
   const summaryPills = [
-    data.month && data.year ? `${data.month} ${data.year}` : null,
+    datePill,
     eventLabel,
     guestLabel ? `${guestLabel} guests` : null,
   ].filter(Boolean);
@@ -520,6 +645,8 @@ export default function CorporateQuiz() {
     eventType: "",
     guests: "",
     month: "", year: "",
+    eventDate: "",      // YYYY-MM-DD from calendar picker
+    eventDateText: "",  // free-text from "further out" input
     budget: "", budgetFit: "",
     firstName: "", company: "", email: "", phone: "",
   });
@@ -575,7 +702,7 @@ export default function CorporateQuiz() {
       phone: data.phone,
       event_type: data.eventType,
       guest_count: data.guests,
-      event_date: data.month && data.year ? `${data.month} ${data.year}` : "",
+      event_date: data.eventDate || data.eventDateText || (data.month && data.year ? `${data.month} ${data.year}` : ""),
     };
     console.log("[CorporateQuiz] Capture payload:", payload);
 
