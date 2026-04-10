@@ -195,6 +195,46 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
   </Section>
 
+  <!-- ==================== SECTION 6B: PAST EVENTS ==================== -->
+  <Section bg="light">
+    <SectionHeader
+      eyebrow="Past Events"
+      heading="Brands That Chose The Hackney"
+    />
+
+    <div class="past-events">
+      <article class="past-event">
+        <div class="past-event-image">
+          <div class="past-event-image-bg lazy-bg" data-bg="/images/hackney-brand-activation-impulse-guest-pink-backdrop.webp" data-bg-pos="center center" role="img" aria-label="Guest at Impulse brand activation with pink crystal backdrop at The Hackney"></div>
+        </div>
+        <div class="past-event-content">
+          <h3>Impulse</h3>
+          <p class="past-event-meta">Brand Activation</p>
+        </div>
+      </article>
+
+      <article class="past-event">
+        <div class="past-event-image">
+          <div class="past-event-image-bg lazy-bg" data-bg="/images/hackney-brand-activation-vagabond-guests-edison-bulbs.webp" data-bg-pos="center center" role="img" aria-label="Guests with champagne at Vagabond Shoemakers launch event under Edison bulbs at The Hackney"></div>
+        </div>
+        <div class="past-event-content">
+          <h3>Vagabond</h3>
+          <p class="past-event-meta">Product Launch</p>
+        </div>
+      </article>
+
+      <article class="past-event">
+        <div class="past-event-image">
+          <div class="past-event-image-bg lazy-bg" data-bg="/images/hackney-brand-activation-enfuse-dinner-presentation.webp" data-bg-pos="center center" role="img" aria-label="Enfuse corporate dinner with speaker presenting to guests surrounded by flowers and greenery at The Hackney"></div>
+        </div>
+        <div class="past-event-content">
+          <h3>Enfuse</h3>
+          <p class="past-event-meta">Corporate Dinner</p>
+        </div>
+      </article>
+    </div>
+  </Section>
+
   <!-- ==================== PHOTO BREAK: VENUE INTERIOR ==================== -->
   <PhotoBreak
     image="/images/hackney-gozney-brand-activation-pizza-oven-crowd.webp"
@@ -708,6 +748,65 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       line-height: 1.7;
       opacity: 0.85;
       margin-bottom: 2rem;
+    }
+
+    /* ==================== PAST EVENTS (matches weddings Real Weddings) ==================== */
+    .past-events {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .past-event {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .past-event-image {
+      aspect-ratio: 2/3;
+      overflow: hidden;
+      border: 1px solid rgba(44, 24, 16, 0.08);
+      border-radius: 2px;
+      background-color: #3D2117;
+    }
+
+    .past-event-image-bg {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center center;
+    }
+
+    .past-event-content {
+      padding-top: 20px;
+    }
+
+    .past-event-content h3 {
+      font-family: var(--font-heading);
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--brewery-dark);
+      margin: 0 0 8px;
+    }
+
+    .past-event-meta {
+      font-family: var(--font-body);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--dusty-coral);
+      font-weight: 500;
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      .past-events {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        max-width: 480px;
+        margin: 0 auto;
+      }
     }
 
     /* ==================== SCROLL ANIMATIONS ==================== */
