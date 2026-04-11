@@ -213,10 +213,12 @@ function StepDate({ data, setData, onNext }) {
         newMonth = "";
       }
     }
+    // "Not sure yet" → clear month (grid will be hidden)
+    if (y === "Not sure yet") newMonth = "";
     setData({ ...data, year: y, month: newMonth });
   }
 
-  const canProceed = data.month && data.year;
+  const canProceed = data.year === "Not sure yet" || (data.month && data.year);
   return (
     <div className="wq-step">
       <FadeIn>
@@ -238,25 +240,27 @@ function StepDate({ data, setData, onNext }) {
           ))}
         </div>
       </FadeIn>
-      <FadeIn delay={250}>
-        <div className="wq-label" style={{ marginTop: 28 }}>Month</div>
-        <div className="wq-month-grid">
-          {MONTHS.map(m => {
-            const disabled = isMonthDisabled(m);
-            return (
-              <button
-                key={m}
-                type="button"
-                className={`wq-month ${data.month === m ? "wq-month--selected" : ""} ${disabled ? "wq-month--disabled" : ""}`}
-                onClick={() => !disabled && setData({ ...data, month: m })}
-                disabled={disabled}
-              >
-                {m}
-              </button>
-            );
-          })}
-        </div>
-      </FadeIn>
+      {data.year !== "Not sure yet" && (
+        <FadeIn delay={250}>
+          <div className="wq-label" style={{ marginTop: 28 }}>Month</div>
+          <div className="wq-month-grid">
+            {MONTHS.map(m => {
+              const disabled = isMonthDisabled(m);
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  className={`wq-month ${data.month === m ? "wq-month--selected" : ""} ${disabled ? "wq-month--disabled" : ""}`}
+                  onClick={() => !disabled && setData({ ...data, month: m })}
+                  disabled={disabled}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        </FadeIn>
+      )}
       <FadeIn delay={350}>
         <button
           onClick={onNext}
