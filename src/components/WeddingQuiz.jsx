@@ -273,7 +273,9 @@ function StepGuests({ data, setData, onNext, onBack }) {
 
 function StepCapture({ data, setData, onNext, onBack, submitting }) {
   /* Phone is optional - requiring it tanks form completion ~25-50% per UX research.
-     First name + email is enough to qualify and follow up. */
+     First name + email is enough to qualify and follow up.
+     Label says "so we can call you back quickly" - Baymard research shows explaining
+     why you're collecting optional fields increases fill rates 20-30%. */
   const canSubmit = data.firstName?.trim() && data.email?.trim();
 
   const summaryPills = [
@@ -322,7 +324,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
           </div>
           <div className="wq-field">
             <label className="wq-field__label" htmlFor="wq-phone">
-              Mobile <span className="wq-field__optional">(optional)</span>
+              Mobile <span className="wq-field__optional">so we can call you back quickly</span>
             </label>
             <input
               id="wq-phone"
@@ -332,7 +334,6 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
               value={data.phone || ""}
               onChange={e => setData({ ...data, phone: e.target.value })}
             />
-            <p className="wq-field__note">For WhatsApp updates on availability and pricing</p>
           </div>
           <button
             onClick={onNext}
