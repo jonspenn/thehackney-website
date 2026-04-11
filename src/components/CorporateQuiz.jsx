@@ -18,12 +18,14 @@ const MONTHS = [
   "Jul","Aug","Sep","Oct","Nov","Dec"
 ];
 
-/* Year list auto-rolls every Jan 1 - shows current year + next 2 years. */
+/* Corporate books short-horizon: current year + next year only.
+   Current year is pre-selected in initial state so the visitor
+   lands straight on the month grid. Next year covers Q4 browsers
+   planning spring. "Not sure yet" catches the rest. */
 const _currentYearForList = new Date().getFullYear();
 const YEARS = [
   String(_currentYearForList),
   String(_currentYearForList + 1),
-  String(_currentYearForList + 2),
   "Not sure yet",
 ];
 
@@ -522,7 +524,7 @@ export default function CorporateQuiz() {
   const [data, setData] = useState({
     eventType: "",
     guests: "",
-    month: "", year: "",
+    month: "", year: String(new Date().getFullYear()),
     budget: "", budgetFit: "",
     firstName: "", company: "", email: "", phone: "",
   });
