@@ -32,11 +32,9 @@ const YEARS = [
 const EVENT_TYPE_OPTIONS = [
   { label: "Conference or Seminar", value: "conference", sublabel: "Presentations, panels, breakout sessions" },
   { label: "Team Day or Offsite", value: "team-day", sublabel: "Workshops, team meals, informal networking" },
-  { label: "Product Launch", value: "product-launch", sublabel: "Brand reveals, showcases, demos" },
-  { label: "Press or PR Event", value: "press-pr", sublabel: "Media gatherings, press lunches, industry dinners" },
-  { label: "Brand Activation", value: "brand-activation", sublabel: "Experiential events, immersive experiences" },
+  { label: "Launch, Showcase or Press Event", value: "launch-showcase", sublabel: "Product reveals, brand activations, media events" },
   { label: "Photography or Film Shoot", value: "photo-film", sublabel: "Studio-style space with natural light" },
-  { label: "Something else", value: "other", sublabel: "Meetings, workshops, private dining - tell us more" },
+  { label: "Something else", value: "other", sublabel: "Meetings, private dining, anything we haven't listed" },
 ];
 
 const GUEST_OPTIONS = [
