@@ -324,7 +324,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
           </div>
           <div className="wq-field">
             <label className="wq-field__label" htmlFor="wq-phone">
-              Mobile <span className="wq-field__optional">so we can call you back quickly</span>
+              Mobile <span className="wq-field__optional">so we can call if you'd like to chat anything through</span>
             </label>
             <input
               id="wq-phone"
