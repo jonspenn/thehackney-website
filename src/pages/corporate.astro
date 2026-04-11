@@ -60,7 +60,7 @@ const localBusinessSchema = {
 const combinedSchema = JSON.stringify([localBusinessSchema]);
 ---
 
-<Base title="Corporate Events Venue East London | The Hackney, E2" description="Host your corporate event at The Hackney - a restored 1856 brewery on Hackney Road. Conferences, team days, product launches, brand activations. 60 seated, 100 standing. Exclusively yours. Trusted by Adidas, Spotify, Samsung, Coca-Cola." schema={combinedSchema}>
+<Base title="Corporate Events Venue East London | The Hackney, E2" description="Host your corporate event at The Hackney - a restored 1856 brewery on Hackney Road. Conferences, team days, product launches, brand activations. 60 seated, 100 standing. Exclusively yours. Trusted by Adidas, Spotify, Samsung, Coca-Cola." schema={combinedSchema} preloadImage="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp">
 
   <!-- ==================== SECTION 1: HERO ==================== -->
   <HeroSection
@@ -68,7 +68,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     image="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp"
     alt="The Hackney main hall set for dinner with long tables, hanging greenery, Edison bulbs, and skylights"
     heading='One Venue.<br>Everything Handled.'
-    cta={{ label: "Get A Proposal", href: "/corporate/#questionnaire" }}
+    cta={{ label: "Get A Proposal", href: "/corporate/?utm_source=website&utm_medium=cta&utm_campaign=corporate&utm_content=hero#questionnaire" }}
     note="Dry hire or full-service. In-house catering, bar, and events team - or bring your own. Up to 100 guests, exclusively yours."
     height="mid"
     textGradient={true}
@@ -103,6 +103,10 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       </div>
     </div>
   </Section>
+
+  <div class="mql-return-link">
+    <a href="/check-your-date/?type=corporate&utm_source=website&utm_medium=cta&utm_campaign=corporate&utm_content=mql-return">Already spoken to us? Check your date &rarr;</a>
+  </div>
 
   <!-- ==================== SECTION 4: CORPORATE QUESTIONNAIRE (hot lane - early, like wedding quiz) ==================== -->
   <!-- Interactive multi-step quiz matching WeddingQuestionnaire pattern:
@@ -233,6 +237,10 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         </div>
       </article>
     </div>
+
+    <div class="section-cta-center">
+      <a href="/corporate/?utm_source=website&utm_medium=cta&utm_campaign=corporate&utm_content=past-events#questionnaire" class="btn btn-primary">Plan Your Event</a>
+    </div>
   </Section>
 
   <!-- ==================== PHOTO BREAK: VENUE INTERIOR ==================== -->
@@ -272,8 +280,23 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       </div>
     </div>
 
-    <div class="space-image-container">
-      <img class="space-image" src="/images/hackney-canapes-wooden-board-corporate-catering.webp" alt="Canapes on wooden boards served at a corporate event at The Hackney" loading="lazy" />
+    <div class="space-gallery">
+      <div class="space-image">
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp" data-bg-pos="center center" role="img" aria-label="The Hackney main hall set for a corporate dinner with long tables, greenery, and Edison bulbs"></div>
+        <div class="space-image-caption">The main hall - 60 seated</div>
+      </div>
+      <div class="space-image">
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-canapes-wooden-board-corporate-catering.webp" data-bg-pos="center center" role="img" aria-label="Canapes on wooden boards served at a corporate event at The Hackney"></div>
+        <div class="space-image-caption">In-house catering</div>
+      </div>
+      <div class="space-image">
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-wedding-courtyard-guests-giant-jenga.webp" data-bg-pos="center center" role="img" aria-label="Guests in the covered courtyard at The Hackney with outdoor seating"></div>
+        <div class="space-image-caption">The covered terrace</div>
+      </div>
+      <div class="space-image">
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-wedding-evening-first-dance-pink-uplighting.webp" data-bg-pos="center center" role="img" aria-label="The Hackney main hall in evening mode with pink uplighting and full venue"></div>
+        <div class="space-image-caption">Evening reception</div>
+      </div>
     </div>
   </Section>
 
@@ -389,10 +412,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
   <!-- ==================== SECTION 12: FINAL CTA ==================== -->
   <FinalCTA
-    heading="Ready to book your event?"
-    body="Check availability on our live calendar or send us an enquiry."
-    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
-    whatsapp={true}
+    eyebrow="Your Next Step"
+    heading="Ready To Book Your Event?"
+    body="Check availability on our live calendar, book a venue tour with Hugo, or send us an enquiry. One conversation to get started."
+    primaryCTA={{ label: "See The Calendar", href: "/check-your-date/" }}
+    note="Weekday dates available at short notice. Peak Fridays book earliest."
     utmCampaign="corporate"
   />
 
@@ -475,13 +499,12 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .event-card h3 {
       font-size: 20px;
       margin-bottom: 12px;
-      color: var(--mid-olive);
+      color: var(--brewery-dark);
     }
 
     .event-card p {
       font-size: 16px;
       line-height: 1.6;
-      opacity: 0.85;
     }
 
     /* Christmas card spans full width as the 5th card */
@@ -519,38 +542,45 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
     /* ==================== THE SPACE ==================== */
     .space-intro {
-      font-size: 17px;
+      font-size: 18px;
       line-height: 1.7;
-      max-width: 720px;
-      margin: 0 auto 2.5rem;
-      text-align: center;
+      max-width: 700px;
+      margin-bottom: 12px;
     }
 
     .space-capacity {
       display: flex;
-      justify-content: center;
-      gap: 4rem;
-      margin-bottom: 2.5rem;
+      gap: 64px;
+      align-items: flex-start;
+      margin-top: 28px;
+      margin-bottom: 56px;
+      padding: 32px 0;
+      border-top: 1px solid rgba(44, 24, 16, 0.12);
+      border-bottom: 1px solid rgba(44, 24, 16, 0.12);
     }
 
     .capacity-stat {
-      text-align: center;
+      flex: 0 1 auto;
+      min-width: 0;
     }
 
     .capacity-number {
       font-family: var(--font-heading);
-      font-size: 3.5rem;
-      font-weight: 700;
-      color: var(--brewery-dark);
+      font-size: clamp(64px, 9vw, 96px);
+      font-weight: 600;
       line-height: 1;
+      color: var(--forest-olive);
+      margin-bottom: 10px;
     }
 
     .capacity-label {
+      font-family: var(--font-body);
       font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--dusty-coral);
-      margin-top: 8px;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      color: var(--brewery-dark);
+      margin-bottom: 6px;
     }
 
     .space-details {
@@ -561,26 +591,65 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     .space-feature h3 {
-      font-size: 1.15rem;
-      margin-bottom: 0.75rem;
-      color: var(--mid-olive);
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 2.4vw, 30px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--brewery-dark);
+      margin-bottom: 14px;
     }
 
     .space-feature p {
       font-size: 16px;
-      line-height: 1.7;
-      opacity: 0.85;
+      line-height: 1.6;
     }
 
-    .space-image-container {
-      max-width: 720px;
-      margin: 0 auto;
+    .space-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 48px;
     }
 
     .space-image {
-      width: 100%;
-      border-radius: 2px;
+      position: relative;
+      aspect-ratio: 16/10;
+      overflow: hidden;
       border: 1px solid rgba(44, 24, 16, 0.08);
+    }
+
+    .space-image-bg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .space-image:nth-child(1) .space-image-bg { background-color: #3D2117; }
+    .space-image:nth-child(2) .space-image-bg { background-color: var(--forest-olive); }
+    .space-image:nth-child(3) .space-image-bg { background-color: #4A3228; }
+    .space-image:nth-child(4) .space-image-bg { background-color: #5C3A1E; }
+
+    .space-image::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%);
+      pointer-events: none;
+    }
+
+    .space-image-caption {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      color: #fff;
+      font-size: 13px;
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      z-index: 1;
     }
 
     /* ==================== PRICING ==================== */
@@ -602,7 +671,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .pricing-tier h3 {
       font-size: 1.1rem;
       margin-bottom: 12px;
-      color: var(--mid-olive);
+      color: var(--brewery-dark);
     }
 
     .pricing-tier-price {
@@ -625,7 +694,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .pricing-tier p {
       font-size: 14px;
       line-height: 1.6;
-      opacity: 0.75;
     }
 
     .pricing-note {
@@ -639,58 +707,73 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .pricing-note p {
       font-size: 14px;
       font-style: italic;
-      opacity: 0.7;
+      color: rgba(44, 24, 16, 0.65);
     }
 
     .pricing-pivot {
+      max-width: 720px;
+      margin: 64px auto 28px;
       text-align: center;
-      max-width: 560px;
-      margin: 0 auto 2rem;
+      padding-top: 48px;
+      border-top: 1px solid rgba(44, 24, 16, 0.08);
     }
 
     .pricing-pivot h3 {
-      margin-bottom: 0.75rem;
+      font-family: var(--font-heading);
+      font-size: clamp(26px, 3.2vw, 36px);
+      font-weight: 600;
+      color: var(--brewery-dark);
+      margin-bottom: 16px;
+      line-height: 1.2;
     }
 
     .pricing-pivot p {
       font-size: 16px;
-      line-height: 1.65;
-      opacity: 0.8;
+      line-height: 1.7;
+      color: var(--brewery-dark);
     }
 
     .pricing-form {
-      max-width: 540px;
+      max-width: 720px;
       margin: 0 auto;
+      background: rgba(44, 24, 16, 0.025);
+      border: 1px solid rgba(44, 24, 16, 0.08);
+      border-radius: 2px;
+      padding: 36px 40px;
     }
 
     .pricing-form .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .pricing-form .form-group {
+      display: flex;
+      flex-direction: column;
     }
 
     .pricing-form .form-group label {
-      display: block;
       font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
+      font-weight: 500;
       color: var(--brewery-dark);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .pricing-form .form-group input {
       width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid rgba(44, 24, 16, 0.15);
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.6);
       font-family: var(--font-body);
       font-size: 15px;
+      padding: 12px 14px;
+      background: var(--warm-canvas);
+      border: 1px solid rgba(44, 24, 16, 0.15);
+      border-radius: 2px;
       color: var(--brewery-dark);
-      transition: border-color 0.2s ease;
+      transition: border-color 0.15s ease;
     }
 
     .pricing-form .form-group input:focus {
@@ -703,23 +786,24 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     .pricing-form-submit {
-      display: block;
       width: 100%;
       margin-top: 8px;
     }
 
     .pricing-form-note {
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 16px;
+      color: var(--brewery-dark);
+      opacity: 0.6;
       text-align: center;
-      font-size: 13px;
-      color: rgba(44, 24, 16, 0.5);
-      margin-top: 12px;
     }
 
     /* ProcessSteps styles now live in ProcessSteps.astro component */
 
     .section-cta-center {
       text-align: center;
-      margin-top: 12px;
+      margin-top: 32px;
     }
 
     /* ==================== CHRISTMAS TEASER ==================== */
@@ -741,7 +825,6 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .christmas-teaser-body {
       font-size: 17px;
       line-height: 1.7;
-      opacity: 0.85;
       margin-bottom: 2rem;
     }
 
@@ -820,6 +903,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     @media (max-width: 768px) {
       .pricing-form .form-row {
         grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .pricing-form {
+        padding: 24px 20px;
       }
 
       .event-grid {
@@ -831,12 +919,14 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         align-items: flex-start;
       }
 
-      .space-capacity {
-        gap: 2rem;
+      .space-gallery {
+        grid-template-columns: 1fr;
       }
 
-      .capacity-number {
-        font-size: 2.5rem;
+      .space-capacity {
+        flex-direction: column;
+        gap: 12px;
+        padding: 24px 0;
       }
 
       .space-details {
@@ -849,6 +939,31 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         gap: 16px;
       }
 
+      .section-cta-center {
+        margin-top: 24px;
+      }
+
+      .past-event-content {
+        padding-top: 6px;
+      }
+    }
+
+    /* ==================== MQL RETURN LINK ==================== */
+    .mql-return-link {
+      text-align: center;
+      padding: 1.5rem 0;
+      font-family: "DM Sans", sans-serif;
+      font-size: 0.85rem;
+    }
+
+    .mql-return-link a {
+      color: #BF7256;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .mql-return-link a:hover {
+      color: #8C472E;
     }
   </style>
 </Base>
