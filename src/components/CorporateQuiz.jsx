@@ -38,10 +38,9 @@ const EVENT_TYPE_OPTIONS = [
 ];
 
 const GUEST_OPTIONS = [
-  { label: "Under 20", value: "under-20", sublabel: "Boardroom-style or intimate dinner" },
-  { label: "20 - 40", value: "20-40", sublabel: "Workshop or seated dinner" },
-  { label: "40 - 60", value: "40-60", sublabel: "Our sweet spot - max seated" },
-  { label: "60 - 100", value: "60-100", sublabel: "Standing reception or mixed format" },
+  { label: "Under 40", value: "under-40", sublabel: "Intimate format - meetings, dinners, workshops" },
+  { label: "40 - 60", value: "40-60", sublabel: "Max seated capacity" },
+  { label: "60 - 100", value: "60-100", sublabel: "Standing or mixed format" },
   { label: "Not sure yet", value: "unsure", sublabel: "We can help you work it out" },
 ];
 
