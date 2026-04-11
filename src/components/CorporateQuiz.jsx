@@ -335,7 +335,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
           </div>
           <div className="wq-field">
             <label className="wq-field__label" htmlFor="cq-phone">
-              Phone <span className="wq-field__optional">(optional)</span>
+              Phone <span className="wq-field__optional">so we can call you back quickly</span>
             </label>
             <input
               id="cq-phone"
