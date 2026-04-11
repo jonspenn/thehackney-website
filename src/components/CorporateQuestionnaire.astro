@@ -273,159 +273,73 @@ import CorporateQuiz from './CorporateQuiz.jsx';
     margin-left: 12px;
   }
 
-  /* ── Corporate calendar date picker ── */
-  .cq-cal-pair {
+  /* ── Year/month date picker (matches wedding quiz) ── */
+  .wq-month-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-top: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
   }
 
-  .cq-cal {
-    border: 1.5px solid rgba(44,24,16,0.08);
-    border-radius: 2px;
-    padding: 16px;
+  .wq-month {
+    padding: 12px 8px;
+    border: 1.5px solid rgba(44,24,16,0.10);
+    border-radius: 6px;
     background: rgba(255,255,255,0.6);
-  }
-
-  .cq-cal__header {
-    font-family: var(--font-heading);
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--brewery-dark);
-    text-align: center;
-    margin-bottom: 12px;
-  }
-
-  .cq-cal__days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-    margin-bottom: 4px;
-  }
-
-  .cq-cal__dow {
     font-family: var(--font-body);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: rgba(44,24,16,0.4);
-    text-align: center;
-    padding: 4px 0;
-  }
-
-  .cq-cal__grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-  }
-
-  .cq-cal__blank {
-    aspect-ratio: 1;
-  }
-
-  .cq-cal__day {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
-    font-family: var(--font-body);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--brewery-dark);
     cursor: pointer;
+    text-align: center;
     transition: all 0.15s ease;
-    padding: 0;
   }
 
-  .cq-cal__day:hover:not(:disabled) {
+  .wq-month:hover {
+    border-color: rgba(44,24,16,0.22);
+    background: rgba(255,255,255,0.85);
+  }
+
+  .wq-month--selected {
+    border-color: var(--forest-olive);
     background: rgba(46,64,9,0.08);
     color: var(--forest-olive);
   }
 
-  .cq-cal__day--selected {
-    background: var(--forest-olive) !important;
-    color: #fff !important;
-    font-weight: 600;
-  }
-
-  .cq-cal__day--today:not(.cq-cal__day--selected) {
-    border: 1.5px solid var(--dusty-coral);
-    color: var(--dusty-coral);
-    font-weight: 600;
-  }
-
-  .cq-cal__day--past {
-    opacity: 0.25;
+  .wq-month--disabled {
+    opacity: 0.3;
     cursor: not-allowed;
     pointer-events: none;
   }
 
-  .cq-cal-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 12px;
+  .wq-year-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
   }
 
-  .cq-cal-nav__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
+  .wq-year {
+    padding: 12px 8px;
+    border: 1.5px solid rgba(44,24,16,0.10);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.6);
     font-family: var(--font-body);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
-    color: var(--dusty-coral);
-    cursor: pointer;
-    padding: 6px 0;
-    transition: color 0.2s;
-  }
-
-  .cq-cal-nav__btn:hover {
-    color: var(--fired-brick);
-  }
-
-  .cq-cal-nav__btn--right {
-    margin-left: auto;
-  }
-
-  .cq-cal-selected {
-    text-align: center;
-    margin-top: 16px;
-    font-family: var(--font-body);
-    font-size: 14px;
     color: var(--brewery-dark);
-  }
-
-  .cq-cal-selected strong {
-    color: var(--forest-olive);
-  }
-
-  .cq-date-alt {
-    text-align: center;
-    margin-top: 16px;
-  }
-
-  .cq-date-alt__link {
-    background: none;
-    border: none;
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--dusty-coral);
-    text-decoration: underline;
-    text-underline-offset: 3px;
     cursor: pointer;
-    padding: 0;
-    transition: color 0.2s;
+    text-align: center;
+    transition: all 0.15s ease;
   }
 
-  .cq-date-alt__link:hover {
-    color: var(--fired-brick);
+  .wq-year:hover {
+    border-color: rgba(44,24,16,0.22);
+    background: rgba(255,255,255,0.85);
+  }
+
+  .wq-year--selected {
+    border-color: var(--forest-olive);
+    background: rgba(46,64,9,0.08);
+    color: var(--forest-olive);
   }
 
   .wq-summary {
@@ -550,17 +464,12 @@ import CorporateQuiz from './CorporateQuiz.jsx';
       padding: 48px 0 48px;
     }
 
-    .cq-cal-pair {
-      grid-template-columns: 1fr;
-      gap: 16px;
+    .wq-month-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
 
-    .cq-cal {
-      padding: 12px;
-    }
-
-    .cq-cal__day {
-      font-size: 14px;
+    .wq-year-row {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .wq-confirm-card {
