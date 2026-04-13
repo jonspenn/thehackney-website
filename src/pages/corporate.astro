@@ -160,6 +160,42 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     />
   </Section>
 
+  <!-- ==================== SECTION 5B: IN-HOUSE EXTRAS ==================== -->
+  <!-- Mirrors weddings "The Details, Also In-House" section. Same structure
+       (three cards + soft CTA) but reframed for corporate: styling/decor,
+       catering design, AV/production. Goal: plant the upsell seed for clients
+       who don't have their own production team, without alienating dry-hire
+       buyers who do. -->
+  <Section bg="light" border="bottom">
+    <SectionHeader
+      eyebrow="Beyond The Venue"
+      heading="More Than Just A Space"
+    />
+    <div class="details-intro">
+      <p>Some clients bring their own production team. Others want everything handled. Either way, our in-house team can take on as much or as little as you need - and it all runs through one point of contact.</p>
+    </div>
+
+    <div class="details-grid">
+      <div class="details-card">
+        <h3>Styling and Decor</h3>
+        <p>Seasonal florals, table centrepieces, branded signage placement, and full room styling. From intimate boardroom setups to large-scale brand activations - our team designs the look and handles every detail on the day.</p>
+      </div>
+      <div class="details-card">
+        <h3>Catering Design</h3>
+        <p>Bespoke menus from breakfast through to evening. Canapes, bowl food, three-course dinners, dietary handling for every guest. Our kitchen develops your menu, runs a tasting, and executes on the day.</p>
+      </div>
+      <div class="details-card">
+        <h3>AV and Production</h3>
+        <p>Projector, screens, professional sound system, and full-venue wifi are built in. Need more? We coordinate with external production teams and can manage technical rehearsals the day before.</p>
+      </div>
+    </div>
+
+    <div class="details-cta">
+      <p>Full details on services and pricing are inside our corporate brochure.</p>
+      <a href="/corporate/?utm_source=website&utm_medium=cta&utm_campaign=corporate&utm_content=section5b-in-house-extras#questionnaire" class="btn btn-primary" data-cta-section="details-extras">Get A Proposal</a>
+    </div>
+  </Section>
+
   <!-- ==================== SECTION 6: EVENTS WE HOST ==================== -->
   <Section bg="light" padding="compact" border="bottom">
     <SectionHeader
@@ -487,6 +523,59 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     /* IncludedGrid styles now live in IncludedGrid.astro component */
+
+    /* ==================== IN-HOUSE EXTRAS (mirrors weddings details section) ==================== */
+    .details-intro {
+      max-width: 760px;
+      margin-bottom: 36px;
+    }
+
+    .details-intro p {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .details-card h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(22px, 2.2vw, 28px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--brewery-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--forest-olive);
+    }
+
+    .details-card p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--brewery-dark);
+    }
+
+    .details-cta {
+      background: rgba(44, 24, 16, 0.03);
+      padding: 28px 40px;
+      border-left: 4px solid var(--forest-olive);
+      max-width: 880px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 28px;
+      justify-content: space-between;
+    }
+
+    .details-cta p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+    }
 
     /* ==================== EVENT TYPES GRID ==================== */
     .event-grid {
@@ -915,7 +1004,24 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 1200px) {
+      .details-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
     @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .details-cta {
+        padding: 24px 28px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
       .pricing-form .form-row {
         grid-template-columns: 1fr;
         gap: 16px;
