@@ -43,7 +43,7 @@ const faqItems = [
   },
   {
     question: "How far in advance should we book?",
-    answer: "Most private events book two to eight weeks out. Saturday evenings go first. Weekday dates and daytime slots are often available at shorter notice. The best way to check is to message Hugo directly - he can tell you what is free in seconds."
+    answer: "Most private events book two to eight weeks out. Saturday evenings go first. Weekday dates and daytime slots are often available at shorter notice. The best way to check is to book a quick discovery call - Hugo can tell you what is available and talk you through the options."
   },
   {
     question: "Is there parking?",
@@ -55,7 +55,7 @@ const faqItems = [
   },
   {
     question: "Can we visit the venue before booking?",
-    answer: "Yes. Hugo, our General Manager, runs venue tours. He will walk you through every space and talk through how your celebration could work. Just message him on WhatsApp or call to arrange a visit."
+    answer: "Yes. Hugo, our General Manager, runs venue tours. He will walk you through every space and talk through how your celebration could work. Book a discovery call and Hugo will arrange a time that works for you."
   },
   {
     question: "Where is the venue?",
@@ -84,13 +84,13 @@ const localBusinessSchema = {
 const combinedSchema = JSON.stringify([localBusinessSchema]);
 ---
 
-<Base title="Private Events Venue East London | Birthdays, Baby Showers | The Hackney, E2" description="Host your private celebration at The Hackney - a restored 1856 brewery on Hackney Road. Birthdays, baby showers, anniversaries, engagement parties. 60 seated, 100 standing. Exclusively yours. All-inclusive packages from £55 per person." schema={combinedSchema} preloadImage="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp">
+<Base title="Private Events Venue East London | Birthdays, Baby Showers | The Hackney, E2" description="Host your private celebration at The Hackney - a restored 1856 brewery on Hackney Road. Birthdays, baby showers, anniversaries, engagement parties. 60 seated, 100 standing. Exclusively yours. All-inclusive packages from £55 per person." schema={combinedSchema} preloadImage="/images/hackney-private-events-hero-party-atmosphere.webp">
 
   <!-- ==================== SECTION 1: HERO ==================== -->
   <HeroSection
     bg="image"
-    image="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp"
-    alt="The Hackney main hall set for a celebration with long tables, hanging greenery, Edison bulbs, and skylights"
+    image="/images/hackney-private-events-hero-party-atmosphere.webp"
+    alt="Evening celebration with atmospheric lighting at The Hackney"
     heading='Your Celebration.<br>Our Brewery.'
     cta={{ label: "Check Availability", href: "/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=hero" }}
     note="Birthdays, baby showers, anniversaries, engagement parties and more - exclusively yours"
@@ -108,23 +108,16 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   ]} />
 
   <!-- ==================== SECTION 3: DIRECT CONTACT BAR ==================== -->
-  <!-- Primary conversion path per PRD. Private event buyers close on a call
-       with Hugo, not a multi-step form. WhatsApp + phone prominent and early. -->
+  <!-- Primary conversion: book a discovery call with Hugo. Filters for serious
+       enquiries and protects Hugo's time. Same pattern as weddings/corporate. -->
   <Section bg="dark" padding="compact">
     <div class="contact-bar">
       <div class="contact-bar-text">
         <h2>Got a date in mind?</h2>
-        <p>Message Hugo directly. Most celebrations are confirmed within 48 hours.</p>
+        <p>Book a quick discovery call with Hugo. He will check availability, talk you through the options, and give you a clear idea of pricing.</p>
       </div>
       <div class="contact-bar-actions">
-        <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20interested%20in%20hosting%20a%20private%20event%20at%20The%20Hackney.%20Could%20you%20let%20me%20know%20about%20availability%3F" class="btn btn-whatsapp" target="_blank" rel="noopener" data-cta-section="contact-bar-whatsapp">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          WhatsApp Hugo
-        </a>
-        <a href="tel:+442079611604" class="btn btn-phone" data-cta-section="contact-bar-phone">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          Call Us
-        </a>
+        <a href="/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=contact-bar" class="btn btn-primary" data-cta-section="contact-bar-discovery-call">Book A Discovery Call</a>
       </div>
     </div>
   </Section>
@@ -230,8 +223,8 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     </div>
 
     <div class="details-cta">
-      <p>Have questions about what we can do for your celebration? Talk to Hugo.</p>
-      <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%20have%20some%20questions%20about%20hosting%20a%20celebration%20at%20The%20Hackney." class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="details-extras-whatsapp">Message Hugo</a>
+      <p>Have questions about what we can do for your celebration? Book a call with Hugo.</p>
+      <a href="/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=details-extras" class="btn btn-primary" data-cta-section="details-extras-discovery-call">Book A Discovery Call</a>
     </div>
   </Section>
 
@@ -340,7 +333,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         </div>
 
         <div class="pricing-block-cta">
-          <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20interested%20in%20a%20baby%20shower%20package%20at%20The%20Hackney.%20Could%20you%20tell%20me%20more%3F" class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="pricing-babyshower-whatsapp">Message Hugo About Baby Showers</a>
+          <a href="/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=pricing-babyshower" class="btn btn-primary" data-cta-section="pricing-babyshower-discovery-call">Book A Discovery Call</a>
         </div>
       </div>
 
@@ -380,13 +373,13 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         </div>
 
         <div class="pricing-block-cta">
-          <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20planning%20a%20birthday%20%2F%20celebration%20at%20The%20Hackney.%20Could%20you%20tell%20me%20about%20availability%20and%20pricing%3F" class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="pricing-birthday-whatsapp">Message Hugo About Celebrations</a>
+          <a href="/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=pricing-birthday" class="btn btn-primary" data-cta-section="pricing-birthday-discovery-call">Book A Discovery Call</a>
         </div>
       </div>
     </div>
 
     <div class="pricing-note">
-      <p>Prices may vary by date and guest count. Get in touch with Hugo for a tailored quote that matches your celebration and your budget.</p>
+      <p>Prices may vary by date and guest count. Book a discovery call for a tailored quote that matches your celebration and your budget.</p>
     </div>
   </Section>
 
@@ -406,12 +399,12 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
 
     <ProcessSteps steps={[
       {
-        title: "Message Hugo",
-        description: "Send a WhatsApp message or give us a call. Tell us what you are celebrating, roughly how many guests, and when you are thinking. Hugo will get back to you the same day."
+        title: "Book A Discovery Call",
+        description: "Check your date on our live calendar and book a quick call with Hugo, our General Manager. Tell us what you are celebrating, roughly how many guests, and when you are thinking."
       },
       {
-        title: "Quick Chat",
-        description: "A five-minute conversation to check availability, talk through what you want, and give you a clear idea of pricing. No forms, no waiting, no back-and-forth emails."
+        title: "Discovery Call",
+        description: "A five-minute conversation with Hugo to check availability, talk through what you want, and give you a clear idea of pricing. No hard sell, just honest answers."
       },
       {
         title: "Visit The Venue",
@@ -424,7 +417,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     ]} />
 
     <div class="section-cta-center">
-      <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27d%20like%20to%20chat%20about%20hosting%20a%20celebration%20at%20The%20Hackney." class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="how-it-works-whatsapp">Start The Conversation</a>
+      <a href="/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=how-it-works" class="btn btn-primary" data-cta-section="how-it-works-discovery-call">Book A Discovery Call</a>
     </div>
   </Section>
 
@@ -448,7 +441,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   <FinalCTA
     eyebrow="Your Next Step"
     heading="Ready To Celebrate?"
-    body="Message Hugo on WhatsApp, call us, or check availability on our live calendar. One conversation to get started."
+    body="Check availability on our live calendar and book a discovery call with Hugo. One conversation to get started."
     primaryCTA={{ label: "Check Your Date", href: "/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=final-cta" }}
     whatsapp={true}
     note="Weekday and daytime dates often available at short notice."
@@ -456,16 +449,9 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   />
 
   <!-- ==================== STICKY MOBILE CONTACT BAR ==================== -->
-  <!-- Always visible on mobile. Tap-to-WhatsApp or tap-to-call. -->
+  <!-- Always visible on mobile. Routes to discovery call booking. -->
   <div class="sticky-contact-bar">
-    <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20interested%20in%20hosting%20a%20private%20event%20at%20The%20Hackney." class="sticky-contact-btn sticky-contact-whatsapp" target="_blank" rel="noopener" data-cta-section="sticky-whatsapp">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      WhatsApp
-    </a>
-    <a href="tel:+442079611604" class="sticky-contact-btn sticky-contact-phone" data-cta-section="sticky-phone">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-      Call
-    </a>
+    <a href="/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=sticky-bar" class="sticky-contact-btn sticky-contact-cta" data-cta-section="sticky-discovery-call">Book A Discovery Call</a>
   </div>
 
   <style>
@@ -499,49 +485,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       flex-shrink: 0;
     }
 
-    .btn-whatsapp {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 24px;
-      background: #25D366;
-      color: #fff;
-      font-family: var(--font-body);
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 2px;
-      transition: background 0.2s ease;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .btn-whatsapp:hover {
-      background: #1da851;
-    }
-
-    .btn-phone {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 24px;
-      background: transparent;
-      color: var(--warm-canvas);
-      font-family: var(--font-body);
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      border: 1px solid rgba(245, 240, 232, 0.3);
-      border-radius: 2px;
-      transition: border-color 0.2s ease, background 0.2s ease;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .btn-phone:hover {
-      border-color: var(--warm-canvas);
-      background: rgba(245, 240, 232, 0.08);
-    }
+    /* Contact bar actions use .btn-primary from global styles */
 
     /* ==================== EVENT TYPES ==================== */
     .event-grid {
@@ -868,15 +812,13 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       letter-spacing: 0.05em;
     }
 
-    .sticky-contact-whatsapp {
-      background: #25D366;
+    .sticky-contact-cta {
+      background: var(--mid-olive);
       color: #fff;
     }
 
-    .sticky-contact-phone {
-      background: transparent;
-      color: var(--warm-canvas);
-      border: 1px solid rgba(245, 240, 232, 0.3);
+    .sticky-contact-cta:hover {
+      background: var(--forest-olive);
     }
 
     /* ==================== RESPONSIVE ==================== */
