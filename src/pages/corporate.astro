@@ -7,6 +7,7 @@ import SectionHeader from '../components/SectionHeader.astro';
 import FAQ from '../components/FAQ.astro';
 import FinalCTA from '../components/FinalCTA.astro';
 import PhotoBreak from '../components/PhotoBreak.astro';
+import PhotoStrip from '../components/PhotoStrip.astro';
 import IncludedGrid from '../components/IncludedGrid.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
 import CorporateQuestionnaire from '../components/CorporateQuestionnaire.astro';
@@ -394,6 +395,15 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       <a href="/corporate/?utm_source=website&utm_medium=cta&utm_campaign=corporate&utm_content=past-events#questionnaire" class="btn btn-primary">Plan Your Event</a>
     </div>
   </Section>
+
+  <!-- ==================== PHOTO STRIP: CORPORATE EVENT DETAILS ==================== -->
+  <!-- Mirrors weddings PhotoStrip position (between Real Weddings and How It Works).
+       Using wedding placeholder images - swap for corporate event detail shots. -->
+  <PhotoStrip images={[
+    { src: "/images/hackney-wedding-chloe-nathan-ceremony-walkout.webp", alt: "Guests at a corporate event at The Hackney", position: "center 65%" },
+    { src: "/images/hackney-wedding-chloe-nathan-speeches-full-room.webp", alt: "Full room at a corporate dinner at The Hackney" },
+    { src: "/images/hackney-wedding-chloe-nathan-couple-hackney-road.webp", alt: "The Hackney venue exterior on Hackney Road" }
+  ]} />
 
   <!-- ==================== SECTION 9: HOW IT WORKS ==================== -->
   <Section bg="light" border="top">
