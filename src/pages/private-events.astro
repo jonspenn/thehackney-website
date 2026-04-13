@@ -4,130 +4,549 @@ import HeroSection from '../components/HeroSection.astro';
 import ProofBar from '../components/ProofBar.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
-import PricingTable from '../components/PricingTable.astro';
+import FAQ from '../components/FAQ.astro';
 import FinalCTA from '../components/FinalCTA.astro';
+import PhotoBreak from '../components/PhotoBreak.astro';
+import PhotoStrip from '../components/PhotoStrip.astro';
+import IncludedGrid from '../components/IncludedGrid.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+
+// Private Events FAQ items
+const faqItems = [
+  {
+    question: "How many guests can you accommodate?",
+    answer: "Up to 60 seated for a sit-down meal and up to 100 for a standing celebration. The space reconfigures for any format - long tables, cocktail rounds, or open dance floor. If you need more than 100, we are probably not the right fit but we are happy to recommend other venues."
+  },
+  {
+    question: "What is included in the hire?",
+    answer: "Exclusive use of the entire building, your dedicated events manager, full staffing, all furniture, and our built-in sound and lighting system. For baby showers, food and drink are included in the package price. For birthdays and celebrations, everything you spend on food and drink counts towards your minimum spend."
+  },
+  {
+    question: "Can we bring our own cake?",
+    answer: "Yes. Most clients bring a celebration cake from their favourite baker. We will store it, set it up, and handle the cutting and serving. There is no cake fee."
+  },
+  {
+    question: "Can we decorate the venue?",
+    answer: "Absolutely. Balloons, banners, flowers, photo walls - you are welcome to personalise the space. We ask that nothing is fixed permanently to walls or floors (no nails, screws, or strong adhesive). Our team can help with setup and will handle the takedown after your event."
+  },
+  {
+    question: "Can we bring a DJ or live music?",
+    answer: "Yes. Our professional sound system is built in and connects to Spotify, so you can run your own playlist or bring a DJ. Live musicians work too, but we have noise restrictions because of our neighbours - acoustic groups up to a quartet, finishing by 10pm. If music is central to your event, mention it when you get in touch."
+  },
+  {
+    question: "How does the minimum spend work for birthdays?",
+    answer: "There is no venue hire fee. You simply need to meet the minimum spend on food and drink. Everything your guests order at the bar counts towards it. The minimum is lower on weekdays than Saturdays, so if your date is flexible you can get more for your money."
+  },
+  {
+    question: "How do the baby shower packages work?",
+    answer: "Our baby shower packages are all-inclusive and priced per person. The package covers exclusive venue hire, food, drinks, and service for four hours. You choose from three tiers depending on whether you want afternoon tea, bottomless prosecco, or bottomless cocktails. The price includes everything - no surprises."
+  },
+  {
+    question: "How far in advance should we book?",
+    answer: "Most private events book two to eight weeks out. Saturday evenings go first. Weekday dates and daytime slots are often available at shorter notice. The best way to check is to message Hugo directly - he can tell you what is free in seconds."
+  },
+  {
+    question: "Is there parking?",
+    answer: "There is no on-site parking. Hackney Road has metered parking during the day and free parking from 7pm to 8am. Several NCP car parks are within 10 minutes. The venue is a one-minute walk from Cambridge Heath Overground and five to seven minutes from Bethnal Green Underground (Central line)."
+  },
+  {
+    question: "Is the venue accessible?",
+    answer: "Honest answer: not fully. The Hackney is a Victorian brewery with a protected facade, which means there is a 15cm step at the entrance and the pavement outside is too narrow for a permanent ramp. The doorway is wide enough for a wheelchair with a little help. We do not currently have accessible toilets on site. If accessibility matters for any of your guests, please tell us up front and we will be straight with you about whether we can make it work."
+  },
+  {
+    question: "Can we visit the venue before booking?",
+    answer: "Yes. Hugo, our General Manager, runs venue tours. He will walk you through every space and talk through how your celebration could work. Just message him on WhatsApp or call to arrange a visit."
+  },
+  {
+    question: "Where is the venue?",
+    answer: "503 Hackney Road, East London, E2 9ED. Cambridge Heath Overground is a one-minute walk and Bethnal Green Underground on the Central line is five to seven minutes away. For larger events, we can share a travel info sheet to send to your guests."
+  }
+];
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "The Hackney",
+  "description": "Private events venue in East London - birthdays, baby showers, celebrations, engagement parties, anniversaries",
+  "@id": "https://thehackney-website.pages.dev",
+  "url": "https://thehackney-website.pages.dev/private-events/",
+  "telephone": "+442079611604",
+  "priceRange": "From £55 per person",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "503 Hackney Road",
+    "addressLocality": "London",
+    "postalCode": "E2 9ED",
+    "addressCountry": "GB"
+  }
+};
+
+const combinedSchema = JSON.stringify([localBusinessSchema]);
 ---
 
-<Base title="Private Events Venue East London | The Hackney, E2" description="Host your private celebration at The Hackney. Birthday parties, anniversaries, baby showers, engagement parties. 60 seated, 100 standing. Exclusively yours.">
+<Base title="Private Events Venue East London | Birthdays, Baby Showers | The Hackney, E2" description="Host your private celebration at The Hackney - a restored 1856 brewery on Hackney Road. Birthdays, baby showers, anniversaries, engagement parties. 60 seated, 100 standing. Exclusively yours. All-inclusive packages from £55 per person." schema={combinedSchema} preloadImage="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp">
 
-  <!-- ==================== HERO ==================== -->
+  <!-- ==================== SECTION 1: HERO ==================== -->
   <HeroSection
-    bg="olive"
-    height="compact"
+    bg="image"
+    image="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp"
+    alt="The Hackney main hall set for a celebration with long tables, hanging greenery, Edison bulbs, and skylights"
     heading='Your Celebration.<br>Our Brewery.'
-    cta={{ label: "Check Availability", href: "/check-your-date/?type=private", utm: "private-hero" }}
-    note="Birthdays, anniversaries, baby showers and more"
+    cta={{ label: "Check Availability", href: "/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=hero" }}
+    note="Birthdays, baby showers, anniversaries, engagement parties and more - exclusively yours"
+    height="mid"
+    textGradient={true}
+    position="center bottom"
   />
 
-  <!-- ==================== SOCIAL PROOF BAR ==================== -->
+  <!-- ==================== SECTION 2: SOCIAL PROOF BAR ==================== -->
   <ProofBar stats={[
     { number: "Exclusive Hire", label: "The whole venue, just for you" },
     { number: "In-House Catering", label: "Food, drinks and service included" },
     { number: "60 Seated", label: "Up to 100 standing" },
-    { number: "Hackney Road E2", label: "2 min from Cambridge Heath" }
+    { number: "Hackney Road E2", label: "1 min from Cambridge Heath" }
   ]} />
 
-  <!-- ==================== EVENT TYPES ==================== -->
+  <!-- ==================== SECTION 3: DIRECT CONTACT BAR ==================== -->
+  <!-- Primary conversion path per PRD. Private event buyers close on a call
+       with Hugo, not a multi-step form. WhatsApp + phone prominent and early. -->
+  <Section bg="dark" padding="compact">
+    <div class="contact-bar">
+      <div class="contact-bar-text">
+        <h2>Got a date in mind?</h2>
+        <p>Message Hugo directly. Most celebrations are confirmed within 48 hours.</p>
+      </div>
+      <div class="contact-bar-actions">
+        <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20interested%20in%20hosting%20a%20private%20event%20at%20The%20Hackney.%20Could%20you%20let%20me%20know%20about%20availability%3F" class="btn btn-whatsapp" target="_blank" rel="noopener" data-cta-section="contact-bar-whatsapp">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Hugo
+        </a>
+        <a href="tel:+442079611604" class="btn btn-phone" data-cta-section="contact-bar-phone">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          Call Us
+        </a>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ==================== SECTION 4: EVENTS WE HOST ==================== -->
   <Section bg="light" padding="compact" border="bottom">
     <SectionHeader
       eyebrow="Celebrations"
       heading="Events We Host"
     />
     <div class="event-grid">
-      <div class="event-card">
-        <h3>Private Celebrations</h3>
-        <p>Mark the milestone - whether it is a milestone birthday, anniversary, baby shower or engagement party. A moment made memorable.</p>
+      <div class="event-card fade-in">
+        <h3>Birthday Parties</h3>
+        <p>From intimate 30th dinners to full-scale 50th celebrations. The whole venue is yours for the evening - dinner, dancing, speeches, and a proper party.</p>
       </div>
-      <div class="event-card">
-        <h3>Christmas Parties</h3>
-        <p>Festive gatherings with in-house catering, drinks packages, and space for everyone to celebrate together.</p>
+      <div class="event-card fade-in">
+        <h3>Baby Showers</h3>
+        <p>A bright, beautiful space for celebrating new life. All-inclusive daytime packages with food, drinks, and four hours of exclusive hire. Bring your own decorations and cake.</p>
+      </div>
+      <div class="event-card fade-in">
+        <h3>Gender Reveals</h3>
+        <p>Make the big moment unforgettable. Our Winter Garden skylight floods the space with natural light - perfect for photos. Bottomless packages available.</p>
+      </div>
+      <div class="event-card fade-in">
+        <h3>Anniversaries</h3>
+        <p>Mark the milestone in a setting that matches the occasion. Seated dinners for up to 60 or standing receptions for 100 - with in-house catering and a full bar.</p>
+      </div>
+      <div class="event-card fade-in">
+        <h3>Engagement Parties</h3>
+        <p>Celebrate the next chapter surrounded by everyone who matters. Cocktails, canapes, dancing - or a seated dinner if that is more your style.</p>
       </div>
     </div>
   </Section>
 
-  <!-- ==================== THE SPACE ==================== -->
-  <Section bg="light" padding="compact" border="bottom">
-    <div class="space-grid">
-      <div class="space-text">
-        <SectionHeader
-          eyebrow="The Venue"
-          heading="The Space"
-        />
-        <p>A restored 1856 brewery with character you cannot find elsewhere. Soaring brick walls, skylights flooding the space with natural light, high ceilings for an open feel, and flexible layout that adapts to your celebration.</p>
-        <p>Capacity is 60 seated, 100 standing. The whole venue is exclusively yours - that means no background events, no surprises, just your moment.</p>
-        <div class="space-promise">
-          <p>Our in-house kitchen and bar team mean you get exactly the food, drinks and service you want. No outside caterers, no corkage, no hidden fees. Just one team, one invoice, and a celebration run exactly your way.</p>
-        </div>
+  <!-- ==================== SECTION 5: VALUE PROP / WHAT'S INCLUDED ==================== -->
+  <Section bg="light" border="bottom" id="included">
+    <SectionHeader
+      eyebrow="Why The Hackney"
+      heading="One Venue. Everything Included."
+    />
+    <div class="different-body">
+      <p>We are more than a venue. We are an events team, an in-house kitchen, and a fully stocked bar - all under one roof. You tell us what you are celebrating and we handle the rest. No sourcing caterers, no coordinating suppliers, no hidden invoices.</p>
+      <p>The whole building is exclusively yours. No other events running at the same time, no shared spaces, no background noise. Just your celebration, your guests, your way.</p>
+    </div>
+
+    <IncludedGrid
+      categories={[
+        {
+          title: "Your Space",
+          items: [
+            "Exclusive hire of the entire building",
+            "Flexible layouts - long tables, rounds, standing, or dance floor",
+            "Winter Garden, Lounge, Bar Area, and Covered Terrace",
+            "Professional sound system with Spotify or bring your own DJ"
+          ]
+        },
+        {
+          title: "Food and Drink",
+          items: [
+            "In-house kitchen - menus designed around your celebration",
+            "From grazing tables and canapes to three-course dinners",
+            "Full cocktail bar with signature drinks available",
+            "All dietary needs handled as standard"
+          ]
+        },
+        {
+          title: "On The Day",
+          items: [
+            "Dedicated events manager from planning to breakdown",
+            "Full staffing - bar team, kitchen, front of house",
+            "Set-up and clear-down handled by our team",
+            "No service charge, no hidden extras, one clear price"
+          ]
+        }
+      ]}
+      promise='<strong>The price we quote is the price you pay.</strong> Baby shower packages are all-inclusive per person. Birthday and celebration hires are a simple minimum spend with no venue hire fee. No surprises on the invoice.'
+    />
+  </Section>
+
+  <!-- ==================== SECTION 6: IN-HOUSE EXTRAS ==================== -->
+  <Section bg="light" border="bottom">
+    <SectionHeader
+      eyebrow="Beyond The Venue"
+      heading="More Than Just A Space"
+    />
+    <div class="details-intro">
+      <p>Some clients want everything handled. Others want to bring their own touches. Either way, our team is here to make it easy.</p>
+    </div>
+
+    <div class="details-grid">
+      <div class="details-card">
+        <h3>Styling and Decor</h3>
+        <p>Balloon installations, table centrepieces, photo walls, and full room styling. Our team helps with setup on the day and handles everything afterwards. Bring your own decorator or let us coordinate.</p>
+      </div>
+      <div class="details-card">
+        <h3>Catering Design</h3>
+        <p>Feasting tables, sharing platters, street food, afternoon tea, or a seated dinner. Our kitchen builds your menu around what you love. Dietary needs from vegan to halal, fully covered.</p>
+      </div>
+      <div class="details-card">
+        <h3>Music and Entertainment</h3>
+        <p>Our sound system is built in and connects to any playlist. DJs are welcome. Acoustic live music up to a quartet works beautifully in the space. We handle the sound - you pick the soundtrack.</p>
+      </div>
+    </div>
+
+    <div class="details-cta">
+      <p>Have questions about what we can do for your celebration? Talk to Hugo.</p>
+      <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%20have%20some%20questions%20about%20hosting%20a%20celebration%20at%20The%20Hackney." class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="details-extras-whatsapp">Message Hugo</a>
+    </div>
+  </Section>
+
+  <!-- ==================== SECTION 7: THE SPACE ==================== -->
+  <Section bg="light" border="bottom">
+    <SectionHeader
+      eyebrow="The Venue"
+      heading="Four Spaces. One Venue. Entirely Yours."
+      subtext="A restored 1856 brewery on Hackney Road, East London. Exposed brick, original timber beams, natural skylights, high ceilings - the architecture does the heavy lifting."
+    />
+    <p class="space-intro">Four interconnected areas adapt to your celebration: the Winter Garden for dining and speeches, the Lounge for cocktails and conversation, the Bar Area for drinks and dancing, and the Covered Terrace for fresh air without leaving the venue.</p>
+    <div class="space-capacity">
+      <div class="capacity-stat">
+        <div class="capacity-number">60</div>
+        <div class="capacity-label">Guests seated</div>
+      </div>
+      <div class="capacity-stat">
+        <div class="capacity-number">100</div>
+        <div class="capacity-label">Standing reception</div>
+      </div>
+    </div>
+
+    <div class="space-gallery">
+      <div class="space-image">
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-winter-garden-long-tables-edison-bulbs-symmetrical.webp" data-bg-pos="center center" role="img" aria-label="The Winter Garden at The Hackney set for dinner with symmetrical long tables, Edison bulbs, and pampas grass"></div>
+        <div class="space-image-caption">The Winter Garden - seats up to 60</div>
       </div>
       <div class="space-image">
-        <div class="space-placeholder" role="img" aria-label="Private event setup at The Hackney">Photo coming soon</div>
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-corporate-salmon-canapes-wooden-board.webp" data-bg-pos="center center" role="img" aria-label="Sharing platters and canapes served at The Hackney"></div>
+        <div class="space-image-caption">In-house catering for every occasion</div>
+      </div>
+      <div class="space-image">
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-corporate-covered-terrace-courtyard.webp" data-bg-pos="center center" role="img" aria-label="The covered terrace at The Hackney with festoon lighting and outdoor seating"></div>
+        <div class="space-image-caption">The Covered Terrace</div>
+      </div>
+      <div class="space-image">
+        <div class="space-image-bg lazy-bg" data-bg="/images/hackney-corporate-winter-garden-evening-event.webp" data-bg-pos="center center" role="img" aria-label="The Winter Garden at The Hackney transformed for an evening celebration with atmospheric lighting"></div>
+        <div class="space-image-caption">Day to night, the space transforms</div>
       </div>
     </div>
   </Section>
 
-  <!-- ==================== WHAT'S INCLUDED ==================== -->
-  <Section bg="light" padding="compact" border="bottom">
+  <!-- ==================== PHOTO BREAK: QUOTE ==================== -->
+  <PhotoBreak
+    image="/images/hackney-venue-dinner-long-tables-greenery-edison-bulbs.webp"
+    alt="Long tables with greenery and Edison bulbs set for a celebration at The Hackney"
+    position="center center"
+    quote="It felt far more put together than weddings of friends who paid triple the amount. Absolutely the best day."
+    attribution="Rosemary, November 2024"
+    quotePosition="bottom"
+  />
+
+  <!-- ==================== SECTION 8: PRICING (THE FORK) ==================== -->
+  <!-- Two distinct pricing models side by side: baby showers (per-person packages)
+       and birthdays/celebrations (minimum spend). Source: 2025 brochures.
+       James to review and update if prices have changed for 2026. -->
+  <Section bg="light" border="top" id="pricing">
     <SectionHeader
-      eyebrow="Everything Included"
-      heading="What Is Included"
-    />
-    <div class="included-grid">
-      <div class="included-item">
-        <h3>Your own space</h3>
-        <p>The whole venue, exclusively. No other events, no background noise, the entire brewery is yours to celebrate in.</p>
-      </div>
-      <div class="included-item">
-        <h3>Food and drink</h3>
-        <p>Our chef creates menus to match your celebration. Wine, beer, spirits, soft drinks, or signature cocktails - everything in-house.</p>
-      </div>
-      <div class="included-item">
-        <h3>Full service</h3>
-        <p>Our events manager Eva, bar team, and kitchen team run the day. You relax and celebrate with your guests.</p>
-      </div>
-      <div class="included-item">
-        <h3>Layout and AV</h3>
-        <p>Flexible layouts for dining, dancing or mingling. Projector, screen and sound system available if you need them.</p>
-      </div>
-      <div class="included-item">
-        <h3>No hidden extras</h3>
-        <p>One price quote, one invoice, all-inclusive. No corkage fees, no service charges, no surprises.</p>
-      </div>
-      <div class="included-item">
-        <h3>All-day access</h3>
-        <p>Whether you are doing a tea-time celebration or an all-night party, the space is yours for as long as you need it.</p>
-      </div>
-    </div>
-  </Section>
-
-  <!-- ==================== PRICING ==================== -->
-  <Section bg="light" padding="compact" border="top">
-    <PricingTable
       eyebrow="Investment"
       heading="Pricing"
-      tiers={[
-        { name: "Afternoon", period: "Tea-time celebration", price: "From £2,500", description: "Venue hire + in-house team" },
-        { name: "Full Day", period: "All-day access", price: "From £4,500", description: "Venue hire + in-house team" },
-        { name: "Evening Party", period: "From 6pm", price: "From £3,000", description: "Venue hire + in-house team" }
-      ]}
     />
+
+    <div class="pricing-fork">
+      <!-- BABY SHOWERS -->
+      <div class="pricing-block">
+        <div class="pricing-block-header">
+          <h3>Baby Showers</h3>
+          <p class="pricing-block-subtitle">All-inclusive daytime packages - 4 hours exclusive hire</p>
+        </div>
+
+        <div class="pricing-package">
+          <div class="pricing-package-name">Classic</div>
+          <div class="pricing-package-price">From &pound;55 <span>per person</span></div>
+          <p class="pricing-package-basis">Based on 20 guests</p>
+          <ul class="pricing-package-includes">
+            <li>4 hours exclusive venue hire</li>
+            <li>Afternoon tea - sandwiches, cakes and pastries</li>
+            <li>Unlimited tea, coffee and juices</li>
+            <li>Room hire with your own music</li>
+          </ul>
+        </div>
+
+        <div class="pricing-package">
+          <div class="pricing-package-name">Bottomless</div>
+          <div class="pricing-package-price">From &pound;75 <span>per person</span></div>
+          <p class="pricing-package-basis">Based on 20 guests</p>
+          <ul class="pricing-package-includes">
+            <li>4 hours exclusive venue hire</li>
+            <li>Beautifully presented grazing table</li>
+            <li>90 minutes bottomless prosecco</li>
+            <li>Unlimited tea, coffee and juice</li>
+          </ul>
+        </div>
+
+        <div class="pricing-package">
+          <div class="pricing-package-name">Bottomless Cocktails</div>
+          <div class="pricing-package-price">From &pound;95 <span>per person</span></div>
+          <p class="pricing-package-basis">Minimum 25 guests</p>
+          <ul class="pricing-package-includes">
+            <li>4 hours exclusive venue hire</li>
+            <li>Grazing table and dessert table</li>
+            <li>90 minutes bottomless mocktails and cocktails</li>
+            <li>Premium tableware, printed menus, name cards</li>
+            <li>Dedicated event host</li>
+          </ul>
+        </div>
+
+        <div class="pricing-block-cta">
+          <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20interested%20in%20a%20baby%20shower%20package%20at%20The%20Hackney.%20Could%20you%20tell%20me%20more%3F" class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="pricing-babyshower-whatsapp">Message Hugo About Baby Showers</a>
+        </div>
+      </div>
+
+      <!-- BIRTHDAYS & CELEBRATIONS -->
+      <div class="pricing-block">
+        <div class="pricing-block-header">
+          <h3>Birthdays and Celebrations</h3>
+          <p class="pricing-block-subtitle">Minimum spend, no hire fee - exclusive hire 3pm to 11:30pm</p>
+        </div>
+
+        <div class="pricing-package pricing-package-highlight">
+          <div class="pricing-package-name">Saturday</div>
+          <div class="pricing-package-price">&pound;3,000 <span>minimum spend</span></div>
+          <p class="pricing-package-basis">No venue hire fee</p>
+          <ul class="pricing-package-includes">
+            <li>Exclusive hire of the entire venue</li>
+            <li>All food and bar spend counts towards minimum</li>
+            <li>Up to 100 guests standing</li>
+            <li>Music until 11pm, guests depart by 11:30pm</li>
+          </ul>
+        </div>
+
+        <div class="pricing-package">
+          <div class="pricing-package-name">Sunday to Friday</div>
+          <div class="pricing-package-price">&pound;2,000 <span>minimum spend</span></div>
+          <p class="pricing-package-basis">No venue hire fee</p>
+          <ul class="pricing-package-includes">
+            <li>Exclusive hire of the entire venue</li>
+            <li>All food and bar spend counts towards minimum</li>
+            <li>Up to 100 guests standing</li>
+            <li>Earlier start times available</li>
+          </ul>
+        </div>
+
+        <div class="pricing-minspend-note">
+          <p><strong>How the minimum spend works:</strong> there is no venue hire fee. Everything you and your guests spend on food and drink counts towards the minimum. Most celebrations comfortably reach it.</p>
+        </div>
+
+        <div class="pricing-block-cta">
+          <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20planning%20a%20birthday%20%2F%20celebration%20at%20The%20Hackney.%20Could%20you%20tell%20me%20about%20availability%20and%20pricing%3F" class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="pricing-birthday-whatsapp">Message Hugo About Celebrations</a>
+        </div>
+      </div>
+    </div>
+
     <div class="pricing-note">
-      <p>Indicative pricing. Every celebration is different - get in touch for a tailored quote that matches your budget and your day.</p>
+      <p>Prices may vary by date and guest count. Get in touch with Hugo for a tailored quote that matches your celebration and your budget.</p>
     </div>
   </Section>
 
-  <!-- ==================== FINAL CTA ==================== -->
+  <!-- ==================== PHOTO STRIP ==================== -->
+  <PhotoStrip images={[
+    { src: "/images/hackney-corporate-strip-enfuce-crowd-1.webp", alt: "Guests celebrating at an event at The Hackney" },
+    { src: "/images/hackney-wedding-courtyard-guests-giant-jenga.webp", alt: "Guests playing garden games in the courtyard at The Hackney" },
+    { src: "/images/hackney-corporate-strip-enfuce-crowd-3.webp", alt: "Evening celebration with atmospheric lighting at The Hackney" }
+  ]} />
+
+  <!-- ==================== SECTION 9: HOW IT WORKS ==================== -->
+  <Section bg="light" border="top">
+    <SectionHeader
+      eyebrow="How It Works"
+      heading="From First Message To Celebration Day"
+    />
+
+    <ProcessSteps steps={[
+      {
+        title: "Message Hugo",
+        description: "Send a WhatsApp message or give us a call. Tell us what you are celebrating, roughly how many guests, and when you are thinking. Hugo will get back to you the same day."
+      },
+      {
+        title: "Quick Chat",
+        description: "A five-minute conversation to check availability, talk through what you want, and give you a clear idea of pricing. No forms, no waiting, no back-and-forth emails."
+      },
+      {
+        title: "Visit The Venue",
+        description: "Come and see the space in person. Hugo will walk you through every room and help you picture how your celebration will look and flow. Optional but recommended."
+      },
+      {
+        title: "Confirm and Celebrate",
+        description: "A deposit secures your date. From that moment, your events manager handles every detail - from menu planning to room layout to the last guest leaving."
+      }
+    ]} />
+
+    <div class="section-cta-center">
+      <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27d%20like%20to%20chat%20about%20hosting%20a%20celebration%20at%20The%20Hackney." class="btn btn-primary" target="_blank" rel="noopener" data-cta-section="how-it-works-whatsapp">Start The Conversation</a>
+    </div>
+  </Section>
+
+  <!-- ==================== SECTION 10: FAQ ==================== -->
+  <Section bg="light" border="top" padding="compact">
+    <SectionHeader
+      eyebrow="Before You Get In Touch"
+      heading="What Our Clients Ask"
+    />
+    <FAQ items={faqItems} />
+  </Section>
+
+  <!-- ==================== PHOTO BREAK: BEFORE FINAL CTA ==================== -->
+  <PhotoBreak
+    image="/images/hackney-edison-bulbs-timber-beam-greenery.webp"
+    alt="Edison bulbs hanging from a timber beam with trailing greenery at The Hackney"
+    position="center center"
+  />
+
+  <!-- ==================== SECTION 12: FINAL CTA ==================== -->
   <FinalCTA
-    heading="Ready to book your event?"
-    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+    eyebrow="Your Next Step"
+    heading="Ready To Celebrate?"
+    body="Message Hugo on WhatsApp, call us, or check availability on our live calendar. One conversation to get started."
+    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=final-cta" }}
     whatsapp={true}
+    note="Weekday and daytime dates often available at short notice."
     utmCampaign="private-events"
   />
 
+  <!-- ==================== STICKY MOBILE CONTACT BAR ==================== -->
+  <!-- Always visible on mobile. Tap-to-WhatsApp or tap-to-call. -->
+  <div class="sticky-contact-bar">
+    <a href="https://wa.me/442079611604?text=Hi%20Hugo%2C%20I%27m%20interested%20in%20hosting%20a%20private%20event%20at%20The%20Hackney." class="sticky-contact-btn sticky-contact-whatsapp" target="_blank" rel="noopener" data-cta-section="sticky-whatsapp">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <a href="tel:+442079611604" class="sticky-contact-btn sticky-contact-phone" data-cta-section="sticky-phone">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+      Call
+    </a>
+  </div>
+
   <style>
+    /* ==================== CONTACT BAR ==================== */
+    .contact-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .contact-bar-text h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 500;
+      color: var(--warm-canvas);
+      margin-bottom: 8px;
+    }
+
+    .contact-bar-text p {
+      font-size: 16px;
+      color: rgba(245, 240, 232, 0.75);
+      margin: 0;
+    }
+
+    .contact-bar-actions {
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .btn-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      background: #25D366;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: background 0.2s ease;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .btn-whatsapp:hover {
+      background: #1da851;
+    }
+
+    .btn-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      background: transparent;
+      color: var(--warm-canvas);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(245, 240, 232, 0.3);
+      border-radius: 2px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .btn-phone:hover {
+      border-color: var(--warm-canvas);
+      background: rgba(245, 240, 232, 0.08);
+    }
+
     /* ==================== EVENT TYPES ==================== */
     .event-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 24px;
     }
 
@@ -135,6 +554,7 @@ import FinalCTA from '../components/FinalCTA.astro';
       padding: 28px 24px;
       border: 1px solid rgba(44, 24, 16, 0.1);
       border-top: 3px solid var(--forest-olive);
+      border-radius: 2px;
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
@@ -144,67 +564,382 @@ import FinalCTA from '../components/FinalCTA.astro';
       transform: translateY(-4px);
     }
 
-    .event-card h3 { font-size: 20px; margin-bottom: 12px; color: var(--mid-olive); }
+    .event-card h3 {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--mid-olive);
+    }
+
     .event-card p { font-size: 16px; line-height: 1.6; opacity: 0.85; }
 
+    /* ==================== VALUE PROP ==================== */
+    .different-body {
+      max-width: 760px;
+    }
+
+    .different-body p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .different-body p:last-of-type {
+      margin-bottom: 36px;
+    }
+
+    /* ==================== IN-HOUSE EXTRAS ==================== */
+    .details-intro {
+      max-width: 760px;
+      margin-bottom: 36px;
+    }
+
+    .details-intro p {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .details-card h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(22px, 2.2vw, 28px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--brewery-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--forest-olive);
+    }
+
+    .details-card p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--brewery-dark);
+    }
+
+    .details-cta {
+      background: rgba(44, 24, 16, 0.03);
+      padding: 28px 40px;
+      border-left: 4px solid var(--forest-olive);
+      max-width: 880px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 28px;
+      justify-content: space-between;
+    }
+
+    .details-cta p {
+      font-size: 17px;
+      line-height: 1.6;
+      margin: 0;
+      flex: 1;
+      min-width: 280px;
+    }
+
     /* ==================== THE SPACE ==================== */
-    .space-grid {
+    .space-intro {
+      font-size: 18px;
+      line-height: 1.7;
+      max-width: 760px;
+      margin-bottom: 40px;
+    }
+
+    .space-capacity {
+      display: flex;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .capacity-stat {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .capacity-number {
+      font-family: var(--font-heading);
+      font-size: clamp(40px, 5vw, 56px);
+      font-weight: 500;
+      color: var(--forest-olive);
+      line-height: 1;
+    }
+
+    .capacity-label {
+      font-size: 15px;
+      color: var(--brewery-dark);
+      opacity: 0.7;
+    }
+
+    .space-gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .space-image {
+      position: relative;
+    }
+
+    .space-image-bg {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background-size: cover;
+      background-position: center center;
+      border-radius: 2px;
+    }
+
+    .space-image-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 40px 16px 12px;
+      background: linear-gradient(to top, rgba(44, 24, 16, 0.75), transparent);
+      color: var(--warm-canvas);
+      font-size: 13px;
+      font-family: var(--font-body);
+      border-radius: 0 0 2px 2px;
+    }
+
+    /* ==================== PRICING FORK ==================== */
+    .pricing-fork {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: start;
-    }
-
-    .space-text p { font-size: 17px; line-height: 1.7; margin-bottom: 20px; }
-
-    .space-promise {
-      margin-top: 30px;
-      padding-top: 30px;
-      border-top: 1px solid rgba(44, 24, 16, 0.1);
-    }
-
-    .space-placeholder {
-      width: 100%;
-      aspect-ratio: 4/3;
-      background: var(--brewery-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 14px;
-      font-family: var(--font-body);
-    }
-
-    /* ==================== INCLUDED ==================== */
-    .included-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
       gap: 40px;
+      margin-bottom: 32px;
     }
 
-    .included-item {
-      padding: 28px 24px;
-      border-left: 4px solid var(--forest-olive);
+    .pricing-block {
+      border: 1px solid rgba(44, 24, 16, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
     }
 
-    .included-item h3 { font-size: 20px; margin-bottom: 12px; color: var(--mid-olive); }
-    .included-item p { font-size: 15px; line-height: 1.7; opacity: 0.85; }
+    .pricing-block-header {
+      padding: 28px 28px 20px;
+      border-bottom: 1px solid rgba(44, 24, 16, 0.08);
+    }
 
-    /* ==================== PRICING NOTE ==================== */
+    .pricing-block-header h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 2.5vw, 30px);
+      font-weight: 500;
+      color: var(--brewery-dark);
+      margin-bottom: 8px;
+    }
+
+    .pricing-block-subtitle {
+      font-size: 14px;
+      color: var(--dusty-coral);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0;
+    }
+
+    .pricing-package {
+      padding: 24px 28px;
+      border-bottom: 1px solid rgba(44, 24, 16, 0.06);
+    }
+
+    .pricing-package:last-of-type {
+      border-bottom: none;
+    }
+
+    .pricing-package-name {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--dusty-coral);
+      margin-bottom: 8px;
+    }
+
+    .pricing-package-price {
+      font-family: var(--font-heading);
+      font-size: clamp(26px, 3vw, 34px);
+      font-weight: 500;
+      color: var(--brewery-dark);
+      margin-bottom: 4px;
+    }
+
+    .pricing-package-price span {
+      font-size: 16px;
+      font-family: var(--font-body);
+      font-weight: 400;
+      opacity: 0.6;
+    }
+
+    .pricing-package-basis {
+      font-size: 13px;
+      color: var(--brewery-dark);
+      opacity: 0.6;
+      margin-bottom: 16px;
+    }
+
+    .pricing-package-includes {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .pricing-package-includes li {
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 4px 0 4px 20px;
+      position: relative;
+      color: var(--brewery-dark);
+      opacity: 0.85;
+    }
+
+    .pricing-package-includes li::before {
+      content: '\2713';
+      position: absolute;
+      left: 0;
+      color: var(--forest-olive);
+      font-weight: 600;
+    }
+
+    .pricing-minspend-note {
+      padding: 20px 28px;
+      background: rgba(44, 24, 16, 0.03);
+    }
+
+    .pricing-minspend-note p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .pricing-block-cta {
+      padding: 20px 28px 28px;
+      text-align: center;
+    }
+
     .pricing-note {
       text-align: center;
-      margin-top: 2rem;
       padding: 20px;
       background: rgba(44, 24, 16, 0.03);
     }
 
-    .pricing-note p { font-size: 14px; font-style: italic; opacity: 0.7; }
+    .pricing-note p { font-size: 14px; font-style: italic; opacity: 0.7; margin: 0; }
+
+    /* ==================== PROCESS / HOW IT WORKS CTA ==================== */
+    .section-cta-center {
+      text-align: center;
+      margin-top: 48px;
+    }
+
+    /* ==================== STICKY MOBILE CONTACT BAR ==================== */
+    .sticky-contact-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--brewery-dark);
+      padding: 8px 12px;
+      gap: 8px;
+    }
+
+    .sticky-contact-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sticky-contact-whatsapp {
+      background: #25D366;
+      color: #fff;
+    }
+
+    .sticky-contact-phone {
+      background: transparent;
+      color: var(--warm-canvas);
+      border: 1px solid rgba(245, 240, 232, 0.3);
+    }
 
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
-      .event-grid { grid-template-columns: 1fr; }
-      .space-grid { grid-template-columns: 1fr; gap: 40px; }
-      .included-grid { grid-template-columns: 1fr; gap: 30px; }
+      .contact-bar {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+      }
+
+      .contact-bar-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn-whatsapp, .btn-phone {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .event-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .details-cta {
+        padding: 24px;
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+      }
+
+      .space-gallery {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .pricing-fork {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-contact-bar {
+        display: flex;
+      }
+
+      /* Prevent content from being hidden behind sticky bar */
+      body {
+        padding-bottom: 60px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .space-gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .space-capacity {
+        flex-direction: column;
+        gap: 20px;
+      }
     }
   </style>
 </Base>
