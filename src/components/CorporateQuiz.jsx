@@ -404,6 +404,7 @@ function StepConfirmation({ data }) {
   const isHighValue = ["great","premium"].includes(data.budgetFit);
   const isPhotoFilm = data.eventType === "photo-film";
 
+  const discoveryUrl = `/bookacall/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
   const tourUrl = `/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
 
   return (
@@ -421,7 +422,7 @@ function StepConfirmation({ data }) {
           We're on it{data.firstName ? `, ${data.firstName.split(" ")[0]}` : ""}
         </h2>
         <p className="wq-subtext" style={{ maxWidth: "none", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
-          Look out for an email from <strong style={{ color: "var(--brewery-dark)", opacity: 1 }}>hello@thehackney.co</strong> within 24 hours with a tailored proposal for your event.
+          Look out for an email from <strong style={{ color: "var(--brewery-dark)", opacity: 1 }}>bookings@thehackney.co</strong> within 24 hours with a tailored proposal for your event.
         </p>
       </FadeIn>
 
@@ -432,17 +433,18 @@ function StepConfirmation({ data }) {
             <p>Our Winter Garden is a studio-style space with floor-to-ceiling windows and abundant natural light - ideal for photography and film. We offer half-day and full-day dry hire. Your proposal will cover rates, access times, and everything you need.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
-                href={tourUrl}
+                href={discoveryUrl}
                 className="wq-btn wq-btn--primary"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_discovery_click" })}
+              >
+                Book a Discovery Call
+              </a>
+              <a
+                href={tourUrl}
+                className="wq-btn wq-btn--outline"
                 onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_tour_click" })}
               >
                 Book a Venue Tour
-              </a>
-              <a
-                href="https://wa.me/442079611604"
-                className="wq-btn wq-btn--outline"
-              >
-                Chat on WhatsApp
               </a>
             </div>
           </div>
@@ -456,17 +458,18 @@ function StepConfirmation({ data }) {
             <p>Want to see the space before your proposal arrives? Book a walkthrough with Hugo, our General Manager - he'll show you every corner and talk through how we'd set up your event.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
-                href={tourUrl}
+                href={discoveryUrl}
                 className="wq-btn wq-btn--primary"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_discovery_click" })}
+              >
+                Book a Discovery Call
+              </a>
+              <a
+                href={tourUrl}
+                className="wq-btn wq-btn--outline"
                 onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_tour_click" })}
               >
                 Book a Venue Tour
-              </a>
-              <a
-                href="https://wa.me/442079611604"
-                className="wq-btn wq-btn--outline"
-              >
-                Chat on WhatsApp
               </a>
             </div>
           </div>
@@ -481,17 +484,18 @@ function StepConfirmation({ data }) {
             <p>We'll review your requirements and email you a detailed proposal covering venue hire, catering, bar, AV, and pricing - everything in one document. If you'd like to see the space in person, you can book a tour with Hugo.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
+                href={discoveryUrl}
+                className="wq-btn wq-btn--outline"
+                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_discovery_click" })}
+              >
+                Book a Discovery Call
+              </a>
+              <a
                 href={tourUrl}
                 className="wq-btn wq-btn--outline"
                 onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_tour_click" })}
               >
                 Book a Venue Tour
-              </a>
-              <a
-                href="https://wa.me/442079611604"
-                className="wq-btn wq-btn--outline"
-              >
-                Chat on WhatsApp
               </a>
             </div>
           </div>
