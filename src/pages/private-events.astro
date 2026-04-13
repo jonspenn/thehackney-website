@@ -232,10 +232,10 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
   <Section bg="light" border="bottom">
     <SectionHeader
       eyebrow="The Venue"
-      heading="Four Spaces. One Venue. Entirely Yours."
-      subtext="A restored 1856 brewery on Hackney Road, East London. Exposed brick, original timber beams, natural skylights, high ceilings - the architecture does the heavy lifting."
+      heading="An 1856 Brewery. Entirely Yours."
+      subtext="The Hackney is a converted Victorian brewery on Hackney Road in East London - exposed brick, original timber beams, and industrial character that sets the scene without needing to dress it up."
     />
-    <p class="space-intro">Four interconnected areas adapt to your celebration: the Winter Garden for dining and speeches, the Lounge for cocktails and conversation, the Bar Area for drinks and dancing, and the Covered Terrace for fresh air without leaving the venue.</p>
+    <p class="space-intro">The venue is yours exclusively. No shared spaces, no other events running alongside yours. Four interconnected areas adapt to your celebration: the Winter Garden for dining, the Lounge for cocktails, the Bar Area for drinks and dancing, and the Covered Terrace for fresh air without leaving the venue.</p>
     <div class="space-capacity">
       <div class="capacity-stat">
         <div class="capacity-number">60</div>
@@ -244,17 +244,18 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       <div class="capacity-stat">
         <div class="capacity-number">100</div>
         <div class="capacity-label">Standing reception</div>
+        <div class="capacity-note">A little more for the right event. Just ask.</div>
       </div>
     </div>
 
     <div class="space-gallery">
       <div class="space-image">
         <div class="space-image-bg lazy-bg" data-bg="/images/hackney-private-events-winter-garden-dinner-setup.webp" data-bg-pos="center center" role="img" aria-label="The Winter Garden at The Hackney set for dinner with long tables, Edison bulbs, and greenery"></div>
-        <div class="space-image-caption">Seats up to 60, up to 100 standing</div>
+        <div class="space-image-caption">The Winter Garden</div>
       </div>
       <div class="space-image">
         <div class="space-image-bg lazy-bg" data-bg="/images/hackney-private-events-canapes-rustic-board.webp" data-bg-pos="center center" role="img" aria-label="Canapés served on a rustic wooden board at The Hackney"></div>
-        <div class="space-image-caption">In-house catering for every occasion</div>
+        <div class="space-image-caption">In-house catering</div>
       </div>
       <div class="space-image">
         <div class="space-image-bg lazy-bg" data-bg="/images/hackney-private-events-terrace-friends-sunshine.webp" data-bg-pos="center center" role="img" aria-label="Friends enjoying drinks on the covered terrace at The Hackney"></div>
@@ -262,7 +263,18 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       </div>
       <div class="space-image">
         <div class="space-image-bg lazy-bg" data-bg="/images/hackney-private-events-dancefloor-party.webp" data-bg-pos="center center" role="img" aria-label="Guests dancing with pink lighting at The Hackney"></div>
-        <div class="space-image-caption">Day to night, the space transforms</div>
+        <div class="space-image-caption">Day to night</div>
+      </div>
+    </div>
+
+    <div class="space-features">
+      <div class="space-feature">
+        <h3>Your Music, Your Way</h3>
+        <p>Our professional sound and lighting system is built into the venue - no need to hire external AV. Run your own Spotify playlist, bring a DJ, or book acoustic musicians. Music runs until 11pm, with guests departing by 11:30pm.</p>
+      </div>
+      <div class="space-feature">
+        <h3>Everything Handled</h3>
+        <p>Your dedicated events manager handles every detail from menu planning to room layout. In-house catering, a full bar team, and all the furniture and tableware you need - nothing to source, nothing to coordinate.</p>
       </div>
     </div>
   </Section>
@@ -591,65 +603,123 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .space-intro {
       font-size: 18px;
       line-height: 1.7;
-      max-width: 760px;
-      margin-bottom: 40px;
+      max-width: 700px;
+      margin-bottom: 12px;
     }
 
     .space-capacity {
       display: flex;
-      gap: 48px;
-      margin-bottom: 48px;
+      gap: 64px;
+      align-items: flex-start;
+      margin-top: 28px;
+      margin-bottom: 56px;
+      padding: 32px 0;
+      border-top: 1px solid rgba(44, 24, 16, 0.12);
+      border-bottom: 1px solid rgba(44, 24, 16, 0.12);
     }
 
     .capacity-stat {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
+      flex: 0 1 auto;
+      min-width: 0;
     }
 
     .capacity-number {
       font-family: var(--font-heading);
-      font-size: clamp(40px, 5vw, 56px);
-      font-weight: 500;
-      color: var(--forest-olive);
+      font-size: clamp(64px, 9vw, 96px);
+      font-weight: 600;
       line-height: 1;
+      color: var(--forest-olive);
+      margin-bottom: 10px;
     }
 
     .capacity-label {
-      font-size: 15px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
       color: var(--brewery-dark);
-      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+
+    .capacity-note {
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--brewery-dark);
+      opacity: 0.6;
+      font-style: italic;
+      max-width: 240px;
     }
 
     .space-gallery {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 16px;
+      margin-bottom: 48px;
     }
 
     .space-image {
       position: relative;
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      border: 1px solid rgba(44, 24, 16, 0.08);
     }
 
     .space-image-bg {
       width: 100%;
-      aspect-ratio: 3/4;
-      background-size: cover;
-      background-position: center center;
-      border-radius: 2px;
+      height: 100%;
     }
 
-    .space-image-caption {
+    .space-image:nth-child(1) .space-image-bg { background-color: #3D2117; }
+    .space-image:nth-child(2) .space-image-bg { background-color: var(--forest-olive); }
+    .space-image:nth-child(3) .space-image-bg { background-color: #4A3228; }
+    .space-image:nth-child(4) .space-image-bg { background-color: #5C3A1E; }
+
+    .space-image::after {
+      content: '';
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 40px 16px 12px;
-      background: linear-gradient(to top, rgba(44, 24, 16, 0.75), transparent);
-      color: var(--warm-canvas);
+      height: 50%;
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%);
+      pointer-events: none;
+    }
+
+    .space-image-caption {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      color: #fff;
       font-size: 13px;
       font-family: var(--font-body);
-      border-radius: 0 0 2px 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      z-index: 1;
+    }
+
+    .space-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 800px;
+    }
+
+    .space-feature h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 2.4vw, 30px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--brewery-dark);
+      margin-bottom: 14px;
+    }
+
+    .space-feature p {
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.85;
     }
 
     /* ==================== PRICING FORK ==================== */
@@ -858,7 +928,17 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       }
 
       .space-gallery {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+      }
+
+      .space-features {
+        grid-template-columns: 1fr;
+      }
+
+      .space-capacity {
+        flex-direction: column;
+        gap: 12px;
+        padding: 24px 0;
       }
 
       .pricing-fork {
@@ -876,13 +956,8 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     @media (max-width: 480px) {
-      .space-gallery {
-        grid-template-columns: 1fr;
-      }
-
-      .space-capacity {
-        flex-direction: column;
-        gap: 20px;
+      .pricing-package-includes li {
+        font-size: 14px;
       }
     }
   </style>
