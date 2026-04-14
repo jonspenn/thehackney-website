@@ -45,8 +45,16 @@ const VALID_FORM_TYPES = [
 const LEAD_TYPE_MAP = {
   "wedding-quiz": "wedding",
   "corporate-quiz": "corporate",
-  "brochure-download": "wedding",
   "supperclub-signup": "supperclub",
+  // brochure-download is handled dynamically below based on brochure_type
+};
+
+const BROCHURE_LEAD_TYPE = {
+  wedding: "wedding",
+  corporate: "corporate",
+  "private-events": "private-events",
+  "supper-club": "supperclub",
+  "cafe-bar": "cafe-bar",
 };
 
 function isValidEmail(str) {
@@ -120,7 +128,14 @@ export async function onRequestPost(context) {
   const lastName = safeStr(body.last_name, 100);
   const phone = safeStr(body.phone, 30);
   const company = safeStr(body.company, 200);
-  const leadType = LEAD_TYPE_MAP[formType] || "unknown";
+  // Resolve lead type - brochure downloads use brochure_type to determine lead type
+  let leadType;
+  if (formType === "brochure-download") {
+    const bt = body.form_data?.brochure_type;
+    leadType = (bt && BROCHURE_LEAD_TYPE[bt]) || "wedding";
+  } else {
+    leadType = LEAD_TYPE_MAP[formType] || "unknown";
+  }
   const formData = body.form_data ? JSON.stringify(body.form_data) : null;
   const visitorId = getCookie(request, "thk_vid") || null;
   const referrer = safeStr(request.headers.get("referer"), 500);

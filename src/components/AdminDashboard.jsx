@@ -234,10 +234,11 @@ export default function AdminDashboard() {
   const [tracking, setTracking] = useState(null);
   const [clicks, setClicks] = useState(null);
   const [contacts, setContacts] = useState(null);
-  const [weddingLeads, setWeddingLeads] = useState(null);
+  const [leads, setLeads] = useState({}); // keyed by lead type: { wedding: {...}, corporate: {...}, ... }
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [activeLeadType, setActiveLeadType] = useState("wedding");
   const [leadSort, setLeadSort] = useState({ field: "created_at", dir: "desc" });
 
   async function load() {
@@ -260,11 +261,19 @@ export default function AdminDashboard() {
         const ctJson = await ctRes.json();
         if (ctJson.ok) setContacts(ctJson);
       }
-      const wlRes = await fetch("/api/wedding-leads", { cache: "no-store" }).catch(() => null);
-      if (wlRes && wlRes.ok) {
-        const wlJson = await wlRes.json();
-        if (wlJson.ok) setWeddingLeads(wlJson);
+      // Fetch leads for all revenue streams in parallel
+      const leadTypes = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
+      const leadResults = await Promise.all(
+        leadTypes.map(t => fetch(`/api/leads?type=${t}`, { cache: "no-store" }).catch(() => null))
+      );
+      const leadsData = {};
+      for (let i = 0; i < leadTypes.length; i++) {
+        if (leadResults[i] && leadResults[i].ok) {
+          const lj = await leadResults[i].json();
+          if (lj.ok) leadsData[leadTypes[i]] = lj;
+        }
       }
+      setLeads(leadsData);
     } catch (err) {
       setError(err.message || "Failed to load");
     } finally {
@@ -300,10 +309,11 @@ export default function AdminDashboard() {
   }, [clicks]);
   const dowMax = useMemo(() => Math.max(1, ...dowSorted.map((d) => d.count)), [dowSorted]);
 
-  /* ── sorted wedding leads (must be above early returns - hooks can't be conditional) ── */
+  /* ── sorted leads for active lead type (must be above early returns - hooks can't be conditional) ── */
+  const currentLeads = leads[activeLeadType];
   const sortedLeads = useMemo(() => {
-    if (!weddingLeads?.leads) return [];
-    const arr = [...weddingLeads.leads];
+    if (!currentLeads?.leads) return [];
+    const arr = [...currentLeads.leads];
     const { field, dir } = leadSort;
     arr.sort((a, b) => {
       let va = a[field], vb = b[field];
@@ -320,7 +330,7 @@ export default function AdminDashboard() {
       return 0;
     });
     return arr;
-  }, [weddingLeads, leadSort]);
+  }, [currentLeads, leadSort]);
 
   function toggleSort(field) {
     setLeadSort(prev =>
@@ -348,11 +358,22 @@ export default function AdminDashboard() {
   const t = tracking?.totals || {};
   const c = clicks?.totals || {};
 
+  const LEAD_TABS = [
+    { type: "wedding", label: "Wedding" },
+    { type: "corporate", label: "Corporate" },
+    { type: "supperclub", label: "Supper Club" },
+    { type: "private-events", label: "Private Events" },
+    { type: "cafe-bar", label: "Cafe-Bar" },
+  ];
+
+  // Total leads across all types for the tab badge
+  const totalLeadsCount = LEAD_TABS.reduce((sum, lt) => sum + (leads[lt.type]?.total || 0), 0);
+
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "visitors", label: "Visitors" },
     { id: "contacts", label: "Contacts" },
-    { id: "wedding-leads", label: "Wedding Leads" },
+    { id: "leads", label: `Leads (${totalLeadsCount})` },
     { id: "dates", label: "Date Clicks" },
     { id: "events", label: "Events" },
   ];
@@ -735,16 +756,39 @@ export default function AdminDashboard() {
         </>
       )}
 
-      {/* ═══════ WEDDING LEADS TAB ═══════ */}
-      {activeTab === "wedding-leads" && (
+      {/* ═══════ LEADS TAB (all revenue streams) ═══════ */}
+      {activeTab === "leads" && (
         <>
+          {/* Lead type sub-tabs */}
+          <div className="adm-subtabs">
+            {LEAD_TABS.map((lt) => (
+              <button
+                key={lt.type}
+                className={`adm-subtab${activeLeadType === lt.type ? " adm-subtab--active" : ""}`}
+                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "created_at", dir: "desc" }); }}
+                type="button"
+              >
+                {lt.label}
+                {(leads[lt.type]?.total || 0) > 0 && (
+                  <span className="adm-subtab__count">{leads[lt.type].total}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
           {/* KPIs */}
           <div className="rep-totals" style={{ marginBottom: "12px" }}>
             <div className="rep-stat">
-              <div className="rep-stat__num">{weddingLeads?.total || 0}</div>
-              <div className="rep-stat__label">Total wedding leads</div>
+              <div className="rep-stat__num">{currentLeads?.total || 0}</div>
+              <div className="rep-stat__label">Total {currentLeads?.lead_type_label || activeLeadType} leads</div>
             </div>
-            {(weddingLeads?.summary?.by_urgency || []).filter(u => u.label === "Ready to book" || u.label === "Need to move fast").map(u => (
+            {currentLeads?.summary?.cross_sell_count > 0 && (
+              <div className="rep-stat rep-stat--today">
+                <div className="rep-stat__num">{currentLeads.summary.cross_sell_count}</div>
+                <div className="rep-stat__label">Also interested in other services</div>
+              </div>
+            )}
+            {activeLeadType === "wedding" && (currentLeads?.summary?.by_urgency || []).filter(u => u.label === "Ready to book" || u.label === "Need to move fast").map(u => (
               <div key={u.label} className="rep-stat rep-stat--today">
                 <div className="rep-stat__num">{u.count}</div>
                 <div className="rep-stat__label">{u.label}</div>
@@ -752,64 +796,105 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Summary breakdowns */}
-          <div className="rep-two-col">
-            <section className="rep-section" style={{ marginTop: "24px" }}>
-              <h2 className="rep-h2">By urgency</h2>
-              {(weddingLeads?.summary?.by_urgency || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                <ol className="rep-toplist">
-                  {weddingLeads.summary.by_urgency.map((row, i) => (
-                    <li key={row.label} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.label}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (weddingLeads.summary.by_urgency[0]?.count || 1)) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.count}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-            <section className="rep-section" style={{ marginTop: "24px" }}>
-              <h2 className="rep-h2">By budget</h2>
-              {(weddingLeads?.summary?.by_budget || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                <ol className="rep-toplist">
-                  {weddingLeads.summary.by_budget.map((row, i) => (
-                    <li key={row.label} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.label}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (weddingLeads.summary.by_budget[0]?.count || 1)) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.count}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-          </div>
+          {/* ── Wedding summaries ── */}
+          {activeLeadType === "wedding" && (
+            <>
+              <div className="rep-two-col">
+                <section className="rep-section" style={{ marginTop: "24px" }}>
+                  <h2 className="rep-h2">By urgency</h2>
+                  {(currentLeads?.summary?.by_urgency || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                    <ol className="rep-toplist">
+                      {currentLeads.summary.by_urgency.map((row, i) => (
+                        <li key={row.label} className="rep-toprow rep-toprow--compact">
+                          <span className="rep-toprank">{i + 1}</span>
+                          <span className="rep-topdate">{row.label}</span>
+                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_urgency[0]?.count || 1)) * 100}%` }} /></span>
+                          <span className="rep-topcount">{row.count}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </section>
+                <section className="rep-section" style={{ marginTop: "24px" }}>
+                  <h2 className="rep-h2">By budget</h2>
+                  {(currentLeads?.summary?.by_budget || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                    <ol className="rep-toplist">
+                      {currentLeads.summary.by_budget.map((row, i) => (
+                        <li key={row.label} className="rep-toprow rep-toprow--compact">
+                          <span className="rep-toprank">{i + 1}</span>
+                          <span className="rep-topdate">{row.label}</span>
+                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_budget[0]?.count || 1)) * 100}%` }} /></span>
+                          <span className="rep-topcount">{row.count}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </section>
+              </div>
+              <div className="rep-two-col">
+                <section className="rep-section">
+                  <h2 className="rep-h2">By wedding year</h2>
+                  {(currentLeads?.summary?.by_year || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                    <ol className="rep-toplist">
+                      {currentLeads.summary.by_year.map((row, i) => (
+                        <li key={row.label} className="rep-toprow rep-toprow--compact">
+                          <span className="rep-toprank">{i + 1}</span>
+                          <span className="rep-topdate">{row.label}</span>
+                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_year[0]?.count || 1)) * 100}%` }} /></span>
+                          <span className="rep-topcount">{row.count}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </section>
+                <section className="rep-section" />
+              </div>
+            </>
+          )}
 
-          <div className="rep-two-col">
-            <section className="rep-section">
-              <h2 className="rep-h2">By wedding year</h2>
-              {(weddingLeads?.summary?.by_year || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                <ol className="rep-toplist">
-                  {weddingLeads.summary.by_year.map((row, i) => (
-                    <li key={row.label} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.label}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (weddingLeads.summary.by_year[0]?.count || 1)) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.count}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-            <section className="rep-section" />
-          </div>
+          {/* ── Corporate summaries ── */}
+          {activeLeadType === "corporate" && (
+            <div className="rep-two-col">
+              <section className="rep-section" style={{ marginTop: "24px" }}>
+                <h2 className="rep-h2">By event type</h2>
+                {(currentLeads?.summary?.by_event_type || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                  <ol className="rep-toplist">
+                    {currentLeads.summary.by_event_type.map((row, i) => (
+                      <li key={row.label} className="rep-toprow rep-toprow--compact">
+                        <span className="rep-toprank">{i + 1}</span>
+                        <span className="rep-topdate">{row.label}</span>
+                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_event_type[0]?.count || 1)) * 100}%` }} /></span>
+                        <span className="rep-topcount">{row.count}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+              <section className="rep-section" style={{ marginTop: "24px" }}>
+                <h2 className="rep-h2">By guest count</h2>
+                {(currentLeads?.summary?.by_guest_count || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                  <ol className="rep-toplist">
+                    {currentLeads.summary.by_guest_count.map((row, i) => (
+                      <li key={row.label} className="rep-toprow rep-toprow--compact">
+                        <span className="rep-toprank">{i + 1}</span>
+                        <span className="rep-topdate">{row.label}</span>
+                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_guest_count[0]?.count || 1)) * 100}%` }} /></span>
+                        <span className="rep-topcount">{row.count}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+            </div>
+          )}
 
-          {/* Sortable leads table */}
+          {/* ── Leads table (adapts columns per type) ── */}
           <section className="rep-section">
-            <h2 className="rep-h2">All wedding leads</h2>
-            <p className="rep-sub">Click any column header to sort. Hottest leads sort to the top.</p>
-            {sortedLeads.length === 0 ? <p className="rep-empty-small">No wedding leads yet. Quiz and brochure submissions will appear here.</p> : (
+            <h2 className="rep-h2">All {currentLeads?.lead_type_label || activeLeadType} leads</h2>
+            <p className="rep-sub">Click column headers to sort. Cross-sell badges show interest in other services.</p>
+            {sortedLeads.length === 0 ? (
+              <p className="rep-empty-small">No {currentLeads?.lead_type_label?.toLowerCase() || activeLeadType} leads yet. Form submissions will appear here.</p>
+            ) : (
               <div className="rep-table-wrap">
                 <table className="rep-table rep-table--sortable">
                   <thead>
@@ -818,12 +903,16 @@ export default function AdminDashboard() {
                       <th>Name</th>
                       <th>Email</th>
                       <th>Phone</th>
-                      <th onClick={() => toggleSort("wedding_year")} style={{ cursor: "pointer" }}>Year{sortIndicator("wedding_year")}</th>
-                      <th onClick={() => toggleSort("wedding_month")} style={{ cursor: "pointer" }}>Month{sortIndicator("wedding_month")}</th>
-                      <th onClick={() => toggleSort("urgency")} style={{ cursor: "pointer" }}>Urgency{sortIndicator("urgency")}</th>
-                      <th onClick={() => toggleSort("guest_count")} style={{ cursor: "pointer" }}>Guests{sortIndicator("guest_count")}</th>
-                      <th onClick={() => toggleSort("budget")} style={{ cursor: "pointer" }}>Budget{sortIndicator("budget")}</th>
+                      {activeLeadType === "corporate" && <th>Company</th>}
+                      {activeLeadType === "wedding" && <th onClick={() => toggleSort("wedding_year")} style={{ cursor: "pointer" }}>Year{sortIndicator("wedding_year")}</th>}
+                      {activeLeadType === "wedding" && <th onClick={() => toggleSort("wedding_month")} style={{ cursor: "pointer" }}>Month{sortIndicator("wedding_month")}</th>}
+                      {(activeLeadType === "corporate") && <th onClick={() => toggleSort("event_type")} style={{ cursor: "pointer" }}>Event type{sortIndicator("event_type")}</th>}
+                      {(activeLeadType === "corporate" || activeLeadType === "wedding") && <th onClick={() => toggleSort("guest_count")} style={{ cursor: "pointer" }}>Guests{sortIndicator("guest_count")}</th>}
+                      {activeLeadType === "corporate" && <th onClick={() => toggleSort("event_date")} style={{ cursor: "pointer" }}>Date{sortIndicator("event_date")}</th>}
+                      {activeLeadType === "wedding" && <th onClick={() => toggleSort("urgency")} style={{ cursor: "pointer" }}>Urgency{sortIndicator("urgency")}</th>}
+                      {activeLeadType === "wedding" && <th onClick={() => toggleSort("budget")} style={{ cursor: "pointer" }}>Budget{sortIndicator("budget")}</th>}
                       <th>Source</th>
+                      <th>Also interested in</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -833,24 +922,42 @@ export default function AdminDashboard() {
                         <td>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
                         <td>{lead.email}</td>
                         <td>{lead.phone || "\u2014"}</td>
-                        <td>{lead.wedding_year || "\u2014"}</td>
-                        <td>{lead.wedding_month || "\u2014"}</td>
-                        <td>
-                          {lead.urgency_label ? (
-                            <span className={`rep-urgency rep-urgency--${lead.urgency || "unknown"}`}>
-                              {lead.urgency_label}
-                            </span>
-                          ) : "\u2014"}
-                        </td>
-                        <td>{lead.guest_count || "\u2014"}</td>
-                        <td>
-                          {lead.budget_label ? (
-                            <span className={`rep-budget rep-budget--${lead.budget || "unknown"}`}>
-                              {lead.budget_label}
-                            </span>
-                          ) : "\u2014"}
-                        </td>
+                        {activeLeadType === "corporate" && <td>{lead.company || "\u2014"}</td>}
+                        {activeLeadType === "wedding" && <td>{lead.wedding_year || "\u2014"}</td>}
+                        {activeLeadType === "wedding" && <td>{lead.wedding_month || "\u2014"}</td>}
+                        {activeLeadType === "corporate" && (
+                          <td>{lead.event_type_label || "\u2014"}</td>
+                        )}
+                        {(activeLeadType === "corporate" || activeLeadType === "wedding") && <td>{lead.guest_count || "\u2014"}</td>}
+                        {activeLeadType === "corporate" && <td>{lead.event_date || "\u2014"}</td>}
+                        {activeLeadType === "wedding" && (
+                          <td>
+                            {lead.urgency_label ? (
+                              <span className={`rep-urgency rep-urgency--${lead.urgency || "unknown"}`}>
+                                {lead.urgency_label}
+                              </span>
+                            ) : "\u2014"}
+                          </td>
+                        )}
+                        {activeLeadType === "wedding" && (
+                          <td>
+                            {lead.budget_label ? (
+                              <span className={`rep-budget rep-budget--${lead.budget || "unknown"}`}>
+                                {lead.budget_label}
+                              </span>
+                            ) : "\u2014"}
+                          </td>
+                        )}
                         <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
+                        <td>
+                          {lead.cross_sell_labels?.length > 0 ? (
+                            <span className="rep-cross-sell">
+                              {lead.cross_sell_labels.map(label => (
+                                <span key={label} className="rep-cross-sell__badge">{label}</span>
+                              ))}
+                            </span>
+                          ) : "\u2014"}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

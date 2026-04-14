@@ -383,6 +383,43 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .rep-budget--5k-10k { background: rgba(191, 114, 86, 0.12); color: #8C472E; }
       .rep-budget--under-5k { background: rgba(44, 24, 16, 0.06); color: rgba(44, 24, 16, 0.55); }
 
+      /* ── Lead type sub-tabs ── */
+      .adm-subtabs {
+        display: flex; gap: 4px; margin-bottom: 20px; padding: 4px;
+        background: rgba(44, 24, 16, 0.04); border-radius: 6px;
+        overflow-x: auto;
+      }
+      .adm-subtab {
+        padding: 8px 16px; border: none; border-radius: 4px;
+        background: transparent; cursor: pointer;
+        font-family: 'DM Sans', sans-serif; font-size: 13px;
+        font-weight: 500; letter-spacing: 0.03em; text-transform: uppercase;
+        color: rgba(44, 24, 16, 0.5); white-space: nowrap;
+        transition: all 0.15s ease;
+      }
+      .adm-subtab:hover { color: rgba(44, 24, 16, 0.8); background: rgba(44, 24, 16, 0.04); }
+      .adm-subtab--active {
+        background: var(--color-warm-canvas, #F5F0E8);
+        color: var(--color-brewery-dark, #2C1810);
+        box-shadow: 0 1px 3px rgba(44, 24, 16, 0.08);
+      }
+      .adm-subtab__count {
+        display: inline-block; margin-left: 6px; padding: 1px 7px;
+        border-radius: 10px; font-size: 11px; font-weight: 600;
+        background: rgba(46, 64, 9, 0.12); color: #2E4009;
+      }
+      .adm-subtab--active .adm-subtab__count {
+        background: rgba(46, 64, 9, 0.18);
+      }
+
+      /* ── Cross-sell badges ── */
+      .rep-cross-sell { display: flex; gap: 4px; flex-wrap: wrap; }
+      .rep-cross-sell__badge {
+        display: inline-block; padding: 2px 8px; border-radius: 10px;
+        font-size: 11px; font-weight: 500; white-space: nowrap;
+        background: rgba(191, 114, 86, 0.12); color: #8C472E;
+      }
+
       @media (max-width: 480px) {
         .rep-shell { padding: 24px 16px 64px; }
         .rep-title { font-size: 32px; }
