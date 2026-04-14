@@ -228,6 +228,120 @@ function heatTextColour(count, max) {
   return ratio > 0.55 ? "var(--color-warm-canvas)" : "var(--color-brewery-dark)";
 }
 
+/* ───────── lead scoring ───────── */
+
+/**
+ * Lead scoring: 0-100 points across 5 dimensions.
+ * Computed client-side from existing lead data - no API changes needed.
+ *
+ * Stage (0-40): Brochure 10 → Quiz 25 → Call 35 → Tour 40
+ * Recency (0-25): days since last activity
+ * Engagement (0-15): sessions + page views + multiple submissions
+ * Date proximity (0-10): months until event date
+ * Revenue potential (0-10): budget + guest count
+ *
+ * Tiers: Hot (60+), Warm (35-59), Cool (15-34), Cold (0-14)
+ * "Dead" override: no activity beyond type-specific threshold + low stage
+ */
+
+const DEAD_DAYS = { wedding: 21, corporate: 14, supperclub: 10, "private-events": 10, "cafe-bar": 10 };
+
+const TIER_CONFIG = {
+  hot:  { label: "Hot",  color: "#8C472E", bg: "rgba(140,71,46,0.08)", border: "#8C472E" },
+  warm: { label: "Warm", color: "#BF7256", bg: "rgba(191,114,86,0.06)", border: "#BF7256" },
+  cool: { label: "Cool", color: "#49590E", bg: "transparent",           border: "#49590E" },
+  cold: { label: "Cold", color: "#999",    bg: "transparent",           border: "#ccc" },
+};
+
+const STAGE_SEQUENCE = ["Brochure", "Quiz", "Call", "Tour"];
+
+function computeLeadScore(lead, leadType) {
+  const now = Date.now();
+
+  /* 1. Stage (0-40) */
+  let stage = 10, stageLabel = "Brochure";
+  if (lead.clicked_venue_tour_at)       { stage = 40; stageLabel = "Tour"; }
+  else if (lead.clicked_discovery_call_at) { stage = 35; stageLabel = "Call"; }
+  else if (lead.form_types?.some(ft => ft.includes("quiz"))) { stage = 25; stageLabel = "Quiz"; }
+
+  /* 2. Recency (0-25) */
+  let recency = 0, daysSinceActivity = 999;
+  const lastAct = lead.last_seen_at || lead.created_at;
+  if (lastAct) {
+    const safe = lastAct.includes("T") ? lastAct : lastAct.replace(" ", "T") + "Z";
+    const d = new Date(safe);
+    if (!Number.isNaN(d.getTime())) {
+      daysSinceActivity = Math.max(0, Math.floor((now - d.getTime()) / 86400000));
+      if (daysSinceActivity <= 1) recency = 25;
+      else if (daysSinceActivity <= 3) recency = 20;
+      else if (daysSinceActivity <= 7) recency = 15;
+      else if (daysSinceActivity <= 14) recency = 10;
+      else if (daysSinceActivity <= 21) recency = 5;
+      else if (daysSinceActivity <= 30) recency = 2;
+    }
+  }
+
+  /* 3. Engagement (0-15) */
+  const sessions = lead.sessions_before_conversion || 0;
+  const pages = lead.total_page_views || 0;
+  let engagement = Math.min(sessions, 5) + Math.min(Math.floor(pages / 3), 5);
+  if (lead.submissions_count > 1) engagement += 5;
+  engagement = Math.min(engagement, 15);
+
+  /* 4. Date proximity (0-10) */
+  let dateProximity = 3; // neutral when unknown
+  if (lead.event_date) {
+    const MONTH_MAP = { january:0, february:1, march:2, april:3, may:4, june:5, july:6, august:7, september:8, october:9, november:10, december:11, jan:0, feb:1, mar:2, apr:3, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 };
+    const parts = lead.event_date.split(" ");
+    if (parts.length === 2) {
+      const m = MONTH_MAP[parts[0].toLowerCase()];
+      const y = parseInt(parts[1], 10);
+      if (m != null && y) {
+        const months = ((y * 12 + m) - (new Date().getFullYear() * 12 + new Date().getMonth()));
+        if (months <= 3) dateProximity = 10;
+        else if (months <= 6) dateProximity = 8;
+        else if (months <= 12) dateProximity = 5;
+        else if (months <= 18) dateProximity = 3;
+        else dateProximity = 1;
+      }
+    }
+  }
+
+  /* 5. Revenue potential (0-10) */
+  const BUDGET_SCORE = { "20k-plus": 5, "10k-20k": 4, "5k-10k": 2, "under-5k": 1 };
+  let revBudget = BUDGET_SCORE[lead.budget] || 2;
+  let revGuests = 2;
+  if (lead.guest_count) {
+    const gMatch = lead.guest_count.match(/(\d+)/);
+    if (gMatch) {
+      const g = parseInt(gMatch[1], 10);
+      if (g >= 80) revGuests = 5; else if (g >= 60) revGuests = 4;
+      else if (g >= 40) revGuests = 3; else if (g >= 20) revGuests = 2;
+      else revGuests = 1;
+    }
+  }
+  const revenue = Math.min(revBudget + revGuests, 10);
+
+  const score = stage + recency + engagement + dateProximity + revenue;
+
+  /* Tier assignment */
+  let tier;
+  if (score >= 60) tier = "hot";
+  else if (score >= 35) tier = "warm";
+  else if (score >= 15) tier = "cool";
+  else tier = "cold";
+
+  /* Dead override: no recent activity + early stage */
+  const deadDays = DEAD_DAYS[leadType] || 21;
+  const isDead = daysSinceActivity > deadDays && stage <= 25;
+  if (isDead) tier = "cold";
+
+  return {
+    score, tier, stageLabel, isDead, daysSinceActivity,
+    breakdown: { stage, recency, engagement, dateProximity, revenue },
+  };
+}
+
 /* ───────── main component ───────── */
 
 export default function AdminDashboard() {
@@ -239,7 +353,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [activeLeadType, setActiveLeadType] = useState("wedding");
-  const [leadSort, setLeadSort] = useState({ field: "created_at", dir: "desc" });
+  const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
+  const [heatFilter, setHeatFilter] = useState("all"); // "all" | "hot" | "warm" | "cool" | "cold"
 
   async function load() {
     setLoading(true);
@@ -309,18 +424,32 @@ export default function AdminDashboard() {
   }, [clicks]);
   const dowMax = useMemo(() => Math.max(1, ...dowSorted.map((d) => d.count)), [dowSorted]);
 
-  /* ── sorted leads for active lead type (must be above early returns - hooks can't be conditional) ── */
+  /* ── scored + sorted leads for active lead type ── */
   const currentLeads = leads[activeLeadType];
-  const sortedLeads = useMemo(() => {
+  const scoredLeads = useMemo(() => {
     if (!currentLeads?.leads) return [];
-    const arr = [...currentLeads.leads];
+    return currentLeads.leads.map(lead => ({
+      ...lead,
+      _score: computeLeadScore(lead, activeLeadType),
+    }));
+  }, [currentLeads, activeLeadType]);
+
+  const heatCounts = useMemo(() => {
+    const counts = { hot: 0, warm: 0, cool: 0, cold: 0 };
+    for (const l of scoredLeads) counts[l._score.tier]++;
+    return counts;
+  }, [scoredLeads]);
+
+  const sortedLeads = useMemo(() => {
+    let arr = [...scoredLeads];
+    if (heatFilter !== "all") arr = arr.filter(l => l._score.tier === heatFilter);
     const { field, dir } = leadSort;
     arr.sort((a, b) => {
       let va = a[field], vb = b[field];
+      if (field === "score") { va = a._score.score; vb = b._score.score; }
       if (field === "urgency") { va = a.urgency_rank; vb = b.urgency_rank; }
       if (field === "budget") { va = a.budget_rank; vb = b.budget_rank; }
       if (field === "event_date") {
-        // Sort "Oct 2027" chronologically: parse year then month
         const MONTH_ORDER = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11, january: 0, february: 1, march: 2, april: 3, june: 5, july: 6, august: 7, september: 8, october: 9, november: 10, december: 11 };
         const parseDate = (d) => { if (!d) return 99999; const p = d.split(" "); const y = parseInt(p[1], 10) || 9999; const m = MONTH_ORDER[(p[0] || "").toLowerCase()] ?? 99; return y * 100 + m; };
         va = parseDate(a.event_date);
@@ -333,7 +462,7 @@ export default function AdminDashboard() {
       return 0;
     });
     return arr;
-  }, [currentLeads, leadSort]);
+  }, [scoredLeads, leadSort, heatFilter]);
 
   function toggleSort(field) {
     setLeadSort(prev =>
@@ -652,7 +781,7 @@ export default function AdminDashboard() {
               <button
                 key={lt.type}
                 className={`adm-subtab${activeLeadType === lt.type ? " adm-subtab--active" : ""}`}
-                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "created_at", dir: "desc" }); }}
+                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); }}
                 type="button"
               >
                 {lt.label}
@@ -683,33 +812,68 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* ── Pipeline funnel ── */}
-          {currentLeads?.summary?.pipeline && (
-            <div className="rep-pipeline" style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-              <div className="rep-pipeline__stage">
-                <div className="rep-stat__num">{currentLeads.summary.pipeline.total_leads}</div>
-                <div className="rep-stat__label">Leads</div>
+          {/* ── Heat distribution bar ── */}
+          {scoredLeads.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              {/* Stacked bar */}
+              <div className="lead-heat-bar">
+                {["hot", "warm", "cool", "cold"].map(tier => {
+                  const count = heatCounts[tier];
+                  if (!count) return null;
+                  const pct = (count / scoredLeads.length) * 100;
+                  return (
+                    <div
+                      key={tier}
+                      className="lead-heat-bar__seg"
+                      style={{ width: `${pct}%`, background: TIER_CONFIG[tier].color }}
+                      title={`${TIER_CONFIG[tier].label}: ${count}`}
+                    />
+                  );
+                })}
               </div>
-              <span style={{ fontSize: "18px", color: "#8C472E" }}>&rarr;</span>
-              <div className="rep-pipeline__stage">
-                <div className="rep-stat__num">{currentLeads.summary.pipeline.clicked_venue_tour}</div>
-                <div className="rep-stat__label">Clicked tour</div>
+              {/* Filter chips */}
+              <div className="lead-heat-chips">
+                <button
+                  className={`lead-heat-chip${heatFilter === "all" ? " lead-heat-chip--active" : ""}`}
+                  onClick={() => setHeatFilter("all")}
+                  type="button"
+                >
+                  All ({scoredLeads.length})
+                </button>
+                {["hot", "warm", "cool", "cold"].map(tier => (
+                  <button
+                    key={tier}
+                    className={`lead-heat-chip${heatFilter === tier ? " lead-heat-chip--active" : ""}`}
+                    style={{ "--chip-color": TIER_CONFIG[tier].color }}
+                    onClick={() => setHeatFilter(heatFilter === tier ? "all" : tier)}
+                    type="button"
+                  >
+                    <span className="lead-heat-chip__dot" style={{ background: TIER_CONFIG[tier].color }} />
+                    {TIER_CONFIG[tier].label} ({heatCounts[tier]})
+                  </button>
+                ))}
               </div>
-              <span style={{ fontSize: "18px", color: "#8C472E" }}>&rarr;</span>
-              <div className="rep-pipeline__stage">
-                <div className="rep-stat__num">{currentLeads.summary.pipeline.clicked_discovery_call}</div>
-                <div className="rep-stat__label">Clicked call</div>
-              </div>
-              {currentLeads.summary.pipeline.clicked_both > 0 && (
-                <span style={{ fontSize: "13px", color: "#2E4009", marginLeft: "4px", fontWeight: 500 }}>
-                  ({currentLeads.summary.pipeline.clicked_both} both)
-                </span>
-              )}
-              <span style={{ fontSize: "14px", color: "#999", marginLeft: "12px" }}>
-                {currentLeads.summary.pipeline.no_action} no action yet
-              </span>
             </div>
           )}
+
+          {/* ── Pipeline stage counts ── */}
+          {scoredLeads.length > 0 && (() => {
+            const stageCounts = { Brochure: 0, Quiz: 0, Call: 0, Tour: 0 };
+            for (const l of scoredLeads) stageCounts[l._score.stageLabel]++;
+            return (
+              <div className="lead-pipeline-bar" style={{ marginBottom: "20px" }}>
+                {STAGE_SEQUENCE.map((s, i) => (
+                  <div key={s} className="lead-pipeline-stage" style={{ flex: Math.max(stageCounts[s], 0.5) }}>
+                    <div className="lead-pipeline-stage__fill" style={{ opacity: stageCounts[s] ? 1 : 0.25 }}>
+                      <span className="lead-pipeline-stage__label">{s}</span>
+                      <span className="lead-pipeline-stage__count">{stageCounts[s]}</span>
+                    </div>
+                    {i < STAGE_SEQUENCE.length - 1 && <span className="lead-pipeline-arrow">{"\u25B6"}</span>}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* ── Wedding summaries ── */}
           {activeLeadType === "wedding" && (
@@ -806,7 +970,7 @@ export default function AdminDashboard() {
           {/* ── Leads table (adapts columns per type) ── */}
           <section className="rep-section">
             <h2 className="rep-h2">All {currentLeads?.lead_type_label || activeLeadType} leads</h2>
-            <p className="rep-sub">Click column headers to sort. Cross-sell badges show interest in other services.</p>
+            <p className="rep-sub">Sorted by lead score. Click headers to re-sort. Left border = heat tier.</p>
             {sortedLeads.length === 0 ? (
               <p className="rep-empty-small">No {currentLeads?.lead_type_label?.toLowerCase() || activeLeadType} leads yet. Form submissions will appear here.</p>
             ) : (
@@ -814,6 +978,8 @@ export default function AdminDashboard() {
                 <table className="rep-table rep-table--sortable">
                   <thead>
                     <tr>
+                      <th onClick={() => toggleSort("score")} style={{ cursor: "pointer", width: "52px" }}>Score{sortIndicator("score")}</th>
+                      <th style={{ width: "80px" }}>Stage</th>
                       <th onClick={() => toggleSort("created_at")} style={{ cursor: "pointer" }}>When{sortIndicator("created_at")}</th>
                       <th>Name</th>
                       <th>Email</th>
@@ -826,72 +992,95 @@ export default function AdminDashboard() {
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("urgency")} style={{ cursor: "pointer" }}>Urgency{sortIndicator("urgency")}</th>}
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("budget")} style={{ cursor: "pointer" }}>Budget{sortIndicator("budget")}</th>}
                       <th>Source</th>
-                      <th>Ad platform</th>
                       <th>Location</th>
-                      <th>Device</th>
                       <th onClick={() => toggleSort("sessions_before_conversion")} style={{ cursor: "pointer" }}>Engagement{sortIndicator("sessions_before_conversion")}</th>
-                      <th>Landing page</th>
-                      <th>Intent</th>
                       <th>Also interested in</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {sortedLeads.map((lead) => (
-                      <tr key={lead.contact_id} className={lead.urgency_rank <= 2 ? "rep-row--hot" : ""}>
-                        <td>{formatRelativeTime(lead.created_at)}</td>
-                        <td>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
-                        <td>{lead.email}</td>
-                        <td>{lead.phone || "\u2014"}</td>
-                        {activeLeadType === "corporate" && <td>{lead.company || "\u2014"}</td>}
-                        {activeLeadType === "wedding" && <td>{lead.event_date || "\u2014"}</td>}
-                        {activeLeadType === "corporate" && (
-                          <td>{lead.event_type_label || "\u2014"}</td>
-                        )}
-                        {(activeLeadType === "corporate" || activeLeadType === "wedding") && <td>{lead.guest_count || "\u2014"}</td>}
-                        {activeLeadType === "corporate" && <td>{lead.event_date || "\u2014"}</td>}
-                        {activeLeadType === "wedding" && (
+                    {sortedLeads.map((lead) => {
+                      const sc = lead._score;
+                      const tc = TIER_CONFIG[sc.tier];
+                      const stageIdx = STAGE_SEQUENCE.indexOf(sc.stageLabel);
+                      return (
+                        <tr
+                          key={lead.contact_id}
+                          className={`lead-row lead-row--${sc.tier}${sc.isDead ? " lead-row--dead" : ""}`}
+                          style={{ borderLeft: `4px solid ${tc.border}`, background: tc.bg }}
+                        >
+                          {/* Score badge */}
                           <td>
-                            {lead.urgency_label ? (
-                              <span className={`rep-urgency rep-urgency--${lead.urgency || "unknown"}`}>
-                                {lead.urgency_label}
-                              </span>
-                            ) : "\u2014"}
-                          </td>
-                        )}
-                        {activeLeadType === "wedding" && (
-                          <td>
-                            {lead.budget_label ? (
-                              <span className={`rep-budget rep-budget--${lead.budget || "unknown"}`}>
-                                {lead.budget_label}
-                              </span>
-                            ) : "\u2014"}
-                          </td>
-                        )}
-                        <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
-                        <td>{lead.ad_platform || "\u2014"}</td>
-                        <td>{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "\u2014"}</td>
-                        <td>{lead.device_type || "\u2014"}</td>
-                        <td>{lead.sessions_before_conversion != null ? `${lead.sessions_before_conversion}s / ${lead.total_page_views || 0}p` : "\u2014"}</td>
-                        <td className="rep-table__ref">{lead.first_landing_page || "\u2014"}</td>
-                        <td>
-                          {(lead.clicked_venue_tour_at || lead.clicked_discovery_call_at) ? (
-                            <span style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-                              {lead.clicked_venue_tour_at && <span className="rep-cross-sell__badge" style={{ background: "#2E4009", color: "#fff" }}>Tour</span>}
-                              {lead.clicked_discovery_call_at && <span className="rep-cross-sell__badge" style={{ background: "#49590E", color: "#fff" }}>Call</span>}
+                            <span
+                              className="lead-score-badge"
+                              style={{ background: tc.color, color: "#fff" }}
+                              title={`Stage ${sc.breakdown.stage} + Recency ${sc.breakdown.recency} + Engagement ${sc.breakdown.engagement} + Date ${sc.breakdown.dateProximity} + Revenue ${sc.breakdown.revenue}`}
+                            >
+                              {sc.score}
                             </span>
-                          ) : "\u2014"}
-                        </td>
-                        <td>
-                          {lead.cross_sell_labels?.length > 0 ? (
-                            <span className="rep-cross-sell">
-                              {lead.cross_sell_labels.map(label => (
-                                <span key={label} className="rep-cross-sell__badge">{label}</span>
+                          </td>
+                          {/* Stage pills */}
+                          <td>
+                            <span className="lead-stage-pills">
+                              {STAGE_SEQUENCE.map((s, i) => (
+                                <span
+                                  key={s}
+                                  className={`lead-stage-pill${i <= stageIdx ? " lead-stage-pill--filled" : ""}`}
+                                  style={i <= stageIdx ? { background: tc.color } : {}}
+                                  title={s}
+                                />
                               ))}
+                              <span className="lead-stage-label">{sc.stageLabel}</span>
                             </span>
-                          ) : "\u2014"}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td>
+                            <span>{formatRelativeTime(lead.created_at)}</span>
+                            {sc.daysSinceActivity > 7 && (
+                              <span className="lead-last-seen">seen {sc.daysSinceActivity}d ago</span>
+                            )}
+                          </td>
+                          <td>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
+                          <td>{lead.email}</td>
+                          <td>{lead.phone || "\u2014"}</td>
+                          {activeLeadType === "corporate" && <td>{lead.company || "\u2014"}</td>}
+                          {activeLeadType === "wedding" && <td>{lead.event_date || "\u2014"}</td>}
+                          {activeLeadType === "corporate" && (
+                            <td>{lead.event_type_label || "\u2014"}</td>
+                          )}
+                          {(activeLeadType === "corporate" || activeLeadType === "wedding") && <td>{lead.guest_count || "\u2014"}</td>}
+                          {activeLeadType === "corporate" && <td>{lead.event_date || "\u2014"}</td>}
+                          {activeLeadType === "wedding" && (
+                            <td>
+                              {lead.urgency_label ? (
+                                <span className={`rep-urgency rep-urgency--${lead.urgency || "unknown"}`}>
+                                  {lead.urgency_label}
+                                </span>
+                              ) : "\u2014"}
+                            </td>
+                          )}
+                          {activeLeadType === "wedding" && (
+                            <td>
+                              {lead.budget_label ? (
+                                <span className={`rep-budget rep-budget--${lead.budget || "unknown"}`}>
+                                  {lead.budget_label}
+                                </span>
+                              ) : "\u2014"}
+                            </td>
+                          )}
+                          <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
+                          <td>{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "\u2014"}</td>
+                          <td>{lead.sessions_before_conversion != null ? `${lead.sessions_before_conversion}s / ${lead.total_page_views || 0}p` : "\u2014"}</td>
+                          <td>
+                            {lead.cross_sell_labels?.length > 0 ? (
+                              <span className="rep-cross-sell">
+                                {lead.cross_sell_labels.map(label => (
+                                  <span key={label} className="rep-cross-sell__badge">{label}</span>
+                                ))}
+                              </span>
+                            ) : "\u2014"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

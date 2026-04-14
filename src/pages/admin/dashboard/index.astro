@@ -420,10 +420,100 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         background: rgba(191, 114, 86, 0.12); color: #8C472E;
       }
 
+      /* ── Lead scoring visuals ── */
+
+      /* Heat distribution bar */
+      .lead-heat-bar {
+        display: flex; height: 8px; border-radius: 4px; overflow: hidden;
+        background: rgba(44,24,16,0.06); margin-bottom: 10px;
+      }
+      .lead-heat-bar__seg { transition: width 0.3s ease; min-width: 2px; }
+
+      /* Heat filter chips */
+      .lead-heat-chips {
+        display: flex; gap: 6px; flex-wrap: wrap;
+      }
+      .lead-heat-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(44,24,16,0.15);
+        background: transparent; color: rgba(44,24,16,0.6);
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+        cursor: pointer; transition: all 0.15s ease;
+      }
+      .lead-heat-chip:hover { border-color: var(--chip-color, rgba(44,24,16,0.3)); color: rgba(44,24,16,0.9); }
+      .lead-heat-chip--active {
+        background: var(--chip-color, #2C1810); color: #fff; border-color: var(--chip-color, #2C1810);
+      }
+      .lead-heat-chip__dot {
+        width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+      }
+      .lead-heat-chip--active .lead-heat-chip__dot { background: #fff !important; }
+
+      /* Pipeline stage bar */
+      .lead-pipeline-bar {
+        display: flex; align-items: center; gap: 0;
+        background: rgba(44,24,16,0.03); border-radius: 6px; overflow: hidden;
+        border: 1px solid rgba(44,24,16,0.08);
+      }
+      .lead-pipeline-stage {
+        display: flex; align-items: center; position: relative;
+      }
+      .lead-pipeline-stage__fill {
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 8px 14px; background: rgba(46,64,9,0.08);
+        transition: opacity 0.2s;
+      }
+      .lead-pipeline-stage:first-child .lead-pipeline-stage__fill { border-radius: 5px 0 0 5px; }
+      .lead-pipeline-stage:last-child .lead-pipeline-stage__fill { border-radius: 0 5px 5px 0; }
+      .lead-pipeline-stage__label {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.05em; color: rgba(44,24,16,0.5);
+      }
+      .lead-pipeline-stage__count {
+        font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700;
+        color: #2E4009;
+      }
+      .lead-pipeline-arrow {
+        font-size: 9px; color: rgba(44,24,16,0.2); margin: 0 -2px; z-index: 1;
+      }
+
+      /* Score badge */
+      .lead-score-badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; border-radius: 50%;
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+        line-height: 1;
+      }
+
+      /* Stage pills (4 dots showing progression) */
+      .lead-stage-pills {
+        display: inline-flex; align-items: center; gap: 3px;
+      }
+      .lead-stage-pill {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: rgba(44,24,16,0.1);
+        transition: background 0.15s;
+      }
+      .lead-stage-pill--filled { /* color set inline */ }
+      .lead-stage-label {
+        font-size: 10px; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.04em; color: rgba(44,24,16,0.5); margin-left: 4px;
+      }
+
+      /* Row styles */
+      .lead-row { transition: background 0.15s; }
+      .lead-row--dead { opacity: 0.5; }
+      .lead-row--dead:hover { opacity: 0.8; }
+      .lead-last-seen {
+        display: block; font-size: 10px; color: rgba(44,24,16,0.4); margin-top: 2px;
+      }
+
       @media (max-width: 480px) {
         .rep-shell { padding: 24px 16px 64px; }
         .rep-title { font-size: 32px; }
         .adm-tab { padding: 8px 12px; font-size: 11px; letter-spacing: 0.06em; }
+        .lead-heat-chips { gap: 4px; }
+        .lead-heat-chip { font-size: 11px; padding: 3px 8px; }
       }
     </style>
   </head>
