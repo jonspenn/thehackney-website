@@ -319,9 +319,12 @@ export default function AdminDashboard() {
       let va = a[field], vb = b[field];
       if (field === "urgency") { va = a.urgency_rank; vb = b.urgency_rank; }
       if (field === "budget") { va = a.budget_rank; vb = b.budget_rank; }
-      if (field === "wedding_year") {
-        va = a.wedding_year ? parseInt(a.wedding_year, 10) : 9999;
-        vb = b.wedding_year ? parseInt(b.wedding_year, 10) : 9999;
+      if (field === "event_date") {
+        // Sort "Oct 2027" chronologically: parse year then month
+        const MONTH_ORDER = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11, january: 0, february: 1, march: 2, april: 3, june: 5, july: 6, august: 7, september: 8, october: 9, november: 10, december: 11 };
+        const parseDate = (d) => { if (!d) return 99999; const p = d.split(" "); const y = parseInt(p[1], 10) || 9999; const m = MONTH_ORDER[(p[0] || "").toLowerCase()] ?? 99; return y * 100 + m; };
+        va = parseDate(a.event_date);
+        vb = parseDate(b.event_date);
       }
       if (va == null) va = dir === "asc" ? "\uffff" : "";
       if (vb == null) vb = dir === "asc" ? "\uffff" : "";
@@ -371,11 +374,8 @@ export default function AdminDashboard() {
 
   const tabs = [
     { id: "overview", label: "Overview" },
-    { id: "visitors", label: "Visitors" },
-    { id: "contacts", label: "Contacts" },
     { id: "leads", label: `Leads (${totalLeadsCount})` },
-    { id: "dates", label: "Date Clicks" },
-    { id: "events", label: "Events" },
+    { id: "analytics", label: "Analytics" },
   ];
 
   return (
@@ -535,9 +535,10 @@ export default function AdminDashboard() {
         </>
       )}
 
-      {/* ═══════ VISITORS TAB ═══════ */}
-      {activeTab === "visitors" && (
+      {/* ═══════ ANALYTICS TAB (Visitors + Date Clicks + Events) ═══════ */}
+      {activeTab === "analytics" && (
         <>
+          <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Visitors</h2>
           <div className="rep-totals">
             <div className="rep-stat">
               <div className="rep-stat__num">{t.totalVisitors || 0}</div>
@@ -633,120 +634,6 @@ export default function AdminDashboard() {
                         <td>{row.total_sessions}</td>
                         <td>{row.total_page_views}</td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        </>
-      )}
-
-      {/* ═══════ CONTACTS TAB ═══════ */}
-      {activeTab === "contacts" && (
-        <>
-          {/* KPIs */}
-          <div className="rep-totals" style={{ marginBottom: "12px" }}>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{contacts?.total_contacts || 0}</div>
-              <div className="rep-stat__label">Total contacts</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{contacts?.total_submissions || 0}</div>
-              <div className="rep-stat__label">Total submissions</div>
-            </div>
-          </div>
-
-          {/* Form type breakdown */}
-          <div className="rep-two-col">
-            <section className="rep-section" style={{ marginTop: "24px" }}>
-              <h2 className="rep-h2">Submissions by form</h2>
-              <p className="rep-sub">Which forms are generating leads.</p>
-              {(contacts?.form_breakdown || []).length === 0 ? <p className="rep-empty-small">No submissions yet.</p> : (
-                <ol className="rep-toplist">
-                  {contacts.form_breakdown.map((row, i) => (
-                    <li key={row.form_type} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{FORM_TYPE_LABELS[row.form_type] || row.form_type}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (contacts.form_breakdown[0]?.count || 1)) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.count}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-            <section className="rep-section" style={{ marginTop: "24px" }}>
-              <h2 className="rep-h2">Contacts by lead type</h2>
-              <p className="rep-sub">Wedding, corporate, supper club breakdown.</p>
-              {(contacts?.lead_breakdown || []).length === 0 ? <p className="rep-empty-small">No contacts yet.</p> : (
-                <ol className="rep-toplist">
-                  {contacts.lead_breakdown.map((row, i) => (
-                    <li key={row.lead_type} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{LEAD_TYPE_LABELS[row.lead_type] || row.lead_type}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (contacts.lead_breakdown[0]?.count || 1)) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.count}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-          </div>
-
-          {/* Recent contacts table */}
-          <section className="rep-section">
-            <h2 className="rep-h2">Recent contacts</h2>
-            <p className="rep-sub">Last 50 contacts captured via forms.</p>
-            {(contacts?.contacts || []).length === 0 ? <p className="rep-empty-small">No contacts yet. Forms will appear here once submitted.</p> : (
-              <div className="rep-table-wrap">
-                <table className="rep-table">
-                  <thead>
-                    <tr><th>When</th><th>Name</th><th>Email</th><th>Phone</th><th>Type</th><th>Source</th></tr>
-                  </thead>
-                  <tbody>
-                    {contacts.contacts.map((row) => (
-                      <tr key={row.contact_id}>
-                        <td>{formatRelativeTime(row.created_at)}</td>
-                        <td>{[row.first_name, row.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
-                        <td>{row.email}</td>
-                        <td>{row.phone || "\u2014"}</td>
-                        <td>
-                          <span className={`rep-event-badge rep-event-badge--${row.lead_type || "unknown"}`}>
-                            {LEAD_TYPE_LABELS[row.lead_type] || row.lead_type || "\u2014"}
-                          </span>
-                        </td>
-                        <td className="rep-table__ref">{row.source_channel || "Direct"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-
-          {/* Recent submissions table */}
-          <section className="rep-section">
-            <h2 className="rep-h2">Recent submissions</h2>
-            <p className="rep-sub">Last 50 form submissions (includes repeat contacts).</p>
-            {(contacts?.submissions || []).length === 0 ? <p className="rep-empty-small">No submissions yet.</p> : (
-              <div className="rep-table-wrap">
-                <table className="rep-table">
-                  <thead>
-                    <tr><th>When</th><th>Form</th><th>Name</th><th>Email</th><th>Data</th></tr>
-                  </thead>
-                  <tbody>
-                    {contacts.submissions.map((row) => (
-                        <tr key={row.submission_id}>
-                          <td>{formatRelativeTime(row.created_at)}</td>
-                          <td>
-                            <span className={`rep-event-badge rep-event-badge--${row.form_type?.split("-")[0] || "form"}`}>
-                              {formLabel(row.form_type, row.form_data)}
-                            </span>
-                          </td>
-                          <td>{row.first_name || "\u2014"}</td>
-                          <td>{row.email || "\u2014"}</td>
-                          <td>{submissionDetails(row)}</td>
-                        </tr>
                     ))}
                   </tbody>
                 </table>
@@ -932,21 +819,17 @@ export default function AdminDashboard() {
                       <th>Email</th>
                       <th>Phone</th>
                       {activeLeadType === "corporate" && <th>Company</th>}
-                      {activeLeadType === "wedding" && <th onClick={() => toggleSort("wedding_year")} style={{ cursor: "pointer" }}>Year{sortIndicator("wedding_year")}</th>}
-                      {activeLeadType === "wedding" && <th onClick={() => toggleSort("wedding_month")} style={{ cursor: "pointer" }}>Month{sortIndicator("wedding_month")}</th>}
+                      {activeLeadType === "wedding" && <th onClick={() => toggleSort("event_date")} style={{ cursor: "pointer" }}>Wedding date{sortIndicator("event_date")}</th>}
                       {(activeLeadType === "corporate") && <th onClick={() => toggleSort("event_type")} style={{ cursor: "pointer" }}>Event type{sortIndicator("event_type")}</th>}
                       {(activeLeadType === "corporate" || activeLeadType === "wedding") && <th onClick={() => toggleSort("guest_count")} style={{ cursor: "pointer" }}>Guests{sortIndicator("guest_count")}</th>}
                       {activeLeadType === "corporate" && <th onClick={() => toggleSort("event_date")} style={{ cursor: "pointer" }}>Date{sortIndicator("event_date")}</th>}
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("urgency")} style={{ cursor: "pointer" }}>Urgency{sortIndicator("urgency")}</th>}
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("budget")} style={{ cursor: "pointer" }}>Budget{sortIndicator("budget")}</th>}
                       <th>Source</th>
-                      <th>Last source</th>
                       <th>Ad platform</th>
                       <th>Location</th>
                       <th>Device</th>
-                      <th onClick={() => toggleSort("sessions_before_conversion")} style={{ cursor: "pointer" }}>Sessions{sortIndicator("sessions_before_conversion")}</th>
-                      <th onClick={() => toggleSort("total_page_views")} style={{ cursor: "pointer" }}>Pages{sortIndicator("total_page_views")}</th>
-                      <th>First seen</th>
+                      <th onClick={() => toggleSort("sessions_before_conversion")} style={{ cursor: "pointer" }}>Engagement{sortIndicator("sessions_before_conversion")}</th>
                       <th>Landing page</th>
                       <th>Intent</th>
                       <th>Also interested in</th>
@@ -960,8 +843,7 @@ export default function AdminDashboard() {
                         <td>{lead.email}</td>
                         <td>{lead.phone || "\u2014"}</td>
                         {activeLeadType === "corporate" && <td>{lead.company || "\u2014"}</td>}
-                        {activeLeadType === "wedding" && <td>{lead.wedding_year || "\u2014"}</td>}
-                        {activeLeadType === "wedding" && <td>{lead.wedding_month || "\u2014"}</td>}
+                        {activeLeadType === "wedding" && <td>{lead.event_date || "\u2014"}</td>}
                         {activeLeadType === "corporate" && (
                           <td>{lead.event_type_label || "\u2014"}</td>
                         )}
@@ -986,13 +868,10 @@ export default function AdminDashboard() {
                           </td>
                         )}
                         <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
-                        <td className="rep-table__ref">{lead.latest_source || "\u2014"}</td>
                         <td>{lead.ad_platform || "\u2014"}</td>
                         <td>{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "\u2014"}</td>
                         <td>{lead.device_type || "\u2014"}</td>
-                        <td>{lead.sessions_before_conversion != null ? lead.sessions_before_conversion : "\u2014"}</td>
-                        <td>{lead.total_page_views != null ? `${lead.total_page_views} (${lead.avg_page_views_per_session || "\u2014"}/s)` : "\u2014"}</td>
-                        <td>{lead.first_seen_at ? formatRelativeTime(lead.first_seen_at) : "\u2014"}</td>
+                        <td>{lead.sessions_before_conversion != null ? `${lead.sessions_before_conversion}s / ${lead.total_page_views || 0}p` : "\u2014"}</td>
                         <td className="rep-table__ref">{lead.first_landing_page || "\u2014"}</td>
                         <td>
                           {(lead.clicked_venue_tour_at || lead.clicked_discovery_call_at) ? (
@@ -1018,12 +897,8 @@ export default function AdminDashboard() {
               </div>
             )}
           </section>
-        </>
-      )}
-
-      {/* ═══════ DATE CLICKS TAB ═══════ */}
-      {activeTab === "dates" && (
-        <>
+          <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
+          <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Date clicks</h2>
           <div className="rep-totals">
             <div className="rep-stat">
               <div className="rep-stat__num">{c.totalClicks || 0}</div>
@@ -1140,12 +1015,8 @@ export default function AdminDashboard() {
               </div>
             )}
           </section>
-        </>
-      )}
-
-      {/* ═══════ EVENTS TAB ═══════ */}
-      {activeTab === "events" && (
-        <>
+          <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
+          <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Events</h2>
           {/* Event type breakdown */}
           <section className="rep-section" style={{ marginTop: "12px" }}>
             <h2 className="rep-h2">Events by type</h2>
