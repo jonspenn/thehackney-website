@@ -355,6 +355,7 @@ export default function AdminDashboard() {
   const [activeLeadType, setActiveLeadType] = useState("wedding");
   const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
   const [heatFilter, setHeatFilter] = useState("all"); // "all" | "hot" | "warm" | "cool" | "cold"
+  const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
 
   async function load() {
     setLoading(true);
@@ -1005,8 +1006,9 @@ export default function AdminDashboard() {
                       return (
                         <tr
                           key={lead.contact_id}
-                          className={`lead-row lead-row--${sc.tier}${sc.isDead ? " lead-row--dead" : ""}`}
-                          style={{ borderLeft: `4px solid ${tc.border}`, background: tc.bg }}
+                          className={`lead-row lead-row--${sc.tier}${sc.isDead ? " lead-row--dead" : ""}${selectedLead?.contact_id === lead.contact_id ? " lead-row--selected" : ""}`}
+                          style={{ borderLeft: `4px solid ${tc.border}`, background: tc.bg, cursor: "pointer" }}
+                          onClick={() => setSelectedLead(lead)}
                         >
                           {/* Score badge */}
                           <td>
@@ -1278,6 +1280,200 @@ export default function AdminDashboard() {
           </section>
         </>
       )}
+
+      {/* ═══════ LEAD PROFILE SLIDE-OUT PANEL ═══════ */}
+      {selectedLead && (() => {
+        const lead = selectedLead;
+        const sc = computeLeadScore(lead, activeLeadType);
+        const tc = TIER_CONFIG[sc.tier];
+        const stageIdx = STAGE_SEQUENCE.indexOf(sc.stageLabel);
+        const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unknown";
+
+        return (
+          <>
+            {/* Backdrop */}
+            <div className="lp-backdrop" onClick={() => setSelectedLead(null)} />
+            {/* Panel */}
+            <div className="lp-panel">
+              {/* Header */}
+              <div className="lp-header">
+                <button className="lp-close" onClick={() => setSelectedLead(null)} type="button">&times;</button>
+                <div className="lp-header__score">
+                  <span className="lead-score-badge" style={{ background: tc.color, color: "#fff", width: 48, height: 48, fontSize: 18 }}>
+                    {sc.score}
+                  </span>
+                  <span className="lp-header__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
+                </div>
+                <h2 className="lp-name">{name}</h2>
+                <div className="lp-stage-bar">
+                  {STAGE_SEQUENCE.map((s, i) => (
+                    <div key={s} className={`lp-stage-step${i <= stageIdx ? " lp-stage-step--active" : ""}`} style={i <= stageIdx ? { borderColor: tc.color, background: i === stageIdx ? tc.color : "transparent", color: i === stageIdx ? "#fff" : tc.color } : {}}>
+                      {s}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Contact details */}
+              <div className="lp-section">
+                <h3 className="lp-section__title">Contact</h3>
+                <div className="lp-detail-grid">
+                  <div className="lp-detail">
+                    <span className="lp-detail__label">Email</span>
+                    <a href={`mailto:${lead.email}`} className="lp-detail__value lp-detail__link">{lead.email}</a>
+                  </div>
+                  <div className="lp-detail">
+                    <span className="lp-detail__label">Phone</span>
+                    {lead.phone ? <a href={`tel:${lead.phone}`} className="lp-detail__value lp-detail__link">{lead.phone}</a> : <span className="lp-detail__value lp-detail__muted">Not provided</span>}
+                  </div>
+                  {lead.company && (
+                    <div className="lp-detail">
+                      <span className="lp-detail__label">Company</span>
+                      <span className="lp-detail__value">{lead.company}</span>
+                    </div>
+                  )}
+                  <div className="lp-detail">
+                    <span className="lp-detail__label">Location</span>
+                    <span className="lp-detail__value">{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "Unknown"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Score breakdown */}
+              <div className="lp-section">
+                <h3 className="lp-section__title">Score breakdown</h3>
+                <div className="lp-score-grid">
+                  {[
+                    { label: "Stage", val: sc.breakdown.stage, max: 40, desc: sc.stageLabel },
+                    { label: "Recency", val: sc.breakdown.recency, max: 25, desc: sc.daysSinceActivity <= 1 ? "Active today" : `${sc.daysSinceActivity}d ago` },
+                    { label: "Engagement", val: sc.breakdown.engagement, max: 15, desc: `${lead.sessions_before_conversion || 0} sessions, ${lead.total_page_views || 0} pages` },
+                    { label: "Date", val: sc.breakdown.dateProximity, max: 10, desc: lead.event_date || "No date" },
+                    { label: "Revenue", val: sc.breakdown.revenue, max: 10, desc: [lead.budget_label, lead.guest_count ? `${lead.guest_count} guests` : null].filter(Boolean).join(", ") || "Unknown" },
+                  ].map(row => (
+                    <div key={row.label} className="lp-score-row">
+                      <span className="lp-score-row__label">{row.label}</span>
+                      <div className="lp-score-row__bar">
+                        <div className="lp-score-row__fill" style={{ width: `${(row.val / row.max) * 100}%`, background: tc.color }} />
+                      </div>
+                      <span className="lp-score-row__val">{row.val}/{row.max}</span>
+                      <span className="lp-score-row__desc">{row.desc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Event / form details */}
+              <div className="lp-section">
+                <h3 className="lp-section__title">Event details</h3>
+                <div className="lp-detail-grid">
+                  {lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Event date</span><span className="lp-detail__value">{lead.event_date}</span></div>}
+                  {lead.event_type_label && <div className="lp-detail"><span className="lp-detail__label">Event type</span><span className="lp-detail__value">{lead.event_type_label}</span></div>}
+                  {lead.guest_count && <div className="lp-detail"><span className="lp-detail__label">Guests</span><span className="lp-detail__value">{lead.guest_count}</span></div>}
+                  {lead.urgency_label && <div className="lp-detail"><span className="lp-detail__label">Urgency</span><span className="lp-detail__value">{lead.urgency_label}</span></div>}
+                  {lead.budget_label && <div className="lp-detail"><span className="lp-detail__label">Budget</span><span className="lp-detail__value">{lead.budget_label}</span></div>}
+                  {lead.wedding_year && !lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Wedding year</span><span className="lp-detail__value">{lead.wedding_year}</span></div>}
+                  {!lead.event_date && !lead.event_type_label && !lead.guest_count && !lead.urgency_label && !lead.budget_label && (
+                    <p className="lp-detail__muted" style={{ gridColumn: "1 / -1" }}>Brochure download only - no questionnaire data yet.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Funnel timeline */}
+              <div className="lp-section">
+                <h3 className="lp-section__title">Funnel timeline</h3>
+                <div className="lp-timeline">
+                  {lead.first_seen_at && (
+                    <div className="lp-timeline__item">
+                      <span className="lp-timeline__dot" />
+                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.first_seen_at)}</span>
+                      <span className="lp-timeline__event">First visited the site</span>
+                      {lead.first_landing_page && <span className="lp-timeline__detail">{lead.first_landing_page}</span>}
+                    </div>
+                  )}
+                  <div className="lp-timeline__item">
+                    <span className="lp-timeline__dot lp-timeline__dot--filled" />
+                    <span className="lp-timeline__time">{formatAbsoluteTime(lead.created_at)}</span>
+                    <span className="lp-timeline__event">
+                      {lead.form_types?.includes("wedding-quiz") ? "Completed wedding questionnaire" :
+                       lead.form_types?.includes("corporate-quiz") ? "Completed corporate questionnaire" :
+                       lead.form_types?.includes("brochure-download") ? "Downloaded brochure" :
+                       lead.form_types?.includes("supperclub-signup") ? "Signed up for supper club" :
+                       "Submitted form"}
+                    </span>
+                  </div>
+                  {lead.submissions_count > 1 && (
+                    <div className="lp-timeline__item">
+                      <span className="lp-timeline__dot lp-timeline__dot--filled" />
+                      <span className="lp-timeline__time" />
+                      <span className="lp-timeline__event">{lead.submissions_count} total form submissions</span>
+                    </div>
+                  )}
+                  {lead.clicked_discovery_call_at && (
+                    <div className="lp-timeline__item">
+                      <span className="lp-timeline__dot lp-timeline__dot--action" />
+                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.clicked_discovery_call_at)}</span>
+                      <span className="lp-timeline__event">Clicked Book a Discovery Call</span>
+                      {lead.clicked_discovery_call_source && <span className="lp-timeline__detail">via {lead.clicked_discovery_call_source}</span>}
+                    </div>
+                  )}
+                  {lead.clicked_venue_tour_at && (
+                    <div className="lp-timeline__item">
+                      <span className="lp-timeline__dot lp-timeline__dot--action" />
+                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.clicked_venue_tour_at)}</span>
+                      <span className="lp-timeline__event">Clicked Book a Venue Tour</span>
+                      {lead.clicked_venue_tour_source && <span className="lp-timeline__detail">via {lead.clicked_venue_tour_source}</span>}
+                    </div>
+                  )}
+                  {lead.last_seen_at && lead.last_seen_at !== lead.first_seen_at && (
+                    <div className="lp-timeline__item">
+                      <span className="lp-timeline__dot" />
+                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.last_seen_at)}</span>
+                      <span className="lp-timeline__event">Last seen on site</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Attribution */}
+              <div className="lp-section">
+                <h3 className="lp-section__title">Attribution</h3>
+                <div className="lp-detail-grid">
+                  <div className="lp-detail"><span className="lp-detail__label">Source</span><span className="lp-detail__value">{lead.source_channel || "Direct"}</span></div>
+                  {lead.source_campaign && <div className="lp-detail"><span className="lp-detail__label">Campaign</span><span className="lp-detail__value">{lead.source_campaign}</span></div>}
+                  {lead.source_keyword && <div className="lp-detail"><span className="lp-detail__label">Keyword</span><span className="lp-detail__value">{lead.source_keyword}</span></div>}
+                  {lead.ad_platform && <div className="lp-detail"><span className="lp-detail__label">Ad platform</span><span className="lp-detail__value">{lead.ad_platform}</span></div>}
+                  {lead.first_landing_page && <div className="lp-detail"><span className="lp-detail__label">Landing page</span><span className="lp-detail__value">{lead.first_landing_page}</span></div>}
+                  {lead.conversion_page && <div className="lp-detail"><span className="lp-detail__label">Conversion page</span><span className="lp-detail__value">{lead.conversion_page}</span></div>}
+                  <div className="lp-detail"><span className="lp-detail__label">Device</span><span className="lp-detail__value">{lead.device_type || "Unknown"}</span></div>
+                  {lead.first_referrer && <div className="lp-detail"><span className="lp-detail__label">Referrer</span><span className="lp-detail__value">{lead.first_referrer}</span></div>}
+                </div>
+              </div>
+
+              {/* Engagement */}
+              <div className="lp-section">
+                <h3 className="lp-section__title">Engagement</h3>
+                <div className="lp-detail-grid">
+                  <div className="lp-detail"><span className="lp-detail__label">Sessions</span><span className="lp-detail__value">{lead.sessions_before_conversion ?? "Unknown"}</span></div>
+                  <div className="lp-detail"><span className="lp-detail__label">Total page views</span><span className="lp-detail__value">{lead.total_page_views ?? "Unknown"}</span></div>
+                  {lead.avg_page_views_per_session != null && <div className="lp-detail"><span className="lp-detail__label">Avg pages/session</span><span className="lp-detail__value">{lead.avg_page_views_per_session}</span></div>}
+                </div>
+              </div>
+
+              {/* Cross-sell */}
+              {lead.cross_sell_labels?.length > 0 && (
+                <div className="lp-section">
+                  <h3 className="lp-section__title">Also interested in</h3>
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    {lead.cross_sell_labels.map(label => (
+                      <span key={label} className="rep-cross-sell__badge">{label}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }
