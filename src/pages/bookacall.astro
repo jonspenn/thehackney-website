@@ -193,11 +193,34 @@ import SectionHeader from '../components/SectionHeader.astro';
         });
       });
 
-      // === Activate tab from URL hash on load ===
+      // === Activate tab from URL hash or ?type= param ===
       var hash = (window.location.hash || '').replace('#', '');
-      if (hash === 'call') {
+      var typeParam = params.get('type');
+      if (hash === 'call' || typeParam === 'discovery-call') {
         activateTab('call');
       }
+
+      // === Booking intent: record returning visitor intent ===
+      // If a known visitor (has thk_vid cookie) lands on this page,
+      // record their booking intent. Catches leads who submitted a form
+      // weeks ago but come back later to book a call or tour.
+      (function() {
+        var match = document.cookie.match(/(?:^|;\s*)thk_vid=([^;]*)/);
+        if (!match) return; // no visitor cookie — anonymous, nothing to record
+
+        // Determine intent from active tab state
+        var intent = (hash === 'call' || typeParam === 'discovery-call') ? 'discovery-call' : 'venue-tour';
+
+        // Determine source from UTM campaign or fallback to page-visit
+        var source = params.get('utm_campaign') || 'page-visit';
+
+        fetch('/api/booking-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ intent: intent, source: source }),
+          keepalive: true
+        }).catch(function() {});
+      })();
     })();
   </script>
 
