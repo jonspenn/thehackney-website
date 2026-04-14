@@ -577,17 +577,12 @@ export default function CorporateQuiz() {
 
   async function handleCaptureSubmit() {
     setSubmitting(true);
-    /* ── PLACEHOLDER: Replace with real endpoint when Klaviyo/Brevo is chosen ── */
-    const payload = {
-      first_name: data.firstName,
-      company: data.company,
-      email: data.email,
-      phone: data.phone,
+
+    const formData = {
       event_type: data.eventType,
       guest_count: data.guests,
       event_date: data.month && data.year ? `${data.month} ${data.year}` : "",
     };
-    console.log("[CorporateQuiz] Capture payload:", payload);
 
     pushDL({
       event: "corporate_quiz_complete",
@@ -595,7 +590,25 @@ export default function CorporateQuiz() {
       quiz_guests: data.guests,
     });
 
-    await new Promise(r => setTimeout(r, 600));
+    try {
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          form_type: "corporate-quiz",
+          email: data.email,
+          first_name: data.firstName,
+          company: data.company,
+          phone: data.phone,
+          form_data: formData,
+        }),
+      });
+      const result = await res.json();
+      console.log("[CorporateQuiz] Submitted:", result);
+    } catch (err) {
+      console.error("[CorporateQuiz] Submit error:", err);
+    }
+
     setSubmitting(false);
     setCompleted(true);
     goNext();

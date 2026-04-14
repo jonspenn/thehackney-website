@@ -125,6 +125,7 @@ function heatTextColour(count, max) {
 export default function AdminDashboard() {
   const [tracking, setTracking] = useState(null);
   const [clicks, setClicks] = useState(null);
+  const [contacts, setContacts] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
@@ -133,9 +134,10 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const [tRes, cRes] = await Promise.all([
+      const [tRes, cRes, ctRes] = await Promise.all([
         fetch("/api/tracking-stats", { cache: "no-store" }),
         fetch("/api/click-stats", { cache: "no-store" }),
+        fetch("/api/contact-stats", { cache: "no-store" }).catch(() => null),
       ]);
       if (!tRes.ok) throw new Error(`Tracking API: HTTP ${tRes.status}`);
       if (!cRes.ok) throw new Error(`Click API: HTTP ${cRes.status}`);
@@ -144,6 +146,10 @@ export default function AdminDashboard() {
       if (cJson.error) throw new Error(cJson.error);
       setTracking(tJson);
       setClicks(cJson);
+      if (ctRes && ctRes.ok) {
+        const ctJson = await ctRes.json();
+        if (ctJson.ok) setContacts(ctJson);
+      }
     } catch (err) {
       setError(err.message || "Failed to load");
     } finally {
@@ -195,6 +201,7 @@ export default function AdminDashboard() {
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "visitors", label: "Visitors" },
+    { id: "contacts", label: "Contacts" },
     { id: "dates", label: "Date Clicks" },
     { id: "events", label: "Events" },
   ];
@@ -455,6 +462,124 @@ export default function AdminDashboard() {
                         <td>{row.total_page_views}</td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </>
+      )}
+
+      {/* ═══════ CONTACTS TAB ═══════ */}
+      {activeTab === "contacts" && (
+        <>
+          {/* KPIs */}
+          <div className="rep-totals" style={{ marginBottom: "12px" }}>
+            <div className="rep-stat">
+              <div className="rep-stat__num">{contacts?.total_contacts || 0}</div>
+              <div className="rep-stat__label">Total contacts</div>
+            </div>
+            <div className="rep-stat">
+              <div className="rep-stat__num">{contacts?.total_submissions || 0}</div>
+              <div className="rep-stat__label">Total submissions</div>
+            </div>
+          </div>
+
+          {/* Form type breakdown */}
+          <div className="rep-two-col">
+            <section className="rep-section" style={{ marginTop: "24px" }}>
+              <h2 className="rep-h2">Submissions by form</h2>
+              <p className="rep-sub">Which forms are generating leads.</p>
+              {(contacts?.form_breakdown || []).length === 0 ? <p className="rep-empty-small">No submissions yet.</p> : (
+                <ol className="rep-toplist">
+                  {contacts.form_breakdown.map((row, i) => (
+                    <li key={row.form_type} className="rep-toprow rep-toprow--compact">
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{row.form_type}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (contacts.form_breakdown[0]?.count || 1)) * 100}%` }} /></span>
+                      <span className="rep-topcount">{row.count}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+            <section className="rep-section" style={{ marginTop: "24px" }}>
+              <h2 className="rep-h2">Contacts by lead type</h2>
+              <p className="rep-sub">Wedding, corporate, supper club breakdown.</p>
+              {(contacts?.lead_breakdown || []).length === 0 ? <p className="rep-empty-small">No contacts yet.</p> : (
+                <ol className="rep-toplist">
+                  {contacts.lead_breakdown.map((row, i) => (
+                    <li key={row.lead_type} className="rep-toprow rep-toprow--compact">
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{row.lead_type}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (contacts.lead_breakdown[0]?.count || 1)) * 100}%` }} /></span>
+                      <span className="rep-topcount">{row.count}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          </div>
+
+          {/* Recent contacts table */}
+          <section className="rep-section">
+            <h2 className="rep-h2">Recent contacts</h2>
+            <p className="rep-sub">Last 50 contacts captured via forms.</p>
+            {(contacts?.contacts || []).length === 0 ? <p className="rep-empty-small">No contacts yet. Forms will appear here once submitted.</p> : (
+              <div className="rep-table-wrap">
+                <table className="rep-table">
+                  <thead>
+                    <tr><th>When</th><th>Name</th><th>Email</th><th>Phone</th><th>Type</th><th>Source</th></tr>
+                  </thead>
+                  <tbody>
+                    {contacts.contacts.map((row) => (
+                      <tr key={row.contact_id}>
+                        <td>{formatRelativeTime(row.created_at)}</td>
+                        <td>{[row.first_name, row.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
+                        <td>{row.email}</td>
+                        <td>{row.phone || "\u2014"}</td>
+                        <td>
+                          <span className={`rep-event-badge rep-event-badge--${row.lead_type || "unknown"}`}>
+                            {row.lead_type || "\u2014"}
+                          </span>
+                        </td>
+                        <td className="rep-table__ref">{row.source_channel || "Direct"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
+          {/* Recent submissions table */}
+          <section className="rep-section">
+            <h2 className="rep-h2">Recent submissions</h2>
+            <p className="rep-sub">Last 50 form submissions (includes repeat contacts).</p>
+            {(contacts?.submissions || []).length === 0 ? <p className="rep-empty-small">No submissions yet.</p> : (
+              <div className="rep-table-wrap">
+                <table className="rep-table">
+                  <thead>
+                    <tr><th>When</th><th>Form</th><th>Name</th><th>Email</th><th>Data</th></tr>
+                  </thead>
+                  <tbody>
+                    {contacts.submissions.map((row) => {
+                      const fd = parseEventData(row.form_data);
+                      const summary = fd ? Object.entries(fd).map(([k, v]) => `${k}: ${v}`).join(", ") : "\u2014";
+                      return (
+                        <tr key={row.submission_id}>
+                          <td>{formatRelativeTime(row.created_at)}</td>
+                          <td>
+                            <span className={`rep-event-badge rep-event-badge--${row.form_type?.split("-")[0] || "form"}`}>
+                              {row.form_type}
+                            </span>
+                          </td>
+                          <td>{row.first_name || "\u2014"}</td>
+                          <td>{row.email || "\u2014"}</td>
+                          <td className="rep-table__ref" style={{ maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{summary}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

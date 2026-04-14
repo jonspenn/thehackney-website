@@ -731,6 +731,17 @@ import ProcessSteps from '../components/ProcessSteps.astro';
             input.value = '';
             button.textContent = 'On The List';
 
+            // Also write to contacts table (fire-and-forget)
+            fetch('/api/submit', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({
+                form_type: 'supperclub-signup',
+                email: email,
+                form_data: { signup_location: location },
+              }),
+            }).catch(() => {}); // silent - supperclub_signups is the primary record
+
             // dataLayer signal for GTM / GA4
             if (window.dataLayer) {
               window.dataLayer.push({

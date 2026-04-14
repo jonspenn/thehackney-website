@@ -1178,5 +1178,91 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .mql-return-link a:hover {
       color: #8C472E;
     }
+
+    /* Brochure form states */
+    .pricing-form-status {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .pricing-form-status[data-state="success"] {
+      color: var(--forest-olive);
+    }
+    .pricing-form-status[data-state="error"] {
+      color: #c0392b;
+    }
 </style>
+
+<script>
+  // Brochure download form handler - POSTs to /api/submit
+  (function () {
+    const form = document.getElementById('brochure');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      if (!btn) return;
+
+      const firstName = form.querySelector('[name="firstName"]')?.value?.trim() || '';
+      const email = form.querySelector('[name="email"]')?.value?.trim() || '';
+      const phone = form.querySelector('[name="mobile"]')?.value?.trim() || '';
+      const weddingYear = form.querySelector('[name="weddingYear"]')?.value || '';
+
+      if (!email) return;
+
+      btn.disabled = true;
+      const originalLabel = btn.textContent;
+      btn.textContent = 'Sending...';
+
+      // Remove any existing status message
+      let status = form.parentElement.querySelector('.pricing-form-status');
+      if (!status) {
+        status = document.createElement('p');
+        status.className = 'pricing-form-status';
+        form.after(status);
+      }
+
+      try {
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            form_type: 'brochure-download',
+            email: email,
+            first_name: firstName,
+            phone: phone,
+            form_data: { wedding_year: weddingYear },
+          }),
+        });
+        const result = await res.json();
+        console.log('[Brochure] Submitted:', result);
+
+        if (result.ok) {
+          status.textContent = "On its way. Check your email and WhatsApp.";
+          status.setAttribute('data-state', 'success');
+          status.hidden = false;
+          btn.textContent = 'Sent';
+        } else {
+          throw new Error(result.error || 'submit_failed');
+        }
+
+        // dataLayer signal for GTM / GA4
+        if (window.dataLayer) {
+          window.dataLayer.push({
+            event: 'brochure_download',
+            brochure_wedding_year: weddingYear,
+          });
+        }
+      } catch (err) {
+        console.error('[Brochure] Submit error:', err);
+        status.textContent = 'Something went wrong. Please try again or email hello@thehackney.co.';
+        status.setAttribute('data-state', 'error');
+        status.hidden = false;
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    });
+  })();
+</script>
 </Base>

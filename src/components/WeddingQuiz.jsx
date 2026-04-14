@@ -603,16 +603,12 @@ export default function WeddingQuiz() {
 
   async function handleCaptureSubmit() {
     setSubmitting(true);
-    /* ââ PLACEHOLDER: Replace with real endpoint when platform is chosen ââ */
-    const payload = {
-      first_name: data.firstName,
-      email: data.email,
-      phone: data.phone,
+
+    const formData = {
       wedding_date: data.month && data.year ? `${data.month} ${data.year}` : "",
       booking_urgency: data.urgency,
       guest_count: data.guests,
     };
-    console.log("[WeddingQuiz] Capture payload:", payload);
 
     /* The lead is officially captured at this point - mark as completed
        so beforeunload doesn't fire abandon. Budget step is post-capture. */
@@ -622,8 +618,26 @@ export default function WeddingQuiz() {
       quiz_guests: data.guests,
     });
 
-    /* Simulate a brief delay for the real API call */
-    await new Promise(r => setTimeout(r, 600));
+    try {
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          form_type: "wedding-quiz",
+          email: data.email,
+          first_name: data.firstName,
+          phone: data.phone,
+          form_data: formData,
+        }),
+      });
+      const result = await res.json();
+      console.log("[WeddingQuiz] Submitted:", result);
+    } catch (err) {
+      // Fire-and-forget: the lead is captured in dataLayer already.
+      // D1 write failure must not block the user from proceeding.
+      console.error("[WeddingQuiz] Submit error:", err);
+    }
+
     setSubmitting(false);
     setCompleted(true);
     goNext();
