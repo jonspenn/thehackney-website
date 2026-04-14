@@ -41,10 +41,11 @@ import ProcessSteps from '../components/ProcessSteps.astro';
         { title: "Book Before Public Release", description: "Claim your seat while the list has priority. Public booking only opens if seats remain." }
       ]} />
 
-      <form class="signup-form-primary" id="signupFormPrimary" action="#" method="POST" data-form="supperclub-signup" data-form-location="primary">
+      <form class="signup-form-primary" id="signupFormPrimary" action="/api/supperclub-signup" method="POST" data-form="supperclub-signup" data-form-location="primary">
         <input type="email" name="email" placeholder="Email address" required aria-label="Email address">
         <button type="submit" class="btn btn-primary">Get First Access</button>
       </form>
+      <p class="signup-form-status" data-status-for="primary" hidden></p>
       <p class="signup-primary-note">We will only email when a new supper club is about to drop.</p>
     </div>
   </Section>
@@ -57,13 +58,14 @@ import ProcessSteps from '../components/ProcessSteps.astro';
         heading="Dinner Without Distraction"
       />
       <p>Our supper club is a series of one-off dining events inside The Hackney - a restored 1856 brewery on Hackney Road with soaring ceilings, skylights and exposed brick.</p>
-      <p>Each night features a guest chef cooking a multi-course menu, wines paired to every dish, live acoustic music and one simple rule: phones away for the evening.</p>
+      <p>Each night features a guest chef cooking a multi-course menu with wines paired to every dish, a room lit almost entirely by candlelight, and a playlist curated for the evening.</p>
 
       <div class="concept-highlight">
         Good food. Good wine. Actual conversation. That is the whole idea.
       </div>
 
-      <p>We are launching the series in partnership with <strong>The Nudge</strong> - London's most trusted guide to things worth doing. As we grow, we will host our own nights and invite chefs, producers and makers from across East London and beyond.</p>
+      <p>We are launching the series in partnership with <strong>The Nudge</strong>, curators of some of London's most talked-about nights. As we grow, we will host our own dinners and invite chefs, producers and makers from across East London and beyond.</p>
+      <p class="concept-read-more"><a href="/journal/the-hackney-supper-club-chef-led-dinners-east-london/">Read the full story of the series.</a></p>
     </div>
   </Section>
 
@@ -127,18 +129,18 @@ import ProcessSteps from '../components/ProcessSteps.astro';
     <div class="expect-grid">
       <div class="expect-item">
         <div class="expect-number">01</div>
-        <h3>Arrive &amp; Unplug</h3>
-        <p>You arrive at The Hackney and your phone goes into a signal-blocking pouch (you keep it on you at all times). Then it is welcome cocktails and live acoustic music in the bar.</p>
+        <h3>Arrive At The Bar</h3>
+        <p>You arrive at The Hackney and take a welcome cocktail at the bar. The room is set, candles lit, the playlist running. A chance to settle in before you sit down.</p>
       </div>
       <div class="expect-item">
         <div class="expect-number">02</div>
         <h3>Sit Down To Eat</h3>
-        <p>Move through to candlelit long tables for a multi-course dinner from that evening's guest chef. Each dish is paired with a wine selected to match. Conversation flows naturally.</p>
+        <p>Move through to a long candlelit table for a multi-course dinner from that evening's guest chef. Each dish is paired with a wine selected to match. Conversation flows naturally.</p>
       </div>
       <div class="expect-item">
         <div class="expect-number">03</div>
         <h3>Leave Lighter</h3>
-        <p>Phones come out of the pouches, you say goodbye to the people you have actually spoken to, and you head home having had a proper evening out. Post about it after - obviously.</p>
+        <p>Dessert, a final pour, goodbyes to the people you have actually spoken to. You head home having had a proper evening out, not another night on your phone.</p>
       </div>
     </div>
   </Section>
@@ -164,29 +166,47 @@ import ProcessSteps from '../components/ProcessSteps.astro';
     />
     <div class="gallery-grid">
       <div class="gallery-block">
-        <div class="gallery-block-bg lazy-bg" data-bg="" style="background-color:#3D2117;"></div>
+        <div class="gallery-block-bg lazy-bg" data-bg="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp" style="background-color:#2C1810;"></div>
         <div class="gallery-caption">The Table</div>
       </div>
       <div class="gallery-block">
-        <div class="gallery-block-bg lazy-bg" data-bg="" style="background-color:#2E4009;"></div>
+        <div class="gallery-block-bg lazy-bg" data-bg="/images/hackney-supper-club-sepps-taste-of-toronto.webp" style="background-color:#3D2117;"></div>
         <div class="gallery-caption">The Food</div>
       </div>
       <div class="gallery-block">
-        <div class="gallery-block-bg lazy-bg" data-bg="" style="background-color:#8C472E;"></div>
+        <div class="gallery-block-bg lazy-bg" data-bg="/images/hackney-private-events-strip-table-setting-candles.webp" style="background-color:#2E4009;"></div>
         <div class="gallery-caption">The Bar</div>
       </div>
       <div class="gallery-block">
-        <div class="gallery-block-bg lazy-bg" data-bg="" style="background-color:#BF7256;"></div>
-        <div class="gallery-caption">Live Music</div>
+        <div class="gallery-block-bg lazy-bg" data-bg="/images/hackney-corporate-table-setting-bespoke-menu-overhead.webp" style="background-color:#8C472E;"></div>
+        <div class="gallery-caption">The Menu</div>
       </div>
       <div class="gallery-block">
-        <div class="gallery-block-bg lazy-bg" data-bg="" style="background-color:#2C1810;"></div>
+        <div class="gallery-block-bg lazy-bg" data-bg="/images/hackney-venue-dinner-long-tables-greenery-edison-bulbs.webp" style="background-color:#4A3228;"></div>
         <div class="gallery-caption">The Venue</div>
       </div>
       <div class="gallery-block">
-        <div class="gallery-block-bg lazy-bg" data-bg="" style="background-color:#4A3228;"></div>
-        <div class="gallery-caption">Guests</div>
+        <div class="gallery-block-bg lazy-bg" data-bg="/images/hackney-brand-activation-enfuce-dinner-presentation.webp" style="background-color:#2C1810;"></div>
+        <div class="gallery-caption">The Room</div>
       </div>
+    </div>
+  </Section>
+
+  <!-- ==================== EMAIL SIGNUP (reinforcement capture - moved above chef section so consumer audience doesn't bounce past it) ==================== -->
+  <Section bg="dark" padding="standard" id="signup-reinforce">
+    <div class="signup-inner">
+      <SectionHeader
+        eyebrow="One More Chance"
+        heading="The Next Menu Will Not Stay Open For Long."
+        align="center"
+      />
+      <p class="signup-body">Small room. Limited seats. First access goes to the list. Public booking only opens if seats remain after subscribers have had their pick.</p>
+      <form class="signup-form" id="signupForm" action="/api/supperclub-signup" method="POST" data-form="supperclub-signup" data-form-location="reinforce">
+        <input type="email" name="email" placeholder="Email address" required aria-label="Email address">
+        <button type="submit" class="btn btn-primary-dark">Notify Me First</button>
+      </form>
+      <p class="signup-form-status" data-status-for="reinforce" hidden></p>
+      <p class="signup-note">We will only email you when a new supper club is about to drop. Unsubscribe any time.</p>
     </div>
   </Section>
 
@@ -213,24 +233,7 @@ import ProcessSteps from '../components/ProcessSteps.astro';
 
         <a href="mailto:hello@thehackney.co?subject=Supper%20Club%20Chef%20Enquiry" class="btn btn-primary">Get In Touch</a>
       </div>
-      <div class="cook-image lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The Hackney professional kitchen"></div>
-    </div>
-  </Section>
-
-  <!-- ==================== EMAIL SIGNUP (reinforcement capture) ==================== -->
-  <Section bg="dark" padding="standard" id="signup-reinforce">
-    <div class="signup-inner">
-      <SectionHeader
-        eyebrow="One More Chance"
-        heading="The Next Menu Will Not Stay Open For Long."
-        align="center"
-      />
-      <p class="signup-body">Small room. Limited seats. First access goes to the list. Public booking only opens if seats remain after subscribers have had their pick.</p>
-      <form class="signup-form" id="signupForm" action="#" method="POST" data-form="supperclub-signup" data-form-location="reinforce">
-        <input type="email" name="email" placeholder="Email address" required aria-label="Email address">
-        <button type="submit" class="btn btn-primary-dark">Notify Me First</button>
-      </form>
-      <p class="signup-note">We will only email you when a new supper club is about to drop. Unsubscribe any time.</p>
+      <div class="cook-image lazy-bg" data-bg="/images/hackney-winter-garden-long-tables-edison-bulbs-symmetrical.webp" data-bg-pos="center center" role="img" aria-label="Dining room at The Hackney set for a supper club with long tables and Edison bulbs"></div>
     </div>
   </Section>
 
@@ -244,6 +247,10 @@ import ProcessSteps from '../components/ProcessSteps.astro';
       <a href="/weddings/" class="cross-sell-card">
         <h3>Weddings</h3>
         <p>Exclusive hire of the entire venue for up to 60 seated guests and 100 standing. An 1856 brewery with skylights, exposed brick and an in-house kitchen.</p>
+      </a>
+      <a href="/private-events/" class="cross-sell-card">
+        <h3>Private Events</h3>
+        <p>Birthdays, milestones, intimate dinners. The same room, the same kitchen, built around the night you are planning.</p>
       </a>
       <a href="/cafe-bar/" class="cross-sell-card">
         <h3>Cafe &amp; Bar</h3>
@@ -602,8 +609,31 @@ import ProcessSteps from '../components/ProcessSteps.astro';
     /* ==================== CROSS-SELL ==================== */
     .cross-sell-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 32px;
+    }
+
+    @media (max-width: 960px) {
+      .cross-sell-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ==================== FORM STATUS ==================== */
+    .signup-form-status {
+      font-family: var(--font-body);
+      font-size: 14px;
+      margin: -4px 0 12px;
+      line-height: 1.5;
+    }
+    .signup-form-status[data-state="success"] {
+      color: var(--forest-olive);
+      font-weight: 500;
+    }
+    .signup-form-status[data-state="error"] {
+      color: var(--fired-brick);
+    }
+    /* dark-section status visible against dark bg */
+    #signup-reinforce .signup-form-status[data-state="success"] {
+      color: var(--dusty-coral);
     }
 
     .cross-sell-card {
@@ -633,14 +663,92 @@ import ProcessSteps from '../components/ProcessSteps.astro';
 
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
-      .sc-hero-ctas { flex-direction: column; }
       .expect-grid { grid-template-columns: 1fr; gap: 32px; }
       .gallery-grid { grid-template-columns: repeat(2, 1fr); }
       .cook-inner { grid-template-columns: 1fr; gap: 40px; }
       .cook-image { aspect-ratio: 16/9; }
       .signup-form { flex-direction: column; }
       .signup-form .btn-primary-dark { width: 100%; text-align: center; }
-      .cross-sell-grid { grid-template-columns: 1fr; }
+    }
+
+    .concept-read-more {
+      margin-top: 28px;
+    }
+    .concept-read-more a {
+      color: var(--dusty-coral);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      border-bottom: 1px solid var(--dusty-coral);
+      padding-bottom: 2px;
+    }
+    .concept-read-more a:hover {
+      color: var(--forest-olive);
+      border-bottom-color: var(--forest-olive);
     }
   </style>
+
+  <script>
+    // Supper club signup form handler. Posts to /api/supperclub-signup
+    // (Cloudflare Pages Function) and shows inline success/error. Until
+    // Klaviyo/Brevo is wired, emails are captured server-side via the
+    // function's console.log + D1 insert.
+    (function () {
+      const forms = document.querySelectorAll('form[data-form="supperclub-signup"]');
+      forms.forEach((form) => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const input = form.querySelector('input[type="email"]');
+          const button = form.querySelector('button[type="submit"]');
+          const location = form.dataset.formLocation || 'unknown';
+          const status = form.parentElement.querySelector(
+            `.signup-form-status[data-status-for="${location}"]`
+          );
+          if (!input || !button) return;
+
+          const email = (input.value || '').trim();
+          if (!email) return;
+
+          button.disabled = true;
+          const originalLabel = button.textContent;
+          button.textContent = 'Sending...';
+
+          try {
+            const res = await fetch('/api/supperclub-signup', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ email, location }),
+            });
+            if (!res.ok) throw new Error('bad_response');
+            if (status) {
+              status.textContent = "You're on the list. We'll email you the moment the next dinner drops.";
+              status.setAttribute('data-state', 'success');
+              status.hidden = false;
+            }
+            input.value = '';
+            button.textContent = 'On The List';
+
+            // dataLayer signal for GTM / GA4
+            if (window.dataLayer) {
+              window.dataLayer.push({
+                event: 'supperclub_signup',
+                signup_location: location,
+              });
+            }
+          } catch (err) {
+            if (status) {
+              status.textContent = 'Something went wrong. Please try again or email hello@thehackney.co.';
+              status.setAttribute('data-state', 'error');
+              status.hidden = false;
+            }
+            button.disabled = false;
+            button.textContent = originalLabel;
+          }
+        });
+      });
+    })();
+  </script>
 </Base>
