@@ -10,6 +10,13 @@ import { useEffect, useMemo, useState } from "react";
 
 /* ───────── constants ───────── */
 
+const FORM_TYPE_LABELS = {
+  "wedding-quiz": "Wedding Questionnaire",
+  "corporate-quiz": "Corporate Questionnaire",
+  "brochure-download": "Brochure Download",
+  "supperclub-signup": "Supper Club Signup",
+};
+
 const EVENT_TYPE_LABELS = {
   page_view: "Page views",
   cta_click: "CTA clicks",
@@ -539,7 +546,7 @@ export default function AdminDashboard() {
                   {contacts.form_breakdown.map((row, i) => (
                     <li key={row.form_type} className="rep-toprow rep-toprow--compact">
                       <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.form_type}</span>
+                      <span className="rep-topdate">{FORM_TYPE_LABELS[row.form_type] || row.form_type}</span>
                       <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (contacts.form_breakdown[0]?.count || 1)) * 100}%` }} /></span>
                       <span className="rep-topcount">{row.count}</span>
                     </li>
@@ -615,7 +622,7 @@ export default function AdminDashboard() {
                           <td>{formatRelativeTime(row.created_at)}</td>
                           <td>
                             <span className={`rep-event-badge rep-event-badge--${row.form_type?.split("-")[0] || "form"}`}>
-                              {row.form_type}
+                              {FORM_TYPE_LABELS[row.form_type] || row.form_type}
                             </span>
                           </td>
                           <td>{row.first_name || "\u2014"}</td>
