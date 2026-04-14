@@ -642,6 +642,84 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         grid-column: 2;
       }
 
+      /* ── Journey view ── */
+      .lp-journey-session {
+        border: 1px solid rgba(44,24,16,0.1); border-radius: 6px;
+        padding: 16px; margin-bottom: 16px; background: rgba(44,24,16,0.015);
+      }
+      .lp-journey-session__header {
+        display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;
+      }
+      .lp-journey-session__num {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+        color: #2C1810; letter-spacing: 0.04em; text-transform: uppercase;
+      }
+      .lp-journey-session__date {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(44,24,16,0.5);
+      }
+      .lp-journey-session__dur {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; color: #49590E;
+        background: rgba(73,89,14,0.08); padding: 2px 8px; border-radius: 3px; font-weight: 600;
+      }
+      .lp-journey-session__source {
+        display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
+      }
+      .lp-journey-tag {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+        padding: 2px 8px; border-radius: 3px; color: #2C1810;
+        background: rgba(44,24,16,0.05); border: 1px solid rgba(44,24,16,0.08);
+      }
+      .lp-journey-tag--platform {
+        background: rgba(140,71,46,0.1); border-color: rgba(140,71,46,0.2); color: #8C472E; font-weight: 700;
+      }
+      .lp-journey-tag--keyword {
+        background: rgba(73,89,14,0.08); border-color: rgba(73,89,14,0.15); color: #49590E; font-style: italic;
+      }
+      .lp-journey-session__clickids {
+        display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;
+      }
+      .lp-journey-clickid {
+        font-family: 'DM Sans', sans-serif; font-size: 10px; color: rgba(44,24,16,0.4);
+        background: rgba(44,24,16,0.03); padding: 1px 6px; border-radius: 2px;
+        border: 1px solid rgba(44,24,16,0.06); cursor: default;
+        max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .lp-journey-pages {
+        border-left: 2px solid rgba(44,24,16,0.08); margin-left: 6px; padding-left: 14px;
+      }
+      .lp-journey-page {
+        display: flex; align-items: baseline; gap: 8px; padding: 3px 0;
+        font-family: 'DM Sans', sans-serif; font-size: 13px;
+      }
+      .lp-journey-page__time {
+        font-size: 11px; color: rgba(44,24,16,0.35); min-width: 40px; flex-shrink: 0;
+      }
+      .lp-journey-page__path {
+        color: #2C1810; word-break: break-all;
+      }
+      .lp-journey-page__dur {
+        font-size: 11px; color: rgba(44,24,16,0.35); white-space: nowrap; margin-left: auto;
+      }
+      .lp-journey-actions {
+        margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(44,24,16,0.08);
+      }
+      .lp-journey-action {
+        display: flex; align-items: center; gap: 8px; padding: 3px 0;
+        font-family: 'DM Sans', sans-serif; font-size: 13px;
+      }
+      .lp-journey-action__dot {
+        width: 7px; height: 7px; border-radius: 50%; background: #8C472E; flex-shrink: 0;
+      }
+      .lp-journey-action__time {
+        font-size: 11px; color: rgba(44,24,16,0.35); min-width: 40px; flex-shrink: 0;
+      }
+      .lp-journey-action__label {
+        color: #8C472E; font-weight: 600;
+      }
+      .lp-journey-action__detail {
+        font-size: 11px; color: rgba(44,24,16,0.4);
+      }
+
       @media (max-width: 480px) {
         .rep-shell { padding: 24px 16px 64px; }
         .rep-title { font-size: 32px; }
@@ -650,6 +728,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         .lead-heat-chip { font-size: 11px; padding: 3px 8px; }
         .lp-panel { width: 100vw; }
         .lp-detail-grid { grid-template-columns: 1fr; }
+        .lp-journey-session { padding: 12px; }
+        .lp-journey-page { font-size: 12px; }
       }
     </style>
   </head>

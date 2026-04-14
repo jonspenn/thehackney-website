@@ -131,6 +131,36 @@ const EVENT_TYPE_LABELS = {
   brochure_download: "Brochure downloads",
 };
 
+/* Journey event labels (friendly names for the timeline) */
+const JOURNEY_EVENT_LABELS = {
+  page_view: "Viewed",
+  cta_click: "Clicked CTA",
+  date_check: "Checked date",
+  scroll_depth: "Scrolled",
+  questionnaire_start: "Started questionnaire",
+  questionnaire_step: "Questionnaire step",
+  questionnaire_complete: "Completed questionnaire",
+  questionnaire_abandon: "Left questionnaire",
+  form_submit: "Submitted form",
+  brochure_download: "Downloaded brochure",
+};
+
+function formatDuration(seconds) {
+  if (seconds == null || seconds < 0) return "";
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+}
+
+function formatTime(iso) {
+  if (!iso) return "";
+  const safe = iso.includes("T") ? iso : iso.replace(" ", "T") + "Z";
+  const d = new Date(safe);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString("en-GB", { hour: "2-digit", minute: "2-digit" });
+}
+
 const DAY_LABELS_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const DAY_LABELS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTH_LABELS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -356,6 +386,21 @@ export default function AdminDashboard() {
   const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
   const [heatFilter, setHeatFilter] = useState("all"); // "all" | "hot" | "warm" | "cool" | "cold"
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
+  const [journey, setJourney] = useState(null); // journey data for selected lead
+  const [journeyLoading, setJourneyLoading] = useState(false);
+
+  function selectLead(lead) {
+    setSelectedLead(lead);
+    setJourney(null);
+    if (lead?.contact_id) {
+      setJourneyLoading(true);
+      fetch(`/api/lead-journey?contact_id=${encodeURIComponent(lead.contact_id)}`, { cache: "no-store" })
+        .then(r => r.json())
+        .then(data => { if (data.ok) setJourney(data); })
+        .catch(() => {})
+        .finally(() => setJourneyLoading(false));
+    }
+  }
 
   async function load() {
     setLoading(true);
@@ -1008,7 +1053,7 @@ export default function AdminDashboard() {
                           key={lead.contact_id}
                           className={`lead-row lead-row--${sc.tier}${sc.isDead ? " lead-row--dead" : ""}${selectedLead?.contact_id === lead.contact_id ? " lead-row--selected" : ""}`}
                           style={{ borderLeft: `4px solid ${tc.border}`, background: tc.bg, cursor: "pointer" }}
-                          onClick={() => setSelectedLead(lead)}
+                          onClick={() => selectLead(lead)}
                         >
                           {/* Score badge */}
                           <td>
@@ -1378,85 +1423,87 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Funnel timeline */}
+              {/* Full journey */}
               <div className="lp-section">
-                <h3 className="lp-section__title">Funnel timeline</h3>
-                <div className="lp-timeline">
-                  {lead.first_seen_at && (
-                    <div className="lp-timeline__item">
-                      <span className="lp-timeline__dot" />
-                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.first_seen_at)}</span>
-                      <span className="lp-timeline__event">First visited the site</span>
-                      {lead.first_landing_page && <span className="lp-timeline__detail">{lead.first_landing_page}</span>}
+                <h3 className="lp-section__title">
+                  Full journey
+                  {journey && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}> - {journey.total_sessions} session{journey.total_sessions !== 1 ? "s" : ""}, {journey.total_events} event{journey.total_events !== 1 ? "s" : ""}</span>}
+                </h3>
+                {journeyLoading && <p className="lp-detail__muted">Loading journey...</p>}
+                {!journeyLoading && !journey && <p className="lp-detail__muted">No journey data available.</p>}
+                {!journeyLoading && journey && journey.sessions.length === 0 && <p className="lp-detail__muted">No sessions recorded for this visitor.</p>}
+                {!journeyLoading && journey && journey.sessions.map((sess, si) => {
+                  const pageViews = sess.events.filter(e => e.event_type === "page_view");
+                  const actions = sess.events.filter(e => e.event_type !== "page_view" && e.event_type !== "scroll_depth");
+                  return (
+                    <div key={sess.session_id} className="lp-journey-session">
+                      {/* Session header */}
+                      <div className="lp-journey-session__header">
+                        <span className="lp-journey-session__num">Session {si + 1}</span>
+                        <span className="lp-journey-session__date">{formatAbsoluteTime(sess.started_at)}</span>
+                        {sess.duration != null && <span className="lp-journey-session__dur">{formatDuration(sess.duration)}</span>}
+                      </div>
+                      {/* Source attribution for this session */}
+                      <div className="lp-journey-session__source">
+                        {sess.ad_platform && <span className="lp-journey-tag lp-journey-tag--platform">{sess.ad_platform}</span>}
+                        <span className="lp-journey-tag">{sess.source}</span>
+                        {sess.campaign && <span className="lp-journey-tag">{sess.campaign}</span>}
+                        {sess.keyword && <span className="lp-journey-tag lp-journey-tag--keyword">{sess.keyword}</span>}
+                        {sess.device_type && <span className="lp-journey-tag">{sess.device_type}</span>}
+                      </div>
+                      {/* Click IDs if any */}
+                      {Object.keys(sess.click_ids).length > 0 && (
+                        <div className="lp-journey-session__clickids">
+                          {Object.entries(sess.click_ids).map(([k, v]) => (
+                            <span key={k} className="lp-journey-clickid" title={v}>{k}</span>
+                          ))}
+                        </div>
+                      )}
+                      {/* Pages visited */}
+                      <div className="lp-journey-pages">
+                        {pageViews.map((ev, ei) => {
+                          const nextEv = pageViews[ei + 1];
+                          let timeOnPage = null;
+                          if (nextEv) {
+                            const t1 = new Date(ev.created_at.replace(" ", "T") + "Z").getTime();
+                            const t2 = new Date(nextEv.created_at.replace(" ", "T") + "Z").getTime();
+                            timeOnPage = Math.round((t2 - t1) / 1000);
+                          }
+                          const path = (() => { try { return new URL(ev.page_url, "https://x").pathname; } catch { return ev.page_url; } })();
+                          return (
+                            <div key={ev.event_id} className="lp-journey-page">
+                              <span className="lp-journey-page__time">{formatTime(ev.created_at)}</span>
+                              <span className="lp-journey-page__path">{path}</span>
+                              {timeOnPage != null && <span className="lp-journey-page__dur">{formatDuration(timeOnPage)}</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {/* Key actions during this session */}
+                      {actions.length > 0 && (
+                        <div className="lp-journey-actions">
+                          {actions.map(ev => {
+                            const label = JOURNEY_EVENT_LABELS[ev.event_type] || ev.event_type;
+                            const data = parseEventData(ev.event_data);
+                            let detail = "";
+                            if (ev.event_type === "cta_click" && data?.track_id) detail = data.track_id;
+                            if (ev.event_type === "date_check" && data?.date) detail = data.date;
+                            if (ev.event_type === "questionnaire_complete") detail = "All steps finished";
+                            if (ev.event_type === "form_submit" && data?.form_type) detail = FORM_TYPE_LABELS[data.form_type] || data.form_type;
+                            return (
+                              <div key={ev.event_id} className="lp-journey-action">
+                                <span className="lp-journey-action__dot" />
+                                <span className="lp-journey-action__time">{formatTime(ev.created_at)}</span>
+                                <span className="lp-journey-action__label">{label}</span>
+                                {detail && <span className="lp-journey-action__detail">{detail}</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <div className="lp-timeline__item">
-                    <span className="lp-timeline__dot lp-timeline__dot--filled" />
-                    <span className="lp-timeline__time">{formatAbsoluteTime(lead.created_at)}</span>
-                    <span className="lp-timeline__event">
-                      {lead.form_types?.includes("wedding-quiz") ? "Completed wedding questionnaire" :
-                       lead.form_types?.includes("corporate-quiz") ? "Completed corporate questionnaire" :
-                       lead.form_types?.includes("brochure-download") ? "Downloaded brochure" :
-                       lead.form_types?.includes("supperclub-signup") ? "Signed up for supper club" :
-                       "Submitted form"}
-                    </span>
-                  </div>
-                  {lead.submissions_count > 1 && (
-                    <div className="lp-timeline__item">
-                      <span className="lp-timeline__dot lp-timeline__dot--filled" />
-                      <span className="lp-timeline__time" />
-                      <span className="lp-timeline__event">{lead.submissions_count} total form submissions</span>
-                    </div>
-                  )}
-                  {lead.clicked_discovery_call_at && (
-                    <div className="lp-timeline__item">
-                      <span className="lp-timeline__dot lp-timeline__dot--action" />
-                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.clicked_discovery_call_at)}</span>
-                      <span className="lp-timeline__event">Clicked Book a Discovery Call</span>
-                      {lead.clicked_discovery_call_source && <span className="lp-timeline__detail">via {lead.clicked_discovery_call_source}</span>}
-                    </div>
-                  )}
-                  {lead.clicked_venue_tour_at && (
-                    <div className="lp-timeline__item">
-                      <span className="lp-timeline__dot lp-timeline__dot--action" />
-                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.clicked_venue_tour_at)}</span>
-                      <span className="lp-timeline__event">Clicked Book a Venue Tour</span>
-                      {lead.clicked_venue_tour_source && <span className="lp-timeline__detail">via {lead.clicked_venue_tour_source}</span>}
-                    </div>
-                  )}
-                  {lead.last_seen_at && lead.last_seen_at !== lead.first_seen_at && (
-                    <div className="lp-timeline__item">
-                      <span className="lp-timeline__dot" />
-                      <span className="lp-timeline__time">{formatAbsoluteTime(lead.last_seen_at)}</span>
-                      <span className="lp-timeline__event">Last seen on site</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Attribution */}
-              <div className="lp-section">
-                <h3 className="lp-section__title">Attribution</h3>
-                <div className="lp-detail-grid">
-                  <div className="lp-detail"><span className="lp-detail__label">Source</span><span className="lp-detail__value">{lead.source_channel || "Direct"}</span></div>
-                  {lead.source_campaign && <div className="lp-detail"><span className="lp-detail__label">Campaign</span><span className="lp-detail__value">{lead.source_campaign}</span></div>}
-                  {lead.source_keyword && <div className="lp-detail"><span className="lp-detail__label">Keyword</span><span className="lp-detail__value">{lead.source_keyword}</span></div>}
-                  {lead.ad_platform && <div className="lp-detail"><span className="lp-detail__label">Ad platform</span><span className="lp-detail__value">{lead.ad_platform}</span></div>}
-                  {lead.first_landing_page && <div className="lp-detail"><span className="lp-detail__label">Landing page</span><span className="lp-detail__value">{lead.first_landing_page}</span></div>}
-                  {lead.conversion_page && <div className="lp-detail"><span className="lp-detail__label">Conversion page</span><span className="lp-detail__value">{lead.conversion_page}</span></div>}
-                  <div className="lp-detail"><span className="lp-detail__label">Device</span><span className="lp-detail__value">{lead.device_type || "Unknown"}</span></div>
-                  {lead.first_referrer && <div className="lp-detail"><span className="lp-detail__label">Referrer</span><span className="lp-detail__value">{lead.first_referrer}</span></div>}
-                </div>
-              </div>
-
-              {/* Engagement */}
-              <div className="lp-section">
-                <h3 className="lp-section__title">Engagement</h3>
-                <div className="lp-detail-grid">
-                  <div className="lp-detail"><span className="lp-detail__label">Sessions</span><span className="lp-detail__value">{lead.sessions_before_conversion ?? "Unknown"}</span></div>
-                  <div className="lp-detail"><span className="lp-detail__label">Total page views</span><span className="lp-detail__value">{lead.total_page_views ?? "Unknown"}</span></div>
-                  {lead.avg_page_views_per_session != null && <div className="lp-detail"><span className="lp-detail__label">Avg pages/session</span><span className="lp-detail__value">{lead.avg_page_views_per_session}</span></div>}
-                </div>
+                  );
+                })}
               </div>
 
               {/* Cross-sell */}
