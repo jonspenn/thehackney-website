@@ -221,15 +221,31 @@ export async function onRequestPost(context) {
     }
 
     // ─── Record the submission (every form submit, even repeat contacts) ───
+    // Extract key fields from form_data into proper columns for querying
+    const fd = body.form_data || {};
+    const subEventType = safeStr(fd.event_type, 100);
+    const subGuestCount = safeStr(fd.guest_count, 50);
+    const subEventDate = safeStr(fd.event_date || fd.wedding_date, 50);
+    const subUrgency = safeStr(fd.booking_urgency, 50);
+    const subBudget = safeStr(fd.budget, 50);
+    const subBrochureType = safeStr(fd.brochure_type, 50);
+    const subWeddingYear = safeStr(fd.wedding_year, 10);
+
     const submissionId = "s_" + generateId();
     await env.DB.prepare(
       `INSERT INTO submissions (
         submission_id, contact_id, form_type, form_data,
-        page_url, user_agent, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)`
+        page_url, user_agent, created_at,
+        event_type, guest_count, event_date, booking_urgency,
+        budget, brochure_type, wedding_year,
+        company, first_name, email, phone
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       submissionId, contactId, formType, formData,
-      referrer, userAgent, now
+      referrer, userAgent, now,
+      subEventType, subGuestCount, subEventDate, subUrgency,
+      subBudget, subBrochureType, subWeddingYear,
+      company, firstName, email, phone
     ).run();
 
     return new Response(

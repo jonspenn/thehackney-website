@@ -28,6 +28,83 @@ const BROCHURE_TYPE_LABELS = {
   "supper-club": "Supper Club",
 };
 
+const LEAD_TYPE_LABELS = {
+  wedding: "Wedding",
+  corporate: "Corporate",
+  supperclub: "Supper Club",
+  "private-events": "Private Events",
+};
+
+const URGENCY_LABELS = {
+  asap: "Need to move fast",
+  ready: "Ready to book",
+  comparing: "Comparing venues",
+  browsing: "Just looking",
+};
+
+const BUDGET_LABELS = {
+  "under-5k": "Under \u00A35K",
+  "5k-10k": "\u00A35K - \u00A310K",
+  "10k-20k": "\u00A310K - \u00A320K",
+  "20k-plus": "\u00A320K+",
+};
+
+const EVENT_TYPE_DISPLAY = {
+  "photo-film": "Photo/Film Shoot",
+  "team-building": "Team Building",
+  conference: "Conference",
+  meeting: "Meeting",
+  "product-launch": "Product Launch",
+  "christmas-party": "Christmas Party",
+  "summer-party": "Summer Party",
+  other: "Other",
+};
+
+/* Build a human-readable detail summary from submission row's proper columns */
+function submissionDetails(row) {
+  const parts = [];
+  // Use proper columns returned by contact-stats.js
+  if (row.event_type) {
+    parts.push(EVENT_TYPE_DISPLAY[row.event_type] || row.event_type);
+  }
+  if (row.guest_count) {
+    parts.push(`${row.guest_count} guests`);
+  }
+  if (row.event_date) {
+    parts.push(row.event_date);
+  }
+  if (row.booking_urgency) {
+    parts.push(URGENCY_LABELS[row.booking_urgency] || row.booking_urgency);
+  }
+  if (row.budget) {
+    parts.push(BUDGET_LABELS[row.budget] || row.budget);
+  }
+  if (row.brochure_type) {
+    parts.push(`${BROCHURE_TYPE_LABELS[row.brochure_type] || row.brochure_type} brochure`);
+  }
+  if (row.wedding_year) {
+    parts.push(row.wedding_year);
+  }
+  if (row.company) {
+    parts.push(row.company);
+  }
+  // Fall back to parsing form_data JSON for older records without proper columns
+  if (parts.length === 0) {
+    const fd = parseEventData(row.form_data);
+    if (fd) {
+      if (fd.event_type) parts.push(EVENT_TYPE_DISPLAY[fd.event_type] || fd.event_type);
+      if (fd.guest_count) parts.push(`${fd.guest_count} guests`);
+      if (fd.event_date || fd.wedding_date) parts.push(fd.event_date || fd.wedding_date);
+      if (fd.booking_urgency) parts.push(URGENCY_LABELS[fd.booking_urgency] || fd.booking_urgency);
+      if (fd.budget) parts.push(BUDGET_LABELS[fd.budget] || fd.budget);
+      if (fd.brochure_type) parts.push(`${BROCHURE_TYPE_LABELS[fd.brochure_type] || fd.brochure_type} brochure`);
+      if (fd.wedding_year) parts.push(fd.wedding_year);
+      if (fd.signup_location) parts.push(fd.signup_location);
+    }
+  }
+  return parts.length > 0 ? parts.join(" \u00B7 ") : "\u2014";
+}
+
 /* For brochure downloads, append the brochure type if available */
 function formLabel(formType, formData) {
   const base = FORM_TYPE_LABELS[formType] || formType;
@@ -585,7 +662,7 @@ export default function AdminDashboard() {
                   {contacts.lead_breakdown.map((row, i) => (
                     <li key={row.lead_type} className="rep-toprow rep-toprow--compact">
                       <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.lead_type}</span>
+                      <span className="rep-topdate">{LEAD_TYPE_LABELS[row.lead_type] || row.lead_type}</span>
                       <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (contacts.lead_breakdown[0]?.count || 1)) * 100}%` }} /></span>
                       <span className="rep-topcount">{row.count}</span>
                     </li>
@@ -614,7 +691,7 @@ export default function AdminDashboard() {
                         <td>{row.phone || "\u2014"}</td>
                         <td>
                           <span className={`rep-event-badge rep-event-badge--${row.lead_type || "unknown"}`}>
-                            {row.lead_type || "\u2014"}
+                            {LEAD_TYPE_LABELS[row.lead_type] || row.lead_type || "\u2014"}
                           </span>
                         </td>
                         <td className="rep-table__ref">{row.source_channel || "Direct"}</td>
@@ -637,10 +714,7 @@ export default function AdminDashboard() {
                     <tr><th>When</th><th>Form</th><th>Name</th><th>Email</th><th>Data</th></tr>
                   </thead>
                   <tbody>
-                    {contacts.submissions.map((row) => {
-                      const fd = parseEventData(row.form_data);
-                      const summary = fd ? Object.entries(fd).map(([k, v]) => `${k}: ${v}`).join(", ") : "\u2014";
-                      return (
+                    {contacts.submissions.map((row) => (
                         <tr key={row.submission_id}>
                           <td>{formatRelativeTime(row.created_at)}</td>
                           <td>
@@ -650,10 +724,9 @@ export default function AdminDashboard() {
                           </td>
                           <td>{row.first_name || "\u2014"}</td>
                           <td>{row.email || "\u2014"}</td>
-                          <td className="rep-table__ref" style={{ maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{summary}</td>
+                          <td>{submissionDetails(row)}</td>
                         </tr>
-                      );
-                    })}
+                    ))}
                   </tbody>
                 </table>
               </div>

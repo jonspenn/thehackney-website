@@ -49,6 +49,7 @@ export async function onRequestGet(context) {
 
   try {
     // Get all wedding-type contacts with their latest submission data
+    // Uses proper columns first, falls back to form_data JSON for older records
     const result = await env.DB.prepare(`
       SELECT
         c.contact_id, c.email, c.first_name, c.last_name, c.phone,
@@ -56,7 +57,8 @@ export async function onRequestGet(context) {
         c.created_at,
         c.form_data as contact_form_data,
         c.questionnaire_data,
-        s.form_type, s.form_data as submission_form_data, s.created_at as submitted_at
+        s.form_type, s.form_data as submission_form_data, s.created_at as submitted_at,
+        s.event_date, s.booking_urgency, s.guest_count, s.budget, s.wedding_year
       FROM contacts c
       LEFT JOIN submissions s ON s.contact_id = c.contact_id
         AND s.form_type IN ('wedding-quiz', 'brochure-download')
@@ -103,38 +105,44 @@ export async function onRequestGet(context) {
           contact.form_types.push(row.form_type);
         }
 
+        // Prefer proper columns, fall back to JSON parsing for older records
         const fd = safeJson(row.submission_form_data);
 
-        // Parse wedding date (format: "Month Year" e.g. "June 2026")
-        if (fd.wedding_date && !contact.wedding_month) {
-          const parts = fd.wedding_date.split(" ");
+        // Parse wedding date - use proper columns first
+        const eventDate = row.event_date || fd.wedding_date;
+        if (eventDate && !contact.wedding_month) {
+          const parts = eventDate.split(" ");
           if (parts.length === 2) {
             contact.wedding_month = parts[0];
             contact.wedding_year = parts[1];
           }
         }
         // Brochure form uses wedding_year directly
-        if (fd.wedding_year && !contact.wedding_year) {
-          contact.wedding_year = fd.wedding_year;
+        const wYear = row.wedding_year || fd.wedding_year;
+        if (wYear && !contact.wedding_year) {
+          contact.wedding_year = wYear;
         }
 
-        // Urgency
-        if (fd.booking_urgency && !contact.urgency) {
-          contact.urgency = fd.booking_urgency;
-          contact.urgency_label = URGENCY_LABEL[fd.booking_urgency] || fd.booking_urgency;
-          contact.urgency_rank = URGENCY_RANK[fd.booking_urgency] || 99;
+        // Urgency - proper column first
+        const urgency = row.booking_urgency || fd.booking_urgency;
+        if (urgency && !contact.urgency) {
+          contact.urgency = urgency;
+          contact.urgency_label = URGENCY_LABEL[urgency] || urgency;
+          contact.urgency_rank = URGENCY_RANK[urgency] || 99;
         }
 
-        // Guest count
-        if (fd.guest_count && !contact.guest_count) {
-          contact.guest_count = fd.guest_count;
+        // Guest count - proper column first
+        const guests = row.guest_count || fd.guest_count;
+        if (guests && !contact.guest_count) {
+          contact.guest_count = guests;
         }
 
-        // Budget (sent as update after step 5)
-        if (fd.budget && !contact.budget) {
-          contact.budget = fd.budget;
-          contact.budget_label = BUDGET_LABEL[fd.budget] || fd.budget;
-          contact.budget_rank = BUDGET_RANK[fd.budget] || 99;
+        // Budget - proper column first
+        const budget = row.budget || fd.budget;
+        if (budget && !contact.budget) {
+          contact.budget = budget;
+          contact.budget_label = BUDGET_LABEL[budget] || budget;
+          contact.budget_rank = BUDGET_RANK[budget] || 99;
         }
       }
 

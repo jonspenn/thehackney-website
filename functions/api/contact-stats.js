@@ -31,20 +31,22 @@ export async function onRequestGet(context) {
        FROM contacts ORDER BY created_at DESC LIMIT 50`
     ).all();
 
-    // Recent submissions (last 50)
+    // Recent submissions (last 50) - return proper columns, not just JSON blob
     const submissions = await env.DB.prepare(
       `SELECT s.submission_id, s.form_type, s.form_data, s.created_at,
-              c.email, c.first_name
+              s.event_type, s.guest_count, s.event_date, s.booking_urgency,
+              s.budget, s.brochure_type, s.wedding_year,
+              s.company, s.first_name, s.email, s.phone
        FROM submissions s
-       LEFT JOIN contacts c ON s.contact_id = c.contact_id
        ORDER BY s.created_at DESC LIMIT 50`
     ).all();
 
-    // Form type breakdown
-    // Form type breakdown - splits brochure downloads by brochure_type
+    // Form type breakdown - splits brochure downloads by brochure_type column
     const breakdown = await env.DB.prepare(
       `SELECT
         CASE
+          WHEN form_type = 'brochure-download' AND brochure_type IS NOT NULL
+          THEN 'brochure-' || brochure_type
           WHEN form_type = 'brochure-download' AND json_extract(form_data, '$.brochure_type') IS NOT NULL
           THEN 'brochure-' || json_extract(form_data, '$.brochure_type')
           ELSE form_type

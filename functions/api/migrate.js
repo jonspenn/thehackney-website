@@ -63,6 +63,26 @@ const MIGRATIONS = [
   { name: "add_klaviyo_profile_id", sql: `ALTER TABLE contacts ADD COLUMN klaviyo_profile_id TEXT` },
   { name: "add_form_data", sql: `ALTER TABLE contacts ADD COLUMN form_data TEXT` },
   { name: "add_questionnaire_data", sql: `ALTER TABLE contacts ADD COLUMN questionnaire_data TEXT` },
+  // ── Submissions: promote form_data fields to proper columns ──
+  { name: "sub_add_event_type", sql: `ALTER TABLE submissions ADD COLUMN event_type TEXT` },
+  { name: "sub_add_guest_count", sql: `ALTER TABLE submissions ADD COLUMN guest_count TEXT` },
+  { name: "sub_add_event_date", sql: `ALTER TABLE submissions ADD COLUMN event_date TEXT` },
+  { name: "sub_add_booking_urgency", sql: `ALTER TABLE submissions ADD COLUMN booking_urgency TEXT` },
+  { name: "sub_add_budget", sql: `ALTER TABLE submissions ADD COLUMN budget TEXT` },
+  { name: "sub_add_brochure_type", sql: `ALTER TABLE submissions ADD COLUMN brochure_type TEXT` },
+  { name: "sub_add_wedding_year", sql: `ALTER TABLE submissions ADD COLUMN wedding_year TEXT` },
+  { name: "sub_add_company", sql: `ALTER TABLE submissions ADD COLUMN company TEXT` },
+  { name: "sub_add_first_name", sql: `ALTER TABLE submissions ADD COLUMN first_name TEXT` },
+  { name: "sub_add_email", sql: `ALTER TABLE submissions ADD COLUMN email TEXT` },
+  { name: "sub_add_phone", sql: `ALTER TABLE submissions ADD COLUMN phone TEXT` },
+  {
+    name: "idx_submissions_event_type",
+    sql: `CREATE INDEX IF NOT EXISTS idx_submissions_event_type ON submissions(event_type)`,
+  },
+  {
+    name: "idx_submissions_urgency",
+    sql: `CREATE INDEX IF NOT EXISTS idx_submissions_urgency ON submissions(booking_urgency)`,
+  },
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,
