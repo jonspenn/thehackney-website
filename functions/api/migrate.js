@@ -50,6 +50,19 @@ const MIGRATIONS = [
       created_at TEXT NOT NULL
     )`,
   },
+  // ALTER TABLE additions for contacts created in earlier sessions with fewer columns.
+  // Each runs independently - errors (column already exists) are caught and ignored.
+  { name: "add_company", sql: `ALTER TABLE contacts ADD COLUMN company TEXT` },
+  { name: "add_last_name", sql: `ALTER TABLE contacts ADD COLUMN last_name TEXT` },
+  { name: "add_lead_type", sql: `ALTER TABLE contacts ADD COLUMN lead_type TEXT` },
+  { name: "add_source_channel", sql: `ALTER TABLE contacts ADD COLUMN source_channel TEXT` },
+  { name: "add_source_keyword", sql: `ALTER TABLE contacts ADD COLUMN source_keyword TEXT` },
+  { name: "add_source_campaign", sql: `ALTER TABLE contacts ADD COLUMN source_campaign TEXT` },
+  { name: "add_source_match_type", sql: `ALTER TABLE contacts ADD COLUMN source_match_type TEXT` },
+  { name: "add_hubspot_contact_id", sql: `ALTER TABLE contacts ADD COLUMN hubspot_contact_id TEXT` },
+  { name: "add_klaviyo_profile_id", sql: `ALTER TABLE contacts ADD COLUMN klaviyo_profile_id TEXT` },
+  { name: "add_form_data", sql: `ALTER TABLE contacts ADD COLUMN form_data TEXT` },
+  { name: "add_questionnaire_data", sql: `ALTER TABLE contacts ADD COLUMN questionnaire_data TEXT` },
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,
