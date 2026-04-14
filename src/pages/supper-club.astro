@@ -4,6 +4,7 @@ import HeroSection from '../components/HeroSection.astro';
 import ProofBar from '../components/ProofBar.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
 ---
 
 <Base title="Supper Club East London | Guest Chef Dinners at The Hackney, E2" description="Supper club nights at The Hackney - guest chef dinners, live music and paired wines inside a restored 1856 brewery on Hackney Road. Sign up for upcoming dates.">
@@ -12,9 +13,11 @@ import SectionHeader from '../components/SectionHeader.astro';
   <HeroSection
     image="/images/hackney-supper-club-sepps-taste-of-toronto.webp"
     alt="Sepps hosting A Taste of Toronto supper club at The Hackney, guests filming at candlelit tables"
-    heading="Guest Chef Dinners.<br>No Phones. No Pretence."
-    cta={{ label: "Get On The List", href: "#signup" }}
-    note="A dining series inside a restored 1856 brewery"
+    eyebrow="The Hackney Supper Club"
+    heading="Guest Chef Dinners.<br>By Invitation First."
+    subtext="Intimate, candlelit evenings with London's favourite chefs inside a restored 1856 brewery. Forty seats. One menu. One night only."
+    cta={{ label: "Get Early Access", href: "#signup" }}
+    note="Our list hears 48 hours before tickets go public. Events regularly sell out."
     height="mid"
     textGradient={true}
     position="center 30%"
@@ -27,6 +30,27 @@ import SectionHeader from '../components/SectionHeader.astro';
     { number: "Live Music", label: "Acoustic sets throughout the evening" },
     { number: "Featured Creators", label: "@sepps, The Nudge and more" }
   ]} />
+
+  <!-- ==================== PRIMARY SIGNUP (moved up - conversion priority) ==================== -->
+  <Section bg="light" border="bottom" id="signup">
+    <div class="signup-primary-inner">
+      <SectionHeader
+        eyebrow="How The List Works"
+        heading="Three Things We Promise."
+      />
+      <ProcessSteps steps={[
+        { title: "Dates Before Anyone Else", description: "We announce new supper clubs to the list 48 hours before tickets open publicly." },
+        { title: "First Refusal On Seats", description: "Limited to 40 guests per night. List members get the first chance to claim a seat before we open to The Nudge, partners or social." },
+        { title: "A Handful Of Emails A Year", description: "No spam. We email when there is a supper club worth knowing about. That is it." }
+      ]} />
+
+      <form class="signup-form-primary" id="signupFormPrimary" action="#" method="POST" data-form="supperclub-signup" data-form-location="primary">
+        <input type="email" name="email" placeholder="Your email address" required aria-label="Email address">
+        <button type="submit" class="btn btn-primary">Get Early Access</button>
+      </form>
+      <p class="signup-primary-note">Events in 2026 have sold out within days. The only reliable way to get a seat is to be on the list.</p>
+    </div>
+  </Section>
 
   <!-- ==================== THE CONCEPT ==================== -->
   <Section bg="light" border="bottom">
@@ -52,10 +76,22 @@ import SectionHeader from '../components/SectionHeader.astro';
       eyebrow="Upcoming Dates"
       heading="Next Supper Club"
     />
-    <p class="upcoming-intro">Tickets for our current series are available through The Nudge. Sign up below to hear about future dates first.</p>
+    <p class="upcoming-intro">New dates are announced to the list first. Get on the list and you will hear before anyone else.</p>
 
     <div class="event-cards">
-      <div class="event-card">
+      <div class="event-card event-card-holding">
+        <div class="event-date">Next Date, Coming Soon</div>
+        <h3>To Be Announced</h3>
+        <div class="event-chef">Guest chef reveal to follow</div>
+        <p class="event-desc">Our next supper club is in planning. List members get the date, chef and menu 48 hours before tickets go public. Past events have sold out within days.</p>
+        <div class="event-meta">
+          <div class="event-meta-item"><strong>Format:</strong> Welcome cocktail, multi-course dinner, paired wines, live acoustic music</div>
+          <div class="event-meta-item"><strong>Seats:</strong> Limited to 40 per night</div>
+        </div>
+        <a href="#signup" class="btn btn-outline-dark">Get On The List</a>
+      </div>
+
+      <div class="event-card event-card-past">
         <div class="event-badge">Past Event</div>
         <div class="event-date">Wednesday 26 March 2026</div>
         <h3>Do Not Disturb: A Dopamine Reset Dinner</h3>
@@ -66,7 +102,7 @@ import SectionHeader from '../components/SectionHeader.astro';
           <div class="event-meta-item"><strong>Includes:</strong> Cocktail, 3 courses, 3 wines, live music</div>
           <div class="event-meta-item"><strong>Partner:</strong> The Nudge</div>
         </div>
-        <span class="btn btn-outline-dark" style="opacity: 0.5; cursor: default;">Tickets Sold Out</span>
+        <span class="btn btn-outline-dark" style="opacity: 0.5; cursor: default;">Sold Out</span>
       </div>
 
       <!-- TEMPLATE: copy this card for future events
@@ -184,18 +220,18 @@ import SectionHeader from '../components/SectionHeader.astro';
     </div>
   </Section>
 
-  <!-- ==================== EMAIL SIGNUP ==================== -->
-  <Section bg="dark" padding="standard" id="signup">
+  <!-- ==================== EMAIL SIGNUP (reinforcement capture) ==================== -->
+  <Section bg="dark" padding="standard" id="signup-reinforce">
     <div class="signup-inner">
       <SectionHeader
-        eyebrow="Stay In The Loop"
-        heading="Get Supper Club Dates First"
+        eyebrow="Last Chance"
+        heading="Do Not Miss The Next One"
         align="center"
       />
-      <p class="signup-body">We announce new dates, guest chefs and menus by email before anywhere else. No spam - just dinner invitations a few times a year.</p>
-      <form class="signup-form" id="signupForm" action="#" method="POST">
+      <p class="signup-body">Our list hears about new supper clubs 48 hours before tickets go public. Forty seats, one menu, one night only - and they go fast.</p>
+      <form class="signup-form" id="signupForm" action="#" method="POST" data-form="supperclub-signup" data-form-location="reinforce">
         <input type="email" name="email" placeholder="Your email address" required aria-label="Email address">
-        <button type="submit" class="btn btn-primary-dark">Sign Up</button>
+        <button type="submit" class="btn btn-primary-dark">Get Early Access</button>
       </form>
       <p class="signup-note">We will only email you about supper club events. Unsubscribe any time.</p>
     </div>
@@ -220,6 +256,82 @@ import SectionHeader from '../components/SectionHeader.astro';
   </Section>
 
   <style>
+    /* ==================== PRIMARY SIGNUP (Section 3) ==================== */
+    .signup-primary-inner {
+      max-width: 960px;
+    }
+
+    .signup-form-primary {
+      display: flex;
+      gap: 12px;
+      max-width: 560px;
+      margin: 40px 0 16px;
+    }
+
+    .signup-form-primary input[type="email"] {
+      flex: 1;
+      padding: 16px 20px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      border: 2px solid rgba(44, 24, 16, 0.15);
+      background: var(--warm-canvas);
+      color: var(--brewery-dark);
+      outline: none;
+      transition: border-color 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .signup-form-primary input[type="email"]::placeholder {
+      color: rgba(44, 24, 16, 0.4);
+    }
+
+    .signup-form-primary input[type="email"]:focus {
+      border-color: var(--forest-olive);
+    }
+
+    .signup-form-primary .btn-primary {
+      white-space: nowrap;
+      padding: 16px 28px;
+    }
+
+    .signup-primary-note {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-size: 16px;
+      color: var(--fired-brick);
+      line-height: 1.5;
+      max-width: 600px;
+      margin: 0;
+    }
+
+    @media (max-width: 640px) {
+      .signup-form-primary {
+        flex-direction: column;
+      }
+      .signup-form-primary .btn-primary {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    /* ==================== UPCOMING EVENTS: HOLDING STATE ==================== */
+    .event-card-holding {
+      border-color: var(--dusty-coral);
+      border-left: 3px solid var(--dusty-coral);
+    }
+
+    .event-card-holding .event-date {
+      color: var(--dusty-coral);
+    }
+
+    .event-card-holding h3 {
+      color: var(--warm-canvas);
+    }
+
+    .event-card-past {
+      opacity: 0.7;
+    }
+
     /* ==================== THE CONCEPT ==================== */
     .concept-inner {
       max-width: 720px;
