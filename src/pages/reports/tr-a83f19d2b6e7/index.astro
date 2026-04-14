@@ -1,8 +1,8 @@
 ---
 /**
- * Internal click-tracking dashboard for /check-your-date.
+ * Internal visitor tracking dashboard for the D1 data platform.
  *
- * URL: /reports/dc-ff544c5d7a1d/
+ * URL: /reports/tr-a83f19d2b6e7/
  *
  * NOT linked from anywhere on the public site. Hidden from:
  *   - Google + all search engines (meta robots, X-Robots-Tag, robots.txt)
@@ -10,10 +10,10 @@
  *   - The public sitemap (filtered in astro.config.mjs)
  *   - Social previews (no og: tags, no canonical link)
  *
- * Audience: Hugo and James (and Jon). Bookmark the URL.
- * Built 2026-04-07 alongside Phase 1 of prd-dynamic-pricing.md.
+ * Audience: Jon, Hugo, and James. Bookmark the URL.
+ * Built 2026-04-14 alongside Phase 1 of prd-sys-d1-data-platform.md.
  */
-import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
+import TrackingReport from '../../../components/TrackingReport.jsx';
 ---
 
 <!doctype html>
@@ -45,7 +45,7 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
 
     <!-- No social previews. No canonical. -->
 
-    <title>Click tracking - The Hackney</title>
+    <title>Visitor tracking - The Hackney</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -139,6 +139,9 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 12px;
+        margin-bottom: 12px;
+      }
+      .rep-totals--today {
         margin-bottom: 32px;
       }
       @media (max-width: 720px) {
@@ -149,6 +152,10 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
         border: 1px solid rgba(44, 24, 16, 0.12);
         border-radius: 2px;
         padding: 20px;
+      }
+      .rep-stat--today {
+        background: rgba(73, 89, 14, 0.04);
+        border-color: rgba(73, 89, 14, 0.15);
       }
       .rep-stat__num {
         font-family: var(--serif);
@@ -218,7 +225,7 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
         margin: 0 0 20px;
       }
 
-      /* Top dates */
+      /* Top list (pages, CTAs, sources, events) */
       .rep-toplist {
         list-style: none;
         margin: 0;
@@ -236,6 +243,10 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
         border-bottom: 1px solid rgba(44, 24, 16, 0.06);
       }
       .rep-toprow:last-child { border-bottom: none; }
+      .rep-toprow--compact {
+        grid-template-columns: 32px minmax(140px, 1.2fr) 3fr 48px;
+        padding: 10px 20px;
+      }
       .rep-toprank {
         font-family: var(--serif);
         font-size: 18px;
@@ -265,119 +276,102 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
         font-weight: 500;
       }
       @media (max-width: 720px) {
-        .rep-toprow {
+        .rep-toprow, .rep-toprow--compact {
           grid-template-columns: 24px 1fr 40px;
           gap: 10px;
         }
         .rep-topbar { display: none; }
       }
 
-      /* Day of week */
-      .rep-dow {
-        background: #fff;
-        border: 1px solid rgba(44, 24, 16, 0.12);
-        border-radius: 2px;
-        padding: 24px;
+      /* Two-column layout for sources + devices */
+      .rep-two-col {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 12px;
-        align-items: end;
-      }
-      .rep-dow__col {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-      }
-      .rep-dow__bar {
-        height: 160px;
-        width: 100%;
-        max-width: 56px;
-        display: flex;
-        align-items: flex-end;
-        background: rgba(44, 24, 16, 0.04);
-        border-radius: 2px;
-      }
-      .rep-dow__fill {
-        width: 100%;
-        background: var(--color-mid-olive);
-        border-radius: 2px 2px 0 0;
-        min-height: 2px;
-      }
-      .rep-dow__count {
-        font-family: var(--serif);
-        font-size: 16px;
-        font-weight: 500;
-      }
-      .rep-dow__label {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: rgba(44, 24, 16, 0.55);
-      }
-
-      /* Heatmap */
-      .rep-heatmap {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-      }
-      @media (max-width: 1000px) {
-        .rep-heatmap { grid-template-columns: repeat(3, 1fr); }
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
       }
       @media (max-width: 720px) {
-        .rep-heatmap { grid-template-columns: repeat(2, 1fr); }
+        .rep-two-col { grid-template-columns: 1fr; }
       }
-      @media (max-width: 480px) {
-        .rep-heatmap { grid-template-columns: 1fr; }
+
+      /* Device cards */
+      .rep-device-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
       }
-      .rep-month {
+      .rep-device-card {
         background: #fff;
         border: 1px solid rgba(44, 24, 16, 0.12);
         border-radius: 2px;
-        padding: 14px;
+        padding: 20px;
+        text-align: center;
       }
-      .rep-month__label {
+      .rep-device-card__pct {
         font-family: var(--serif);
-        font-size: 16px;
+        font-size: 32px;
         font-weight: 500;
-        text-align: center;
-        margin-bottom: 8px;
+        color: var(--color-brewery-dark);
+        line-height: 1.1;
       }
-      .rep-month__dow {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
-        font-size: 9px;
+      .rep-device-card__label {
+        font-size: 11px;
         font-weight: 700;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: rgba(44, 24, 16, 0.45);
-        text-align: center;
-        margin-bottom: 4px;
-      }
-      .rep-month__grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
-      }
-      .rep-month__cell {
-        aspect-ratio: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        font-weight: 500;
-        background: rgba(44, 24, 16, 0.04);
         color: rgba(44, 24, 16, 0.55);
-        border-radius: 2px;
+        margin-top: 8px;
       }
-      .rep-month__cell--blank {
-        background: transparent;
+      .rep-device-card__count {
+        font-size: 12px;
+        color: rgba(44, 24, 16, 0.45);
+        margin-top: 4px;
       }
 
-      /* Recent table */
+      /* Event badges */
+      .rep-event-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 2px;
+        white-space: nowrap;
+      }
+      .rep-event-badge--page {
+        background: rgba(46, 64, 9, 0.1);
+        color: var(--color-forest-olive);
+      }
+      .rep-event-badge--cta {
+        background: rgba(73, 89, 14, 0.12);
+        color: var(--color-mid-olive);
+      }
+      .rep-event-badge--date {
+        background: rgba(191, 114, 86, 0.12);
+        color: var(--color-dusty-coral);
+      }
+      .rep-event-badge--scroll {
+        background: rgba(44, 24, 16, 0.06);
+        color: rgba(44, 24, 16, 0.6);
+      }
+      .rep-event-badge--questionnaire {
+        background: rgba(140, 71, 46, 0.1);
+        color: var(--color-fired-brick);
+      }
+      .rep-event-badge--form {
+        background: rgba(73, 89, 14, 0.12);
+        color: var(--color-mid-olive);
+      }
+      .rep-event-badge--brochure {
+        background: rgba(191, 114, 86, 0.12);
+        color: var(--color-dusty-coral);
+      }
+
+      /* Tables */
+      .rep-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
       .rep-table {
         width: 100%;
         background: #fff;
@@ -385,6 +379,7 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
         border-collapse: collapse;
         border-radius: 2px;
         overflow: hidden;
+        min-width: 600px;
       }
       .rep-table th, .rep-table td {
         padding: 10px 16px;
@@ -404,7 +399,7 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
       .rep-table__ref {
         color: rgba(44, 24, 16, 0.55);
         font-size: 12px;
-        max-width: 360px;
+        max-width: 280px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -418,26 +413,32 @@ import ClickStatsReport from '../../../components/ClickStatsReport.jsx';
         color: rgba(44, 24, 16, 0.45);
         line-height: 1.6;
       }
+
+      @media (max-width: 480px) {
+        .rep-shell { padding: 24px 16px 64px; }
+        .rep-title { font-size: 32px; }
+      }
     </style>
   </head>
   <body>
     <div class="rep-shell">
       <p class="rep-eyebrow">Internal - The Hackney</p>
-      <h1 class="rep-title">Date click tracking</h1>
+      <h1 class="rep-title">Visitor tracking</h1>
       <p class="rep-lede">
-        Anonymous click data from couples using the availability calendar
-        on /check-your-date. Refreshes automatically every minute.
+        First-party visitor data from the D1 tracking platform.
+        Shows visitors, sessions, page views, CTA clicks, and traffic sources.
+        Auto-refreshes every 60 seconds.
         Bookmark this page - it isn't linked from anywhere.
       </p>
 
-      <ClickStatsReport client:load />
+      <TrackingReport client:load />
 
       <div class="rep-footer">
         Internal dashboard. Do not share this URL outside the team.
-        Data is fully anonymous (no names, no emails, no IPs) and is
-        used to calibrate dynamic pricing and surface demand patterns.
+        Data is first-party and anonymous (no names, no emails, no IPs stored).
+        Cookie consent is respected - declined visitors get session-only tracking.
         <br />
-        Also available: <a href="/reports/tr-a83f19d2b6e7/" style="color: var(--color-dusty-coral);">Visitor tracking dashboard</a>
+        Also available: <a href="/reports/dc-ff544c5d7a1d/" style="color: var(--color-dusty-coral);">Date click tracking</a>
       </div>
     </div>
   </body>
