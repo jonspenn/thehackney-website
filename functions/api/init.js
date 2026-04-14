@@ -105,6 +105,11 @@ export async function onRequestPost(context) {
   const ua = (request.headers.get("user-agent") || "").slice(0, 500);
   const deviceType = detectDevice(ua);
 
+  // IP geolocation from Cloudflare (free on every request)
+  const cf = request.cf || {};
+  const ipCountry = cf.country || null; // 2-letter code e.g. "GB"
+  const ipCity = cf.city || null;       // e.g. "London"
+
   const cookies = parseCookies(request.headers.get("cookie"));
   const existingVid = cookies[COOKIE_NAME];
 
@@ -156,9 +161,21 @@ export async function onRequestPost(context) {
             params.fbclid || null, deviceType
           ).run();
 
+          // Update last-touch attribution on every new session
           await env.DB.prepare(
-            "UPDATE visitors SET last_seen_at = ?, total_sessions = total_sessions + 1 WHERE visitor_id = ?"
-          ).bind(now(), visitorId).run();
+            `UPDATE visitors SET last_seen_at = ?, total_sessions = total_sessions + 1,
+              latest_utm_source = ?, latest_utm_medium = ?, latest_utm_campaign = ?,
+              latest_utm_term = ?, latest_utm_content = ?,
+              latest_referrer = ?, latest_landing_page = ?
+             WHERE visitor_id = ?`
+          ).bind(
+            now(),
+            params.utm_source || null, params.utm_medium || null,
+            params.utm_campaign || null, params.utm_term || null,
+            params.utm_content || null,
+            referrer || null, page,
+            visitorId
+          ).run();
         }
 
         // Update last_seen
@@ -188,8 +205,12 @@ export async function onRequestPost(context) {
           first_utm_term, first_utm_content, first_gclid, first_fbclid,
           first_hsa_cam, first_hsa_kw, first_hsa_mt, device_type, total_sessions, total_page_views,
           first_wbraid, first_gbraid, first_fbc, first_fbp,
-          first_ttclid, first_msclkid, first_li_fat_id)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?, ?, ?, ?, ?, ?)`
+          first_ttclid, first_msclkid, first_li_fat_id,
+          first_ip_country, first_ip_city,
+          latest_utm_source, latest_utm_medium, latest_utm_campaign,
+          latest_utm_term, latest_utm_content, latest_referrer, latest_landing_page)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?, ?, ?, ?, ?, ?,
+                 ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         visitorId, ts, ts, page, referrer || null,
         params.utm_source || null, params.utm_medium || null,
@@ -200,7 +221,11 @@ export async function onRequestPost(context) {
         params.wbraid || null, params.gbraid || null,
         params._fbc || null, params._fbp || null,
         params.ttclid || null, params.msclkid || null,
-        params.li_fat_id || null
+        params.li_fat_id || null,
+        ipCountry, ipCity,
+        params.utm_source || null, params.utm_medium || null,
+        params.utm_campaign || null, params.utm_term || null,
+        params.utm_content || null, referrer || null, page
       ).run();
 
       await env.DB.prepare(

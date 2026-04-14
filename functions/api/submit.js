@@ -207,6 +207,11 @@ export async function onRequestPost(context) {
       let utmContent = null, firstLandingPage = null, firstReferrer = null;
       let deviceType = null;
       let sessionsBefore = null;
+      // IP geolocation + last-touch + engagement metrics
+      let ipCountry = null, ipCity = null;
+      let latestSource = null, latestReferrer = null, latestLandingPage = null;
+      let totalPageViews = null, avgPageViews = null;
+      let firstSeenAt = null, lastSeenAt = null;
 
       if (visitorId) {
         const visitor = await env.DB.prepare(
@@ -215,7 +220,12 @@ export async function onRequestPost(context) {
                   first_gclid, first_fbclid, first_fbc, first_fbp,
                   first_wbraid, first_gbraid,
                   first_ttclid, first_msclkid, first_li_fat_id,
-                  first_landing_page, first_referrer, device_type
+                  first_landing_page, first_referrer, device_type,
+                  first_ip_country, first_ip_city,
+                  latest_utm_source, latest_utm_medium, latest_utm_campaign,
+                  latest_referrer, latest_landing_page,
+                  total_page_views, total_sessions,
+                  first_seen_at, last_seen_at
            FROM visitors WHERE visitor_id = ?`
         ).bind(visitorId).first();
 
@@ -243,6 +253,24 @@ export async function onRequestPost(context) {
           firstLandingPage = visitor.first_landing_page || null;
           firstReferrer = visitor.first_referrer || null;
           deviceType = visitor.device_type || null;
+
+          // IP geolocation
+          ipCountry = visitor.first_ip_country || null;
+          ipCity = visitor.first_ip_city || null;
+
+          // Last-touch attribution
+          const latSrc = [visitor.latest_utm_source, visitor.latest_utm_medium]
+            .filter(Boolean).join(" / ");
+          latestSource = latSrc || null;
+          latestReferrer = visitor.latest_referrer || null;
+          latestLandingPage = visitor.latest_landing_page || null;
+
+          // Engagement metrics
+          totalPageViews = visitor.total_page_views || null;
+          const sessions = visitor.total_sessions || 1;
+          avgPageViews = totalPageViews ? Math.round((totalPageViews / sessions) * 10) / 10 : null;
+          firstSeenAt = visitor.first_seen_at || null;
+          lastSeenAt = visitor.last_seen_at || null;
         }
 
         // Count sessions before this conversion
@@ -265,8 +293,12 @@ export async function onRequestPost(context) {
           gclid, fbclid, fbc, fbp, wbraid, gbraid,
           ttclid, msclkid, li_fat_id, utm_content,
           first_landing_page, conversion_page, sessions_before_conversion,
-          device_type, first_referrer
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          device_type, first_referrer,
+          ip_country, ip_city,
+          latest_source, latest_referrer, latest_landing_page,
+          total_page_views, avg_page_views_per_session,
+          first_seen_at, last_seen_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         contactId, visitorId, email, firstName, lastName, phone, company,
         leadType, sourceChannel, sourceKeyword, sourceCampaign, sourceMatchType,
@@ -274,7 +306,11 @@ export async function onRequestPost(context) {
         gclid, fbclid, fbc, fbp, wbraid, gbraid,
         ttclid, msclkid, liFatId, utmContent,
         firstLandingPage, conversionPage, sessionsBefore,
-        deviceType, firstReferrer
+        deviceType, firstReferrer,
+        ipCountry, ipCity,
+        latestSource, latestReferrer, latestLandingPage,
+        totalPageViews, avgPageViews,
+        firstSeenAt, lastSeenAt
       ).run();
 
       // Stitch visitor record to this contact

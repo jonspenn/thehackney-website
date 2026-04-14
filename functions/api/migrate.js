@@ -118,6 +118,34 @@ const MIGRATIONS = [
     name: "idx_submissions_urgency",
     sql: `CREATE INDEX IF NOT EXISTS idx_submissions_urgency ON submissions(booking_urgency)`,
   },
+  // ── Visitors: IP geolocation ──
+  { name: "vis_add_ip_country", sql: `ALTER TABLE visitors ADD COLUMN first_ip_country TEXT` },
+  { name: "vis_add_ip_city", sql: `ALTER TABLE visitors ADD COLUMN first_ip_city TEXT` },
+
+  // ── Visitors: last-touch attribution (updated on every new session) ──
+  { name: "vis_add_latest_utm_source", sql: `ALTER TABLE visitors ADD COLUMN latest_utm_source TEXT` },
+  { name: "vis_add_latest_utm_medium", sql: `ALTER TABLE visitors ADD COLUMN latest_utm_medium TEXT` },
+  { name: "vis_add_latest_utm_campaign", sql: `ALTER TABLE visitors ADD COLUMN latest_utm_campaign TEXT` },
+  { name: "vis_add_latest_utm_term", sql: `ALTER TABLE visitors ADD COLUMN latest_utm_term TEXT` },
+  { name: "vis_add_latest_utm_content", sql: `ALTER TABLE visitors ADD COLUMN latest_utm_content TEXT` },
+  { name: "vis_add_latest_referrer", sql: `ALTER TABLE visitors ADD COLUMN latest_referrer TEXT` },
+  { name: "vis_add_latest_landing_page", sql: `ALTER TABLE visitors ADD COLUMN latest_landing_page TEXT` },
+
+  // ── Contacts: IP geolocation ──
+  { name: "ct_add_ip_country", sql: `ALTER TABLE contacts ADD COLUMN ip_country TEXT` },
+  { name: "ct_add_ip_city", sql: `ALTER TABLE contacts ADD COLUMN ip_city TEXT` },
+
+  // ── Contacts: last-touch attribution ──
+  { name: "ct_add_latest_source", sql: `ALTER TABLE contacts ADD COLUMN latest_source TEXT` },
+  { name: "ct_add_latest_referrer", sql: `ALTER TABLE contacts ADD COLUMN latest_referrer TEXT` },
+  { name: "ct_add_latest_landing_page", sql: `ALTER TABLE contacts ADD COLUMN latest_landing_page TEXT` },
+
+  // ── Contacts: engagement metrics ──
+  { name: "ct_add_total_page_views", sql: `ALTER TABLE contacts ADD COLUMN total_page_views INTEGER` },
+  { name: "ct_add_avg_page_views", sql: `ALTER TABLE contacts ADD COLUMN avg_page_views_per_session REAL` },
+  { name: "ct_add_first_seen_at", sql: `ALTER TABLE contacts ADD COLUMN first_seen_at TEXT` },
+  { name: "ct_add_last_seen_at", sql: `ALTER TABLE contacts ADD COLUMN last_seen_at TEXT` },
+
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,

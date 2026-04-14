@@ -912,9 +912,13 @@ export default function AdminDashboard() {
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("urgency")} style={{ cursor: "pointer" }}>Urgency{sortIndicator("urgency")}</th>}
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("budget")} style={{ cursor: "pointer" }}>Budget{sortIndicator("budget")}</th>}
                       <th>Source</th>
+                      <th>Last source</th>
                       <th>Ad platform</th>
+                      <th>Location</th>
                       <th>Device</th>
                       <th onClick={() => toggleSort("sessions_before_conversion")} style={{ cursor: "pointer" }}>Sessions{sortIndicator("sessions_before_conversion")}</th>
+                      <th onClick={() => toggleSort("total_page_views")} style={{ cursor: "pointer" }}>Pages{sortIndicator("total_page_views")}</th>
+                      <th>First seen</th>
                       <th>Landing page</th>
                       <th>Also interested in</th>
                     </tr>
@@ -953,9 +957,13 @@ export default function AdminDashboard() {
                           </td>
                         )}
                         <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
+                        <td className="rep-table__ref">{lead.latest_source || "\u2014"}</td>
                         <td>{lead.ad_platform || "\u2014"}</td>
+                        <td>{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "\u2014"}</td>
                         <td>{lead.device_type || "\u2014"}</td>
                         <td>{lead.sessions_before_conversion != null ? lead.sessions_before_conversion : "\u2014"}</td>
+                        <td>{lead.total_page_views != null ? `${lead.total_page_views} (${lead.avg_page_views_per_session || "\u2014"}/s)` : "\u2014"}</td>
+                        <td>{lead.first_seen_at ? formatRelativeTime(lead.first_seen_at) : "\u2014"}</td>
                         <td className="rep-table__ref">{lead.first_landing_page || "\u2014"}</td>
                         <td>
                           {lead.cross_sell_labels?.length > 0 ? (

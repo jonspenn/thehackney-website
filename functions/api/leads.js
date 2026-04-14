@@ -103,6 +103,10 @@ export async function onRequestGet(context) {
         c.ttclid, c.msclkid, c.li_fat_id, c.utm_content,
         c.first_landing_page, c.conversion_page,
         c.sessions_before_conversion, c.device_type, c.first_referrer,
+        c.ip_country, c.ip_city,
+        c.latest_source, c.latest_referrer, c.latest_landing_page,
+        c.total_page_views, c.avg_page_views_per_session,
+        c.first_seen_at, c.last_seen_at,
         s.form_type, s.form_data as submission_form_data, s.created_at as submitted_at,
         s.event_type, s.booking_urgency, s.guest_count, s.budget,
         s.wedding_year, s.event_date, s.brochure_type
@@ -191,6 +195,18 @@ export async function onRequestGet(context) {
           sessions_before_conversion: row.sessions_before_conversion,
           device_type: row.device_type,
           first_referrer: row.first_referrer,
+          // Geo
+          ip_country: row.ip_country,
+          ip_city: row.ip_city,
+          // Last-touch
+          latest_source: row.latest_source,
+          latest_referrer: row.latest_referrer,
+          latest_landing_page: row.latest_landing_page,
+          // Engagement
+          total_page_views: row.total_page_views,
+          avg_page_views_per_session: row.avg_page_views_per_session,
+          first_seen_at: row.first_seen_at,
+          last_seen_at: row.last_seen_at,
           // Parsed fields
           event_type: null,
           event_type_label: null,
