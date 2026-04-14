@@ -1,0 +1,384 @@
+---
+/**
+ * Internal analytics dashboard - combined view.
+ *
+ * URL: /admin/dashboard/
+ *
+ * Protected by Cloudflare Access (zero trust). Only verified team
+ * emails can reach this page. Cloudflare intercepts the request at the
+ * edge before it hits the origin.
+ *
+ * NOT linked from anywhere on the public site. Hidden from:
+ *   - Google + all search engines (meta robots)
+ *   - AI training crawlers (named user-agents)
+ *   - The public sitemap (filtered in astro.config.mjs)
+ *   - Social previews (no og: tags, no canonical)
+ *
+ * Audience: Jon, Hugo, and James.
+ * Built 2026-04-14.
+ */
+import AdminDashboard from '../../../components/AdminDashboard.jsx';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Hard noindex -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, nocache, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <meta name="googlebot-news" content="noindex, nofollow" />
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="slurp" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="duckduckbot" content="noindex, nofollow" />
+    <meta name="baiduspider" content="noindex, nofollow" />
+    <meta name="yandex" content="noindex, nofollow" />
+    <meta name="ChatGPT-User" content="noindex, nofollow" />
+    <meta name="GPTBot" content="noindex, nofollow" />
+    <meta name="Google-Extended" content="noindex, nofollow" />
+    <meta name="ClaudeBot" content="noindex, nofollow" />
+    <meta name="anthropic-ai" content="noindex, nofollow" />
+    <meta name="PerplexityBot" content="noindex, nofollow" />
+    <meta name="CCBot" content="noindex, nofollow" />
+    <meta name="Applebot-Extended" content="noindex, nofollow" />
+
+    <meta name="referrer" content="no-referrer" />
+
+    <title>Dashboard - The Hackney</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;700&display=swap"
+    />
+
+    <style is:global>
+      :root {
+        --color-warm-canvas: #F5F0E8;
+        --color-brewery-dark: #2C1810;
+        --color-forest-olive: #2E4009;
+        --color-mid-olive: #49590E;
+        --color-fired-brick: #8C472E;
+        --color-dusty-coral: #BF7256;
+        --color-mahogany: #40160C;
+        --serif: 'Cormorant Garamond', Georgia, serif;
+        --sans: 'DM Sans', system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: var(--sans);
+        background: var(--color-warm-canvas);
+        color: var(--color-brewery-dark);
+        font-size: 15px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .rep-shell {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 48px 32px 96px;
+      }
+
+      .rep-eyebrow {
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-dusty-coral);
+        margin: 0 0 8px;
+      }
+      .rep-title {
+        font-family: var(--serif);
+        font-size: 42px;
+        font-weight: 500;
+        margin: 0 0 8px;
+        color: var(--color-brewery-dark);
+        letter-spacing: -0.01em;
+      }
+      .rep-lede {
+        font-family: var(--sans);
+        font-size: 14px;
+        max-width: 640px;
+        margin: 0 0 32px;
+        color: rgba(44, 24, 16, 0.7);
+      }
+
+      .rep-state {
+        padding: 64px;
+        text-align: center;
+        font-size: 16px;
+        color: rgba(44, 24, 16, 0.6);
+      }
+      .rep-state--error { color: var(--color-fired-brick); }
+      .rep-retry {
+        margin-top: 16px;
+        font-family: var(--sans);
+        background: var(--color-mid-olive);
+        color: var(--color-warm-canvas);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 2px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .rep { position: relative; }
+
+      /* ── Tabs ── */
+      .adm-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid rgba(44, 24, 16, 0.12);
+        padding-bottom: 0;
+        align-items: flex-end;
+      }
+      .adm-tab {
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: transparent;
+        border: 1px solid transparent;
+        border-bottom: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        color: rgba(44, 24, 16, 0.55);
+        border-radius: 2px 2px 0 0;
+        transition: color 0.15s, background 0.15s;
+        margin-bottom: -1px;
+      }
+      .adm-tab:hover {
+        color: var(--color-brewery-dark);
+        background: rgba(44, 24, 16, 0.03);
+      }
+      .adm-tab--active {
+        color: var(--color-brewery-dark);
+        background: #fff;
+        border-color: rgba(44, 24, 16, 0.12);
+      }
+      .adm-refresh {
+        position: static;
+        margin-left: auto;
+        margin-bottom: 4px;
+      }
+
+      /* ── Stat cards ── */
+      .rep-totals {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .rep-totals--today { margin-bottom: 32px; }
+      @media (max-width: 720px) { .rep-totals { grid-template-columns: repeat(2, 1fr); } }
+      .rep-stat {
+        background: #fff;
+        border: 1px solid rgba(44, 24, 16, 0.12);
+        border-radius: 2px;
+        padding: 20px;
+      }
+      .rep-stat--today {
+        background: rgba(73, 89, 14, 0.04);
+        border-color: rgba(73, 89, 14, 0.15);
+      }
+      .rep-stat__num {
+        font-family: var(--serif);
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 1.1;
+        color: var(--color-brewery-dark);
+      }
+      .rep-stat__label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(44, 24, 16, 0.55);
+        margin-top: 8px;
+      }
+
+      .rep-refresh {
+        font-family: var(--sans);
+        background: transparent;
+        color: var(--color-mid-olive);
+        border: 1px solid var(--color-mid-olive);
+        padding: 8px 16px;
+        border-radius: 2px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .rep-refresh:hover {
+        background: var(--color-mid-olive);
+        color: var(--color-warm-canvas);
+      }
+
+      .rep-empty {
+        background: #fff;
+        border: 1px solid rgba(44, 24, 16, 0.12);
+        border-radius: 2px;
+        padding: 32px;
+        text-align: center;
+        color: rgba(44, 24, 16, 0.7);
+        margin-bottom: 32px;
+      }
+      .rep-empty-small {
+        color: rgba(44, 24, 16, 0.5);
+        font-size: 14px;
+        padding: 16px 0;
+      }
+
+      .rep-section { margin-top: 48px; }
+      .rep-h2 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 500;
+        margin: 0 0 4px;
+        color: var(--color-brewery-dark);
+      }
+      .rep-sub {
+        font-size: 13px;
+        color: rgba(44, 24, 16, 0.6);
+        margin: 0 0 20px;
+      }
+
+      /* ── Top lists ── */
+      .rep-toplist {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        border: 1px solid rgba(44, 24, 16, 0.12);
+        border-radius: 2px;
+      }
+      .rep-toprow {
+        display: grid;
+        grid-template-columns: 32px minmax(180px, 1.5fr) 3fr 48px;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 20px;
+        border-bottom: 1px solid rgba(44, 24, 16, 0.06);
+      }
+      .rep-toprow:last-child { border-bottom: none; }
+      .rep-toprow--compact { grid-template-columns: 32px minmax(140px, 1.2fr) 3fr 48px; padding: 10px 20px; }
+      .rep-toprank { font-family: var(--serif); font-size: 18px; color: var(--color-dusty-coral); font-weight: 500; }
+      .rep-topdate { font-size: 14px; color: var(--color-brewery-dark); }
+      .rep-topbar { background: rgba(44, 24, 16, 0.06); height: 8px; border-radius: 2px; overflow: hidden; }
+      .rep-topbar__fill { display: block; height: 100%; background: var(--color-mid-olive); }
+      .rep-topcount { font-family: var(--serif); font-size: 18px; text-align: right; color: var(--color-brewery-dark); font-weight: 500; }
+      @media (max-width: 720px) {
+        .rep-toprow, .rep-toprow--compact { grid-template-columns: 24px 1fr 40px; gap: 10px; }
+        .rep-topbar { display: none; }
+      }
+
+      /* ── Two-column layout ── */
+      .rep-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+      @media (max-width: 720px) { .rep-two-col { grid-template-columns: 1fr; } }
+
+      /* ── Device cards ── */
+      .rep-device-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+      .rep-device-card {
+        background: #fff;
+        border: 1px solid rgba(44, 24, 16, 0.12);
+        border-radius: 2px;
+        padding: 20px;
+        text-align: center;
+      }
+      .rep-device-card__pct { font-family: var(--serif); font-size: 32px; font-weight: 500; color: var(--color-brewery-dark); line-height: 1.1; }
+      .rep-device-card__label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(44, 24, 16, 0.55); margin-top: 8px; }
+      .rep-device-card__count { font-size: 12px; color: rgba(44, 24, 16, 0.45); margin-top: 4px; }
+
+      /* ── Event badges ── */
+      .rep-event-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 2px; white-space: nowrap; }
+      .rep-event-badge--page { background: rgba(46,64,9,0.1); color: var(--color-forest-olive); }
+      .rep-event-badge--cta { background: rgba(73,89,14,0.12); color: var(--color-mid-olive); }
+      .rep-event-badge--date { background: rgba(191,114,86,0.12); color: var(--color-dusty-coral); }
+      .rep-event-badge--scroll { background: rgba(44,24,16,0.06); color: rgba(44,24,16,0.6); }
+      .rep-event-badge--questionnaire { background: rgba(140,71,46,0.1); color: var(--color-fired-brick); }
+      .rep-event-badge--form { background: rgba(73,89,14,0.12); color: var(--color-mid-olive); }
+      .rep-event-badge--brochure { background: rgba(191,114,86,0.12); color: var(--color-dusty-coral); }
+
+      /* ── Day of week chart ── */
+      .rep-dow {
+        background: #fff;
+        border: 1px solid rgba(44, 24, 16, 0.12);
+        border-radius: 2px;
+        padding: 24px;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 12px;
+        align-items: end;
+      }
+      .rep-dow__col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+      .rep-dow__bar { height: 160px; width: 100%; max-width: 56px; display: flex; align-items: flex-end; background: rgba(44, 24, 16, 0.04); border-radius: 2px; }
+      .rep-dow__fill { width: 100%; background: var(--color-mid-olive); border-radius: 2px 2px 0 0; min-height: 2px; }
+      .rep-dow__count { font-family: var(--serif); font-size: 16px; font-weight: 500; }
+      .rep-dow__label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(44, 24, 16, 0.55); }
+
+      /* ── Heatmap ── */
+      .rep-heatmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+      @media (max-width: 1000px) { .rep-heatmap { grid-template-columns: repeat(3, 1fr); } }
+      @media (max-width: 720px) { .rep-heatmap { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 480px) { .rep-heatmap { grid-template-columns: 1fr; } }
+      .rep-month { background: #fff; border: 1px solid rgba(44, 24, 16, 0.12); border-radius: 2px; padding: 14px; }
+      .rep-month__label { font-family: var(--serif); font-size: 16px; font-weight: 500; text-align: center; margin-bottom: 8px; }
+      .rep-month__dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(44, 24, 16, 0.45); text-align: center; margin-bottom: 4px; }
+      .rep-month__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+      .rep-month__cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; background: rgba(44, 24, 16, 0.04); color: rgba(44, 24, 16, 0.55); border-radius: 2px; }
+      .rep-month__cell--blank { background: transparent; }
+
+      /* ── Tables ── */
+      .rep-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .rep-table { width: 100%; background: #fff; border: 1px solid rgba(44, 24, 16, 0.12); border-collapse: collapse; border-radius: 2px; overflow: hidden; min-width: 600px; }
+      .rep-table th, .rep-table td { padding: 10px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid rgba(44, 24, 16, 0.06); }
+      .rep-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(44, 24, 16, 0.55); background: rgba(44, 24, 16, 0.02); }
+      .rep-table tr:last-child td { border-bottom: none; }
+      .rep-table__ref { color: rgba(44, 24, 16, 0.55); font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+      .rep-footer {
+        margin-top: 64px;
+        padding-top: 24px;
+        border-top: 1px solid rgba(44, 24, 16, 0.1);
+        font-size: 11px;
+        color: rgba(44, 24, 16, 0.45);
+        line-height: 1.6;
+      }
+
+      @media (max-width: 480px) {
+        .rep-shell { padding: 24px 16px 64px; }
+        .rep-title { font-size: 32px; }
+        .adm-tab { padding: 8px 12px; font-size: 11px; letter-spacing: 0.06em; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="rep-shell">
+      <p class="rep-eyebrow">Internal - The Hackney</p>
+      <h1 class="rep-title">Dashboard</h1>
+      <p class="rep-lede">
+        Everything in one place. Visitor tracking, date clicks, CTA performance,
+        traffic sources. Auto-refreshes every 60 seconds.
+      </p>
+
+      <AdminDashboard client:load />
+
+      <div class="rep-footer">
+        Protected by Cloudflare Access. Data is first-party and anonymous
+        (no names, no emails, no IPs stored). Cookie consent is respected.
+      </div>
+    </div>
+  </body>
+</html>
