@@ -2,7 +2,7 @@
 title: "The Hackney Supper Club: Chef-Led Dinners in East London"
 description: "A series of one-night-only supper clubs at The Hackney in East London. Forty seats, one menu, rotating chefs. How the list works and what to expect."
 pubDate: 2026-04-14
-category: "Supper Clubs"
+category: "Food & Drink"
 author: "The Hackney"
 image: "/images/hackney-supper-club-hero-candlelit-long-table-greenery.webp"
 imageAlt: "Long candlelit banquet table at The Hackney set for dinner, with hanging greenery and Edison bulb chandelier"
