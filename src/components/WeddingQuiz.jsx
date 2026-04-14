@@ -643,6 +643,25 @@ export default function WeddingQuiz() {
     goNext();
   }
 
+  /* Budget step (step 5) fires AFTER capture. Send budget + budgetFit to D1
+     as questionnaire_data on the existing contact. Fire-and-forget. */
+  function handleBudgetNext() {
+    if (data.budget && data.email) {
+      fetch("/api/update-contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          email: data.email,
+          questionnaire_data: {
+            budget: data.budget,
+            budget_fit: data.budgetFit,
+          },
+        }),
+      }).catch(() => {}); // silent - lead is already captured
+    }
+    goNext();
+  }
+
   return (
     <div className="wq" id="wedding-quiz">
       {/* Hide dots on Step 1 - showing "1 of 5" before they engage feels like a chore */}
@@ -657,7 +676,7 @@ export default function WeddingQuiz() {
       {step === 2 && <StepUrgency data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 3 && <StepGuests data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 4 && <StepCapture data={data} setData={setData} onNext={handleCaptureSubmit} onBack={goBack} submitting={submitting} />}
-      {step === 5 && <StepBudget data={data} setData={setData} onNext={goNext} onBack={goBack} />}
+      {step === 5 && <StepBudget data={data} setData={setData} onNext={handleBudgetNext} onBack={goBack} />}
       {step === 6 && <StepConfirmation data={data} />}
     </div>
   );

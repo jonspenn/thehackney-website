@@ -126,9 +126,11 @@ export default function AdminDashboard() {
   const [tracking, setTracking] = useState(null);
   const [clicks, setClicks] = useState(null);
   const [contacts, setContacts] = useState(null);
+  const [weddingLeads, setWeddingLeads] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [leadSort, setLeadSort] = useState({ field: "created_at", dir: "desc" });
 
   async function load() {
     setLoading(true);
@@ -149,6 +151,11 @@ export default function AdminDashboard() {
       if (ctRes && ctRes.ok) {
         const ctJson = await ctRes.json();
         if (ctJson.ok) setContacts(ctJson);
+      }
+      const wlRes = await fetch("/api/wedding-leads", { cache: "no-store" }).catch(() => null);
+      if (wlRes && wlRes.ok) {
+        const wlJson = await wlRes.json();
+        if (wlJson.ok) setWeddingLeads(wlJson);
       }
     } catch (err) {
       setError(err.message || "Failed to load");
@@ -198,10 +205,47 @@ export default function AdminDashboard() {
   const t = tracking?.totals || {};
   const c = clicks?.totals || {};
 
+  /* ── sorted wedding leads ── */
+  const sortedLeads = useMemo(() => {
+    if (!weddingLeads?.leads) return [];
+    const arr = [...weddingLeads.leads];
+    const { field, dir } = leadSort;
+    arr.sort((a, b) => {
+      let va = a[field], vb = b[field];
+      // Use rank fields for urgency/budget to get logical ordering
+      if (field === "urgency") { va = a.urgency_rank; vb = b.urgency_rank; }
+      if (field === "budget") { va = a.budget_rank; vb = b.budget_rank; }
+      if (field === "wedding_year") {
+        va = a.wedding_year ? parseInt(a.wedding_year, 10) : 9999;
+        vb = b.wedding_year ? parseInt(b.wedding_year, 10) : 9999;
+      }
+      if (va == null) va = dir === "asc" ? "\uffff" : "";
+      if (vb == null) vb = dir === "asc" ? "\uffff" : "";
+      if (va < vb) return dir === "asc" ? -1 : 1;
+      if (va > vb) return dir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return arr;
+  }, [weddingLeads, leadSort]);
+
+  function toggleSort(field) {
+    setLeadSort(prev =>
+      prev.field === field
+        ? { field, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { field, dir: field === "created_at" ? "desc" : "asc" }
+    );
+  }
+
+  function sortIndicator(field) {
+    if (leadSort.field !== field) return "";
+    return leadSort.dir === "asc" ? " \u25B2" : " \u25BC";
+  }
+
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "visitors", label: "Visitors" },
     { id: "contacts", label: "Contacts" },
+    { id: "wedding-leads", label: "Wedding Leads" },
     { id: "dates", label: "Date Clicks" },
     { id: "events", label: "Events" },
   ];
@@ -580,6 +624,132 @@ export default function AdminDashboard() {
                         </tr>
                       );
                     })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </>
+      )}
+
+      {/* ═══════ WEDDING LEADS TAB ═══════ */}
+      {activeTab === "wedding-leads" && (
+        <>
+          {/* KPIs */}
+          <div className="rep-totals" style={{ marginBottom: "12px" }}>
+            <div className="rep-stat">
+              <div className="rep-stat__num">{weddingLeads?.total || 0}</div>
+              <div className="rep-stat__label">Total wedding leads</div>
+            </div>
+            {(weddingLeads?.summary?.by_urgency || []).filter(u => u.label === "Ready to book" || u.label === "Need to move fast").map(u => (
+              <div key={u.label} className="rep-stat rep-stat--today">
+                <div className="rep-stat__num">{u.count}</div>
+                <div className="rep-stat__label">{u.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Summary breakdowns */}
+          <div className="rep-two-col">
+            <section className="rep-section" style={{ marginTop: "24px" }}>
+              <h2 className="rep-h2">By urgency</h2>
+              {(weddingLeads?.summary?.by_urgency || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                <ol className="rep-toplist">
+                  {weddingLeads.summary.by_urgency.map((row, i) => (
+                    <li key={row.label} className="rep-toprow rep-toprow--compact">
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{row.label}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (weddingLeads.summary.by_urgency[0]?.count || 1)) * 100}%` }} /></span>
+                      <span className="rep-topcount">{row.count}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+            <section className="rep-section" style={{ marginTop: "24px" }}>
+              <h2 className="rep-h2">By budget</h2>
+              {(weddingLeads?.summary?.by_budget || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                <ol className="rep-toplist">
+                  {weddingLeads.summary.by_budget.map((row, i) => (
+                    <li key={row.label} className="rep-toprow rep-toprow--compact">
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{row.label}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (weddingLeads.summary.by_budget[0]?.count || 1)) * 100}%` }} /></span>
+                      <span className="rep-topcount">{row.count}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          </div>
+
+          <div className="rep-two-col">
+            <section className="rep-section">
+              <h2 className="rep-h2">By wedding year</h2>
+              {(weddingLeads?.summary?.by_year || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
+                <ol className="rep-toplist">
+                  {weddingLeads.summary.by_year.map((row, i) => (
+                    <li key={row.label} className="rep-toprow rep-toprow--compact">
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{row.label}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (weddingLeads.summary.by_year[0]?.count || 1)) * 100}%` }} /></span>
+                      <span className="rep-topcount">{row.count}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+            <section className="rep-section" />
+          </div>
+
+          {/* Sortable leads table */}
+          <section className="rep-section">
+            <h2 className="rep-h2">All wedding leads</h2>
+            <p className="rep-sub">Click any column header to sort. Hottest leads sort to the top.</p>
+            {sortedLeads.length === 0 ? <p className="rep-empty-small">No wedding leads yet. Quiz and brochure submissions will appear here.</p> : (
+              <div className="rep-table-wrap">
+                <table className="rep-table rep-table--sortable">
+                  <thead>
+                    <tr>
+                      <th onClick={() => toggleSort("created_at")} style={{ cursor: "pointer" }}>When{sortIndicator("created_at")}</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th onClick={() => toggleSort("wedding_year")} style={{ cursor: "pointer" }}>Year{sortIndicator("wedding_year")}</th>
+                      <th onClick={() => toggleSort("wedding_month")} style={{ cursor: "pointer" }}>Month{sortIndicator("wedding_month")}</th>
+                      <th onClick={() => toggleSort("urgency")} style={{ cursor: "pointer" }}>Urgency{sortIndicator("urgency")}</th>
+                      <th onClick={() => toggleSort("guest_count")} style={{ cursor: "pointer" }}>Guests{sortIndicator("guest_count")}</th>
+                      <th onClick={() => toggleSort("budget")} style={{ cursor: "pointer" }}>Budget{sortIndicator("budget")}</th>
+                      <th>Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedLeads.map((lead) => (
+                      <tr key={lead.contact_id} className={lead.urgency_rank <= 2 ? "rep-row--hot" : ""}>
+                        <td>{formatRelativeTime(lead.created_at)}</td>
+                        <td>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
+                        <td>{lead.email}</td>
+                        <td>{lead.phone || "\u2014"}</td>
+                        <td>{lead.wedding_year || "\u2014"}</td>
+                        <td>{lead.wedding_month || "\u2014"}</td>
+                        <td>
+                          {lead.urgency_label ? (
+                            <span className={`rep-urgency rep-urgency--${lead.urgency || "unknown"}`}>
+                              {lead.urgency_label}
+                            </span>
+                          ) : "\u2014"}
+                        </td>
+                        <td>{lead.guest_count || "\u2014"}</td>
+                        <td>
+                          {lead.budget_label ? (
+                            <span className={`rep-budget rep-budget--${lead.budget || "unknown"}`}>
+                              {lead.budget_label}
+                            </span>
+                          ) : "\u2014"}
+                        </td>
+                        <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
