@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import CookieConsent from '../components/CookieConsent.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -111,6 +112,10 @@ const {
       <slot />
     </main>
     <Footer />
+    <CookieConsent />
+
+    <!-- D1 first-party tracking (prd-sys-d1-data-platform.md Phase 1) -->
+    <script is:inline src="/scripts/tracking.js" defer></script>
 
     <script>
       // Fade-in on scroll intersection observer

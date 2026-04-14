@@ -1,0 +1,156 @@
+---
+/**
+ * CookieConsent.astro - Simple cookie consent banner
+ *
+ * Phase 1 of prd-sys-d1-data-platform.md
+ *
+ * Controls whether the thk_vid tracking cookie persists beyond the session.
+ * Accept: cookie gets 2yr Max-Age on next /api/init call.
+ * Decline: cookie is session-only (cleared on browser close).
+ *
+ * Stores choice in a separate thk_consent cookie (not HttpOnly, readable by JS).
+ * Banner only appears if thk_consent cookie is not set.
+ *
+ * Does NOT gate GTM or Clarity (they currently run ungated, per PRD open question).
+ * This banner only controls the first-party D1 tracking cookie persistence.
+ *
+ * Brand: Warm Canvas background, Brewery Dark text, Mid Olive accept button.
+ */
+---
+
+<div id="cookie-consent" class="cookie-consent" role="dialog" aria-label="Cookie consent" hidden>
+  <div class="cookie-consent-inner">
+    <p class="cookie-consent-text">
+      We use a cookie to remember you between visits so we can show you relevant information.
+      No data is shared with advertisers.
+    </p>
+    <div class="cookie-consent-buttons">
+      <button id="cookie-accept" class="btn btn-primary cookie-consent-accept">Accept</button>
+      <button id="cookie-decline" class="cookie-consent-decline">Decline</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: var(--warm-canvas, #F5F0E8);
+    border-top: 1px solid rgba(44, 24, 16, 0.12);
+    box-shadow: 0 -2px 8px rgba(44, 24, 16, 0.08);
+    padding: 16px 24px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .cookie-consent.visible {
+    transform: translateY(0);
+  }
+
+  .cookie-consent-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .cookie-consent-text {
+    font-family: var(--font-body, 'DM Sans', sans-serif);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--brewery-dark, #2C1810);
+    margin: 0;
+    flex: 1;
+  }
+
+  .cookie-consent-buttons {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .cookie-consent-accept {
+    font-size: 0.8125rem;
+    padding: 8px 20px;
+  }
+
+  .cookie-consent-decline {
+    font-family: var(--font-body, 'DM Sans', sans-serif);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgba(44, 24, 16, 0.5);
+    background: none;
+    border: 1px solid rgba(44, 24, 16, 0.15);
+    border-radius: 2px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .cookie-consent-decline:hover {
+    color: var(--brewery-dark, #2C1810);
+    border-color: rgba(44, 24, 16, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .cookie-consent-inner {
+      flex-direction: column;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .cookie-consent-buttons {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var COOKIE_NAME = "thk_consent";
+    var COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 1 year
+
+    function getConsent() {
+      var m = document.cookie.match(/(?:^|;\s*)thk_consent=(\w+)/);
+      return m ? m[1] : null;
+    }
+
+    function setConsent(value) {
+      document.cookie = COOKIE_NAME + "=" + value +
+        "; path=/; max-age=" + COOKIE_MAX_AGE +
+        "; SameSite=Lax; Secure";
+    }
+
+    // If consent already given, don't show banner
+    if (getConsent()) return;
+
+    var banner = document.getElementById("cookie-consent");
+    if (!banner) return;
+
+    // Show with slight delay for less jarring appearance
+    banner.hidden = false;
+    setTimeout(function () {
+      banner.classList.add("visible");
+    }, 500);
+
+    document.getElementById("cookie-accept").addEventListener("click", function () {
+      setConsent("accepted");
+      banner.classList.remove("visible");
+      setTimeout(function () { banner.hidden = true; }, 300);
+    });
+
+    document.getElementById("cookie-decline").addEventListener("click", function () {
+      setConsent("declined");
+      banner.classList.remove("visible");
+      setTimeout(function () { banner.hidden = true; }, 300);
+    });
+  })();
+</script>

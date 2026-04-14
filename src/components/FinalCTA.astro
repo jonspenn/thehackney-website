@@ -86,8 +86,8 @@ function resolveHref(href: string): string {
     <h2>{heading}</h2>
     {body && <p class="final-cta-body">{body}</p>}
     <div class="final-cta-buttons">
-      <a href={resolveHref(primaryCTA.href)} class="btn btn-primary">{primaryCTA.label}</a>
-      {secondaryCTA && <a href={resolveHref(secondaryCTA.href)} class="btn btn-outline">{secondaryCTA.label}</a>}
+      <a href={resolveHref(primaryCTA.href)} class="btn btn-primary" data-track="cta" data-track-id="final-cta-primary">{primaryCTA.label}</a>
+      {secondaryCTA && <a href={resolveHref(secondaryCTA.href)} class="btn btn-outline" data-track="cta" data-track-id="final-cta-secondary">{secondaryCTA.label}</a>}
     </div>
     {whatsapp && (
       <div class="final-cta-contact">
