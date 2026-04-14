@@ -223,27 +223,13 @@ export default function AdminDashboard() {
   }, [clicks]);
   const dowMax = useMemo(() => Math.max(1, ...dowSorted.map((d) => d.count)), [dowSorted]);
 
-  /* ── loading / error states ── */
-  if (loading) return <div className="rep-state">Loading dashboard data\u2026</div>;
-  if (error) return (
-    <div className="rep-state rep-state--error">
-      Could not load data: {error}<br />
-      <button className="rep-retry" onClick={load} type="button">Retry</button>
-    </div>
-  );
-  if (!tracking && !clicks) return null;
-
-  const t = tracking?.totals || {};
-  const c = clicks?.totals || {};
-
-  /* ── sorted wedding leads ── */
+  /* ── sorted wedding leads (must be above early returns - hooks can't be conditional) ── */
   const sortedLeads = useMemo(() => {
     if (!weddingLeads?.leads) return [];
     const arr = [...weddingLeads.leads];
     const { field, dir } = leadSort;
     arr.sort((a, b) => {
       let va = a[field], vb = b[field];
-      // Use rank fields for urgency/budget to get logical ordering
       if (field === "urgency") { va = a.urgency_rank; vb = b.urgency_rank; }
       if (field === "budget") { va = a.budget_rank; vb = b.budget_rank; }
       if (field === "wedding_year") {
@@ -271,6 +257,19 @@ export default function AdminDashboard() {
     if (leadSort.field !== field) return "";
     return leadSort.dir === "asc" ? " \u25B2" : " \u25BC";
   }
+
+  /* ── loading / error states ── */
+  if (loading) return <div className="rep-state">Loading dashboard data\u2026</div>;
+  if (error) return (
+    <div className="rep-state rep-state--error">
+      Could not load data: {error}<br />
+      <button className="rep-retry" onClick={load} type="button">Retry</button>
+    </div>
+  );
+  if (!tracking && !clicks) return null;
+
+  const t = tracking?.totals || {};
+  const c = clicks?.totals || {};
 
   const tabs = [
     { id: "overview", label: "Overview" },
