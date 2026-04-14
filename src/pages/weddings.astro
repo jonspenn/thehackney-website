@@ -1232,7 +1232,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
             email: email,
             first_name: firstName,
             phone: phone,
-            form_data: { wedding_year: weddingYear },
+            form_data: { brochure_type: 'wedding', wedding_year: weddingYear },
           }),
         });
         const result = await res.json();

@@ -41,9 +41,16 @@ export async function onRequestGet(context) {
     ).all();
 
     // Form type breakdown
+    // Form type breakdown - splits brochure downloads by brochure_type
     const breakdown = await env.DB.prepare(
-      `SELECT form_type, COUNT(*) as count
-       FROM submissions GROUP BY form_type ORDER BY count DESC`
+      `SELECT
+        CASE
+          WHEN form_type = 'brochure-download' AND json_extract(form_data, '$.brochure_type') IS NOT NULL
+          THEN 'brochure-' || json_extract(form_data, '$.brochure_type')
+          ELSE form_type
+        END as form_type,
+        COUNT(*) as count
+       FROM submissions GROUP BY 1 ORDER BY count DESC`
     ).all();
 
     // Lead type breakdown

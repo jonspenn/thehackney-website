@@ -14,8 +14,32 @@ const FORM_TYPE_LABELS = {
   "wedding-quiz": "Wedding Questionnaire",
   "corporate-quiz": "Corporate Questionnaire",
   "brochure-download": "Brochure Download",
+  "brochure-wedding": "Wedding Brochure",
+  "brochure-corporate": "Corporate Brochure",
+  "brochure-private-events": "Private Events Brochure",
+  "brochure-supper-club": "Supper Club Brochure",
   "supperclub-signup": "Supper Club Signup",
 };
+
+const BROCHURE_TYPE_LABELS = {
+  wedding: "Wedding",
+  corporate: "Corporate",
+  "private-events": "Private Events",
+  "supper-club": "Supper Club",
+};
+
+/* For brochure downloads, append the brochure type if available */
+function formLabel(formType, formData) {
+  const base = FORM_TYPE_LABELS[formType] || formType;
+  if (formType === "brochure-download" && formData) {
+    const fd = parseEventData(formData);
+    if (fd?.brochure_type) {
+      const bt = BROCHURE_TYPE_LABELS[fd.brochure_type] || fd.brochure_type;
+      return `${bt} Brochure`;
+    }
+  }
+  return base;
+}
 
 const EVENT_TYPE_LABELS = {
   page_view: "Page views",
@@ -622,7 +646,7 @@ export default function AdminDashboard() {
                           <td>{formatRelativeTime(row.created_at)}</td>
                           <td>
                             <span className={`rep-event-badge rep-event-badge--${row.form_type?.split("-")[0] || "form"}`}>
-                              {FORM_TYPE_LABELS[row.form_type] || row.form_type}
+                              {formLabel(row.form_type, row.form_data)}
                             </span>
                           </td>
                           <td>{row.first_name || "\u2014"}</td>
