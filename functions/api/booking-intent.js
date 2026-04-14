@@ -2,15 +2,20 @@
  * POST /api/booking-intent
  *
  * Records when a lead clicks "Book a Discovery Call" or "Book a Venue Tour"
- * from the quiz success screen. Updates the contact record with:
- *   - booking_intent: "discovery-call" | "venue-tour"
- *   - booking_intent_at: ISO timestamp
- *   - booking_intent_source: "wedding-quiz" | "corporate-quiz"
+ * from the quiz success screen or visits /bookacall/ as a returning visitor.
  *
- * Identity: matches by visitor_id (thk_vid cookie) to find the contact
- * that was just created by the quiz submission.
+ * Tracks call and tour intents INDEPENDENTLY so both are visible:
+ *   - clicked_discovery_call_at: ISO timestamp (set once per intent)
+ *   - clicked_discovery_call_source: where the click came from
+ *   - clicked_venue_tour_at: ISO timestamp (set once per intent)
+ *   - clicked_venue_tour_source: where the click came from
  *
- * Body: { intent: "discovery-call"|"venue-tour", source: "wedding-quiz"|"corporate-quiz" }
+ * Each intent is additive - recording a tour does NOT erase a previous call.
+ * Timestamps only set if not already present (first click wins per intent).
+ *
+ * Identity: matches by visitor_id (thk_vid cookie) to find the contact.
+ *
+ * Body: { intent: "discovery-call"|"venue-tour", source: "wedding-quiz"|"corporate-quiz"|"page-visit" }
  *
  * Binding: env.DB (D1 database `hackney-date-tracking`)
  */
@@ -83,10 +88,24 @@ export async function onRequestPost(context) {
     }
 
     const now = new Date().toISOString();
-    await env.DB.prepare(
-      `UPDATE contacts SET booking_intent = ?, booking_intent_at = ?, booking_intent_source = ?
-       WHERE contact_id = ?`
-    ).bind(intent, now, source || null, contact.contact_id).run();
+
+    // Set the appropriate column pair based on intent type
+    // Only set if not already recorded (COALESCE keeps first click)
+    if (intent === "discovery-call") {
+      await env.DB.prepare(
+        `UPDATE contacts
+         SET clicked_discovery_call_at = COALESCE(clicked_discovery_call_at, ?),
+             clicked_discovery_call_source = COALESCE(clicked_discovery_call_source, ?)
+         WHERE contact_id = ?`
+      ).bind(now, source || null, contact.contact_id).run();
+    } else {
+      await env.DB.prepare(
+        `UPDATE contacts
+         SET clicked_venue_tour_at = COALESCE(clicked_venue_tour_at, ?),
+             clicked_venue_tour_source = COALESCE(clicked_venue_tour_source, ?)
+         WHERE contact_id = ?`
+      ).bind(now, source || null, contact.contact_id).run();
+    }
 
     console.log("[booking-intent]", JSON.stringify({
       contact_id: contact.contact_id, intent, source, ts: now,

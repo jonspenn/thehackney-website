@@ -813,6 +813,11 @@ export default function AdminDashboard() {
                 <div className="rep-stat__num">{currentLeads.summary.pipeline.clicked_discovery_call}</div>
                 <div className="rep-stat__label">Clicked call</div>
               </div>
+              {currentLeads.summary.pipeline.clicked_both > 0 && (
+                <span style={{ fontSize: "13px", color: "#2E4009", marginLeft: "4px", fontWeight: 500 }}>
+                  ({currentLeads.summary.pipeline.clicked_both} both)
+                </span>
+              )}
               <span style={{ fontSize: "14px", color: "#999", marginLeft: "12px" }}>
                 {currentLeads.summary.pipeline.no_action} no action yet
               </span>
@@ -990,10 +995,11 @@ export default function AdminDashboard() {
                         <td>{lead.first_seen_at ? formatRelativeTime(lead.first_seen_at) : "\u2014"}</td>
                         <td className="rep-table__ref">{lead.first_landing_page || "\u2014"}</td>
                         <td>
-                          {lead.booking_intent === "venue-tour" ? (
-                            <span className="rep-cross-sell__badge" style={{ background: "#2E4009", color: "#fff" }}>Tour</span>
-                          ) : lead.booking_intent === "discovery-call" ? (
-                            <span className="rep-cross-sell__badge" style={{ background: "#49590E", color: "#fff" }}>Call</span>
+                          {(lead.clicked_venue_tour_at || lead.clicked_discovery_call_at) ? (
+                            <span style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                              {lead.clicked_venue_tour_at && <span className="rep-cross-sell__badge" style={{ background: "#2E4009", color: "#fff" }}>Tour</span>}
+                              {lead.clicked_discovery_call_at && <span className="rep-cross-sell__badge" style={{ background: "#49590E", color: "#fff" }}>Call</span>}
+                            </span>
                           ) : "\u2014"}
                         </td>
                         <td>

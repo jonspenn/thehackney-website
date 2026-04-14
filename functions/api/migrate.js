@@ -146,10 +146,16 @@ const MIGRATIONS = [
   { name: "ct_add_first_seen_at", sql: `ALTER TABLE contacts ADD COLUMN first_seen_at TEXT` },
   { name: "ct_add_last_seen_at", sql: `ALTER TABLE contacts ADD COLUMN last_seen_at TEXT` },
 
-  // ── Contacts: booking intent (set when quiz success CTA is clicked) ──
+  // ── Contacts: booking intent (old single-field - superseded but kept for migration history) ──
   { name: "ct_add_booking_intent", sql: `ALTER TABLE contacts ADD COLUMN booking_intent TEXT` },
   { name: "ct_add_booking_intent_at", sql: `ALTER TABLE contacts ADD COLUMN booking_intent_at TEXT` },
   { name: "ct_add_booking_intent_source", sql: `ALTER TABLE contacts ADD COLUMN booking_intent_source TEXT` },
+
+  // ── Contacts: independent call + tour intent tracking (replaces single booking_intent) ──
+  { name: "ct_add_clicked_discovery_call_at", sql: `ALTER TABLE contacts ADD COLUMN clicked_discovery_call_at TEXT` },
+  { name: "ct_add_clicked_discovery_call_source", sql: `ALTER TABLE contacts ADD COLUMN clicked_discovery_call_source TEXT` },
+  { name: "ct_add_clicked_venue_tour_at", sql: `ALTER TABLE contacts ADD COLUMN clicked_venue_tour_at TEXT` },
+  { name: "ct_add_clicked_venue_tour_source", sql: `ALTER TABLE contacts ADD COLUMN clicked_venue_tour_source TEXT` },
 
   {
     name: "idx_contacts_email",
