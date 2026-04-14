@@ -897,6 +897,11 @@ export default function AdminDashboard() {
               </div>
             )}
           </section>
+        </>
+      )}
+
+      {activeTab === "analytics" && (
+        <>
           <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
           <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Date clicks</h2>
           <div className="rep-totals">
