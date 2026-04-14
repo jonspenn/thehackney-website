@@ -912,6 +912,10 @@ export default function AdminDashboard() {
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("urgency")} style={{ cursor: "pointer" }}>Urgency{sortIndicator("urgency")}</th>}
                       {activeLeadType === "wedding" && <th onClick={() => toggleSort("budget")} style={{ cursor: "pointer" }}>Budget{sortIndicator("budget")}</th>}
                       <th>Source</th>
+                      <th>Ad platform</th>
+                      <th>Device</th>
+                      <th onClick={() => toggleSort("sessions_before_conversion")} style={{ cursor: "pointer" }}>Sessions{sortIndicator("sessions_before_conversion")}</th>
+                      <th>Landing page</th>
                       <th>Also interested in</th>
                     </tr>
                   </thead>
@@ -949,6 +953,10 @@ export default function AdminDashboard() {
                           </td>
                         )}
                         <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
+                        <td>{lead.ad_platform || "\u2014"}</td>
+                        <td>{lead.device_type || "\u2014"}</td>
+                        <td>{lead.sessions_before_conversion != null ? lead.sessions_before_conversion : "\u2014"}</td>
+                        <td className="rep-table__ref">{lead.first_landing_page || "\u2014"}</td>
                         <td>
                           {lead.cross_sell_labels?.length > 0 ? (
                             <span className="rep-cross-sell">

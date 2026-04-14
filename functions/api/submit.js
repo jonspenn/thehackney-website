@@ -200,9 +200,23 @@ export async function onRequestPost(context) {
       let sourceCampaign = null;
       let sourceMatchType = null;
 
+      // Attribution fields - populated from visitor record if available
+      let gclid = null, fbclid = null, fbc = null, fbp = null;
+      let wbraid = null, gbraid = null;
+      let ttclid = null, msclkid = null, liFatId = null;
+      let utmContent = null, firstLandingPage = null, firstReferrer = null;
+      let deviceType = null;
+      let sessionsBefore = null;
+
       if (visitorId) {
         const visitor = await env.DB.prepare(
-          "SELECT first_utm_source, first_utm_medium, first_utm_campaign, first_utm_term, first_hsa_kw, first_hsa_mt FROM visitors WHERE visitor_id = ?"
+          `SELECT first_utm_source, first_utm_medium, first_utm_campaign, first_utm_term,
+                  first_utm_content, first_hsa_kw, first_hsa_mt,
+                  first_gclid, first_fbclid, first_fbc, first_fbp,
+                  first_wbraid, first_gbraid,
+                  first_ttclid, first_msclkid, first_li_fat_id,
+                  first_landing_page, first_referrer, device_type
+           FROM visitors WHERE visitor_id = ?`
         ).bind(visitorId).first();
 
         if (visitor) {
@@ -212,19 +226,55 @@ export async function onRequestPost(context) {
           sourceKeyword = visitor.first_hsa_kw || visitor.first_utm_term || null;
           sourceCampaign = visitor.first_utm_campaign || null;
           sourceMatchType = visitor.first_hsa_mt || null;
+          utmContent = visitor.first_utm_content || null;
+
+          // Ad platform click IDs
+          gclid = visitor.first_gclid || null;
+          fbclid = visitor.first_fbclid || null;
+          fbc = visitor.first_fbc || null;
+          fbp = visitor.first_fbp || null;
+          wbraid = visitor.first_wbraid || null;
+          gbraid = visitor.first_gbraid || null;
+          ttclid = visitor.first_ttclid || null;
+          msclkid = visitor.first_msclkid || null;
+          liFatId = visitor.first_li_fat_id || null;
+
+          // Journey context
+          firstLandingPage = visitor.first_landing_page || null;
+          firstReferrer = visitor.first_referrer || null;
+          deviceType = visitor.device_type || null;
         }
+
+        // Count sessions before this conversion
+        const sessionCount = await env.DB.prepare(
+          "SELECT COUNT(*) as cnt FROM sessions WHERE visitor_id = ?"
+        ).bind(visitorId).first();
+        sessionsBefore = sessionCount ? sessionCount.cnt : null;
       }
+
+      // Conversion page = the page they were on when they submitted the form
+      const conversionPage = referrer
+        ? (() => { try { return new URL(referrer).pathname; } catch { return referrer; } })()
+        : null;
 
       await env.DB.prepare(
         `INSERT INTO contacts (
           contact_id, visitor_id, email, first_name, last_name, phone, company,
           lead_type, source_channel, source_keyword, source_campaign, source_match_type,
-          form_data, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          form_data, created_at,
+          gclid, fbclid, fbc, fbp, wbraid, gbraid,
+          ttclid, msclkid, li_fat_id, utm_content,
+          first_landing_page, conversion_page, sessions_before_conversion,
+          device_type, first_referrer
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         contactId, visitorId, email, firstName, lastName, phone, company,
         leadType, sourceChannel, sourceKeyword, sourceCampaign, sourceMatchType,
-        formData, now
+        formData, now,
+        gclid, fbclid, fbc, fbp, wbraid, gbraid,
+        ttclid, msclkid, liFatId, utmContent,
+        firstLandingPage, conversionPage, sessionsBefore,
+        deviceType, firstReferrer
       ).run();
 
       // Stitch visitor record to this contact

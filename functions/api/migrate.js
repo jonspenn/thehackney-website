@@ -63,6 +63,41 @@ const MIGRATIONS = [
   { name: "add_klaviyo_profile_id", sql: `ALTER TABLE contacts ADD COLUMN klaviyo_profile_id TEXT` },
   { name: "add_form_data", sql: `ALTER TABLE contacts ADD COLUMN form_data TEXT` },
   { name: "add_questionnaire_data", sql: `ALTER TABLE contacts ADD COLUMN questionnaire_data TEXT` },
+  // ── Visitors: ad platform click IDs + Meta cookies ──
+  { name: "vis_add_wbraid", sql: `ALTER TABLE visitors ADD COLUMN first_wbraid TEXT` },
+  { name: "vis_add_gbraid", sql: `ALTER TABLE visitors ADD COLUMN first_gbraid TEXT` },
+  { name: "vis_add_fbc", sql: `ALTER TABLE visitors ADD COLUMN first_fbc TEXT` },
+  { name: "vis_add_fbp", sql: `ALTER TABLE visitors ADD COLUMN first_fbp TEXT` },
+  { name: "vis_add_ttclid", sql: `ALTER TABLE visitors ADD COLUMN first_ttclid TEXT` },
+  { name: "vis_add_msclkid", sql: `ALTER TABLE visitors ADD COLUMN first_msclkid TEXT` },
+  { name: "vis_add_li_fat_id", sql: `ALTER TABLE visitors ADD COLUMN first_li_fat_id TEXT` },
+
+  // ── Sessions: ad platform click IDs + Meta cookies ──
+  { name: "ses_add_wbraid", sql: `ALTER TABLE sessions ADD COLUMN wbraid TEXT` },
+  { name: "ses_add_gbraid", sql: `ALTER TABLE sessions ADD COLUMN gbraid TEXT` },
+  { name: "ses_add_fbc", sql: `ALTER TABLE sessions ADD COLUMN fbc TEXT` },
+  { name: "ses_add_fbp", sql: `ALTER TABLE sessions ADD COLUMN fbp TEXT` },
+  { name: "ses_add_ttclid", sql: `ALTER TABLE sessions ADD COLUMN ttclid TEXT` },
+  { name: "ses_add_msclkid", sql: `ALTER TABLE sessions ADD COLUMN msclkid TEXT` },
+  { name: "ses_add_li_fat_id", sql: `ALTER TABLE sessions ADD COLUMN li_fat_id TEXT` },
+
+  // ── Contacts: full attribution + conversion context ──
+  { name: "ct_add_gclid", sql: `ALTER TABLE contacts ADD COLUMN gclid TEXT` },
+  { name: "ct_add_fbclid", sql: `ALTER TABLE contacts ADD COLUMN fbclid TEXT` },
+  { name: "ct_add_fbc", sql: `ALTER TABLE contacts ADD COLUMN fbc TEXT` },
+  { name: "ct_add_fbp", sql: `ALTER TABLE contacts ADD COLUMN fbp TEXT` },
+  { name: "ct_add_wbraid", sql: `ALTER TABLE contacts ADD COLUMN wbraid TEXT` },
+  { name: "ct_add_gbraid", sql: `ALTER TABLE contacts ADD COLUMN gbraid TEXT` },
+  { name: "ct_add_ttclid", sql: `ALTER TABLE contacts ADD COLUMN ttclid TEXT` },
+  { name: "ct_add_msclkid", sql: `ALTER TABLE contacts ADD COLUMN msclkid TEXT` },
+  { name: "ct_add_li_fat_id", sql: `ALTER TABLE contacts ADD COLUMN li_fat_id TEXT` },
+  { name: "ct_add_utm_content", sql: `ALTER TABLE contacts ADD COLUMN utm_content TEXT` },
+  { name: "ct_add_landing_page", sql: `ALTER TABLE contacts ADD COLUMN first_landing_page TEXT` },
+  { name: "ct_add_conversion_page", sql: `ALTER TABLE contacts ADD COLUMN conversion_page TEXT` },
+  { name: "ct_add_sessions_before", sql: `ALTER TABLE contacts ADD COLUMN sessions_before_conversion INTEGER` },
+  { name: "ct_add_device_type", sql: `ALTER TABLE contacts ADD COLUMN device_type TEXT` },
+  { name: "ct_add_first_referrer", sql: `ALTER TABLE contacts ADD COLUMN first_referrer TEXT` },
+
   // ── Submissions: promote form_data fields to proper columns ──
   { name: "sub_add_event_type", sql: `ALTER TABLE submissions ADD COLUMN event_type TEXT` },
   { name: "sub_add_guest_count", sql: `ALTER TABLE submissions ADD COLUMN guest_count TEXT` },

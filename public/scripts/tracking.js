@@ -34,18 +34,31 @@
     return m ? m[1] : null;
   }
 
-  // Collect URL params once
+  // Read a named cookie value
+  function getCookie(name) {
+    var m = document.cookie.match(new RegExp("(?:^|;\\s*)" + name + "=([^;]*)"));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
+  // Collect URL params + Meta cookies once
   function getParams() {
     var sp = new URLSearchParams(window.location.search);
     var p = {};
     var keys = [
       "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
-      "gclid", "fbclid", "hsa_cam", "hsa_kw", "hsa_mt"
+      "gclid", "fbclid", "wbraid", "gbraid",
+      "hsa_cam", "hsa_kw", "hsa_mt",
+      "ttclid", "msclkid", "li_fat_id"
     ];
     for (var i = 0; i < keys.length; i++) {
       var v = sp.get(keys[i]);
       if (v) p[keys[i]] = v;
     }
+    // Meta cookies - set by Meta Pixel, needed for Conversions API
+    var fbc = getCookie("_fbc");
+    var fbp = getCookie("_fbp");
+    if (fbc) p._fbc = fbc;
+    if (fbp) p._fbp = fbp;
     return p;
   }
 

@@ -99,6 +99,10 @@ export async function onRequestGet(context) {
         c.created_at,
         c.form_data as contact_form_data,
         c.questionnaire_data,
+        c.gclid, c.fbclid, c.fbc, c.fbp, c.wbraid, c.gbraid,
+        c.ttclid, c.msclkid, c.li_fat_id, c.utm_content,
+        c.first_landing_page, c.conversion_page,
+        c.sessions_before_conversion, c.device_type, c.first_referrer,
         s.form_type, s.form_data as submission_form_data, s.created_at as submitted_at,
         s.event_type, s.booking_urgency, s.guest_count, s.budget,
         s.wedding_year, s.event_date, s.brochure_type
@@ -159,6 +163,14 @@ export async function onRequestGet(context) {
           ? [...crossSellMap.get(row.contact_id)]
           : [];
 
+        // Determine ad platform source from click IDs
+        let adPlatform = null;
+        if (row.gclid || row.wbraid || row.gbraid) adPlatform = "Google";
+        else if (row.fbclid || row.fbc) adPlatform = "Meta";
+        else if (row.ttclid) adPlatform = "TikTok";
+        else if (row.msclkid) adPlatform = "Microsoft";
+        else if (row.li_fat_id) adPlatform = "LinkedIn";
+
         contactMap.set(row.contact_id, {
           contact_id: row.contact_id,
           email: row.email,
@@ -170,6 +182,15 @@ export async function onRequestGet(context) {
           source_keyword: row.source_keyword,
           source_campaign: row.source_campaign,
           created_at: row.created_at,
+          // Attribution
+          ad_platform: adPlatform,
+          has_click_id: !!(row.gclid || row.fbclid || row.wbraid || row.gbraid || row.ttclid || row.msclkid || row.li_fat_id),
+          utm_content: row.utm_content,
+          first_landing_page: row.first_landing_page,
+          conversion_page: row.conversion_page,
+          sessions_before_conversion: row.sessions_before_conversion,
+          device_type: row.device_type,
+          first_referrer: row.first_referrer,
           // Parsed fields
           event_type: null,
           event_type_label: null,

@@ -68,6 +68,8 @@ function utmsChanged(session, params) {
   }
   if (params.gclid && params.gclid !== session.gclid) return true;
   if (params.fbclid && params.fbclid !== session.fbclid) return true;
+  if (params.wbraid && params.wbraid !== session.wbraid) return true;
+  if (params.gbraid && params.gbraid !== session.gbraid) return true;
   return false;
 }
 
@@ -124,7 +126,7 @@ export async function onRequestPost(context) {
         const latestSession = await env.DB.prepare(
           `SELECT session_id, started_at, ended_at,
                   utm_source, utm_medium, utm_campaign, utm_term, utm_content,
-                  gclid, fbclid
+                  gclid, fbclid, wbraid, gbraid
            FROM sessions WHERE visitor_id = ?
            ORDER BY started_at DESC LIMIT 1`
         ).bind(visitorId).first();
@@ -184,28 +186,39 @@ export async function onRequestPost(context) {
         `INSERT INTO visitors (visitor_id, first_seen_at, last_seen_at, first_landing_page,
           first_referrer, first_utm_source, first_utm_medium, first_utm_campaign,
           first_utm_term, first_utm_content, first_gclid, first_fbclid,
-          first_hsa_cam, first_hsa_kw, first_hsa_mt, device_type, total_sessions, total_page_views)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1)`
+          first_hsa_cam, first_hsa_kw, first_hsa_mt, device_type, total_sessions, total_page_views,
+          first_wbraid, first_gbraid, first_fbc, first_fbp,
+          first_ttclid, first_msclkid, first_li_fat_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         visitorId, ts, ts, page, referrer || null,
         params.utm_source || null, params.utm_medium || null,
         params.utm_campaign || null, params.utm_term || null,
         params.utm_content || null, params.gclid || null,
         params.fbclid || null, params.hsa_cam || null,
-        params.hsa_kw || null, params.hsa_mt || null, deviceType
+        params.hsa_kw || null, params.hsa_mt || null, deviceType,
+        params.wbraid || null, params.gbraid || null,
+        params._fbc || null, params._fbp || null,
+        params.ttclid || null, params.msclkid || null,
+        params.li_fat_id || null
       ).run();
 
       await env.DB.prepare(
         `INSERT INTO sessions (session_id, visitor_id, started_at, landing_page, referrer,
           utm_source, utm_medium, utm_campaign, utm_term, utm_content, gclid, fbclid,
+          wbraid, gbraid, fbc, fbp, ttclid, msclkid, li_fat_id,
           device_type, page_count)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`
       ).bind(
         sessionId, visitorId, ts, page, referrer || null,
         params.utm_source || null, params.utm_medium || null,
         params.utm_campaign || null, params.utm_term || null,
         params.utm_content || null, params.gclid || null,
-        params.fbclid || null, deviceType
+        params.fbclid || null,
+        params.wbraid || null, params.gbraid || null,
+        params._fbc || null, params._fbp || null,
+        params.ttclid || null, params.msclkid || null,
+        params.li_fat_id || null, deviceType
       ).run();
     }
   } catch (err) {
