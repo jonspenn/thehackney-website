@@ -128,9 +128,9 @@ const faqSchema = {
         <p>Free wifi, plenty of plugs, long tables in the winter garden. Stay for an hour or stay for the afternoon. Plenty of local freelancers call us their regular.</p>
       </div>
       <div class="daypart-card">
-        <p class="daypart-eyebrow">Saturday Mornings</p>
-        <h3>Before The Day Gets Going</h3>
-        <p>Open from 9am. Coffee, pastries and a proper breakfast to start the weekend. Great for a walk-and-coffee with the dog.</p>
+        <p class="daypart-eyebrow">Saturdays</p>
+        <h3>When We're Open</h3>
+        <p>Most Saturdays we open at 9am for coffee, pastries and weekend brunch. Some Saturdays the venue is booked for a private event. Check our <a href="/check-your-date/">availability calendar</a> to see which Saturdays are clear.</p>
       </div>
       <div class="daypart-card">
         <p class="daypart-eyebrow">Sundays</p>
@@ -185,7 +185,7 @@ const faqSchema = {
         <div class="hours-row"><span>Sunday</span><span>9am - 4pm</span></div>
       </div>
 
-      <p class="hours-note">On days when the venue is booked for a private event, the cafe-bar may close earlier than usual. Check Google Maps for today's live hours before heading over.</p>
+      <p class="hours-note">On days when the venue is booked for a private event, the cafe-bar may close earlier than usual or not open at all. See our <a href="/check-your-date/" class="hours-link">availability calendar</a> for event days, or Google Maps for today's live hours.</p>
 
       <a href={mapsUrl} target="_blank" rel="noopener" class="btn btn-primary-dark" data-cafe-cta="hours-google">Check Today's Hours on Google</a>
     </div>
@@ -370,6 +370,12 @@ const faqSchema = {
       opacity: 0.85;
     }
 
+    .daypart-card a {
+      color: var(--forest-olive);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
     /* ==================== SERVE ==================== */
     .serve-grid {
       display: grid;
@@ -444,6 +450,12 @@ const faqSchema = {
       margin-bottom: 2rem;
       line-height: 1.6;
       color: var(--warm-canvas);
+    }
+
+    .hours-note .hours-link {
+      color: var(--warm-canvas);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     /* ==================== FIND US ==================== */
