@@ -107,6 +107,7 @@ export async function onRequestGet(context) {
         c.latest_source, c.latest_referrer, c.latest_landing_page,
         c.total_page_views, c.avg_page_views_per_session,
         c.first_seen_at, c.last_seen_at,
+        c.booking_intent, c.booking_intent_at, c.booking_intent_source,
         s.form_type, s.form_data as submission_form_data, s.created_at as submitted_at,
         s.event_type, s.booking_urgency, s.guest_count, s.budget,
         s.wedding_year, s.event_date, s.brochure_type
@@ -207,6 +208,10 @@ export async function onRequestGet(context) {
           avg_page_views_per_session: row.avg_page_views_per_session,
           first_seen_at: row.first_seen_at,
           last_seen_at: row.last_seen_at,
+          // Booking intent
+          booking_intent: row.booking_intent,
+          booking_intent_at: row.booking_intent_at,
+          booking_intent_source: row.booking_intent_source,
           // Parsed fields
           event_type: null,
           event_type_label: null,
@@ -335,6 +340,18 @@ export async function onRequestGet(context) {
     // Cross-sell summary for all types
     const withCrossSell = leads.filter(l => l.cross_sell.length > 0).length;
     summaries.cross_sell_count = withCrossSell;
+
+    // Pipeline stage counts
+    const withDiscovery = leads.filter(l => l.booking_intent === "discovery-call").length;
+    const withTour = leads.filter(l => l.booking_intent === "venue-tour").length;
+    const withAnyIntent = leads.filter(l => l.booking_intent).length;
+    summaries.pipeline = {
+      total_leads: leads.length,
+      clicked_discovery_call: withDiscovery,
+      clicked_venue_tour: withTour,
+      clicked_any: withAnyIntent,
+      no_action: leads.length - withAnyIntent,
+    };
 
     return new Response(
       JSON.stringify({

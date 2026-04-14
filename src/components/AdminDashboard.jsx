@@ -796,6 +796,29 @@ export default function AdminDashboard() {
             ))}
           </div>
 
+          {/* ── Pipeline funnel ── */}
+          {currentLeads?.summary?.pipeline && (
+            <div className="rep-pipeline" style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
+              <div className="rep-pipeline__stage">
+                <div className="rep-stat__num">{currentLeads.summary.pipeline.total_leads}</div>
+                <div className="rep-stat__label">Leads</div>
+              </div>
+              <span style={{ fontSize: "18px", color: "#8C472E" }}>&rarr;</span>
+              <div className="rep-pipeline__stage">
+                <div className="rep-stat__num">{currentLeads.summary.pipeline.clicked_venue_tour}</div>
+                <div className="rep-stat__label">Clicked tour</div>
+              </div>
+              <span style={{ fontSize: "18px", color: "#8C472E" }}>&rarr;</span>
+              <div className="rep-pipeline__stage">
+                <div className="rep-stat__num">{currentLeads.summary.pipeline.clicked_discovery_call}</div>
+                <div className="rep-stat__label">Clicked call</div>
+              </div>
+              <span style={{ fontSize: "14px", color: "#999", marginLeft: "12px" }}>
+                {currentLeads.summary.pipeline.no_action} no action yet
+              </span>
+            </div>
+          )}
+
           {/* ── Wedding summaries ── */}
           {activeLeadType === "wedding" && (
             <>
@@ -920,6 +943,7 @@ export default function AdminDashboard() {
                       <th onClick={() => toggleSort("total_page_views")} style={{ cursor: "pointer" }}>Pages{sortIndicator("total_page_views")}</th>
                       <th>First seen</th>
                       <th>Landing page</th>
+                      <th>Intent</th>
                       <th>Also interested in</th>
                     </tr>
                   </thead>
@@ -965,6 +989,13 @@ export default function AdminDashboard() {
                         <td>{lead.total_page_views != null ? `${lead.total_page_views} (${lead.avg_page_views_per_session || "\u2014"}/s)` : "\u2014"}</td>
                         <td>{lead.first_seen_at ? formatRelativeTime(lead.first_seen_at) : "\u2014"}</td>
                         <td className="rep-table__ref">{lead.first_landing_page || "\u2014"}</td>
+                        <td>
+                          {lead.booking_intent === "venue-tour" ? (
+                            <span className="rep-cross-sell__badge" style={{ background: "#2E4009", color: "#fff" }}>Tour</span>
+                          ) : lead.booking_intent === "discovery-call" ? (
+                            <span className="rep-cross-sell__badge" style={{ background: "#49590E", color: "#fff" }}>Call</span>
+                          ) : "\u2014"}
+                        </td>
                         <td>
                           {lead.cross_sell_labels?.length > 0 ? (
                             <span className="rep-cross-sell">

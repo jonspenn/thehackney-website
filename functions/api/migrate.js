@@ -146,6 +146,11 @@ const MIGRATIONS = [
   { name: "ct_add_first_seen_at", sql: `ALTER TABLE contacts ADD COLUMN first_seen_at TEXT` },
   { name: "ct_add_last_seen_at", sql: `ALTER TABLE contacts ADD COLUMN last_seen_at TEXT` },
 
+  // ── Contacts: booking intent (set when quiz success CTA is clicked) ──
+  { name: "ct_add_booking_intent", sql: `ALTER TABLE contacts ADD COLUMN booking_intent TEXT` },
+  { name: "ct_add_booking_intent_at", sql: `ALTER TABLE contacts ADD COLUMN booking_intent_at TEXT` },
+  { name: "ct_add_booking_intent_source", sql: `ALTER TABLE contacts ADD COLUMN booking_intent_source TEXT` },
+
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,

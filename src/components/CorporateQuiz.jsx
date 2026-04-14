@@ -407,6 +407,28 @@ function StepConfirmation({ data }) {
   const discoveryUrl = `/bookacall/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
   const tourUrl = `/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
 
+  function trackCtaClick(ctaType) {
+    const eventName = ctaType === "discovery" ? "corp_quiz_success_discovery_click" : "corp_quiz_success_tour_click";
+    if (window.dataLayer) window.dataLayer.push({ event: eventName });
+    if (window.__thk) window.__thk.track("cta_click", {
+      cta_id: ctaType === "discovery" ? "corp-quiz-book-discovery" : "corp-quiz-book-tour",
+      cta_text: ctaType === "discovery" ? "Book a Discovery Call" : "Book a Venue Tour",
+      destination: ctaType === "discovery" ? discoveryUrl : tourUrl,
+      quiz_type: "corporate",
+      event_type: data.eventType || null,
+    });
+    // Record booking intent on the contact record
+    fetch("/api/booking-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        intent: ctaType === "discovery" ? "discovery-call" : "venue-tour",
+        source: "corporate-quiz",
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
   return (
     <div className="wq-step wq-step--confirmation">
       <FadeIn>
@@ -435,14 +457,14 @@ function StepConfirmation({ data }) {
               <a
                 href={discoveryUrl}
                 className="wq-btn wq-btn--primary"
-                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_discovery_click" })}
+                onClick={() => trackCtaClick("discovery")}
               >
                 Book a Discovery Call
               </a>
               <a
                 href={tourUrl}
                 className="wq-btn wq-btn--outline"
-                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_tour_click" })}
+                onClick={() => trackCtaClick("tour")}
               >
                 Book a Venue Tour
               </a>
@@ -460,14 +482,14 @@ function StepConfirmation({ data }) {
               <a
                 href={discoveryUrl}
                 className="wq-btn wq-btn--primary"
-                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_discovery_click" })}
+                onClick={() => trackCtaClick("discovery")}
               >
                 Book a Discovery Call
               </a>
               <a
                 href={tourUrl}
                 className="wq-btn wq-btn--outline"
-                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_tour_click" })}
+                onClick={() => trackCtaClick("tour")}
               >
                 Book a Venue Tour
               </a>
@@ -486,14 +508,14 @@ function StepConfirmation({ data }) {
               <a
                 href={discoveryUrl}
                 className="wq-btn wq-btn--outline"
-                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_discovery_click" })}
+                onClick={() => trackCtaClick("discovery")}
               >
                 Book a Discovery Call
               </a>
               <a
                 href={tourUrl}
                 className="wq-btn wq-btn--outline"
-                onClick={() => window.dataLayer && window.dataLayer.push({ event: "corp_quiz_success_tour_click" })}
+                onClick={() => trackCtaClick("tour")}
               >
                 Book a Venue Tour
               </a>
