@@ -39,6 +39,7 @@ export default function PipelineView({ leads, onSelectLead }) {
   const [selectedStage, setSelectedStage] = useState(null);
   const [funnelOpen, setFunnelOpen] = useState(true);
   const [trendsOpen, setTrendsOpen] = useState(true);
+  const [hiddenMetrics, setHiddenMetrics] = useState(new Set());
 
   /* Compute funnel for every lead in active type */
   const { stageCounts, stageLeads, totalActive, terminalCounts } = useMemo(() => {
@@ -286,41 +287,112 @@ export default function PipelineView({ leads, onSelectLead }) {
 
               <div className="pipe-legend">
                 {(monthlyData.isHighIntent ? TREND_METRICS : TREND_METRICS.slice(0, 1)).map(m => (
-                  <span key={m.key} className="pipe-legend__item">
-                    <span className="pipe-legend__swatch" style={{ background: m.color }} />
+                  <button
+                    key={m.key}
+                    className="pipe-legend__item"
+                    style={{ opacity: hiddenMetrics.has(m.key) ? 0.35 : 1, cursor: "pointer", background: "none", border: "none", padding: "2px 6px", borderRadius: "3px", textDecoration: hiddenMetrics.has(m.key) ? "line-through" : "none" }}
+                    onClick={() => setHiddenMetrics(prev => {
+                      const next = new Set(prev);
+                      next.has(m.key) ? next.delete(m.key) : next.add(m.key);
+                      return next;
+                    })}
+                    title={hiddenMetrics.has(m.key) ? `Show ${m.label}` : `Hide ${m.label}`}
+                  >
+                    <span className="pipe-legend__swatch" style={{ background: hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : m.color }} />
                     {m.label}
-                  </span>
+                  </button>
                 ))}
               </div>
 
-              <div className="pipe-chart">
-                {monthlyData.months.map((month) => {
-                  const metrics = monthlyData.isHighIntent ? TREND_METRICS : TREND_METRICS.slice(0, 1);
-                  const maxVal = monthlyData.maxVal || 1;
+              {(() => {
+                const metrics = monthlyData.isHighIntent ? TREND_METRICS : TREND_METRICS.slice(0, 1);
+                const maxVal = monthlyData.maxVal || 1;
+                const months = monthlyData.months;
+                const currentMonth = new Date().getUTCMonth(); // 0-based
 
-                  return (
-                    <div key={month.key} className={`pipe-chart__col${month.isFuture ? " pipe-chart__col--future" : ""}`}>
-                      <div className="pipe-chart__bars">
-                        {!month.isFuture && metrics.map(m => {
-                          const val = month[m.key] || 0;
-                          const pct = Math.max(0, (val / maxVal) * 100);
-                          return (
-                            <div
-                              key={m.key}
-                              className={`pipe-chart__bar${val === 0 ? " pipe-chart__bar--empty" : ""}`}
-                              style={{ height: `${Math.max(pct, val > 0 ? 4 : 0)}%`, background: m.color }}
-                              title={`${m.label}: ${val}`}
-                            >
-                              {val > 0 && <span className="pipe-chart__val">{val}</span>}
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="pipe-chart__label">{month.shortLabel}</div>
-                    </div>
-                  );
-                })}
-              </div>
+                /* SVG dimensions */
+                const W = 800, H = 180, PAD_T = 24, PAD_B = 28, PAD_L = 28, PAD_R = 12;
+                const plotW = W - PAD_L - PAD_R;
+                const plotH = H - PAD_T - PAD_B;
+
+                /* Gridlines */
+                const gridSteps = Math.min(maxVal, 5);
+                const gridLines = [];
+                for (let i = 0; i <= gridSteps; i++) {
+                  const val = Math.round((maxVal / gridSteps) * i);
+                  const y = PAD_T + plotH - (plotH * (val / maxVal));
+                  gridLines.push({ val, y });
+                }
+
+                return (
+                  <div className="pipe-line-chart">
+                    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", height: "auto", maxHeight: "220px" }}>
+                      {/* Grid lines */}
+                      {gridLines.map(g => (
+                        <g key={g.val}>
+                          <line x1={PAD_L} y1={g.y} x2={W - PAD_R} y2={g.y} stroke="rgba(44,24,16,0.08)" strokeWidth="1" />
+                          <text x={PAD_L - 6} y={g.y + 3} textAnchor="end" fontSize="9" fill="rgba(44,24,16,0.35)">{g.val}</text>
+                        </g>
+                      ))}
+
+                      {/* Future month shading */}
+                      {currentMonth < 11 && (
+                        <rect
+                          x={PAD_L + plotW * ((currentMonth + 1) / 11)}
+                          y={PAD_T}
+                          width={plotW * ((11 - currentMonth - 1) / 11)}
+                          height={plotH}
+                          fill="rgba(44,24,16,0.02)"
+                        />
+                      )}
+
+                      {/* Month labels */}
+                      {months.map((m, i) => {
+                        const x = PAD_L + (plotW * (i / 11));
+                        return (
+                          <text
+                            key={m.key} x={x} y={H - 6}
+                            textAnchor="middle" fontSize="10"
+                            fill={m.isFuture ? "rgba(44,24,16,0.2)" : "rgba(44,24,16,0.5)"}
+                            fontWeight="500"
+                          >
+                            {m.shortLabel}
+                          </text>
+                        );
+                      })}
+
+                      {/* Lines + dots for each metric */}
+                      {metrics.filter(metric => !hiddenMetrics.has(metric.key)).map(metric => {
+                        const points = months
+                          .filter(m => !m.isFuture)
+                          .map((m, i) => ({
+                            x: PAD_L + (plotW * (i / 11)),
+                            y: PAD_T + plotH - (plotH * ((m[metric.key] || 0) / maxVal)),
+                            val: m[metric.key] || 0,
+                          }));
+
+                        if (points.length === 0) return null;
+
+                        const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+
+                        return (
+                          <g key={metric.key}>
+                            <path d={pathD} fill="none" stroke={metric.color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+                            {points.map((p, i) => (
+                              <g key={i}>
+                                <circle cx={p.x} cy={p.y} r={p.val > 0 ? 3.5 : 2} fill={p.val > 0 ? metric.color : "rgba(44,24,16,0.1)"} stroke="#F5F0E8" strokeWidth="1.5" />
+                                {p.val > 0 && (
+                                  <text x={p.x} y={p.y - 8} textAnchor="middle" fontSize="9" fontWeight="600" fill={metric.color}>{p.val}</text>
+                                )}
+                              </g>
+                            ))}
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                );
+              })()}
             </>
           )}
         </div>
