@@ -9,7 +9,7 @@ import {
   FORM_TYPE_LABELS, LEAD_TYPE_LABELS,
   URGENCY_LABELS, URGENCY_STAGE, BUDGET_LABELS,
   TIER_CONFIG,
-  FUNNEL_LABELS, HEALTH_COLORS,
+  FUNNEL_LABELS, HEALTH_COLORS, STAGE_DEFINITIONS,
   JOURNEY_EVENT_LABELS,
   LOST_REASONS, DAY_TYPE_LABELS,
 } from "./constants.js";
@@ -668,6 +668,14 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             </div>
 
             <FunnelTrack funnel={funnel} tc={tc} />
+
+            {/* Current stage definition */}
+            {STAGE_DEFINITIONS[funnel.currentStage] && (
+              <div className="lp-stage-def">
+                <span className="lp-stage-def__stage">{FUNNEL_LABELS[funnel.currentStage]}</span>
+                <span className="lp-stage-def__text">{STAGE_DEFINITIONS[funnel.currentStage]}</span>
+              </div>
+            )}
 
             {/* Engagement depth bar */}
             <div className="lp-funnel-engagement" style={{ marginTop: "8px" }}>

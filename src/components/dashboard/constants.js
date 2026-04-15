@@ -114,6 +114,22 @@ export const FUNNEL_LABELS = {
   signup: "Signup", booked: "Booked", attended: "Attended", return: "Return",
 };
 
+export const STAGE_DEFINITIONS = {
+  lead: "Downloaded a brochure or submitted a contact form",
+  qualified: "Completed the wedding or event quiz",
+  engaged: "Clicked to book a discovery call or venue tour",
+  meeting: "Had a venue tour or discovery call with Hugo",
+  proposal: "Hugo has sent a proposal - waiting on their decision",
+  won: "Booked - deposit received and date confirmed",
+  lost: "Did not proceed - see lost reason below",
+  cancelled: "Tour or call was booked but cancelled before it happened",
+  noshow: "Tour or call was booked but they didn't show up",
+  signup: "Signed up via the website",
+  booked: "Booked a ticket or reservation",
+  attended: "Attended the event",
+  return: "Came back for another visit",
+};
+
 export const HEALTH_THRESHOLDS = {
   wedding: {
     lead:      [7, 14],
