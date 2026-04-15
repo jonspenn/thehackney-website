@@ -1,7 +1,8 @@
 /**
  * BookingsView - Monthly revenue closed, year-over-year comparison.
- * Data sourced from HubSpot won deals export (bookings-data.js).
+ * Data sourced from HubSpot won deals export (bookings-data.js + bookings-deals.js).
  * Interactive legend: click a year to toggle it on/off.
+ * Click any revenue figure to drill into the deals behind it.
  */
 
 import { useState, useMemo } from "react";
@@ -9,8 +10,10 @@ import {
   REVENUE_BY_YEAR, YEAR_TOTALS, CURRENT_DATA_MONTH,
   YEAR_COLORS, YEAR_STYLES,
 } from "./bookings-data.js";
+import { DEALS_BY_MONTH } from "./bookings-deals.js";
 
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const YEARS = Object.keys(REVENUE_BY_YEAR).map(Number).sort();
 const CURRENT_YEAR = YEARS[YEARS.length - 1];
 
@@ -23,9 +26,18 @@ function formatRevenueExact(val) {
   return `£${val.toLocaleString("en-GB")}`;
 }
 
+function formatEventDate(d) {
+  if (!d) return "-";
+  try {
+    const [y, m, day] = d.split("-");
+    return `${parseInt(day)} ${SHORT_MONTHS[parseInt(m) - 1]} ${y}`;
+  } catch { return d; }
+}
+
 export default function BookingsView() {
   const [hiddenYears, setHiddenYears] = useState(new Set());
   const [hoveredMonth, setHoveredMonth] = useState(null);
+  const [drillDown, setDrillDown] = useState(null); // { year, month } or null
 
   /* Compute max value across visible years for Y-axis scaling */
   const maxVal = useMemo(() => {
@@ -33,7 +45,6 @@ export default function BookingsView() {
     for (const year of YEARS) {
       if (hiddenYears.has(year)) continue;
       for (let m = 0; m < 12; m++) {
-        // For current year, only count months with data
         if (year === CURRENT_YEAR && m >= CURRENT_DATA_MONTH) continue;
         const val = REVENUE_BY_YEAR[year][m];
         if (val > max) max = val;
@@ -47,14 +58,30 @@ export default function BookingsView() {
     const result = {};
     for (const year of YEARS) {
       let total = 0;
-      const monthsToCount = year === CURRENT_YEAR ? CURRENT_DATA_MONTH : CURRENT_DATA_MONTH;
-      for (let m = 0; m < monthsToCount; m++) {
+      for (let m = 0; m < CURRENT_DATA_MONTH; m++) {
         total += REVENUE_BY_YEAR[year][m];
       }
       result[year] = total;
     }
     return result;
   }, []);
+
+  /* Drill-down deals */
+  const drillDeals = useMemo(() => {
+    if (!drillDown) return null;
+    const key = `${drillDown.year}-${drillDown.month + 1}`;
+    return DEALS_BY_MONTH[key] || [];
+  }, [drillDown]);
+
+  function handleCellClick(year, monthIdx) {
+    const val = REVENUE_BY_YEAR[year][monthIdx];
+    if (val <= 0) return;
+    if (drillDown && drillDown.year === year && drillDown.month === monthIdx) {
+      setDrillDown(null); // toggle off
+    } else {
+      setDrillDown({ year, month: monthIdx });
+    }
+  }
 
   /* SVG dimensions */
   const W = 820, H = 240, PAD_T = 30, PAD_B = 32, PAD_L = 52, PAD_R = 16;
@@ -70,7 +97,6 @@ export default function BookingsView() {
     gridLines.push({ val: v, y });
   }
 
-  /* Month X positions (0-11) */
   const monthX = (i) => PAD_L + (plotW * (i / 11));
   const valY = (v) => PAD_T + plotH - (plotH * (v / niceMax));
 
@@ -141,7 +167,7 @@ export default function BookingsView() {
         <svg
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="xMidYMid meet"
-          style={{ width: "100%", height: "auto", maxHeight: "280px" }}
+          style={{ width: "100%", height: "auto", maxHeight: "280px", cursor: "pointer" }}
           onMouseLeave={() => setHoveredMonth(null)}
         >
           {/* Grid lines */}
@@ -154,7 +180,7 @@ export default function BookingsView() {
             </g>
           ))}
 
-          {/* Future month shading for current year */}
+          {/* Future month shading */}
           {CURRENT_DATA_MONTH < 12 && (
             <rect
               x={monthX(CURRENT_DATA_MONTH)}
@@ -166,7 +192,7 @@ export default function BookingsView() {
             />
           )}
 
-          {/* Hover columns (invisible hit areas) */}
+          {/* Hover columns */}
           {SHORT_MONTHS.map((_, i) => {
             const colW = plotW / 12;
             return (
@@ -230,15 +256,14 @@ export default function BookingsView() {
                   strokeLinecap="round"
                 />
                 {points.map((p, i) => (
-                  <g key={i}>
+                  <g key={i} onClick={() => handleCellClick(year, p.month)} style={{ cursor: p.val > 0 ? "pointer" : "default" }}>
                     <circle
                       cx={p.x} cy={p.y}
                       r={hoveredMonth === p.month ? 4.5 : (p.val > 0 ? 3 : 1.5)}
                       fill={p.val > 0 ? YEAR_COLORS[year] : "rgba(44,24,16,0.08)"}
-                      stroke="#F5F0E8"
-                      strokeWidth="1.5"
+                      stroke={drillDown && drillDown.year === year && drillDown.month === p.month ? "#2E4009" : "#F5F0E8"}
+                      strokeWidth={drillDown && drillDown.year === year && drillDown.month === p.month ? 2.5 : 1.5}
                     />
-                    {/* Show value on hover or always for current year endpoints */}
                     {(hoveredMonth === p.month || (year === CURRENT_YEAR && i === points.length - 1)) && p.val > 0 && (
                       <text
                         x={p.x}
@@ -259,6 +284,45 @@ export default function BookingsView() {
         </svg>
       </div>
 
+      {/* ── Drill-down panel ── */}
+      {drillDown && drillDeals && (
+        <div className="bookings-drill">
+          <div className="bookings-drill__header">
+            <h3 className="bookings-drill__title">
+              {FULL_MONTHS[drillDown.month]} {drillDown.year}
+              <span className="bookings-drill__total"> - {formatRevenueExact(REVENUE_BY_YEAR[drillDown.year][drillDown.month])} from {drillDeals.length} deal{drillDeals.length !== 1 ? "s" : ""}</span>
+            </h3>
+            <button className="bookings-drill__close" onClick={() => setDrillDown(null)} type="button" title="Close">&times;</button>
+          </div>
+          {drillDeals.length > 0 ? (
+            <div className="bookings-drill__table-wrap">
+              <table className="bookings-drill__table">
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "left" }}>Deal</th>
+                    <th>Type</th>
+                    <th>Event date</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {drillDeals.map((deal, idx) => (
+                    <tr key={idx}>
+                      <td style={{ textAlign: "left", fontWeight: 500 }}>{deal.n}</td>
+                      <td>{deal.t}</td>
+                      <td>{formatEventDate(deal.d)}</td>
+                      <td style={{ fontWeight: 600 }}>{formatRevenueExact(deal.a)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p style={{ color: "rgba(44,24,16,0.4)", fontStyle: "italic", margin: "8px 0" }}>No deal data available for this month.</p>
+          )}
+        </div>
+      )}
+
       {/* ── Month detail table ── */}
       <div className="bookings-table-wrap">
         <table className="bookings-table">
@@ -275,7 +339,6 @@ export default function BookingsView() {
               const vals = YEARS.map(y => REVENUE_BY_YEAR[y][i]);
               const pastVals = vals.filter((v, idx) => YEARS[idx] !== CURRENT_YEAR || !isFuture);
               const bestVal = Math.max(...pastVals);
-              const bestYear = pastVals.indexOf(bestVal);
 
               return (
                 <tr
@@ -286,16 +349,22 @@ export default function BookingsView() {
                   className={hoveredMonth === i ? "bookings-table__row--hover" : ""}
                 >
                   <td style={{ fontWeight: 600 }}>{label}</td>
-                  {YEARS.map((y, idx) => {
+                  {YEARS.map((y) => {
                     const val = REVENUE_BY_YEAR[y][i];
                     const isBest = val === bestVal && val > 0 && (!isFuture || y !== CURRENT_YEAR);
+                    const isActive = drillDown && drillDown.year === y && drillDown.month === i;
                     return (
                       <td
                         key={y}
+                        className={val > 0 ? "bookings-table__cell--clickable" : ""}
                         style={{
                           fontWeight: isBest ? 700 : 400,
                           color: isBest ? "#2E4009" : undefined,
+                          background: isActive ? "rgba(46,64,9,0.08)" : undefined,
+                          cursor: val > 0 ? "pointer" : "default",
                         }}
+                        onClick={() => handleCellClick(y, i)}
+                        title={val > 0 ? `Click to see ${FULL_MONTHS[i]} ${y} deals` : ""}
                       >
                         {val > 0 ? formatRevenueExact(val) : "-"}
                       </td>
@@ -325,7 +394,7 @@ export default function BookingsView() {
 
       <p className="bookings-footnote">
         Source: HubSpot won deals export (14 Apr 2026). Close date basis, all event types.
-        2026 data through {SHORT_MONTHS[CURRENT_DATA_MONTH - 1]}.
+        2026 data through {SHORT_MONTHS[CURRENT_DATA_MONTH - 1]}. Click any figure to see deals.
       </p>
     </div>
   );

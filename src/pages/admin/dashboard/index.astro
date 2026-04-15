@@ -703,6 +703,34 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .bookings-table td:first-child { text-align: left; }
       .bookings-table__row--hover { background: rgba(44,24,16,0.02); }
       .bookings-table__total td { border-top: 2px solid rgba(44,24,16,0.15); font-weight: 700; }
+      .bookings-table__cell--clickable:hover { background: rgba(44,24,16,0.03); }
+      .bookings-drill {
+        margin-bottom: 16px; padding: 12px 16px;
+        background: rgba(44,24,16,0.02); border: 1px solid rgba(44,24,16,0.08);
+        border-radius: 4px;
+      }
+      .bookings-drill__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      .bookings-drill__title {
+        font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600;
+        color: #2C1810; margin: 0;
+      }
+      .bookings-drill__total { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: rgba(44,24,16,0.5); }
+      .bookings-drill__close {
+        background: none; border: none; font-size: 20px; color: rgba(44,24,16,0.3);
+        cursor: pointer; padding: 0 4px; line-height: 1;
+      }
+      .bookings-drill__close:hover { color: #2C1810; }
+      .bookings-drill__table-wrap { overflow-x: auto; }
+      .bookings-drill__table { width: 100%; border-collapse: collapse; font-size: 12px; }
+      .bookings-drill__table th {
+        text-align: right; padding: 5px 10px; font-weight: 600; font-size: 10px;
+        text-transform: uppercase; letter-spacing: 0.4px; color: rgba(44,24,16,0.45);
+        border-bottom: 1px solid rgba(44,24,16,0.08);
+      }
+      .bookings-drill__table td {
+        text-align: right; padding: 4px 10px; border-bottom: 1px solid rgba(44,24,16,0.04);
+        color: #2C1810; font-variant-numeric: tabular-nums; font-size: 12px;
+      }
       .bookings-footnote { font-size: 11px; color: rgba(44,24,16,0.35); font-style: italic; margin-top: 8px; }
 
       /* ── Cross-sell badges ── */
