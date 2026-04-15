@@ -112,7 +112,8 @@ export async function onRequestPost(context) {
         const tier = rate_card_tier || null;
 
         sql = `UPDATE contacts SET won_at = ?, funnel_stage = 'won', stage_entered_at = ?,
-               hire_fee = ?, min_spend = ?, deal_value = ?, rate_card_tier = ?
+               hire_fee = ?, min_spend = ?, deal_value = ?, rate_card_tier = ?,
+               contact_type = 'customer'
                WHERE contact_id = ?`;
         binds = [now, now, hf, ms, dv, tier, contact_id];
         break;
@@ -153,7 +154,8 @@ export async function onRequestPost(context) {
         switch (stage) {
           case "won":
             sql = `UPDATE contacts SET won_at = NULL, hire_fee = NULL, min_spend = NULL,
-                   deal_value = NULL, rate_card_tier = NULL, funnel_stage = NULL, stage_entered_at = NULL
+                   deal_value = NULL, rate_card_tier = NULL, funnel_stage = NULL, stage_entered_at = NULL,
+                   contact_type = 'lead'
                    WHERE contact_id = ?`;
             binds = [contact_id];
             break;

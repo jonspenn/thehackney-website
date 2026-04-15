@@ -121,7 +121,7 @@ export async function onRequestGet(context) {
         s.wedding_year, s.event_date, s.brochure_type
       FROM contacts c
       LEFT JOIN submissions s ON s.contact_id = c.contact_id
-      WHERE c.lead_type = ? AND ${showDeleted ? "c.deleted_at IS NOT NULL" : "c.deleted_at IS NULL"}
+      WHERE c.lead_type = ? AND (c.contact_type IS NULL OR c.contact_type = 'lead') AND ${showDeleted ? "c.deleted_at IS NOT NULL" : "c.deleted_at IS NULL"}
       ORDER BY c.created_at DESC
       LIMIT 500
     `).bind(leadType).all();

@@ -178,6 +178,10 @@ const MIGRATIONS = [
   // Soft delete
   { name: "ct_add_deleted_at", sql: `ALTER TABLE contacts ADD COLUMN deleted_at TEXT` },
 
+  // ── Contacts: lead vs customer classification ──
+  { name: "ct_add_contact_type", sql: `ALTER TABLE contacts ADD COLUMN contact_type TEXT DEFAULT 'lead'` },
+  { name: "idx_contacts_type", sql: `CREATE INDEX IF NOT EXISTS idx_contacts_type ON contacts(contact_type)` },
+
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,
