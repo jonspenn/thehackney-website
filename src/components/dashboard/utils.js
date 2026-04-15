@@ -327,6 +327,22 @@ export function computeFunnelStage(lead, leadType) {
     if (proposalAt) { completed.proposal = proposalAt; currentStage = "proposal"; stageEnteredAt = proposalAt; }
     if (wonAt) { completed.won = wonAt; currentStage = "won"; stageEnteredAt = wonAt; }
     if (lostAt) { currentStage = "lost"; stageEnteredAt = lostAt; }
+
+    /* Backfill earlier stages as implicitly completed.
+       If someone had a tour, they must have been engaged first.
+       If they had a proposal, they must have had at least a tour. */
+    const stageOrder = ["lead", "qualified", "engaged", "call", "tour", "proposal", "won"];
+    let highestIdx = -1;
+    for (let i = stageOrder.length - 1; i >= 0; i--) {
+      if (completed[stageOrder[i]]) { highestIdx = i; break; }
+    }
+    if (highestIdx > 0) {
+      for (let i = 0; i < highestIdx; i++) {
+        if (!completed[stageOrder[i]]) {
+          completed[stageOrder[i]] = completed[stageOrder[highestIdx]];
+        }
+      }
+    }
   }
 
   const daysInStage = daysBetween(stageEnteredAt, new Date());
