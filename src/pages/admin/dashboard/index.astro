@@ -346,7 +346,11 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .rep-month__cell--blank { background: transparent; }
 
       /* ── Tables ── */
-      .rep-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .rep-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(44,24,16,0.2) transparent; }
+      .rep-table-wrap::-webkit-scrollbar { height: 8px; }
+      .rep-table-wrap::-webkit-scrollbar-track { background: rgba(44,24,16,0.04); border-radius: 4px; }
+      .rep-table-wrap::-webkit-scrollbar-thumb { background: rgba(44,24,16,0.18); border-radius: 4px; }
+      .rep-table-wrap::-webkit-scrollbar-thumb:hover { background: rgba(44,24,16,0.3); }
       .rep-table { width: 100%; background: var(--color-warm-white); border: 1px solid var(--border-warm); border-collapse: collapse; border-radius: 2px; overflow: hidden; min-width: 600px; }
       .rep-table th, .rep-table td { padding: 10px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border-subtle); }
       .rep-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-fired-brick); background: rgba(64, 22, 12, 0.03); }
