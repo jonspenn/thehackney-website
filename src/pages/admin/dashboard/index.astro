@@ -666,44 +666,68 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .rep-stat--clickable:hover { border-color: rgba(73,89,14,0.3); background: rgba(73,89,14,0.04); }
       .rep-stat--active { border-color: #49590E; background: rgba(73,89,14,0.06); }
 
-      .lead-search {
-        display: flex; align-items: center; gap: 8px;
-        margin-bottom: 16px; max-width: 520px;
+      /* ── Lead filter toolbar ── */
+      .lead-toolbar {
+        display: flex; flex-direction: column; gap: 10px;
+        margin-bottom: 20px; padding: 16px 20px;
+        background: #fff; border: 1px solid rgba(44,24,16,0.12);
+        border-radius: 4px;
       }
-      .lead-search__input {
-        flex: 1; padding: 10px 14px;
+      .lead-toolbar__search {
+        display: flex; align-items: center; gap: 8px;
+      }
+      .lead-toolbar__input {
+        flex: 1; max-width: 340px; padding: 9px 14px;
         font-family: 'DM Sans', sans-serif; font-size: 14px; color: #2C1810;
-        background: #F5F0E8; border: 1px solid rgba(44,24,16,0.15);
+        background: var(--color-warm-canvas); border: 1px solid rgba(44,24,16,0.15);
         border-radius: 4px; outline: none; transition: border-color 0.15s;
       }
-      .lead-search__input::placeholder { color: rgba(44,24,16,0.35); }
-      .lead-search__input:focus { border-color: #49590E; }
-      .lead-search__btn {
-        padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+      .lead-toolbar__input::placeholder { color: rgba(44,24,16,0.35); }
+      .lead-toolbar__input:focus { border-color: #49590E; }
+      .lead-toolbar__search-btn {
+        padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 12px;
         font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
         color: #fff; background: #49590E; border: none; border-radius: 4px;
         cursor: pointer; transition: background 0.15s; white-space: nowrap;
       }
-      .lead-search__btn:hover { background: #2E4009; }
-      .lead-search__clear {
-        background: none; border: 1px solid rgba(44,24,16,0.15);
-        border-radius: 4px; padding: 10px 14px; font-size: 12px;
-        font-family: 'DM Sans', sans-serif; color: rgba(44,24,16,0.5);
-        cursor: pointer; transition: all 0.15s; white-space: nowrap;
+      .lead-toolbar__search-btn:hover { background: #2E4009; }
+      .lead-toolbar__filters {
+        display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
       }
-      .lead-search__clear:hover { background: rgba(44,24,16,0.05); color: #2C1810; }
-      .breakdown-filter-bar {
-        display: flex; align-items: center; gap: 12px; margin: 8px 0 16px;
-        padding: 8px 14px; border-radius: 4px; background: rgba(73,89,14,0.06);
-        border: 1px solid rgba(73,89,14,0.15); font-family: 'DM Sans', sans-serif; font-size: 13px;
+      .lead-toolbar__select {
+        padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+        color: #2C1810; background: var(--color-warm-canvas);
+        border: 1px solid rgba(44,24,16,0.15); border-radius: 4px;
+        cursor: pointer; outline: none; transition: border-color 0.15s;
+        appearance: none; -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%232C1810' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 10px center;
+        padding-right: 28px;
       }
-      .breakdown-filter-bar__label { color: #2C1810; }
-      .breakdown-filter-bar__clear {
-        margin-left: auto; background: none; border: 1px solid rgba(44,24,16,0.15);
-        border-radius: 3px; padding: 3px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif;
-        color: rgba(44,24,16,0.6); cursor: pointer; transition: all 0.15s;
+      .lead-toolbar__select:focus { border-color: #49590E; }
+      .lead-toolbar__active {
+        display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+        padding-top: 6px; border-top: 1px solid rgba(44,24,16,0.06);
       }
-      .breakdown-filter-bar__clear:hover { background: rgba(44,24,16,0.05); color: #2C1810; }
+      .lead-toolbar__tag {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
+        font-family: 'DM Sans', sans-serif; color: #2E4009;
+        background: rgba(46,64,9,0.08); border: 1px solid rgba(46,64,9,0.15);
+      }
+      .lead-toolbar__tag button {
+        background: none; border: none; color: rgba(44,24,16,0.4);
+        cursor: pointer; font-size: 13px; padding: 0 0 0 2px; line-height: 1;
+        transition: color 0.15s;
+      }
+      .lead-toolbar__tag button:hover { color: #2C1810; }
+      .lead-toolbar__clear-all {
+        background: none; border: none; font-family: 'DM Sans', sans-serif;
+        font-size: 12px; color: rgba(44,24,16,0.45); cursor: pointer;
+        text-decoration: underline; padding: 0 4px; transition: color 0.15s;
+      }
+      .lead-toolbar__clear-all:hover { color: #2C1810; }
+
       .rep-device-card--clickable { cursor: pointer; transition: all 0.15s; }
       .rep-device-card--clickable:hover { background: rgba(73,89,14,0.06); border-color: rgba(73,89,14,0.3); }
       .rep-device-card--active { border-color: #49590E; background: rgba(73,89,14,0.06); }
@@ -790,6 +814,11 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         .rep-shell { padding: 24px 16px 64px; }
         .rep-title { font-size: 32px; }
         .adm-tab { padding: 8px 12px; font-size: 11px; letter-spacing: 0.06em; }
+        .lead-toolbar { padding: 12px; }
+        .lead-toolbar__search { flex-wrap: wrap; }
+        .lead-toolbar__input { max-width: none; }
+        .lead-toolbar__filters { flex-direction: column; align-items: stretch; }
+        .lead-toolbar__select { width: 100%; }
         .lead-heat-chips { gap: 4px; }
         .lead-heat-chip { font-size: 11px; padding: 3px 8px; }
         .lp-hero { flex-direction: column; text-align: center; padding: 16px; gap: 12px; }

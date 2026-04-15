@@ -965,209 +965,96 @@ export default function AdminDashboard() {
             })}
           </div>
 
-          {/* ── Search bar ── */}
-          <form className="lead-search" onSubmit={(e) => { e.preventDefault(); setLeadSearch(leadSearchDraft.trim()); }}>
-            <input
-              type="text"
-              className="lead-search__input"
-              placeholder="Search by name, email, or phone\u2026"
-              value={leadSearchDraft}
-              onChange={(e) => setLeadSearchDraft(e.target.value)}
-            />
-            <button className="lead-search__btn" type="submit">Search</button>
-            {leadSearch && (
-              <button className="lead-search__clear" onClick={() => { setLeadSearch(""); setLeadSearchDraft(""); }} type="button">{"\u2715"} Clear</button>
-            )}
-          </form>
-
-          {/* ── Heat bar, pipeline, charts (hidden when search is active) ── */}
-          {!leadSearch && <>
-          {/* ── Heat distribution bar ── */}
-          {scoredLeads.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              {/* Stacked bar */}
-              <div className="lead-heat-bar">
-                {["hot", "warm", "cool", "cold"].map(tier => {
-                  const count = heatCounts[tier];
-                  if (!count) return null;
-                  const pct = (count / scoredLeads.length) * 100;
-                  return (
-                    <div
-                      key={tier}
-                      className="lead-heat-bar__seg"
-                      style={{ width: `${pct}%`, background: TIER_CONFIG[tier].color }}
-                      title={`${TIER_CONFIG[tier].label}: ${count}`}
-                    />
-                  );
-                })}
-              </div>
-              {/* Filter chips */}
-              <div className="lead-heat-chips">
-                <button
-                  className={`lead-heat-chip${heatFilter === "all" ? " lead-heat-chip--active" : ""}`}
-                  onClick={() => setHeatFilter("all")}
-                  type="button"
-                >
-                  All ({scoredLeads.length})
-                </button>
+          {/* ── Filter / Sort / Search toolbar ── */}
+          <div className="lead-toolbar">
+            <form className="lead-toolbar__search" onSubmit={(e) => { e.preventDefault(); setLeadSearch(leadSearchDraft.trim()); }}>
+              <input
+                type="text"
+                className="lead-toolbar__input"
+                placeholder="Search name, email, or phone\u2026"
+                value={leadSearchDraft}
+                onChange={(e) => setLeadSearchDraft(e.target.value)}
+              />
+              <button className="lead-toolbar__search-btn" type="submit">Search</button>
+            </form>
+            <div className="lead-toolbar__filters">
+              {/* Heat tier */}
+              <select className="lead-toolbar__select" value={heatFilter} onChange={(e) => setHeatFilter(e.target.value)}>
+                <option value="all">All tiers ({scoredLeads.length})</option>
                 {["hot", "warm", "cool", "cold"].map(tier => (
-                  <button
-                    key={tier}
-                    className={`lead-heat-chip${heatFilter === tier ? " lead-heat-chip--active" : ""}`}
-                    style={{ "--chip-color": TIER_CONFIG[tier].color }}
-                    onClick={() => setHeatFilter(heatFilter === tier ? "all" : tier)}
-                    type="button"
-                  >
-                    <span className="lead-heat-chip__dot" style={{ background: TIER_CONFIG[tier].color }} />
-                    {TIER_CONFIG[tier].label} ({heatCounts[tier]})
-                  </button>
+                  <option key={tier} value={tier}>{TIER_CONFIG[tier].label} ({heatCounts[tier]})</option>
                 ))}
-              </div>
+              </select>
+              {/* Urgency - wedding only */}
+              {activeLeadType === "wedding" && (currentLeads?.summary?.by_urgency || []).length > 0 && (
+                <select className="lead-toolbar__select"
+                  value={breakdownFilter?.field === "urgency_label" ? breakdownFilter.value : ""}
+                  onChange={(e) => setBreakdownFilter(e.target.value ? { field: "urgency_label", value: e.target.value, label: `Urgency: ${e.target.value}` } : null)}>
+                  <option value="">All urgencies</option>
+                  {currentLeads.summary.by_urgency.map(row => (
+                    <option key={row.label} value={row.label}>{row.label} ({row.count})</option>
+                  ))}
+                </select>
+              )}
+              {/* Budget - wedding only */}
+              {activeLeadType === "wedding" && (currentLeads?.summary?.by_budget || []).length > 0 && (
+                <select className="lead-toolbar__select"
+                  value={breakdownFilter?.field === "budget_label" ? breakdownFilter.value : ""}
+                  onChange={(e) => setBreakdownFilter(e.target.value ? { field: "budget_label", value: e.target.value, label: `Budget: ${e.target.value}` } : null)}>
+                  <option value="">All budgets</option>
+                  {currentLeads.summary.by_budget.map(row => (
+                    <option key={row.label} value={row.label}>{row.label} ({row.count})</option>
+                  ))}
+                </select>
+              )}
+              {/* Wedding year */}
+              {activeLeadType === "wedding" && (currentLeads?.summary?.by_year || []).length > 0 && (
+                <select className="lead-toolbar__select"
+                  value={breakdownFilter?.field === "wedding_year" ? breakdownFilter.value : ""}
+                  onChange={(e) => setBreakdownFilter(e.target.value ? { field: "wedding_year", value: e.target.value, label: `Year: ${e.target.value}` } : null)}>
+                  <option value="">All years</option>
+                  {currentLeads.summary.by_year.map(row => (
+                    <option key={row.label} value={row.label}>{row.label} ({row.count})</option>
+                  ))}
+                </select>
+              )}
+              {/* Event type - corporate only */}
+              {activeLeadType === "corporate" && (currentLeads?.summary?.by_event_type || []).length > 0 && (
+                <select className="lead-toolbar__select"
+                  value={breakdownFilter?.field === "event_type_label" ? breakdownFilter.value : ""}
+                  onChange={(e) => setBreakdownFilter(e.target.value ? { field: "event_type_label", value: e.target.value, label: `Event: ${e.target.value}` } : null)}>
+                  <option value="">All event types</option>
+                  {currentLeads.summary.by_event_type.map(row => (
+                    <option key={row.label} value={row.label}>{row.label} ({row.count})</option>
+                  ))}
+                </select>
+              )}
+              {/* Guest count - corporate only */}
+              {activeLeadType === "corporate" && (currentLeads?.summary?.by_guest_count || []).length > 0 && (
+                <select className="lead-toolbar__select"
+                  value={breakdownFilter?.field === "guest_count" ? breakdownFilter.value : ""}
+                  onChange={(e) => setBreakdownFilter(e.target.value ? { field: "guest_count", value: e.target.value, label: `Guests: ${e.target.value}` } : null)}>
+                  <option value="">All guest counts</option>
+                  {currentLeads.summary.by_guest_count.map(row => (
+                    <option key={row.label} value={row.label}>{row.label} ({row.count})</option>
+                  ))}
+                </select>
+              )}
             </div>
-          )}
-
-          {/* ── Pipeline stage counts ── */}
-          {scoredLeads.length > 0 && (() => {
-            const stageCounts = { Brochure: 0, Quiz: 0, Call: 0, Tour: 0 };
-            for (const l of scoredLeads) stageCounts[l._score.stageLabel]++;
-            return (
-              <div className="lead-pipeline-bar" style={{ marginBottom: "20px" }}>
-                {STAGE_SEQUENCE.map((s, i) => (
-                  <div key={s} className="lead-pipeline-stage" style={{ flex: Math.max(stageCounts[s], 0.5) }}>
-                    <div className="lead-pipeline-stage__fill" style={{ opacity: stageCounts[s] ? 1 : 0.25 }}>
-                      <span className="lead-pipeline-stage__label">{s}</span>
-                      <span className="lead-pipeline-stage__count">{stageCounts[s]}</span>
-                    </div>
-                    {i < STAGE_SEQUENCE.length - 1 && <span className="lead-pipeline-arrow">{"\u25B6"}</span>}
-                  </div>
-                ))}
+            {/* Active filters summary */}
+            {(leadSearch || breakdownFilter || heatFilter !== "all") && (
+              <div className="lead-toolbar__active">
+                {leadSearch && <span className="lead-toolbar__tag">Search: "{leadSearch}" <button onClick={() => { setLeadSearch(""); setLeadSearchDraft(""); }}>{"\u2715"}</button></span>}
+                {heatFilter !== "all" && <span className="lead-toolbar__tag">{TIER_CONFIG[heatFilter].label} <button onClick={() => setHeatFilter("all")}>{"\u2715"}</button></span>}
+                {breakdownFilter && <span className="lead-toolbar__tag">{breakdownFilter.label} <button onClick={() => setBreakdownFilter(null)}>{"\u2715"}</button></span>}
+                <button className="lead-toolbar__clear-all" onClick={() => { setLeadSearch(""); setLeadSearchDraft(""); setHeatFilter("all"); setBreakdownFilter(null); }}>Clear all</button>
               </div>
-            );
-          })()}
-
-          {/* ── Wedding summaries ── */}
-          {activeLeadType === "wedding" && (
-            <>
-              <div className="rep-two-col">
-                <section className="rep-section" style={{ marginTop: "24px" }}>
-                  <h2 className="rep-h2">By urgency</h2>
-                  {(currentLeads?.summary?.by_urgency || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                    <ol className="rep-toplist">
-                      {currentLeads.summary.by_urgency.map((row, i) => {
-                        const active = breakdownFilter?.field === "urgency_label" && breakdownFilter?.value === row.label;
-                        return (
-                          <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                              onClick={() => setBreakdownFilter(active ? null : { field: "urgency_label", value: row.label, label: `Urgency: ${row.label}` })}>
-                            <span className="rep-toprank">{i + 1}</span>
-                            <span className="rep-topdate">{row.label}</span>
-                            <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_urgency[0]?.count || 1)) * 100}%` }} /></span>
-                            <span className="rep-topcount rep-topcount--link">{row.count}</span>
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  )}
-                </section>
-                <section className="rep-section" style={{ marginTop: "24px" }}>
-                  <h2 className="rep-h2">By budget</h2>
-                  {(currentLeads?.summary?.by_budget || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                    <ol className="rep-toplist">
-                      {currentLeads.summary.by_budget.map((row, i) => {
-                        const active = breakdownFilter?.field === "budget_label" && breakdownFilter?.value === row.label;
-                        return (
-                          <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                              onClick={() => setBreakdownFilter(active ? null : { field: "budget_label", value: row.label, label: `Budget: ${row.label}` })}>
-                            <span className="rep-toprank">{i + 1}</span>
-                            <span className="rep-topdate">{row.label}</span>
-                            <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_budget[0]?.count || 1)) * 100}%` }} /></span>
-                            <span className="rep-topcount rep-topcount--link">{row.count}</span>
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  )}
-                </section>
-              </div>
-              <div className="rep-two-col">
-                <section className="rep-section">
-                  <h2 className="rep-h2">By wedding year</h2>
-                  {(currentLeads?.summary?.by_year || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                    <ol className="rep-toplist">
-                      {currentLeads.summary.by_year.map((row, i) => {
-                        const active = breakdownFilter?.field === "wedding_year" && breakdownFilter?.value === row.label;
-                        return (
-                          <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                              onClick={() => setBreakdownFilter(active ? null : { field: "wedding_year", value: row.label, label: `Year: ${row.label}` })}>
-                            <span className="rep-toprank">{i + 1}</span>
-                            <span className="rep-topdate">{row.label}</span>
-                            <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_year[0]?.count || 1)) * 100}%` }} /></span>
-                            <span className="rep-topcount rep-topcount--link">{row.count}</span>
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  )}
-                </section>
-                <section className="rep-section" />
-              </div>
-            </>
-          )}
-
-          {/* ── Corporate summaries ── */}
-          {activeLeadType === "corporate" && (
-            <div className="rep-two-col">
-              <section className="rep-section" style={{ marginTop: "24px" }}>
-                <h2 className="rep-h2">By event type</h2>
-                {(currentLeads?.summary?.by_event_type || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                  <ol className="rep-toplist">
-                    {currentLeads.summary.by_event_type.map((row, i) => {
-                      const active = breakdownFilter?.field === "event_type_label" && breakdownFilter?.value === row.label;
-                      return (
-                        <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                            onClick={() => setBreakdownFilter(active ? null : { field: "event_type_label", value: row.label, label: `Event: ${row.label}` })}>
-                          <span className="rep-toprank">{i + 1}</span>
-                          <span className="rep-topdate">{row.label}</span>
-                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_event_type[0]?.count || 1)) * 100}%` }} /></span>
-                          <span className="rep-topcount rep-topcount--link">{row.count}</span>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                )}
-              </section>
-              <section className="rep-section" style={{ marginTop: "24px" }}>
-                <h2 className="rep-h2">By guest count</h2>
-                {(currentLeads?.summary?.by_guest_count || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
-                  <ol className="rep-toplist">
-                    {currentLeads.summary.by_guest_count.map((row, i) => {
-                      const active = breakdownFilter?.field === "guest_count" && breakdownFilter?.value === row.label;
-                      return (
-                        <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                            onClick={() => setBreakdownFilter(active ? null : { field: "guest_count", value: row.label, label: `Guests: ${row.label}` })}>
-                          <span className="rep-toprank">{i + 1}</span>
-                          <span className="rep-topdate">{row.label}</span>
-                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_guest_count[0]?.count || 1)) * 100}%` }} /></span>
-                          <span className="rep-topcount rep-topcount--link">{row.count}</span>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                )}
-              </section>
-            </div>
-          )}
-          </>}
+            )}
+          </div>
 
           {/* ── Leads table (adapts columns per type) ── */}
           <section className="rep-section">
-            <h2 className="rep-h2">All {currentLeads?.lead_type_label || activeLeadType} leads</h2>
-            <p className="rep-sub">Sorted by lead score. Click headers to re-sort. Left border = heat tier.{breakdownFilter ? "" : " Click any chart number above to filter."}</p>
-            {breakdownFilter && (
-              <div className="breakdown-filter-bar">
-                <span className="breakdown-filter-bar__label">Filtered by: <strong>{breakdownFilter.label}</strong></span>
-                <button className="breakdown-filter-bar__clear" onClick={() => setBreakdownFilter(null)}>{"\u2715"} Clear filter</button>
-              </div>
-            )}
+            <p className="rep-sub" style={{ marginTop: 0 }}>Showing {sortedLeads.length} of {scoredLeads.length} leads. Click a row to view full profile.</p>
             {sortedLeads.length === 0 ? (
               <p className="rep-empty-small">No {currentLeads?.lead_type_label?.toLowerCase() || activeLeadType} leads yet. Form submissions will appear here.</p>
             ) : (
