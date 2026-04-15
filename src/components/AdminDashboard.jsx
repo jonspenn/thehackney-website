@@ -146,7 +146,7 @@ const JOURNEY_EVENT_LABELS = {
 };
 
 function formatDuration(seconds) {
-  if (seconds == null || seconds < 0) return "";
+  if (seconds == null || !Number.isFinite(seconds) || seconds < 0) return "";
   if (seconds < 60) return `${seconds}s`;
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -1620,9 +1620,10 @@ export default function AdminDashboard() {
                         const nextEv = pageViews[ei + 1];
                         let timeOnPage = null;
                         if (nextEv) {
-                          const t1 = new Date(ev.created_at.replace(" ", "T") + "Z").getTime();
-                          const t2 = new Date(nextEv.created_at.replace(" ", "T") + "Z").getTime();
-                          timeOnPage = Math.round((t2 - t1) / 1000);
+                          const t1 = new Date(ev.created_at.replace(" ", "T") + (ev.created_at.includes("Z") ? "" : "Z")).getTime();
+                          const t2 = new Date(nextEv.created_at.replace(" ", "T") + (nextEv.created_at.includes("Z") ? "" : "Z")).getTime();
+                          const diff = Math.round((t2 - t1) / 1000);
+                          if (Number.isFinite(diff) && diff >= 0) timeOnPage = diff;
                         }
                         const path = (() => { try { return new URL(ev.page_url, "https://x").pathname; } catch { return ev.page_url; } })();
                         return (
