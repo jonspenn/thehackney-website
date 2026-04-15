@@ -36,12 +36,12 @@ const LEAD_TYPE_LABELS = {
 };
 
 const URGENCY_LABELS = {
-  asap: "Need to move fast",
-  ready: "Ready to book",
-  comparing: "Comparing venues",
-  browsing: "Just looking",
-  exploring: "Exploring options",
+  browsing: "1 \u00B7 Browsing",
+  comparing: "2 \u00B7 Shortlisting",
+  ready: "3 \u00B7 Ready to book",
+  asap: "4 \u00B7 Urgent",
 };
+const URGENCY_STAGE = { browsing: 1, comparing: 2, ready: 3, asap: 4 };
 
 const BUDGET_LABELS = {
   "under-5k": "Under \u00A35K",
@@ -1116,7 +1116,8 @@ export default function AdminDashboard() {
                             <td>
                               {lead.urgency_label ? (
                                 <span className={`rep-urgency rep-urgency--${lead.urgency || "unknown"}`}>
-                                  {lead.urgency_label}
+                                  <span className="rep-urgency__stage">{URGENCY_STAGE[lead.urgency] || "?"}</span>
+                                  {URGENCY_LABELS[lead.urgency]?.replace(/^\d\s*\u00B7\s*/, "") || lead.urgency_label}
                                 </span>
                               ) : "\u2014"}
                             </td>
