@@ -564,6 +564,25 @@ function computeFunnelStage(lead, leadType) {
   };
 }
 
+/* ───────── source channel → clean label ───────── */
+const SOURCE_MAP = [
+  { match: /google/i,     label: "Google",    color: "#49590E", bg: "rgba(73,89,14,0.08)" },
+  { match: /meta|facebook|instagram|fb/i, label: "Meta", color: "#8C472E", bg: "rgba(140,71,46,0.1)" },
+  { match: /pinterest/i,  label: "Pinterest", color: "#8C472E", bg: "rgba(140,71,46,0.08)" },
+  { match: /hitched/i,    label: "Hitched",   color: "#49590E", bg: "rgba(73,89,14,0.06)" },
+  { match: /bridebook/i,  label: "Bridebook", color: "#49590E", bg: "rgba(73,89,14,0.06)" },
+  { match: /tiktok/i,     label: "TikTok",    color: "#2C1810", bg: "rgba(44,24,16,0.06)" },
+  { match: /bing|microsoft/i, label: "Bing",  color: "#2C1810", bg: "rgba(44,24,16,0.06)" },
+];
+function resolveSource(raw) {
+  if (!raw) return { label: "Direct", color: "rgba(44,24,16,0.5)", bg: "rgba(44,24,16,0.04)" };
+  for (const s of SOURCE_MAP) { if (s.match.test(raw)) return s; }
+  // Fallback: clean up "source / medium" to just source name, title-cased
+  const base = raw.split("/")[0].trim();
+  const label = base.charAt(0).toUpperCase() + base.slice(1);
+  return { label, color: "rgba(44,24,16,0.5)", bg: "rgba(44,24,16,0.04)" };
+}
+
 /* ───────── main component ───────── */
 
 export default function AdminDashboard() {
@@ -1336,7 +1355,9 @@ export default function AdminDashboard() {
                               ) : "\u2014"}
                             </td>
                           )}
-                          <td className="rep-table__ref">{lead.source_channel || "Direct"}</td>
+                          {(() => { const src = resolveSource(lead.source_channel); return (
+                            <td><span className="lead-source-badge" style={{ color: src.color, background: src.bg }}>{src.label}</span></td>
+                          ); })()}
                           <td>{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "\u2014"}</td>
                           <td>{lead.sessions_before_conversion != null ? `${lead.sessions_before_conversion}s / ${lead.total_page_views || 0}p` : "\u2014"}</td>
                           <td>
@@ -1853,12 +1874,32 @@ export default function AdminDashboard() {
                 // Sort by time
                 milestones.sort((a, b) => (a.time || "").localeCompare(b.time || ""));
 
-                // Source breakdown
+                // Source breakdown - clean up raw URLs to short labels
                 const sourceCounts = {};
                 journey.sessions.forEach(s => {
-                  const key = s.ad_platform || s.source || "Direct";
-                  sourceCounts[key] = (sourceCounts[key] || 0) + 1;
+                  let label = s.source || "Direct";
+                  // Clean up raw referrer URLs to domain only
+                  if (label.startsWith("http")) {
+                    try { label = new URL(label).hostname.replace("www.", ""); } catch { /* keep raw */ }
+                  }
+                  sourceCounts[label] = (sourceCounts[label] || 0) + 1;
                 });
+
+                // Ad attribution - platforms, campaigns, keywords, click IDs
+                const adPlatforms = {};
+                const campaigns = {};
+                const keywords = {};
+                const clickIdTypes = new Set();
+                journey.sessions.forEach(s => {
+                  if (s.ad_platform) adPlatforms[s.ad_platform] = (adPlatforms[s.ad_platform] || 0) + 1;
+                  if (s.campaign) campaigns[s.campaign] = (campaigns[s.campaign] || 0) + 1;
+                  if (s.keyword) keywords[s.keyword] = (keywords[s.keyword] || 0) + 1;
+                  if (s.click_ids) Object.keys(s.click_ids).forEach(k => clickIdTypes.add(k));
+                });
+                const hasAttribution = Object.keys(adPlatforms).length > 0 || Object.keys(campaigns).length > 0 || Object.keys(keywords).length > 0 || clickIdTypes.size > 0;
+
+                // Time span
+                const daysSpan = daysBetween(parseTimestamp(firstDate), parseTimestamp(lastDate));
 
                 return (
                   <>
@@ -1881,9 +1922,36 @@ export default function AdminDashboard() {
                         <span className="jny-stat__label">date checks</span>
                       </div>
                       <div className="jny-stat">
-                        <span className="jny-stat__val">{Object.entries(sourceCounts).map(([k,v]) => k + (v > 1 ? " (" + v + ")" : "")).join(", ")}</span>
-                        <span className="jny-stat__label">sources</span>
+                        <span className="jny-stat__val">{daysSpan === 0 ? "Same day" : daysSpan + "d"}</span>
+                        <span className="jny-stat__label">time span</span>
                       </div>
+                    </div>
+
+                    {/* Sources + Attribution as tags */}
+                    <div className="jny-tags-row">
+                      <div className="jny-tags-group">
+                        <span className="jny-tags-group__label">Sources</span>
+                        {Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).map(([src, cnt]) => (
+                          <span key={src} className="lp-journey-tag">{src}{cnt > 1 ? " (" + cnt + ")" : ""}</span>
+                        ))}
+                      </div>
+                      {hasAttribution && (
+                        <div className="jny-tags-group">
+                          <span className="jny-tags-group__label">Ads</span>
+                          {Object.entries(adPlatforms).map(([p, cnt]) => (
+                            <span key={p} className="lp-journey-tag lp-journey-tag--platform">{p}{cnt > 1 ? " (" + cnt + ")" : ""}</span>
+                          ))}
+                          {Object.entries(campaigns).map(([c, cnt]) => (
+                            <span key={c} className="lp-journey-tag lp-journey-tag--campaign">{c}{cnt > 1 ? " (" + cnt + ")" : ""}</span>
+                          ))}
+                          {Object.entries(keywords).map(([k, cnt]) => (
+                            <span key={k} className="lp-journey-tag lp-journey-tag--keyword">{k}{cnt > 1 ? " (" + cnt + ")" : ""}</span>
+                          ))}
+                          {clickIdTypes.size > 0 && (
+                            <span className="lp-journey-tag lp-journey-tag--clickid">{[...clickIdTypes].join(", ")}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Key milestones timeline */}
