@@ -108,7 +108,7 @@ export async function onRequestGet(context) {
   }
 
   // ── Step 0: Clean up any previous test data ──
-  const cleanup = { contacts: 0, submissions: 0 };
+  const cleanup = { contacts: 0, submissions: 0, visitors: 0 };
   try {
     const delSub = await env.DB.prepare(
       `DELETE FROM submissions WHERE email LIKE '%.test@example.com'`
@@ -118,6 +118,10 @@ export async function onRequestGet(context) {
       `DELETE FROM contacts WHERE email LIKE '%.test@example.com'`
     ).run();
     cleanup.contacts = delCon.meta?.changes || 0;
+    const delVis = await env.DB.prepare(
+      `DELETE FROM visitors WHERE visitor_id LIKE 'v_test_%'`
+    ).run();
+    cleanup.visitors = delVis.meta?.changes || 0;
   } catch (e) {
     cleanup.error = e.message;
   }
@@ -131,8 +135,33 @@ export async function onRequestGet(context) {
     const lastSeen = iso(Math.min(lead.daysAgo, 2));
 
     const visitorId = "v_test_" + Math.random().toString(36).slice(2, 10);
+    const firstSeen = iso(lead.daysAgo);
 
-    // Insert contact (plain INSERT, no OR IGNORE - errors are caught explicitly)
+    // Insert matching visitor record first (FK requires it)
+    try {
+      await env.DB.prepare(`
+        INSERT INTO visitors (
+          visitor_id, first_seen_at, last_seen_at, first_landing_page,
+          first_referrer, first_utm_source, first_utm_medium,
+          device_type, total_sessions, total_page_views,
+          first_ip_country, first_ip_city
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        visitorId, firstSeen, lastSeen,
+        leadType === "wedding" ? "/weddings/" : leadType === "corporate" ? "/corporate/" : `/${leadType}/`,
+        null,
+        lead.source?.split(" / ")[0] || null,
+        lead.source?.split(" / ")[1] || null,
+        Math.random() > 0.4 ? "desktop" : "mobile",
+        lead.sessions || 1,
+        lead.pages || 3,
+        "GB", "London"
+      ).run();
+    } catch (err) {
+      results.errors.push(`VISITOR ${lead.email}: ${err.message}`);
+    }
+
+    // Insert contact
     try {
       await env.DB.prepare(`
         INSERT INTO contacts (
