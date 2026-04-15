@@ -377,6 +377,193 @@ function computeLeadScore(lead, leadType) {
   };
 }
 
+/* ───────── lead funnel & lifecycle ───────── */
+
+/**
+ * Funnel stages per revenue stream. Each stage has:
+ *   key: internal identifier
+ *   label: display name
+ *   auto: whether it's detected automatically from D1 data
+ *
+ * Health thresholds (days) per stage transition, per lead type.
+ * green < amber < red. These are starting estimates - recalibrate
+ * after 50+ real leads flow through D1 post-launch.
+ */
+
+const FUNNEL_STAGES = {
+  wedding:          ["lead", "qualified", "engaged", "meeting", "proposal", "won"],
+  corporate:        ["lead", "qualified", "engaged", "meeting", "proposal", "won"],
+  "private-events": ["lead", "qualified", "engaged", "meeting", "proposal", "won"],
+  supperclub:       ["signup", "engaged", "booked", "attended"],
+  "cafe-bar":       ["signup", "engaged", "return"],
+};
+
+const FUNNEL_LABELS = {
+  lead: "Lead", qualified: "Qualified", engaged: "Engaged",
+  meeting: "Meeting", proposal: "Proposal", won: "Won",
+  lost: "Lost", cancelled: "Cancelled", noshow: "No-show",
+  signup: "Signup", booked: "Booked", attended: "Attended", return: "Return",
+};
+
+/* Health thresholds: [green max, amber max] in days. Beyond amber = red. */
+const HEALTH_THRESHOLDS = {
+  wedding: {
+    lead:      [7, 14],   // lead → qualified
+    qualified: [3, 7],    // qualified → engaged
+    engaged:   [5, 10],   // engaged → meeting
+    meeting:   [2, 5],    // meeting → proposal
+    proposal:  [7, 14],   // proposal → won/lost
+  },
+  corporate: {
+    lead:      [3, 7],
+    qualified: [2, 5],
+    engaged:   [3, 7],
+    meeting:   [1, 3],
+    proposal:  [5, 10],
+  },
+  "private-events": {
+    lead:      [5, 10],
+    qualified: [3, 7],
+    engaged:   [5, 10],
+    meeting:   [2, 5],
+    proposal:  [7, 14],
+  },
+  supperclub: {
+    signup:  [14, 30],
+    engaged: [7, 14],
+    booked:  [3, 7],
+  },
+  "cafe-bar": {
+    signup:  [14, 30],
+    engaged: [7, 14],
+  },
+};
+
+const HEALTH_COLORS = {
+  green:  { color: "#2E4009", bg: "rgba(46,64,9,0.12)", label: "On track" },
+  amber:  { color: "#BF7256", bg: "rgba(191,114,86,0.12)", label: "Slowing" },
+  red:    { color: "#8C472E", bg: "rgba(140,71,46,0.15)", label: "Stuck" },
+};
+
+function parseTimestamp(ts) {
+  if (!ts) return null;
+  const safe = ts.includes("T") ? ts : ts.replace(" ", "T") + "Z";
+  const d = new Date(safe);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function daysBetween(from, to) {
+  if (!from) return 999;
+  const t = to || new Date();
+  return Math.max(0, Math.floor((t.getTime() - from.getTime()) / 86400000));
+}
+
+function computeFunnelStage(lead, leadType) {
+  const stages = FUNNEL_STAGES[leadType] || FUNNEL_STAGES.wedding;
+  const isLowIntent = leadType === "supperclub" || leadType === "cafe-bar";
+
+  /* Determine current stage + timestamp for each completed stage */
+  const completed = {};
+  let currentStage, stageEnteredAt;
+
+  if (isLowIntent) {
+    /* Supper club / cafe-bar: signup → engaged → booked/return */
+    completed.signup = parseTimestamp(lead.created_at);
+    currentStage = "signup";
+    stageEnteredAt = completed.signup;
+    /* Future: engaged from Klaviyo data, booked/attended from manual or integration */
+  } else {
+    /* Wedding / corporate / private events full funnel */
+    completed.lead = parseTimestamp(lead.created_at);
+    currentStage = "lead";
+    stageEnteredAt = completed.lead;
+
+    const hasQuiz = lead.form_types?.some(ft => ft.includes("quiz"));
+    if (hasQuiz) {
+      /* Quiz submission time: use submitted_at if available, else approximate from created_at */
+      completed.qualified = parseTimestamp(lead.submitted_at) || completed.lead;
+      currentStage = "qualified";
+      stageEnteredAt = completed.qualified;
+    }
+
+    const callAt = parseTimestamp(lead.clicked_discovery_call_at);
+    const tourAt = parseTimestamp(lead.clicked_venue_tour_at);
+    const engagedAt = callAt && tourAt ? (callAt < tourAt ? callAt : tourAt) : (callAt || tourAt);
+    if (engagedAt) {
+      completed.engaged = engagedAt;
+      currentStage = "engaged";
+      stageEnteredAt = engagedAt;
+    }
+
+    /* Manual stages (Phase B - not yet in API, but ready for when they arrive) */
+    const meetingAt = parseTimestamp(lead.meeting_at);
+    const cancelledAt = parseTimestamp(lead.cancelled_at);
+    const noshowAt = parseTimestamp(lead.noshow_at);
+    const proposalAt = parseTimestamp(lead.proposal_at);
+    const wonAt = parseTimestamp(lead.won_at);
+    const lostAt = parseTimestamp(lead.lost_at);
+
+    if (cancelledAt && !meetingAt) {
+      currentStage = "cancelled";
+      stageEnteredAt = cancelledAt;
+    }
+    if (noshowAt && !meetingAt) {
+      currentStage = "noshow";
+      stageEnteredAt = noshowAt;
+    }
+    if (meetingAt) {
+      completed.meeting = meetingAt;
+      currentStage = "meeting";
+      stageEnteredAt = meetingAt;
+    }
+    if (proposalAt) {
+      completed.proposal = proposalAt;
+      currentStage = "proposal";
+      stageEnteredAt = proposalAt;
+    }
+    if (wonAt) {
+      completed.won = wonAt;
+      currentStage = "won";
+      stageEnteredAt = wonAt;
+    }
+    if (lostAt) {
+      currentStage = "lost";
+      stageEnteredAt = lostAt;
+    }
+  }
+
+  /* Time in current stage */
+  const daysInStage = daysBetween(stageEnteredAt, new Date());
+
+  /* Health colour */
+  const thresholds = (HEALTH_THRESHOLDS[leadType] || HEALTH_THRESHOLDS.wedding)[currentStage];
+  let health = "green";
+  if (thresholds) {
+    if (daysInStage > thresholds[1]) health = "red";
+    else if (daysInStage > thresholds[0]) health = "amber";
+  }
+  /* Won and Lost don't get health indicators */
+  if (currentStage === "won" || currentStage === "lost") health = null;
+
+  /* Engagement depth (reuse existing data) */
+  const engagementSignals = {
+    sessions: lead.sessions_before_conversion || 0,
+    pages: lead.total_page_views || 0,
+    submissions: lead.submissions_count || 0,
+  };
+
+  return {
+    stages,
+    completed,
+    currentStage,
+    stageEnteredAt,
+    daysInStage,
+    health,
+    engagementSignals,
+    lostReason: lead.lost_reason || null,
+  };
+}
+
 /* ───────── main component ───────── */
 
 export default function AdminDashboard() {
@@ -1068,7 +1255,8 @@ export default function AdminDashboard() {
                     {sortedLeads.map((lead) => {
                       const sc = lead._score;
                       const tc = TIER_CONFIG[sc.tier];
-                      const stageIdx = STAGE_SEQUENCE.indexOf(sc.stageLabel);
+                      const funnel = computeFunnelStage(lead, activeLeadType);
+                      const hc = funnel.health ? HEALTH_COLORS[funnel.health] : null;
                       return (
                         <tr
                           key={lead.contact_id}
@@ -1086,18 +1274,29 @@ export default function AdminDashboard() {
                               {sc.score}
                             </span>
                           </td>
-                          {/* Stage pills */}
+                          {/* Funnel stage pills */}
                           <td>
                             <span className="lead-stage-pills">
-                              {STAGE_SEQUENCE.map((s, i) => (
-                                <span
-                                  key={s}
-                                  className={`lead-stage-pill${i <= stageIdx ? " lead-stage-pill--filled" : ""}`}
-                                  style={i <= stageIdx ? { background: tc.color } : {}}
-                                  title={s}
-                                />
-                              ))}
-                              <span className="lead-stage-label">{sc.stageLabel}</span>
+                              {funnel.stages.map((stageKey) => {
+                                const done = !!funnel.completed[stageKey];
+                                const current = funnel.currentStage === stageKey;
+                                let bg = undefined;
+                                if (done && !current) bg = tc.color;
+                                else if (current && hc) bg = hc.color;
+                                else if (current) bg = tc.color;
+                                return (
+                                  <span
+                                    key={stageKey}
+                                    className={`lead-stage-pill${done || current ? " lead-stage-pill--filled" : ""}${current ? " lead-stage-pill--current" : ""}`}
+                                    style={bg ? { background: bg } : {}}
+                                    title={`${FUNNEL_LABELS[stageKey]}${current ? ` (${funnel.daysInStage}d)` : ""}`}
+                                  />
+                                );
+                              })}
+                              <span className="lead-stage-label">{FUNNEL_LABELS[funnel.currentStage]}</span>
+                              {funnel.health && funnel.health !== "green" && (
+                                <span className="lead-health-badge" style={{ color: hc.color, background: hc.bg }}>{funnel.daysInStage}d</span>
+                              )}
                             </span>
                           </td>
                           <td>
@@ -1377,7 +1576,7 @@ export default function AdminDashboard() {
         const lead = selectedLead;
         const sc = computeLeadScore(lead, activeLeadType);
         const tc = TIER_CONFIG[sc.tier];
-        const stageIdx = STAGE_SEQUENCE.indexOf(sc.stageLabel);
+        const funnel = computeFunnelStage(lead, activeLeadType);
         const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unknown";
 
         return (
@@ -1400,12 +1599,89 @@ export default function AdminDashboard() {
                   {lead.phone && <> &middot; <a href={`tel:${lead.phone}`} className="lp-hero__link">{lead.phone}</a></>}
                   {lead.company && <> &middot; {lead.company}</>}
                 </div>
-                <div className="lp-stage-bar" style={{ marginTop: "12px" }}>
-                  {STAGE_SEQUENCE.map((s, i) => (
-                    <div key={s} className={`lp-stage-step${i <= stageIdx ? " lp-stage-step--active" : ""}`} style={i <= stageIdx ? { borderColor: tc.color, background: i === stageIdx ? (sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color) : "transparent", color: i === stageIdx ? (sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff") : tc.color } : {}}>
-                      {s}
+
+                {/* Funnel journey track */}
+                <div className="lp-funnel" style={{ marginTop: "16px" }}>
+                  {funnel.stages.map((stageKey, i) => {
+                    const isCompleted = !!funnel.completed[stageKey];
+                    const isCurrent = funnel.currentStage === stageKey;
+                    const isFuture = !isCompleted && !isCurrent;
+                    const isLost = funnel.currentStage === "lost";
+                    const isCancelled = funnel.currentStage === "cancelled";
+                    const isNoshow = funnel.currentStage === "noshow";
+                    const hc = funnel.health ? HEALTH_COLORS[funnel.health] : null;
+                    const completedDate = funnel.completed[stageKey];
+
+                    /* Determine dot style */
+                    let dotClass = "lp-funnel__dot";
+                    let dotStyle = {};
+                    let lineStyle = {};
+                    if (isCompleted && !isCurrent) {
+                      dotClass += " lp-funnel__dot--done";
+                      dotStyle = { background: tc.color, borderColor: tc.color };
+                      lineStyle = { background: tc.color };
+                    } else if (isCurrent) {
+                      dotClass += " lp-funnel__dot--current";
+                      if (isLost) {
+                        dotStyle = { background: "#8C472E", borderColor: "#8C472E" };
+                      } else if (isCancelled || isNoshow) {
+                        dotStyle = { background: "#BF7256", borderColor: "#BF7256" };
+                      } else if (hc) {
+                        dotStyle = { background: hc.color, borderColor: hc.color };
+                      } else {
+                        dotStyle = { background: tc.color, borderColor: tc.color };
+                      }
+                    }
+
+                    return (
+                      <div key={stageKey} className={`lp-funnel__step${isCurrent ? " lp-funnel__step--current" : ""}${isFuture ? " lp-funnel__step--future" : ""}`}>
+                        {i > 0 && <div className="lp-funnel__line" style={isCompleted || isCurrent ? lineStyle : {}} />}
+                        <div className={dotClass} style={dotStyle}>
+                          {isCompleted && !isCurrent && <span className="lp-funnel__check">{"\u2713"}</span>}
+                          {isCurrent && !isLost && !isCancelled && !isNoshow && funnel.health && (
+                            <span className="lp-funnel__pulse" />
+                          )}
+                        </div>
+                        <span className="lp-funnel__label">{FUNNEL_LABELS[stageKey]}</span>
+                        {isCompleted && !isCurrent && completedDate && (
+                          <span className="lp-funnel__date">{completedDate.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>
+                        )}
+                        {isCurrent && (
+                          <>
+                            {funnel.health && (
+                              <span className="lp-funnel__health" style={{ color: hc.color, background: hc.bg }}>
+                                {funnel.daysInStage === 0 ? "Today" : `${funnel.daysInStage}d`}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {/* Lost / cancelled / no-show indicator after the main funnel */}
+                  {(funnel.currentStage === "lost" || funnel.currentStage === "cancelled" || funnel.currentStage === "noshow") && (
+                    <div className="lp-funnel__step lp-funnel__step--current">
+                      <div className="lp-funnel__line" />
+                      <div className={`lp-funnel__dot lp-funnel__dot--current`} style={{ background: funnel.currentStage === "lost" ? "#8C472E" : "#BF7256", borderColor: funnel.currentStage === "lost" ? "#8C472E" : "#BF7256" }}>
+                        <span style={{ color: "#fff", fontSize: "10px", fontWeight: 700 }}>{funnel.currentStage === "lost" ? "\u2717" : "\u2014"}</span>
+                      </div>
+                      <span className="lp-funnel__label">{FUNNEL_LABELS[funnel.currentStage]}</span>
+                      {funnel.lostReason && (
+                        <span className="lp-funnel__date">{funnel.lostReason.replace(/_/g, " ")}</span>
+                      )}
                     </div>
-                  ))}
+                  )}
+                </div>
+
+                {/* Engagement depth bar */}
+                <div className="lp-funnel-engagement" style={{ marginTop: "8px" }}>
+                  <span className="lp-funnel-engagement__label">Engagement</span>
+                  <span className="lp-funnel-engagement__detail">
+                    {funnel.engagementSignals.sessions} session{funnel.engagementSignals.sessions !== 1 ? "s" : ""}, {funnel.engagementSignals.pages} pages
+                  </span>
+                  <div className="lp-funnel-engagement__bar">
+                    <div className="lp-funnel-engagement__fill" style={{ width: `${Math.min((funnel.engagementSignals.sessions * 8 + funnel.engagementSignals.pages * 2), 100)}%` }} />
+                  </div>
                 </div>
               </div>
             </div>
