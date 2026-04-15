@@ -632,6 +632,10 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
   const funnel = computeFunnelStage(lead, activeLeadType);
   const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unknown";
 
+  // Days in system
+  const firstSeen = parseTimestamp(lead.first_seen_at || lead.created_at);
+  const daysInSystem = firstSeen ? Math.max(0, Math.floor((Date.now() - firstSeen.getTime()) / 86400000)) : null;
+
   return (
     <div className="lp-fullpage">
       {/* Back button */}
@@ -647,6 +651,14 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             </span>
             <span className="lp-hero__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
           </div>
+          {daysInSystem !== null && (
+            <div className="lp-hero__age">
+              <span className="lp-hero__age-badge">
+                {daysInSystem === 0 ? "<1" : daysInSystem}
+              </span>
+              <span className="lp-hero__age-label">{daysInSystem === 1 ? "day" : "days"}</span>
+            </div>
+          )}
           <div className="lp-hero__info">
             <h2 className="lp-hero__name">{name}</h2>
             <div className="lp-hero__contact">
