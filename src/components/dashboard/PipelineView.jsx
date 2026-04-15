@@ -2,6 +2,7 @@
  * PipelineView - Visual funnel pipeline showing lead counts per stage.
  * Sub-tabs by revenue stream. Click a stage to see leads in that stage.
  * Click a lead row to open their full profile.
+ * Funnel and monthly chart are collapsible so the drill-in table stays accessible.
  */
 
 import { useMemo, useState } from "react";
@@ -35,6 +36,8 @@ const TREND_METRICS = [
 export default function PipelineView({ leads, onSelectLead }) {
   const [activeType, setActiveType] = useState("wedding");
   const [selectedStage, setSelectedStage] = useState(null);
+  const [funnelOpen, setFunnelOpen] = useState(true);
+  const [trendsOpen, setTrendsOpen] = useState(true);
 
   /* Compute funnel for every lead in active type */
   const { stageCounts, stageLeads, totalActive, terminalCounts } = useMemo(() => {
@@ -77,8 +80,6 @@ export default function PipelineView({ leads, onSelectLead }) {
     const rates = {};
     for (let i = 1; i < stages.length; i++) {
       const prev = stageCounts[stages[i - 1]] || 0;
-      const curr = stageCounts[stages[i]] || 0;
-      // Cumulative: sum of this stage + all later stages
       let cumulative = 0;
       for (let j = i; j < stages.length; j++) cumulative += (stageCounts[stages[j]] || 0);
       rates[stages[i]] = prev > 0 ? Math.round((cumulative / prev) * 100) : null;
@@ -87,7 +88,6 @@ export default function PipelineView({ leads, onSelectLead }) {
   }, [stageCounts, stages]);
 
   const selectedLeads = selectedStage ? (stageLeads[selectedStage] || []) : [];
-  // Sort by score descending
   const sortedSelectedLeads = useMemo(() => {
     return [...selectedLeads].sort((a, b) => (b._score?.score || 0) - (a._score?.score || 0));
   }, [selectedLeads]);
@@ -101,14 +101,12 @@ export default function PipelineView({ leads, onSelectLead }) {
 
     const isHighIntent = activeType === "wedding" || activeType === "corporate" || activeType === "private-events";
 
-    // Bucket function: "YYYY-MM" key from a timestamp
     function toMonthKey(ts) {
       const d = parseTimestamp(ts);
       if (!d) return null;
       return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
     }
 
-    // Find the range of months to display (earliest lead to now)
     let earliest = null;
     for (const lead of currentLeads) {
       const d = parseTimestamp(lead.created_at);
@@ -125,45 +123,34 @@ export default function PipelineView({ leads, onSelectLead }) {
       cur.setUTCMonth(cur.getUTCMonth() + 1);
     }
 
-    // Init buckets
     const buckets = {};
     for (const mk of monthKeys) {
       buckets[mk] = { new: 0, qualified: 0, engaged: 0, meeting: 0, won: 0, lost: 0 };
     }
 
-    // Fill buckets from lead data
     for (const lead of currentLeads) {
       const newKey = toMonthKey(lead.created_at);
       if (newKey && buckets[newKey]) buckets[newKey].new++;
 
       if (isHighIntent) {
-        // Qualified = has quiz submission
         const hasQuiz = lead.form_types?.some(ft => ft.includes("quiz"));
         if (hasQuiz) {
           const qKey = toMonthKey(lead.submitted_at || lead.created_at);
           if (qKey && buckets[qKey]) buckets[qKey].qualified++;
         }
-
-        // Engaged = clicked call or tour
         const engagedTs = lead.clicked_discovery_call_at || lead.clicked_venue_tour_at;
         if (engagedTs) {
           const eKey = toMonthKey(engagedTs);
           if (eKey && buckets[eKey]) buckets[eKey].engaged++;
         }
-
-        // Meeting+
         if (lead.meeting_at) {
           const mKey = toMonthKey(lead.meeting_at);
           if (mKey && buckets[mKey]) buckets[mKey].meeting++;
         }
-
-        // Won
         if (lead.won_at) {
           const wKey = toMonthKey(lead.won_at);
           if (wKey && buckets[wKey]) buckets[wKey].won++;
         }
-
-        // Lost
         if (lead.lost_at) {
           const lKey = toMonthKey(lead.lost_at);
           if (lKey && buckets[lKey]) buckets[lKey].lost++;
@@ -171,14 +158,12 @@ export default function PipelineView({ leads, onSelectLead }) {
       }
     }
 
-    // Build output array
     let maxVal = 0;
     const months = monthKeys.map(mk => {
       const [y, m] = mk.split("-");
-      const label = `${SHORT_MONTHS[parseInt(m, 10) - 1]} ${y}`;
       const data = buckets[mk];
       for (const v of Object.values(data)) { if (v > maxVal) maxVal = v; }
-      return { key: mk, label, shortLabel: SHORT_MONTHS[parseInt(m, 10) - 1], ...data };
+      return { key: mk, label: `${SHORT_MONTHS[parseInt(m, 10) - 1]} ${y}`, shortLabel: SHORT_MONTHS[parseInt(m, 10) - 1], ...data };
     });
 
     return { months, maxVal, isHighIntent };
@@ -204,56 +189,67 @@ export default function PipelineView({ leads, onSelectLead }) {
           ))}
         </div>
 
-        {/* ── Visual pipeline ── */}
-        <div className="pipe-funnel">
-          {stages.map((stageKey, i) => {
-            const count = stageCounts[stageKey] || 0;
-            const isSelected = selectedStage === stageKey;
-            const barWidth = maxCount > 0 ? Math.max(8, (count / maxCount) * 100) : 8;
+        {/* ── Collapsible funnel ── */}
+        <button
+          type="button"
+          className="pipe-collapse-toggle"
+          onClick={() => setFunnelOpen(p => !p)}
+        >
+          <span className={`pipe-collapse-toggle__arrow${funnelOpen ? " pipe-collapse-toggle__arrow--open" : ""}`}>{"\u25B6"}</span>
+          Pipeline {!funnelOpen && <span className="pipe-collapse-toggle__summary">{totalActive} leads across {stages.length} stages</span>}
+        </button>
 
-            return (
-              <div key={stageKey} className="pipe-stage-col">
-                {/* Conversion arrow between stages */}
-                {i > 0 && conversionRates[stageKey] != null && (
-                  <div className="pipe-conv-arrow">
-                    <span className="pipe-conv-arrow__pct">{conversionRates[stageKey]}%</span>
+        {funnelOpen && (
+          <>
+            <div className="pipe-funnel">
+              {stages.map((stageKey, i) => {
+                const count = stageCounts[stageKey] || 0;
+                const isSelected = selectedStage === stageKey;
+                const barWidth = maxCount > 0 ? Math.max(8, (count / maxCount) * 100) : 8;
+
+                return (
+                  <div key={stageKey} className="pipe-stage-col">
+                    {i > 0 && conversionRates[stageKey] != null && (
+                      <div className="pipe-conv-arrow">
+                        <span className="pipe-conv-arrow__pct">{conversionRates[stageKey]}%</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      className={`pipe-stage${isSelected ? " pipe-stage--selected" : ""}${count === 0 ? " pipe-stage--empty" : ""}`}
+                      onClick={() => setSelectedStage(isSelected ? null : stageKey)}
+                    >
+                      <div className="pipe-stage__bar" style={{ width: `${barWidth}%` }} />
+                      <div className="pipe-stage__count">{count}</div>
+                      <div className="pipe-stage__label">{FUNNEL_LABELS[stageKey]}</div>
+                    </button>
                   </div>
-                )}
-                <button
-                  type="button"
-                  className={`pipe-stage${isSelected ? " pipe-stage--selected" : ""}${count === 0 ? " pipe-stage--empty" : ""}`}
-                  onClick={() => setSelectedStage(isSelected ? null : stageKey)}
-                >
-                  <div className="pipe-stage__bar" style={{ width: `${barWidth}%` }} />
-                  <div className="pipe-stage__count">{count}</div>
-                  <div className="pipe-stage__label">{FUNNEL_LABELS[stageKey]}</div>
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
 
-        {/* Terminal stages row (lost, cancelled, no-show) */}
-        {totalTerminal > 0 && (
-          <div className="pipe-terminal">
-            {["lost", "cancelled", "noshow"].map(key => {
-              if (!terminalCounts[key]) return null;
-              const isSelected = selectedStage === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  className={`pipe-terminal__btn${isSelected ? " pipe-terminal__btn--selected" : ""}`}
-                  onClick={() => setSelectedStage(isSelected ? null : key)}
-                >
-                  {FUNNEL_LABELS[key]}: {terminalCounts[key]}
-                </button>
-              );
-            })}
-          </div>
+            {totalTerminal > 0 && (
+              <div className="pipe-terminal">
+                {["lost", "cancelled", "noshow"].map(key => {
+                  if (!terminalCounts[key]) return null;
+                  const isSelected = selectedStage === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      className={`pipe-terminal__btn${isSelected ? " pipe-terminal__btn--selected" : ""}`}
+                      onClick={() => setSelectedStage(isSelected ? null : key)}
+                    >
+                      {FUNNEL_LABELS[key]}: {terminalCounts[key]}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
 
-        {/* Summary line */}
+        {/* Summary / status line */}
         <div className="pipe-panel__status">
           {selectedStage ? (
             <span>
@@ -268,7 +264,68 @@ export default function PipelineView({ leads, onSelectLead }) {
         </div>
       </div>
 
-      {/* ── Leads in selected stage ── */}
+      {/* ── Collapsible monthly trends (above the drill-in table) ── */}
+      {monthlyData.months.length > 0 && (
+        <div className="pipe-trends">
+          <button
+            type="button"
+            className="pipe-collapse-toggle"
+            onClick={() => setTrendsOpen(p => !p)}
+          >
+            <span className={`pipe-collapse-toggle__arrow${trendsOpen ? " pipe-collapse-toggle__arrow--open" : ""}`}>{"\u25B6"}</span>
+            Monthly trends {!trendsOpen && <span className="pipe-collapse-toggle__summary">{monthlyData.months.length} month{monthlyData.months.length !== 1 ? "s" : ""}</span>}
+          </button>
+
+          {trendsOpen && (
+            <>
+              <p className="pipe-trends__sub">Month-by-month breakdown. Spot seasonal patterns, drops, and growth.</p>
+
+              <div className="pipe-legend">
+                {(monthlyData.isHighIntent ? TREND_METRICS : TREND_METRICS.slice(0, 1)).map(m => (
+                  <span key={m.key} className="pipe-legend__item">
+                    <span className="pipe-legend__swatch" style={{ background: m.color }} />
+                    {m.label}
+                  </span>
+                ))}
+              </div>
+
+              <div className="pipe-chart">
+                {monthlyData.months.map((month) => {
+                  const metrics = monthlyData.isHighIntent ? TREND_METRICS : TREND_METRICS.slice(0, 1);
+                  const maxVal = monthlyData.maxVal || 1;
+
+                  return (
+                    <div key={month.key} className="pipe-chart__col">
+                      <div className="pipe-chart__bars">
+                        {metrics.map(m => {
+                          const val = month[m.key] || 0;
+                          const pct = Math.max(0, (val / maxVal) * 100);
+                          return (
+                            <div
+                              key={m.key}
+                              className={`pipe-chart__bar${val === 0 ? " pipe-chart__bar--empty" : ""}`}
+                              style={{ height: `${Math.max(pct, val > 0 ? 4 : 0)}%`, background: m.color }}
+                              title={`${m.label}: ${val}`}
+                            >
+                              {val > 0 && <span className="pipe-chart__val">{val}</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="pipe-chart__label">{month.shortLabel}</div>
+                      {month.key.endsWith("-01") && (
+                        <div className="pipe-chart__year">{month.key.split("-")[0]}</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Leads in selected stage (now below both collapsible sections) ── */}
       {selectedStage && sortedSelectedLeads.length > 0 && (
         <div style={{ marginTop: "4px" }}>
           <div className="rep-table-wrap">
@@ -349,57 +406,6 @@ export default function PipelineView({ leads, onSelectLead }) {
 
       {selectedStage && sortedSelectedLeads.length === 0 && (
         <p className="rep-empty-small" style={{ marginTop: "12px" }}>No leads at this stage.</p>
-      )}
-
-      {/* ── Monthly trends ── */}
-      {monthlyData.months.length > 0 && (
-        <div className="pipe-trends">
-          <h3 className="pipe-trends__title">Monthly trends</h3>
-          <p className="pipe-trends__sub">Month-by-month breakdown. Spot seasonal patterns, drops, and growth.</p>
-
-          {/* Legend */}
-          <div className="pipe-legend">
-            {(monthlyData.isHighIntent ? TREND_METRICS : TREND_METRICS.slice(0, 1)).map(m => (
-              <span key={m.key} className="pipe-legend__item">
-                <span className="pipe-legend__swatch" style={{ background: m.color }} />
-                {m.label}
-              </span>
-            ))}
-          </div>
-
-          {/* Chart */}
-          <div className="pipe-chart">
-            {monthlyData.months.map((month) => {
-              const metrics = monthlyData.isHighIntent ? TREND_METRICS : TREND_METRICS.slice(0, 1);
-              const maxVal = monthlyData.maxVal || 1;
-
-              return (
-                <div key={month.key} className="pipe-chart__col">
-                  <div className="pipe-chart__bars">
-                    {metrics.map(m => {
-                      const val = month[m.key] || 0;
-                      const pct = Math.max(0, (val / maxVal) * 100);
-                      return (
-                        <div
-                          key={m.key}
-                          className={`pipe-chart__bar${val === 0 ? " pipe-chart__bar--empty" : ""}`}
-                          style={{ height: `${Math.max(pct, val > 0 ? 4 : 0)}%`, background: m.color }}
-                          title={`${m.label}: ${val}`}
-                        >
-                          {val > 0 && <span className="pipe-chart__val">{val}</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="pipe-chart__label">{month.shortLabel}</div>
-                  {month.key.endsWith("-01") && (
-                    <div className="pipe-chart__year">{month.key.split("-")[0]}</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
       )}
     </>
   );
