@@ -165,6 +165,26 @@ export const SOURCE_MAP = [
   { match: /bing|microsoft/i, label: "Bing",  color: "#2C1810", bg: "rgba(44,24,16,0.06)" },
 ];
 
+/* ── Lost reasons ── */
+
+export const LOST_REASONS = [
+  { value: "booked_elsewhere", label: "Booked elsewhere" },
+  { value: "budget", label: "Budget" },
+  { value: "date_unavailable", label: "Date unavailable" },
+  { value: "changed_plans", label: "Changed plans" },
+  { value: "no_response", label: "No response" },
+  { value: "not_a_fit", label: "Not a fit" },
+  { value: "other", label: "Other" },
+];
+
+export const DAY_TYPE_LABELS = {
+  sat: "Saturday",
+  fri: "Friday",
+  "sun-thu": "Sun - Thu",
+  "dec-wed-fri": "Dec Wed - Fri",
+  "dec-mon-tue": "Dec Mon - Tue",
+};
+
 /* ── Lead tab config ── */
 
 export const LEAD_TABS = [

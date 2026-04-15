@@ -56,6 +56,26 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleStatusChange(result) {
+    // Re-fetch leads for the current type so the table + profile reflect the update
+    try {
+      const res = await fetch(`/api/leads?type=${activeLeadType}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok) {
+          setLeads(prev => ({ ...prev, [activeLeadType]: data }));
+          // Update the selected lead with fresh data
+          if (selectedLead) {
+            const updated = data.leads.find(l => l.contact_id === selectedLead.contact_id);
+            if (updated) setSelectedLead(updated);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[status-refresh]", err);
+    }
+  }
+
   async function load() {
     setLoading(true);
     setError(null);
@@ -722,6 +742,7 @@ export default function AdminDashboard() {
           showFullJourney={showFullJourney}
           setShowFullJourney={setShowFullJourney}
           onBack={() => setSelectedLead(null)}
+          onStatusChange={handleStatusChange}
         />
       )}
     </div>

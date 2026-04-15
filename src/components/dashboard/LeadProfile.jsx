@@ -3,12 +3,15 @@
  * Extracted from AdminDashboard.jsx for reuse and maintainability.
  */
 
+import { useState, useEffect } from "react";
+
 import {
   FORM_TYPE_LABELS, LEAD_TYPE_LABELS,
   URGENCY_LABELS, URGENCY_STAGE, BUDGET_LABELS,
   TIER_CONFIG,
   FUNNEL_LABELS, HEALTH_COLORS,
   JOURNEY_EVENT_LABELS,
+  LOST_REASONS, DAY_TYPE_LABELS,
 } from "./constants.js";
 
 import {
@@ -353,9 +356,213 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
   );
 }
 
+/* ── Status action dialogs ── */
+
+function LostDialog({ onConfirm, onCancel }) {
+  const [reason, setReason] = useState("");
+  const [note, setNote] = useState("");
+  return (
+    <div className="lp-dialog-backdrop" onClick={onCancel}>
+      <div className="lp-dialog" onClick={e => e.stopPropagation()}>
+        <h4 className="lp-dialog__title">Mark as Lost</h4>
+        <label className="lp-dialog__label">Reason (required)</label>
+        <select className="lp-dialog__select" value={reason} onChange={e => setReason(e.target.value)}>
+          <option value="">Select a reason...</option>
+          {LOST_REASONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+        </select>
+        <label className="lp-dialog__label">Note (optional)</label>
+        <input className="lp-dialog__input" value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. Chose Asylum Chapel" />
+        <div className="lp-dialog__actions">
+          <button className="lp-dialog__btn lp-dialog__btn--cancel" onClick={onCancel} type="button">Cancel</button>
+          <button className="lp-dialog__btn lp-dialog__btn--confirm lp-dialog__btn--lost" onClick={() => onConfirm(reason, note)} disabled={!reason} type="button">Confirm Lost</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WonDialog({ lead, onConfirm, onCancel }) {
+  const [loading, setLoading] = useState(false);
+  const [rateCard, setRateCard] = useState(null);
+  const [dayType, setDayType] = useState("sat");
+  const [hireFee, setHireFee] = useState("");
+  const [minSpend, setMinSpend] = useState("");
+  const [error, setError] = useState(null);
+
+  // Fetch rate card on mount
+  useEffect(() => {
+    if (!lead.event_date) return;
+    setLoading(true);
+    fetch(`/api/rate-card-lookup?date=${encodeURIComponent(lead.event_date)}&dayType=sat`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) {
+          setRateCard(data);
+          setHireFee(String(data.selected.hire));
+          setMinSpend(String(data.selected.min));
+          setDayType(data.selected.dayType);
+        } else {
+          setError(data.message || data.error);
+        }
+        setLoading(false);
+      })
+      .catch(() => { setError("Failed to load rate card"); setLoading(false); });
+  }, [lead.event_date]);
+
+  function handleDayTypeChange(dt) {
+    setDayType(dt);
+    if (rateCard) {
+      const opt = rateCard.options.find(o => o.dayType === dt);
+      if (opt) {
+        setHireFee(String(opt.hire));
+        setMinSpend(String(opt.min));
+      }
+    }
+  }
+
+  const hf = parseInt(hireFee) || 0;
+  const ms = parseInt(minSpend) || 0;
+  const tier = rateCard ? `${rateCard.year}/${String(rateCard.month).padStart(2, "0")}/${dayType}` : null;
+
+  return (
+    <div className="lp-dialog-backdrop" onClick={onCancel}>
+      <div className="lp-dialog lp-dialog--won" onClick={e => e.stopPropagation()}>
+        <h4 className="lp-dialog__title">Mark as Won</h4>
+        {loading && <p className="lp-dialog__muted">Loading rate card...</p>}
+        {error && <p className="lp-dialog__muted">{error}</p>}
+        {rateCard && (
+          <>
+            <p className="lp-dialog__info">
+              Rate card: {rateCard.season?.label} {rateCard.year}
+              {rateCard.extrapolated && <span className="lp-dialog__warn"> (extrapolated - pending James review)</span>}
+            </p>
+            <label className="lp-dialog__label">Day type</label>
+            <div className="lp-dialog__daytype-row">
+              {rateCard.options.map(opt => (
+                <button
+                  key={opt.dayType}
+                  type="button"
+                  className={`lp-dialog__daytype-btn${dayType === opt.dayType ? " lp-dialog__daytype-btn--active" : ""}`}
+                  onClick={() => handleDayTypeChange(opt.dayType)}
+                >{opt.dayTypeLabel}</button>
+              ))}
+            </div>
+          </>
+        )}
+        {!lead.event_date && <p className="lp-dialog__muted">No event date - enter values manually.</p>}
+        <div className="lp-dialog__fields">
+          <div>
+            <label className="lp-dialog__label">Hire fee</label>
+            <div className="lp-dialog__currency">
+              <span className="lp-dialog__currency-symbol">&pound;</span>
+              <input className="lp-dialog__input lp-dialog__input--number" type="number" value={hireFee} onChange={e => setHireFee(e.target.value)} placeholder="0" />
+            </div>
+          </div>
+          <div>
+            <label className="lp-dialog__label">Min spend</label>
+            <div className="lp-dialog__currency">
+              <span className="lp-dialog__currency-symbol">&pound;</span>
+              <input className="lp-dialog__input lp-dialog__input--number" type="number" value={minSpend} onChange={e => setMinSpend(e.target.value)} placeholder="0" />
+            </div>
+          </div>
+          <div>
+            <label className="lp-dialog__label">Deal value</label>
+            <p className="lp-dialog__total">&pound;{(hf + ms).toLocaleString()}</p>
+          </div>
+        </div>
+        <div className="lp-dialog__actions">
+          <button className="lp-dialog__btn lp-dialog__btn--cancel" onClick={onCancel} type="button">Cancel</button>
+          <button className="lp-dialog__btn lp-dialog__btn--confirm lp-dialog__btn--won" onClick={() => onConfirm(hf, ms, tier)} disabled={hf === 0 && ms === 0} type="button">Confirm Won</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
+  const [showLost, setShowLost] = useState(false);
+  const [showWon, setShowWon] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Don't show actions for low-intent streams (supper club, cafe-bar) or already terminal
+  const isLowIntent = activeLeadType === "supperclub" || activeLeadType === "cafe-bar";
+  if (isLowIntent) return null;
+  if (funnel.currentStage === "won") return null;
+
+  async function fireAction(action, extra = {}) {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/lead-status", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ contact_id: lead.contact_id, action, ...extra }),
+      });
+      const data = await res.json();
+      if (data.ok && onStatusChange) onStatusChange(data);
+    } catch (err) {
+      console.error("[action]", err);
+    }
+    setSaving(false);
+  }
+
+  // Determine which buttons to show based on current funnel stage
+  const stage = funnel.currentStage;
+  const showMeeting = ["lead", "qualified", "engaged", "cancelled", "noshow"].includes(stage);
+  const showCancelled = ["engaged"].includes(stage);
+  const showNoshow = ["engaged"].includes(stage);
+  const showProposal = ["meeting"].includes(stage);
+  const showWonBtn = ["meeting", "proposal"].includes(stage);
+  const showLostBtn = stage !== "lost";
+
+  return (
+    <>
+      <div className="lp-actions">
+        <span className="lp-actions__label">Actions</span>
+        {showMeeting && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => fireAction("meeting")} disabled={saving} type="button">Had Meeting</button>}
+        {showCancelled && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => fireAction("cancelled")} disabled={saving} type="button">Cancelled</button>}
+        {showNoshow && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => fireAction("noshow")} disabled={saving} type="button">No-show</button>}
+        {showProposal && <button className="lp-actions__btn lp-actions__btn--proposal" onClick={() => fireAction("proposal")} disabled={saving} type="button">Sent Proposal</button>}
+        {showWonBtn && <button className="lp-actions__btn lp-actions__btn--won" onClick={() => setShowWon(true)} disabled={saving} type="button">Won</button>}
+        {showLostBtn && <button className="lp-actions__btn lp-actions__btn--lost" onClick={() => setShowLost(true)} disabled={saving} type="button">Mark as Lost</button>}
+      </div>
+      {showLost && (
+        <LostDialog
+          onConfirm={(reason, note) => { setShowLost(false); fireAction("lost", { lost_reason: reason, lost_reason_note: note || undefined }); }}
+          onCancel={() => setShowLost(false)}
+        />
+      )}
+      {showWon && (
+        <WonDialog
+          lead={lead}
+          onConfirm={(hf, ms, tier) => { setShowWon(false); fireAction("won", { hire_fee: hf, min_spend: ms, rate_card_tier: tier || undefined }); }}
+          onCancel={() => setShowWon(false)}
+        />
+      )}
+    </>
+  );
+}
+
+/* ── Deal value display ── */
+
+function DealValueBadge({ lead }) {
+  if (!lead.deal_value) return null;
+  return (
+    <div className="lp-deal-value">
+      <span className="lp-deal-value__label">Deal value</span>
+      <span className="lp-deal-value__amount">&pound;{lead.deal_value.toLocaleString()}</span>
+      {lead.hire_fee != null && lead.min_spend != null && (
+        <span className="lp-deal-value__breakdown">Hire &pound;{lead.hire_fee.toLocaleString()} + Min spend &pound;{lead.min_spend.toLocaleString()}</span>
+      )}
+      {lead.rate_card_tier && (
+        <span className="lp-deal-value__tier">Rate card: {lead.rate_card_tier}</span>
+      )}
+    </div>
+  );
+}
+
 /* ── Main component ── */
 
-export default function LeadProfile({ lead, activeLeadType, journey, journeyLoading, showFullJourney, setShowFullJourney, onBack }) {
+export default function LeadProfile({ lead, activeLeadType, journey, journeyLoading, showFullJourney, setShowFullJourney, onBack, onStatusChange }) {
   const sc = computeLeadScore(lead, activeLeadType);
   const tc = TIER_CONFIG[sc.tier];
   const funnel = computeFunnelStage(lead, activeLeadType);
@@ -398,6 +605,10 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             </div>
           </div>
         </div>
+
+        {/* Action buttons + deal value */}
+        <ActionButtons lead={lead} funnel={funnel} activeLeadType={activeLeadType} onStatusChange={onStatusChange} />
+        <DealValueBadge lead={lead} />
 
         {/* Two-column: left = details, right = score */}
         <div className="lp-cols">

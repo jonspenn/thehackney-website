@@ -157,6 +157,24 @@ const MIGRATIONS = [
   { name: "ct_add_clicked_venue_tour_at", sql: `ALTER TABLE contacts ADD COLUMN clicked_venue_tour_at TEXT` },
   { name: "ct_add_clicked_venue_tour_source", sql: `ALTER TABLE contacts ADD COLUMN clicked_venue_tour_source TEXT` },
 
+  // ── Contacts: funnel lifecycle tracking (Phase 2B) ──
+  { name: "ct_add_funnel_stage", sql: `ALTER TABLE contacts ADD COLUMN funnel_stage TEXT` },
+  { name: "ct_add_stage_entered_at", sql: `ALTER TABLE contacts ADD COLUMN stage_entered_at TEXT` },
+  { name: "ct_add_meeting_at", sql: `ALTER TABLE contacts ADD COLUMN meeting_at TEXT` },
+  { name: "ct_add_proposal_at", sql: `ALTER TABLE contacts ADD COLUMN proposal_at TEXT` },
+  { name: "ct_add_won_at", sql: `ALTER TABLE contacts ADD COLUMN won_at TEXT` },
+  { name: "ct_add_lost_at", sql: `ALTER TABLE contacts ADD COLUMN lost_at TEXT` },
+  { name: "ct_add_lost_reason", sql: `ALTER TABLE contacts ADD COLUMN lost_reason TEXT` },
+  { name: "ct_add_lost_reason_note", sql: `ALTER TABLE contacts ADD COLUMN lost_reason_note TEXT` },
+  { name: "ct_add_cancelled_at", sql: `ALTER TABLE contacts ADD COLUMN cancelled_at TEXT` },
+  { name: "ct_add_noshow_at", sql: `ALTER TABLE contacts ADD COLUMN noshow_at TEXT` },
+
+  // ── Contacts: deal value (rate card lookup + Hugo sign-off) ──
+  { name: "ct_add_hire_fee", sql: `ALTER TABLE contacts ADD COLUMN hire_fee INTEGER` },
+  { name: "ct_add_min_spend", sql: `ALTER TABLE contacts ADD COLUMN min_spend INTEGER` },
+  { name: "ct_add_deal_value", sql: `ALTER TABLE contacts ADD COLUMN deal_value INTEGER` },
+  { name: "ct_add_rate_card_tier", sql: `ALTER TABLE contacts ADD COLUMN rate_card_tier TEXT` },
+
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,

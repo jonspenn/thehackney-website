@@ -722,6 +722,111 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         transition: width 0.3s ease;
       }
 
+      /* ── Action buttons ── */
+      .lp-actions {
+        display: flex; align-items: center; gap: 8px; padding: 12px 24px;
+        border-top: 1px solid var(--border-subtle); flex-wrap: wrap;
+      }
+      .lp-actions__label {
+        font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.1em; color: rgba(44,24,16,0.35);
+        margin-right: 4px;
+      }
+      .lp-actions__btn {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+        padding: 5px 12px; border-radius: 4px; border: 1px solid;
+        cursor: pointer; transition: all 0.15s ease;
+      }
+      .lp-actions__btn:disabled { opacity: 0.5; cursor: wait; }
+      .lp-actions__btn--meeting { background: rgba(46,64,9,0.06); border-color: rgba(46,64,9,0.2); color: #2E4009; }
+      .lp-actions__btn--meeting:hover:not(:disabled) { background: rgba(46,64,9,0.12); }
+      .lp-actions__btn--proposal { background: rgba(191,114,86,0.06); border-color: rgba(191,114,86,0.2); color: #BF7256; }
+      .lp-actions__btn--proposal:hover:not(:disabled) { background: rgba(191,114,86,0.12); }
+      .lp-actions__btn--won { background: rgba(73,89,14,0.08); border-color: #49590E; color: #49590E; }
+      .lp-actions__btn--won:hover:not(:disabled) { background: rgba(73,89,14,0.15); }
+      .lp-actions__btn--lost { background: rgba(140,71,46,0.04); border-color: rgba(140,71,46,0.2); color: #8C472E; }
+      .lp-actions__btn--lost:hover:not(:disabled) { background: rgba(140,71,46,0.1); }
+      .lp-actions__btn--cancel { background: rgba(44,24,16,0.03); border-color: rgba(44,24,16,0.12); color: rgba(44,24,16,0.5); }
+      .lp-actions__btn--cancel:hover:not(:disabled) { background: rgba(44,24,16,0.06); }
+
+      /* ── Dialog (backdrop + card) ── */
+      .lp-dialog-backdrop {
+        position: fixed; inset: 0; background: rgba(44,24,16,0.25); z-index: 100;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .lp-dialog {
+        background: var(--warm-canvas); border-radius: 8px; padding: 24px;
+        min-width: 380px; max-width: 480px; box-shadow: 0 8px 32px rgba(44,24,16,0.15);
+        border: 1px solid var(--border-warm);
+      }
+      .lp-dialog--won { min-width: 420px; }
+      .lp-dialog__title {
+        font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 600;
+        color: var(--color-brewery-dark); margin: 0 0 16px;
+      }
+      .lp-dialog__label {
+        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.08em; color: rgba(44,24,16,0.4);
+        display: block; margin: 12px 0 4px;
+      }
+      .lp-dialog__select, .lp-dialog__input {
+        font-family: 'DM Sans', sans-serif; font-size: 13px; width: 100%; padding: 8px 10px;
+        border: 1px solid var(--border-warm); border-radius: 4px; background: #fff;
+        color: var(--color-brewery-dark);
+      }
+      .lp-dialog__input--number { padding-left: 24px; }
+      .lp-dialog__currency { position: relative; }
+      .lp-dialog__currency-symbol {
+        position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+        font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(44,24,16,0.4);
+      }
+      .lp-dialog__muted { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(44,24,16,0.4); margin: 4px 0; }
+      .lp-dialog__info { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(44,24,16,0.6); margin: 0 0 4px; }
+      .lp-dialog__warn { color: #BF7256; font-weight: 600; }
+      .lp-dialog__fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 8px; }
+      .lp-dialog__total {
+        font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700;
+        color: #49590E; margin: 8px 0 0;
+      }
+      .lp-dialog__daytype-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+      .lp-dialog__daytype-btn {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+        padding: 4px 10px; border-radius: 3px; border: 1px solid var(--border-warm);
+        background: transparent; color: rgba(44,24,16,0.6); cursor: pointer;
+      }
+      .lp-dialog__daytype-btn--active { background: rgba(73,89,14,0.1); border-color: #49590E; color: #49590E; }
+      .lp-dialog__actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+      .lp-dialog__btn {
+        font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+        padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer;
+      }
+      .lp-dialog__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+      .lp-dialog__btn--cancel { background: rgba(44,24,16,0.06); color: rgba(44,24,16,0.5); }
+      .lp-dialog__btn--confirm { color: #fff; }
+      .lp-dialog__btn--won { background: #49590E; }
+      .lp-dialog__btn--won:hover:not(:disabled) { background: #2E4009; }
+      .lp-dialog__btn--lost { background: #8C472E; }
+      .lp-dialog__btn--lost:hover:not(:disabled) { background: #6A3622; }
+
+      /* ── Deal value badge ── */
+      .lp-deal-value {
+        padding: 12px 24px; display: flex; align-items: baseline; gap: 12px;
+        border-top: 1px solid var(--border-subtle); flex-wrap: wrap;
+      }
+      .lp-deal-value__label {
+        font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.1em; color: rgba(44,24,16,0.35);
+      }
+      .lp-deal-value__amount {
+        font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #49590E;
+      }
+      .lp-deal-value__breakdown {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(44,24,16,0.45);
+      }
+      .lp-deal-value__tier {
+        font-family: 'DM Sans', sans-serif; font-size: 10px; color: rgba(44,24,16,0.3);
+      }
+
       /* Health badge in table rows */
       .lead-health-badge {
         display: inline-block; padding: 1px 5px; border-radius: 6px;
