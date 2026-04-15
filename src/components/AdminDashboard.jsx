@@ -1026,11 +1026,13 @@ export default function AdminDashboard() {
               </div>
             )}
             </div>
+            <div className="lead-panel__status">
+              Showing {sortedLeads.length} of {scoredLeads.length} leads. Click a row to view full profile.
+            </div>
           </div>
 
-          {/* ── Leads table (adapts columns per type) ── */}
-          <section className="rep-section">
-            <p className="rep-sub" style={{ marginTop: 0 }}>Showing {sortedLeads.length} of {scoredLeads.length} leads. Click a row to view full profile.</p>
+          {/* ── Leads table ── */}
+          <div style={{ marginTop: "4px" }}>
             {sortedLeads.length === 0 ? (
               <p className="rep-empty-small">No {currentLeads?.lead_type_label?.toLowerCase() || activeLeadType} leads yet. Form submissions will appear here.</p>
             ) : (
@@ -1146,7 +1148,7 @@ export default function AdminDashboard() {
                 </table>
               </div>
             )}
-          </section>
+          </div>
         </>
       )}
 
