@@ -733,6 +733,36 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       }
       .bookings-footnote { font-size: 11px; color: rgba(44,24,16,0.35); font-style: italic; margin-top: 8px; }
 
+      /* ── Customers tab ── */
+      .cust-kpis {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px; margin-bottom: 16px;
+      }
+      .cust-kpi {
+        background: #F5F0E8; border: 1px solid rgba(44,24,16,0.08); border-radius: 6px;
+        padding: 14px 16px; min-width: 0;
+      }
+      .cust-kpi__label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(44,24,16,0.45); margin-bottom: 2px; }
+      .cust-kpi__value { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: #2C1810; }
+      .cust-row { transition: background 0.15s; }
+      .cust-row:hover { background: rgba(46,64,9,0.04); }
+      .cust-source-summary { margin-top: 24px; }
+      .cust-source-summary__title {
+        font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600;
+        color: #2C1810; margin-bottom: 12px;
+      }
+      .cust-source-summary__grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+      }
+      .cust-source-card {
+        background: #F5F0E8; border: 1px solid rgba(44,24,16,0.08); border-radius: 6px;
+        padding: 12px 14px;
+      }
+      .cust-source-card__label { font-size: 12px; font-weight: 600; color: #2C1810; margin-bottom: 4px; }
+      .cust-source-card__value { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: #2E4009; }
+      .cust-source-card__count { font-size: 11px; color: rgba(44,24,16,0.45); margin-top: 2px; }
+
       /* ── Cross-sell badges ── */
       .rep-cross-sell { display: flex; gap: 4px; flex-wrap: wrap; }
       .rep-cross-sell__badge {

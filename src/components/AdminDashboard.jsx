@@ -25,6 +25,7 @@ import LeadProfile from "./dashboard/LeadProfile.jsx";
 import LeadTable from "./dashboard/LeadTable.jsx";
 import PipelineView from "./dashboard/PipelineView.jsx";
 import BookingsView from "./dashboard/BookingsView.jsx";
+import CustomersView from "./dashboard/CustomersView.jsx";
 
 /* ───────── main component ───────── */
 
@@ -244,6 +245,7 @@ export default function AdminDashboard() {
     { id: "leads", label: `Leads (${totalLeadsCount})` },
     { id: "pipeline", label: "Pipeline" },
     { id: "bookings", label: "Bookings" },
+    { id: "customers", label: "Customers" },
     { id: "analytics", label: "Analytics" },
   ];
 
@@ -576,6 +578,13 @@ export default function AdminDashboard() {
       {/* ═══════ BOOKINGS TAB ═══════ */}
       {activeTab === "bookings" && (
         <BookingsView />
+      )}
+
+      {/* ═══════ CUSTOMERS TAB ═══════ */}
+      {activeTab === "customers" && !selectedLead && (
+        <CustomersView
+          onSelectCustomer={selectLead}
+        />
       )}
 
       {activeTab === "analytics" && (
