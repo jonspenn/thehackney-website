@@ -188,6 +188,14 @@ export function daysBetween(from, to) {
 export function computeLeadScore(lead, leadType) {
   const now = Date.now();
 
+  // Customers (Won) are always 100 HOT - they've converted
+  if (lead.won_at || lead.funnel_stage === "won") {
+    return {
+      score: 100, tier: "hot", stageLabel: "Won", isDead: false, daysSinceActivity: 0,
+      breakdown: { stage: 40, intent: 10, recency: 25, engagement: 15, dateProximity: 0, revenue: 10 },
+    };
+  }
+
   let stage = 8, stageLabel = "Brochure";
   /* Score reflects funnel progression: Tour > Call > Quiz > Brochure */
   if (lead.tour_at || lead.clicked_venue_tour_at)       { stage = 30; stageLabel = "Tour"; }
