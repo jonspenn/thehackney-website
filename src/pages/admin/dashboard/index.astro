@@ -696,9 +696,12 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         text-align: center;
       }
       .lp-funnel__health {
-        display: inline-block; padding: 1px 6px; border-radius: 8px;
-        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
-        text-align: center;
+        display: inline-flex; align-items: center; gap: 2px; padding: 2px 8px; border-radius: 10px;
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+        text-align: center; white-space: nowrap;
+      }
+      .lp-funnel__health-label {
+        font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em;
       }
 
       /* Engagement depth bar under funnel */
@@ -875,6 +878,14 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lp-detail__muted { font-size: 13px; color: rgba(44,24,16,0.4); font-style: italic; }
 
       /* Score breakdown bars */
+      .lp-score-toggle {
+        display: flex; align-items: center; justify-content: space-between; width: 100%;
+        background: none; border: none; padding: 0; cursor: pointer; gap: 8px;
+      }
+      .lp-score-toggle:hover .lp-score-toggle__arrow { color: #2C1810; }
+      .lp-score-toggle__arrow {
+        font-size: 10px; color: rgba(44,24,16,0.3); transition: color 0.15s;
+      }
       .lp-score-grid { display: flex; flex-direction: column; gap: 6px; }
       .lp-score-row {
         display: grid; grid-template-columns: 72px 1fr 40px; gap: 8px; align-items: center;

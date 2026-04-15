@@ -69,14 +69,11 @@ function FunnelTrack({ funnel, tc }) {
             {isCompleted && !isCurrent && completedDate && (
               <span className="lp-funnel__date">{completedDate.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>
             )}
-            {isCurrent && (
-              <>
-                {funnel.health && (
-                  <span className="lp-funnel__health" style={{ color: hc.color, background: hc.bg }}>
-                    {funnel.daysInStage === 0 ? "Today" : `${funnel.daysInStage}d`}
-                  </span>
-                )}
-              </>
+            {isCurrent && funnel.health && (
+              <span className="lp-funnel__health" style={{ color: hc.color, background: hc.bg }}>
+                {funnel.daysInStage === 0 ? "Today" : `${funnel.daysInStage}d`}
+                {funnel.health !== "green" && <span className="lp-funnel__health-label"> - {hc.label}</span>}
+              </span>
             )}
           </div>
         );
@@ -588,6 +585,45 @@ function DealValueBadge({ lead }) {
   );
 }
 
+/* ── Collapsible score breakdown ── */
+
+function ScoreBreakdown({ sc, tc, lead }) {
+  const [expanded, setExpanded] = useState(false);
+  const rows = [
+    { label: "Stage", val: sc.breakdown.stage, max: 30, desc: sc.stageLabel },
+    { label: "Intent", val: sc.breakdown.intent, max: 10, desc: URGENCY_LABELS[lead.urgency] || "No signal" },
+    { label: "Recency", val: sc.breakdown.recency, max: 25, desc: sc.daysSinceActivity <= 1 ? "Active today" : `${sc.daysSinceActivity}d ago` },
+    { label: "Engagement", val: sc.breakdown.engagement, max: 15, desc: `${lead.sessions_before_conversion || 0} sessions, ${lead.total_page_views || 0} pages` },
+    { label: "Date", val: sc.breakdown.dateProximity, max: 10, desc: lead.event_date || "No date" },
+    { label: "Revenue", val: sc.breakdown.revenue, max: 10, desc: [lead.budget_label, lead.guest_count ? `${lead.guest_count} guests` : null].filter(Boolean).join(", ") || "Unknown" },
+  ];
+
+  return (
+    <div className="lp-col">
+      <div className="lp-section">
+        <button type="button" className="lp-score-toggle" onClick={() => setExpanded(e => !e)}>
+          <h3 className="lp-section__title" style={{ margin: 0 }}>Score breakdown</h3>
+          <span className="lp-score-toggle__arrow">{expanded ? "\u25B2" : "\u25BC"}</span>
+        </button>
+        {expanded && (
+          <div className="lp-score-grid" style={{ marginTop: "12px" }}>
+            {rows.map(row => (
+              <div key={row.label} className="lp-score-row">
+                <span className="lp-score-row__label">{row.label}</span>
+                <div className="lp-score-row__bar">
+                  <div className="lp-score-row__fill" style={{ width: `${(row.val / row.max) * 100}%`, background: tc.color }} />
+                </div>
+                <span className="lp-score-row__val">{row.val}/{row.max}</span>
+                <span className="lp-score-row__desc">{row.desc}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ── Main component ── */
 
 export default function LeadProfile({ lead, activeLeadType, journey, journeyLoading, showFullJourney, setShowFullJourney, onBack, onStatusChange }) {
@@ -695,31 +731,7 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             )}
           </div>
 
-          <div className="lp-col">
-            {/* Score breakdown */}
-            <div className="lp-section">
-              <h3 className="lp-section__title">Score breakdown</h3>
-              <div className="lp-score-grid">
-                {[
-                  { label: "Stage", val: sc.breakdown.stage, max: 30, desc: sc.stageLabel },
-                  { label: "Intent", val: sc.breakdown.intent, max: 10, desc: URGENCY_LABELS[lead.urgency] || "No signal" },
-                  { label: "Recency", val: sc.breakdown.recency, max: 25, desc: sc.daysSinceActivity <= 1 ? "Active today" : `${sc.daysSinceActivity}d ago` },
-                  { label: "Engagement", val: sc.breakdown.engagement, max: 15, desc: `${lead.sessions_before_conversion || 0} sessions, ${lead.total_page_views || 0} pages` },
-                  { label: "Date", val: sc.breakdown.dateProximity, max: 10, desc: lead.event_date || "No date" },
-                  { label: "Revenue", val: sc.breakdown.revenue, max: 10, desc: [lead.budget_label, lead.guest_count ? `${lead.guest_count} guests` : null].filter(Boolean).join(", ") || "Unknown" },
-                ].map(row => (
-                  <div key={row.label} className="lp-score-row">
-                    <span className="lp-score-row__label">{row.label}</span>
-                    <div className="lp-score-row__bar">
-                      <div className="lp-score-row__fill" style={{ width: `${(row.val / row.max) * 100}%`, background: tc.color }} />
-                    </div>
-                    <span className="lp-score-row__val">{row.val}/{row.max}</span>
-                    <span className="lp-score-row__desc">{row.desc}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <ScoreBreakdown sc={sc} tc={tc} lead={lead} />
         </div>
 
         {/* Journey */}
