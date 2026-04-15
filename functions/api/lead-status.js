@@ -29,7 +29,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-const VALID_ACTIONS = ["meeting", "cancelled", "noshow", "proposal", "won", "lost"];
+const VALID_ACTIONS = ["meeting", "cancelled", "noshow", "proposal", "won", "lost", "revert"];
 const VALID_LOST_REASONS = [
   "booked_elsewhere",
   "budget",
@@ -124,6 +124,61 @@ export async function onRequestPost(context) {
                WHERE contact_id = ?`;
         binds = [now, now, lost_reason, lost_reason_note || null, contact_id];
         break;
+
+      case "revert": {
+        // Read current state to determine what to clear
+        const current = await env.DB.prepare(
+          `SELECT funnel_stage, meeting_at, proposal_at, won_at, lost_at, cancelled_at, noshow_at
+           FROM contacts WHERE contact_id = ?`
+        ).bind(contact_id).first();
+
+        if (!current || !current.funnel_stage) {
+          return json({ ok: false, error: "nothing_to_revert" }, 400);
+        }
+
+        const stage = current.funnel_stage;
+
+        // Clear the fields for the current manual stage, let computeFunnelStage recalculate
+        switch (stage) {
+          case "won":
+            sql = `UPDATE contacts SET won_at = NULL, hire_fee = NULL, min_spend = NULL,
+                   deal_value = NULL, rate_card_tier = NULL, funnel_stage = NULL, stage_entered_at = NULL
+                   WHERE contact_id = ?`;
+            binds = [contact_id];
+            break;
+          case "lost":
+            sql = `UPDATE contacts SET lost_at = NULL, lost_reason = NULL, lost_reason_note = NULL,
+                   funnel_stage = NULL, stage_entered_at = NULL
+                   WHERE contact_id = ?`;
+            binds = [contact_id];
+            break;
+          case "proposal":
+            sql = `UPDATE contacts SET proposal_at = NULL, funnel_stage = NULL, stage_entered_at = NULL
+                   WHERE contact_id = ?`;
+            binds = [contact_id];
+            break;
+          case "meeting":
+            sql = `UPDATE contacts SET meeting_at = NULL, funnel_stage = NULL, stage_entered_at = NULL
+                   WHERE contact_id = ?`;
+            binds = [contact_id];
+            break;
+          case "cancelled":
+            sql = `UPDATE contacts SET cancelled_at = NULL, funnel_stage = NULL, stage_entered_at = NULL
+                   WHERE contact_id = ?`;
+            binds = [contact_id];
+            break;
+          case "noshow":
+            sql = `UPDATE contacts SET noshow_at = NULL, funnel_stage = NULL, stage_entered_at = NULL
+                   WHERE contact_id = ?`;
+            binds = [contact_id];
+            break;
+          default:
+            return json({ ok: false, error: "cannot_revert_auto_stage" }, 400);
+        }
+
+        console.log("[lead-status] revert", JSON.stringify({ contact_id, from_stage: stage }));
+        break;
+      }
     }
 
     await env.DB.prepare(sql).bind(...binds).run();

@@ -484,10 +484,9 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
   const [showWon, setShowWon] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Don't show actions for low-intent streams (supper club, cafe-bar) or already terminal
+  // Don't show actions for low-intent streams (supper club, cafe-bar)
   const isLowIntent = activeLeadType === "supperclub" || activeLeadType === "cafe-bar";
   if (isLowIntent) return null;
-  if (funnel.currentStage === "won") return null;
 
   async function fireAction(action, extra = {}) {
     setSaving(true);
@@ -507,17 +506,20 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
 
   // Determine which buttons to show based on current funnel stage
   const stage = funnel.currentStage;
+  const manualStages = ["meeting", "cancelled", "noshow", "proposal", "won", "lost"];
+  const isManualStage = manualStages.includes(stage);
   const showMeeting = ["lead", "qualified", "engaged", "cancelled", "noshow"].includes(stage);
   const showCancelled = ["engaged"].includes(stage);
   const showNoshow = ["engaged"].includes(stage);
   const showProposal = ["meeting"].includes(stage);
   const showWonBtn = ["meeting", "proposal"].includes(stage);
-  const showLostBtn = stage !== "lost";
+  const showLostBtn = stage !== "lost" && stage !== "won";
 
   return (
     <>
       <div className="lp-actions">
         <span className="lp-actions__label">Actions</span>
+        {isManualStage && <button className="lp-actions__btn lp-actions__btn--revert" onClick={() => fireAction("revert")} disabled={saving} type="button">↩ Undo {FUNNEL_LABELS[stage] || stage}</button>}
         {showMeeting && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => fireAction("meeting")} disabled={saving} type="button">Had Meeting</button>}
         {showCancelled && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => fireAction("cancelled")} disabled={saving} type="button">Cancelled</button>}
         {showNoshow && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => fireAction("noshow")} disabled={saving} type="button">No-show</button>}
