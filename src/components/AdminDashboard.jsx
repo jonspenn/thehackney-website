@@ -40,6 +40,7 @@ const URGENCY_LABELS = {
   ready: "Ready to book",
   comparing: "Comparing venues",
   browsing: "Just looking",
+  exploring: "Exploring options",
 };
 
 const BUDGET_LABELS = {
