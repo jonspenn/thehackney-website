@@ -726,15 +726,11 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             <div className="lp-section">
               <h3 className="lp-section__title">Event details</h3>
               <div className="lp-detail-grid">
-                {lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Event date</span><span className="lp-detail__value">{lead.event_date}</span></div>}
+                <div className="lp-detail"><span className="lp-detail__label">Event date</span><span className={`lp-detail__value${!lead.event_date && !lead.wedding_year ? " lp-detail__value--empty" : ""}`}>{lead.event_date || lead.wedding_year || "Not provided"}</span></div>
                 {lead.event_type_label && <div className="lp-detail"><span className="lp-detail__label">Event type</span><span className="lp-detail__value">{lead.event_type_label}</span></div>}
-                {lead.guest_count && <div className="lp-detail"><span className="lp-detail__label">Guests</span><span className="lp-detail__value">{lead.guest_count}</span></div>}
-                {lead.urgency_label && <div className="lp-detail"><span className="lp-detail__label">Urgency</span><span className="lp-detail__value">{lead.urgency_label}</span></div>}
-                {lead.budget_label && <div className="lp-detail"><span className="lp-detail__label">Budget</span><span className="lp-detail__value">{lead.budget_label}</span></div>}
-                {lead.wedding_year && !lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Wedding year</span><span className="lp-detail__value">{lead.wedding_year}</span></div>}
-                {!lead.event_date && !lead.event_type_label && !lead.guest_count && !lead.urgency_label && !lead.budget_label && (
-                  <p className="lp-detail__muted" style={{ gridColumn: "1 / -1" }}>Brochure download only - no questionnaire data yet.</p>
-                )}
+                <div className="lp-detail"><span className="lp-detail__label">Guests</span><span className={`lp-detail__value${!lead.guest_count ? " lp-detail__value--empty" : ""}`}>{lead.guest_count || "Not provided"}</span></div>
+                <div className="lp-detail"><span className="lp-detail__label">Urgency</span><span className={`lp-detail__value${!lead.urgency_label ? " lp-detail__value--empty" : ""}`}>{lead.urgency_label || "Not provided"}</span></div>
+                <div className="lp-detail"><span className="lp-detail__label">Budget</span><span className={`lp-detail__value${!lead.budget_label ? " lp-detail__value--empty" : ""}`}>{lead.budget_label || "Not provided"}</span></div>
               </div>
             </div>
 
