@@ -23,6 +23,7 @@ import {
 
 import LeadProfile from "./dashboard/LeadProfile.jsx";
 import LeadTable from "./dashboard/LeadTable.jsx";
+import PipelineView from "./dashboard/PipelineView.jsx";
 
 /* ───────── main component ───────── */
 
@@ -240,6 +241,7 @@ export default function AdminDashboard() {
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "leads", label: `Leads (${totalLeadsCount})` },
+    { id: "pipeline", label: "Pipeline" },
     { id: "analytics", label: "Analytics" },
   ];
 
@@ -558,6 +560,14 @@ export default function AdminDashboard() {
             setShowRecycleBin(next);
             if (next) fetchDeletedLeads();
           }}
+        />
+      )}
+
+      {/* ═══════ PIPELINE TAB ═══════ */}
+      {activeTab === "pipeline" && !selectedLead && (
+        <PipelineView
+          leads={leads}
+          onSelectLead={selectLead}
         />
       )}
 
