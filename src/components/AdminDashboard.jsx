@@ -980,6 +980,8 @@ export default function AdminDashboard() {
             )}
           </form>
 
+          {/* ── Heat bar, pipeline, charts (hidden when search is active) ── */}
+          {!leadSearch && <>
           {/* ── Heat distribution bar ── */}
           {scoredLeads.length > 0 && (
             <div style={{ marginBottom: "20px" }}>
@@ -1154,6 +1156,7 @@ export default function AdminDashboard() {
               </section>
             </div>
           )}
+          </>}
 
           {/* ── Leads table (adapts columns per type) ── */}
           <section className="rep-section">
