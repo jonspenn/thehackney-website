@@ -97,7 +97,7 @@ export async function onRequestGet(context) {
       SELECT
         c.contact_id, c.email, c.first_name, c.last_name, c.phone, c.company,
         c.lead_type, c.source_channel, c.source_keyword, c.source_campaign,
-        c.created_at,
+        c.hubspot_contact_id, c.created_at,
         c.form_data as contact_form_data,
         c.questionnaire_data,
         c.gclid, c.fbclid, c.fbc, c.fbp, c.wbraid, c.gbraid,
@@ -194,6 +194,7 @@ export async function onRequestGet(context) {
           source_channel: row.source_channel,
           source_keyword: row.source_keyword,
           source_campaign: row.source_campaign,
+          hubspot_contact_id: row.hubspot_contact_id || null,
           created_at: row.created_at,
           // Attribution
           ad_platform: adPlatform,

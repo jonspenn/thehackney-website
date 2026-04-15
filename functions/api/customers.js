@@ -56,6 +56,7 @@ export async function onRequestGet(context) {
       SELECT
         c.contact_id, c.email, c.first_name, c.last_name, c.phone, c.company,
         c.lead_type, c.source_channel, c.source_keyword, c.source_campaign,
+        c.hubspot_contact_id,
         c.created_at, c.won_at, c.deal_value, c.hire_fee, c.min_spend, c.rate_card_tier,
         c.funnel_stage, c.meeting_at, c.proposal_at,
         c.ip_country, c.ip_city,
@@ -109,6 +110,7 @@ export async function onRequestGet(context) {
           last_seen_at: row.last_seen_at,
           total_page_views: row.total_page_views,
           sessions_before_conversion: row.sessions_before_conversion,
+          hubspot_contact_id: row.hubspot_contact_id || null,
           ad_platform: adPlatform,
           // Parsed from submissions
           event_type: null,

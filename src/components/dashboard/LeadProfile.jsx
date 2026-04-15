@@ -679,6 +679,15 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
               <a href={`mailto:${lead.email}`} className="lp-hero__link">{lead.email}</a>
               {lead.phone && <> &middot; <a href={`tel:${lead.phone}`} className="lp-hero__link">{lead.phone}</a></>}
               {lead.company && <> &middot; {lead.company}</>}
+              {lead.hubspot_contact_id && (
+                <> &middot; <a
+                  href={`https://app.hubspot.com/contacts/25870094/contact/${lead.hubspot_contact_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cust-hs-link"
+                  title="Open in HubSpot"
+                >HubSpot</a></>
+              )}
             </div>
 
             <FunnelTrack funnel={funnel} tc={tc} />

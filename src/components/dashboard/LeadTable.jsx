@@ -372,6 +372,7 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
                   <th>Location</th>
                   <th onClick={() => toggleSort("sessions_before_conversion")} style={{ cursor: "pointer" }}>Engagement{sortIndicator("sessions_before_conversion")}</th>
                   <th>Also interested in</th>
+                  <th style={{ width: "60px" }}>HubSpot</th>
                 </tr>
               </thead>
               <tbody>
@@ -478,6 +479,17 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
                               <span key={label} className="rep-cross-sell__badge">{label}</span>
                             ))}
                           </span>
+                        ) : "\u2014"}
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {lead.hubspot_contact_id ? (
+                          <a
+                            href={`https://app.hubspot.com/contacts/25870094/contact/${lead.hubspot_contact_id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cust-hs-link"
+                            title="Open in HubSpot"
+                          >View</a>
                         ) : "\u2014"}
                       </td>
                     </tr>

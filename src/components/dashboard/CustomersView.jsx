@@ -30,6 +30,13 @@ function formatCurrency(n) {
   return "\u00A3" + n.toLocaleString("en-GB");
 }
 
+const HUBSPOT_PORTAL = "25870094";
+
+function hubspotUrl(contactId) {
+  if (!contactId) return null;
+  return `https://app.hubspot.com/contacts/${HUBSPOT_PORTAL}/contact/${contactId}`;
+}
+
 function formatDate(iso) {
   if (!iso) return "\u2014";
   try {
@@ -216,6 +223,7 @@ export default function CustomersView({ onSelectCustomer }) {
                   <th onClick={() => toggleSort("deal_value")} style={{ cursor: "pointer" }}>Deal value{sortIndicator("deal_value")}</th>
                   <th>Source</th>
                   <th>Location</th>
+                  <th style={{ width: "60px" }}>HubSpot</th>
                 </tr>
               </thead>
               <tbody>
@@ -240,6 +248,17 @@ export default function CustomersView({ onSelectCustomer }) {
                       <td style={{ fontWeight: 600 }}>{formatCurrency(c.deal_value)}</td>
                       <td><span className="lead-source-badge" style={{ color: src.color, background: src.bg }}>{src.label}</span></td>
                       <td>{[c.ip_city, c.ip_country].filter(Boolean).join(", ") || "\u2014"}</td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {c.hubspot_contact_id ? (
+                          <a
+                            href={hubspotUrl(c.hubspot_contact_id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cust-hs-link"
+                            title="Open in HubSpot"
+                          >View</a>
+                        ) : "\u2014"}
+                      </td>
                     </tr>
                   );
                 })}
