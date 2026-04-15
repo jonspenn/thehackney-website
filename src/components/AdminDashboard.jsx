@@ -387,6 +387,7 @@ export default function AdminDashboard() {
   const [heatFilter, setHeatFilter] = useState("all"); // "all" | "hot" | "warm" | "cool" | "cold"
   const [breakdownFilter, setBreakdownFilter] = useState(null); // { field, value, label } or null
   const [leadSearch, setLeadSearch] = useState("");
+  const [leadSearchDraft, setLeadSearchDraft] = useState("");
   const [analyticsFilter, setAnalyticsFilter] = useState(null); // { type, value, label } or null
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
   const [journey, setJourney] = useState(null); // journey data for selected lead
@@ -923,7 +924,7 @@ export default function AdminDashboard() {
               <button
                 key={lt.type}
                 className={`adm-subtab${activeLeadType === lt.type ? " adm-subtab--active" : ""}`}
-                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); setBreakdownFilter(null); setLeadSearch(""); }}
+                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); setBreakdownFilter(null); setLeadSearch(""); setLeadSearchDraft(""); }}
                 type="button"
               >
                 {lt.label}
@@ -965,18 +966,19 @@ export default function AdminDashboard() {
           </div>
 
           {/* ── Search bar ── */}
-          <div className="lead-search">
+          <form className="lead-search" onSubmit={(e) => { e.preventDefault(); setLeadSearch(leadSearchDraft.trim()); }}>
             <input
               type="text"
               className="lead-search__input"
               placeholder="Search by name, email, or phone\u2026"
-              value={leadSearch}
-              onChange={(e) => setLeadSearch(e.target.value)}
+              value={leadSearchDraft}
+              onChange={(e) => setLeadSearchDraft(e.target.value)}
             />
+            <button className="lead-search__btn" type="submit">Search</button>
             {leadSearch && (
-              <button className="lead-search__clear" onClick={() => setLeadSearch("")} type="button">{"\u2715"}</button>
+              <button className="lead-search__clear" onClick={() => { setLeadSearch(""); setLeadSearchDraft(""); }} type="button">{"\u2715"} Clear</button>
             )}
-          </div>
+          </form>
 
           {/* ── Heat distribution bar ── */}
           {scoredLeads.length > 0 && (
