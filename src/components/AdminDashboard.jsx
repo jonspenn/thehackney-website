@@ -41,7 +41,7 @@ const URGENCY_LABELS = {
   ready: "3 \u00B7 Ready to book",
   asap: "4 \u00B7 Urgent",
 };
-const URGENCY_STAGE = { browsing: 1, comparing: 2, ready: 3, asap: 4 };
+const URGENCY_STAGE = { browsing: 1, comparing: 2, ready: 3, asap: 4, _default: 0 };
 
 const BUDGET_LABELS = {
   "under-5k": "Under \u00A35K",
@@ -1115,9 +1115,9 @@ export default function AdminDashboard() {
                           {activeLeadType === "wedding" && (
                             <td>
                               {lead.urgency_label ? (
-                                <span className={`rep-urgency rep-urgency--${lead.urgency || "unknown"}`}>
-                                  <span className="rep-urgency__stage">{URGENCY_STAGE[lead.urgency] || "?"}</span>
-                                  {URGENCY_LABELS[lead.urgency]?.replace(/^\d\s*\u00B7\s*/, "") || lead.urgency_label}
+                                <span className={`rep-urgency rep-urgency--${URGENCY_STAGE[lead.urgency] != null ? lead.urgency : "unknown"}`}>
+                                  <span className="rep-urgency__stage">{URGENCY_STAGE[lead.urgency] ?? 0}</span>
+                                  {URGENCY_LABELS[lead.urgency]?.replace(/^\d\s*\u00B7\s*/, "") || "No signal"}
                                 </span>
                               ) : "\u2014"}
                             </td>
