@@ -935,36 +935,6 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* KPIs */}
-          <div className="rep-totals" style={{ marginBottom: "12px" }}>
-            <div className={`rep-stat${breakdownFilter ? " rep-stat--clickable" : ""}`}
-                 style={breakdownFilter ? { cursor: "pointer" } : {}}
-                 onClick={() => breakdownFilter && setBreakdownFilter(null)}>
-              <div className="rep-stat__num">{currentLeads?.total || 0}</div>
-              <div className="rep-stat__label">Total {currentLeads?.lead_type_label || activeLeadType} leads{breakdownFilter ? " (click to clear filter)" : ""}</div>
-            </div>
-            {currentLeads?.summary?.cross_sell_count > 0 && (() => {
-              const active = breakdownFilter?.field === "_cross_sell";
-              return (
-                <div className={`rep-stat rep-stat--today rep-stat--clickable${active ? " rep-stat--active" : ""}`}
-                     onClick={() => setBreakdownFilter(active ? null : { field: "_cross_sell", value: true, label: "Also interested in other services" })}>
-                  <div className="rep-stat__num">{currentLeads.summary.cross_sell_count}</div>
-                  <div className="rep-stat__label">Also interested in other services</div>
-                </div>
-              );
-            })()}
-            {activeLeadType === "wedding" && (currentLeads?.summary?.by_urgency || []).filter(u => u.label === "Ready to book" || u.label === "Need to move fast").map(u => {
-              const active = breakdownFilter?.field === "urgency_label" && breakdownFilter?.value === u.label;
-              return (
-                <div key={u.label} className={`rep-stat rep-stat--today rep-stat--clickable${active ? " rep-stat--active" : ""}`}
-                     onClick={() => setBreakdownFilter(active ? null : { field: "urgency_label", value: u.label, label: `Urgency: ${u.label}` })}>
-                  <div className="rep-stat__num">{u.count}</div>
-                  <div className="rep-stat__label">{u.label}</div>
-                </div>
-              );
-            })}
-          </div>
-
           {/* ── Filter / Sort / Search toolbar ── */}
           <div className="lead-toolbar">
             <form className="lead-toolbar__search" onSubmit={(e) => { e.preventDefault(); setLeadSearch(leadSearchDraft.trim()); }}>
