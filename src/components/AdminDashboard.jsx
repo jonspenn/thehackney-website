@@ -289,13 +289,17 @@ const STAGE_SEQUENCE = ["Brochure", "Quiz", "Call", "Tour"];
 function computeLeadScore(lead, leadType) {
   const now = Date.now();
 
-  /* 1. Stage (0-40) */
-  let stage = 10, stageLabel = "Brochure";
-  if (lead.clicked_venue_tour_at)       { stage = 40; stageLabel = "Tour"; }
-  else if (lead.clicked_discovery_call_at) { stage = 35; stageLabel = "Call"; }
-  else if (lead.form_types?.some(ft => ft.includes("quiz"))) { stage = 25; stageLabel = "Quiz"; }
+  /* 1. Stage (0-30) - what they've DONE. Weights: HubSpot baseline 15 Apr 2026 */
+  let stage = 8, stageLabel = "Brochure";
+  if (lead.clicked_venue_tour_at)       { stage = 30; stageLabel = "Tour"; }   // 10% of leads, 36.9% close
+  else if (lead.clicked_discovery_call_at) { stage = 26; stageLabel = "Call"; } // 5.7% of leads, 43.9% close
+  else if (lead.form_types?.some(ft => ft.includes("quiz"))) { stage = 18; stageLabel = "Quiz"; }
 
-  /* 2. Recency (0-25) */
+  /* 2. Intent (0-10) - what they SAID (quiz urgency answer) */
+  const INTENT_SCORE = { asap: 10, ready: 8, comparing: 5, browsing: 2 };
+  const intent = INTENT_SCORE[lead.urgency] || 0;
+
+  /* 3. Recency (0-25) */
   let recency = 0, daysSinceActivity = 999;
   const lastAct = lead.last_seen_at || lead.created_at;
   if (lastAct) {
@@ -312,14 +316,14 @@ function computeLeadScore(lead, leadType) {
     }
   }
 
-  /* 3. Engagement (0-15) */
+  /* 4. Engagement (0-15) */
   const sessions = lead.sessions_before_conversion || 0;
   const pages = lead.total_page_views || 0;
   let engagement = Math.min(sessions, 5) + Math.min(Math.floor(pages / 3), 5);
   if (lead.submissions_count > 1) engagement += 5;
   engagement = Math.min(engagement, 15);
 
-  /* 4. Date proximity (0-10) */
+  /* 5. Date proximity (0-10) */
   let dateProximity = 3; // neutral when unknown
   if (lead.event_date) {
     const MONTH_MAP = { january:0, february:1, march:2, april:3, may:4, june:5, july:6, august:7, september:8, october:9, november:10, december:11, jan:0, feb:1, mar:2, apr:3, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 };
@@ -338,7 +342,7 @@ function computeLeadScore(lead, leadType) {
     }
   }
 
-  /* 5. Revenue potential (0-10) */
+  /* 6. Revenue potential (0-10) */
   const BUDGET_SCORE = { "20k-plus": 5, "10k-20k": 4, "5k-10k": 2, "under-5k": 1 };
   let revBudget = BUDGET_SCORE[lead.budget] || 2;
   let revGuests = 2;
@@ -353,7 +357,7 @@ function computeLeadScore(lead, leadType) {
   }
   const revenue = Math.min(revBudget + revGuests, 10);
 
-  const score = stage + recency + engagement + dateProximity + revenue;
+  const score = stage + intent + recency + engagement + dateProximity + revenue;
 
   /* Tier assignment */
   let tier;
@@ -364,12 +368,12 @@ function computeLeadScore(lead, leadType) {
 
   /* Dead override: no recent activity + early stage */
   const deadDays = DEAD_DAYS[leadType] || 21;
-  const isDead = daysSinceActivity > deadDays && stage <= 25;
+  const isDead = daysSinceActivity > deadDays && stage <= 18;
   if (isDead) tier = "cold";
 
   return {
     score, tier, stageLabel, isDead, daysSinceActivity,
-    breakdown: { stage, recency, engagement, dateProximity, revenue },
+    breakdown: { stage, intent, recency, engagement, dateProximity, revenue },
   };
 }
 
@@ -1077,7 +1081,7 @@ export default function AdminDashboard() {
                             <span
                               className="lead-score-badge"
                               style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff" }}
-                              title={`Stage ${sc.breakdown.stage} + Recency ${sc.breakdown.recency} + Engagement ${sc.breakdown.engagement} + Date ${sc.breakdown.dateProximity} + Revenue ${sc.breakdown.revenue}`}
+                              title={`Stage ${sc.breakdown.stage} + Intent ${sc.breakdown.intent} + Recency ${sc.breakdown.recency} + Engagement ${sc.breakdown.engagement} + Date ${sc.breakdown.dateProximity} + Revenue ${sc.breakdown.revenue}`}
                             >
                               {sc.score}
                             </span>
@@ -1469,7 +1473,8 @@ export default function AdminDashboard() {
                   <h3 className="lp-section__title">Score breakdown</h3>
                   <div className="lp-score-grid">
                     {[
-                      { label: "Stage", val: sc.breakdown.stage, max: 40, desc: sc.stageLabel },
+                      { label: "Stage", val: sc.breakdown.stage, max: 30, desc: sc.stageLabel },
+                      { label: "Intent", val: sc.breakdown.intent, max: 10, desc: URGENCY_LABELS[lead.urgency] || "No signal" },
                       { label: "Recency", val: sc.breakdown.recency, max: 25, desc: sc.daysSinceActivity <= 1 ? "Active today" : `${sc.daysSinceActivity}d ago` },
                       { label: "Engagement", val: sc.breakdown.engagement, max: 15, desc: `${lead.sessions_before_conversion || 0} sessions, ${lead.total_page_views || 0} pages` },
                       { label: "Date", val: sc.breakdown.dateProximity, max: 10, desc: lead.event_date || "No date" },
