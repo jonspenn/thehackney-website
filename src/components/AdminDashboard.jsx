@@ -386,6 +386,7 @@ export default function AdminDashboard() {
   const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
   const [heatFilter, setHeatFilter] = useState("all"); // "all" | "hot" | "warm" | "cool" | "cold"
   const [breakdownFilter, setBreakdownFilter] = useState(null); // { field, value, label } or null
+  const [analyticsFilter, setAnalyticsFilter] = useState(null); // { type, value, label } or null
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
   const [journey, setJourney] = useState(null); // journey data for selected lead
   const [journeyLoading, setJourneyLoading] = useState(false);
@@ -517,6 +518,49 @@ export default function AdminDashboard() {
     return arr;
   }, [scoredLeads, leadSort, heatFilter, breakdownFilter]);
 
+  function applyAnalyticsFilter(type, value, label) {
+    const current = analyticsFilter;
+    if (current && current.type === type && current.value === value) {
+      setAnalyticsFilter(null);
+    } else {
+      setAnalyticsFilter({ type, value, label });
+      if (activeTab !== "analytics") setActiveTab("analytics");
+    }
+  }
+
+  /* Filtered recent tables for analytics */
+  const filteredRecentVisitors = useMemo(() => {
+    const list = tracking?.recentVisitors || [];
+    if (!analyticsFilter) return list;
+    const f = analyticsFilter;
+    if (f.type === "source") return list.filter(v => (v.first_utm_source || "Direct") === f.value);
+    if (f.type === "device") return list.filter(v => (v.device_type || "Unknown") === f.value);
+    if (f.type === "page") return list.filter(v => shortenUrl(v.first_landing_page) === f.value);
+    return list;
+  }, [tracking, analyticsFilter]);
+
+  const filteredRecentEvents = useMemo(() => {
+    const list = tracking?.recentEvents || [];
+    if (!analyticsFilter) return list;
+    const f = analyticsFilter;
+    if (f.type === "event_type") return list.filter(e => e.event_type === f.value);
+    if (f.type === "page") return list.filter(e => shortenUrl(e.page_url) === f.value);
+    if (f.type === "cta") return list.filter(e => {
+      if (e.event_type !== "cta_click") return false;
+      const d = parseEventData(e.event_data);
+      return d && d.track_id === f.value;
+    });
+    return list;
+  }, [tracking, analyticsFilter]);
+
+  const filteredRecentClicks = useMemo(() => {
+    const list = clicks?.recent || [];
+    if (!analyticsFilter) return list;
+    const f = analyticsFilter;
+    if (f.type === "date") return list.filter(c => c.clicked_date === f.value);
+    return list;
+  }, [clicks, analyticsFilter]);
+
   function toggleSort(field) {
     setLeadSort(prev =>
       prev.field === field
@@ -627,14 +671,19 @@ export default function AdminDashboard() {
               <p className="rep-sub">Most viewed pages.</p>
               {(tracking?.topPages || []).length === 0 ? <p className="rep-empty-small">No page views yet.</p> : (
                 <ol className="rep-toplist">
-                  {tracking.topPages.slice(0, 10).map((row, i) => (
-                    <li key={row.page_url} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{shortenUrl(row.page_url)}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.view_count / topPageMax) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.view_count}</span>
-                    </li>
-                  ))}
+                  {tracking.topPages.slice(0, 10).map((row, i) => {
+                    const short = shortenUrl(row.page_url);
+                    const active = analyticsFilter?.type === "page" && analyticsFilter?.value === short;
+                    return (
+                      <li key={row.page_url} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                          onClick={() => applyAnalyticsFilter("page", short, `Page: ${short}`)}>
+                        <span className="rep-toprank">{i + 1}</span>
+                        <span className="rep-topdate">{short}</span>
+                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.view_count / topPageMax) * 100}%` }} /></span>
+                        <span className="rep-topcount rep-topcount--link">{row.view_count}</span>
+                      </li>
+                    );
+                  })}
                 </ol>
               )}
             </section>
@@ -643,14 +692,18 @@ export default function AdminDashboard() {
               <p className="rep-sub">First-touch UTM source.</p>
               {(tracking?.sources || []).length === 0 ? <p className="rep-empty-small">No source data yet.</p> : (
                 <ol className="rep-toplist">
-                  {tracking.sources.slice(0, 10).map((row, i) => (
-                    <li key={row.source} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.source}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / sourceMax) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.visitor_count}</span>
-                    </li>
-                  ))}
+                  {tracking.sources.slice(0, 10).map((row, i) => {
+                    const active = analyticsFilter?.type === "source" && analyticsFilter?.value === row.source;
+                    return (
+                      <li key={row.source} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                          onClick={() => applyAnalyticsFilter("source", row.source, `Source: ${row.source}`)}>
+                        <span className="rep-toprank">{i + 1}</span>
+                        <span className="rep-topdate">{row.source}</span>
+                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / sourceMax) * 100}%` }} /></span>
+                        <span className="rep-topcount rep-topcount--link">{row.visitor_count}</span>
+                      </li>
+                    );
+                  })}
                 </ol>
               )}
             </section>
@@ -666,7 +719,8 @@ export default function AdminDashboard() {
                   {tracking.devices.map((d) => {
                     const pct = deviceTotal > 0 ? Math.round((d.visitor_count / deviceTotal) * 100) : 0;
                     return (
-                      <div key={d.device_type} className="rep-device-card">
+                      <div key={d.device_type} className={`rep-device-card rep-device-card--clickable${analyticsFilter?.type === "device" && analyticsFilter?.value === (d.device_type || "Unknown") ? " rep-device-card--active" : ""}`}
+                           onClick={() => applyAnalyticsFilter("device", d.device_type || "Unknown", `Device: ${d.device_type || "Unknown"}`)}>
                         <div className="rep-device-card__pct">{pct}%</div>
                         <div className="rep-device-card__label">{d.device_type || "Unknown"}</div>
                         <div className="rep-device-card__count">{d.visitor_count} visitors</div>
@@ -681,17 +735,21 @@ export default function AdminDashboard() {
               <p className="rep-sub">Which buttons are getting clicked.</p>
               {(tracking?.topCTAs || []).length === 0 ? <p className="rep-empty-small">No CTA clicks yet.</p> : (
                 <ol className="rep-toplist">
-                  {tracking.topCTAs.slice(0, 10).map((row, i) => (
-                    <li key={`${row.cta_id}-${row.page_url}`} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">
-                        <strong>{row.cta_id || "unknown"}</strong><br />
-                        <span style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>{shortenUrl(row.page_url)}</span>
-                      </span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topCTAMax) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.click_count}</span>
-                    </li>
-                  ))}
+                  {tracking.topCTAs.slice(0, 10).map((row, i) => {
+                    const active = analyticsFilter?.type === "cta" && analyticsFilter?.value === row.cta_id;
+                    return (
+                      <li key={`${row.cta_id}-${row.page_url}`} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                          onClick={() => applyAnalyticsFilter("cta", row.cta_id, `CTA: ${row.cta_id}`)}>
+                        <span className="rep-toprank">{i + 1}</span>
+                        <span className="rep-topdate">
+                          <strong>{row.cta_id || "unknown"}</strong><br />
+                          <span style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>{shortenUrl(row.page_url)}</span>
+                        </span>
+                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topCTAMax) * 100}%` }} /></span>
+                        <span className="rep-topcount rep-topcount--link">{row.click_count}</span>
+                      </li>
+                    );
+                  })}
                 </ol>
               )}
             </section>
@@ -703,14 +761,18 @@ export default function AdminDashboard() {
             <p className="rep-sub">Top 5 most-clicked future dates on /check-your-date.</p>
             {(clicks?.topDates || []).length === 0 ? <p className="rep-empty-small">No date clicks yet.</p> : (
               <ol className="rep-toplist">
-                {clicks.topDates.slice(0, 5).map((row, i) => (
-                  <li key={row.clicked_date} className="rep-toprow">
-                    <span className="rep-toprank">{i + 1}</span>
-                    <span className="rep-topdate">{formatLongDate(row.clicked_date)}</span>
-                    <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topDateMax) * 100}%` }} /></span>
-                    <span className="rep-topcount">{row.click_count}</span>
-                  </li>
-                ))}
+                {clicks.topDates.slice(0, 5).map((row, i) => {
+                  const active = analyticsFilter?.type === "date" && analyticsFilter?.value === row.clicked_date;
+                  return (
+                    <li key={row.clicked_date} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                        onClick={() => applyAnalyticsFilter("date", row.clicked_date, `Date: ${formatLongDate(row.clicked_date)}`)}>
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{formatLongDate(row.clicked_date)}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topDateMax) * 100}%` }} /></span>
+                      <span className="rep-topcount rep-topcount--link">{row.click_count}</span>
+                    </li>
+                  );
+                })}
               </ol>
             )}
           </section>
@@ -743,17 +805,22 @@ export default function AdminDashboard() {
           {/* Top pages - full list */}
           <section className="rep-section">
             <h2 className="rep-h2">Top pages</h2>
-            <p className="rep-sub">Most viewed pages by total page_view events.</p>
+            <p className="rep-sub">Most viewed pages by total page_view events. Click a count to filter recent events.</p>
             {(tracking?.topPages || []).length === 0 ? <p className="rep-empty-small">No page views yet.</p> : (
               <ol className="rep-toplist">
-                {tracking.topPages.map((row, i) => (
-                  <li key={row.page_url} className="rep-toprow">
-                    <span className="rep-toprank">{i + 1}</span>
-                    <span className="rep-topdate">{shortenUrl(row.page_url)}</span>
-                    <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.view_count / topPageMax) * 100}%` }} /></span>
-                    <span className="rep-topcount">{row.view_count}</span>
-                  </li>
-                ))}
+                {tracking.topPages.map((row, i) => {
+                  const short = shortenUrl(row.page_url);
+                  const active = analyticsFilter?.type === "page" && analyticsFilter?.value === short;
+                  return (
+                    <li key={row.page_url} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                        onClick={() => applyAnalyticsFilter("page", short, `Page: ${short}`)}>
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{short}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.view_count / topPageMax) * 100}%` }} /></span>
+                      <span className="rep-topcount rep-topcount--link">{row.view_count}</span>
+                    </li>
+                  );
+                })}
               </ol>
             )}
           </section>
@@ -762,17 +829,21 @@ export default function AdminDashboard() {
           <div className="rep-two-col">
             <section className="rep-section">
               <h2 className="rep-h2">Traffic sources</h2>
-              <p className="rep-sub">First-touch UTM source per visitor.</p>
+              <p className="rep-sub">First-touch UTM source per visitor. Click a count to filter recent visitors.</p>
               {(tracking?.sources || []).length === 0 ? <p className="rep-empty-small">No source data yet.</p> : (
                 <ol className="rep-toplist">
-                  {tracking.sources.map((row, i) => (
-                    <li key={row.source} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.source}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / sourceMax) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.visitor_count}</span>
-                    </li>
-                  ))}
+                  {tracking.sources.map((row, i) => {
+                    const active = analyticsFilter?.type === "source" && analyticsFilter?.value === row.source;
+                    return (
+                      <li key={row.source} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                          onClick={() => applyAnalyticsFilter("source", row.source, `Source: ${row.source}`)}>
+                        <span className="rep-toprank">{i + 1}</span>
+                        <span className="rep-topdate">{row.source}</span>
+                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / sourceMax) * 100}%` }} /></span>
+                        <span className="rep-topcount rep-topcount--link">{row.visitor_count}</span>
+                      </li>
+                    );
+                  })}
                 </ol>
               )}
             </section>
@@ -784,7 +855,8 @@ export default function AdminDashboard() {
                   {tracking.devices.map((d) => {
                     const pct = deviceTotal > 0 ? Math.round((d.visitor_count / deviceTotal) * 100) : 0;
                     return (
-                      <div key={d.device_type} className="rep-device-card">
+                      <div key={d.device_type} className={`rep-device-card rep-device-card--clickable${analyticsFilter?.type === "device" && analyticsFilter?.value === (d.device_type || "Unknown") ? " rep-device-card--active" : ""}`}
+                           onClick={() => applyAnalyticsFilter("device", d.device_type || "Unknown", `Device: ${d.device_type || "Unknown"}`)}>
                         <div className="rep-device-card__pct">{pct}%</div>
                         <div className="rep-device-card__label">{d.device_type || "Unknown"}</div>
                         <div className="rep-device-card__count">{d.visitor_count} visitors</div>
@@ -800,14 +872,20 @@ export default function AdminDashboard() {
           <section className="rep-section">
             <h2 className="rep-h2">Recent visitors</h2>
             <p className="rep-sub">Last 30 visitors with first-touch attribution.</p>
-            {(tracking?.recentVisitors || []).length === 0 ? <p className="rep-empty-small">No visitors yet.</p> : (
+            {analyticsFilter && (analyticsFilter.type === "source" || analyticsFilter.type === "device" || analyticsFilter.type === "page") && (
+              <div className="breakdown-filter-bar">
+                <span className="breakdown-filter-bar__label">Filtered by: <strong>{analyticsFilter.label}</strong> ({filteredRecentVisitors.length} of {(tracking?.recentVisitors || []).length})</span>
+                <button className="breakdown-filter-bar__clear" onClick={() => setAnalyticsFilter(null)}>{"\u2715"} Clear filter</button>
+              </div>
+            )}
+            {filteredRecentVisitors.length === 0 ? <p className="rep-empty-small">{analyticsFilter ? "No matching visitors in recent data." : "No visitors yet."}</p> : (
               <div className="rep-table-wrap">
                 <table className="rep-table">
                   <thead>
                     <tr><th>First seen</th><th>Device</th><th>Landing page</th><th>Source</th><th>Sessions</th><th>Pages</th></tr>
                   </thead>
                   <tbody>
-                    {tracking.recentVisitors.map((row) => (
+                    {filteredRecentVisitors.map((row) => (
                       <tr key={row.visitor_id}>
                         <td>{formatRelativeTime(row.first_seen_at)}</td>
                         <td>{row.device_type || "\u2014"}</td>
@@ -1198,14 +1276,18 @@ export default function AdminDashboard() {
             <p className="rep-sub">Future dates only, ranked by interest. This is the demand signal.</p>
             {(clicks?.topDates || []).length === 0 ? <p className="rep-empty-small">No future-date clicks yet.</p> : (
               <ol className="rep-toplist">
-                {clicks.topDates.map((row, i) => (
-                  <li key={row.clicked_date} className="rep-toprow">
-                    <span className="rep-toprank">{i + 1}</span>
-                    <span className="rep-topdate">{formatLongDate(row.clicked_date)}</span>
-                    <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topDateMax) * 100}%` }} /></span>
-                    <span className="rep-topcount">{row.click_count}</span>
-                  </li>
-                ))}
+                {clicks.topDates.map((row, i) => {
+                  const active = analyticsFilter?.type === "date" && analyticsFilter?.value === row.clicked_date;
+                  return (
+                    <li key={row.clicked_date} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                        onClick={() => applyAnalyticsFilter("date", row.clicked_date, `Date: ${formatLongDate(row.clicked_date)}`)}>
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{formatLongDate(row.clicked_date)}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topDateMax) * 100}%` }} /></span>
+                      <span className="rep-topcount rep-topcount--link">{row.click_count}</span>
+                    </li>
+                  );
+                })}
               </ol>
             )}
           </section>
@@ -1272,12 +1354,18 @@ export default function AdminDashboard() {
           <section className="rep-section">
             <h2 className="rep-h2">Recent activity</h2>
             <p className="rep-sub">Last 50 date clicks.</p>
-            {(clicks?.recent || []).length === 0 ? <p className="rep-empty-small">No clicks logged yet.</p> : (
+            {analyticsFilter?.type === "date" && (
+              <div className="breakdown-filter-bar">
+                <span className="breakdown-filter-bar__label">Filtered by: <strong>{analyticsFilter.label}</strong> ({filteredRecentClicks.length} of {(clicks?.recent || []).length})</span>
+                <button className="breakdown-filter-bar__clear" onClick={() => setAnalyticsFilter(null)}>{"\u2715"} Clear filter</button>
+              </div>
+            )}
+            {filteredRecentClicks.length === 0 ? <p className="rep-empty-small">{analyticsFilter?.type === "date" ? "No matching clicks in recent data." : "No clicks logged yet."}</p> : (
               <div className="rep-table-wrap">
                 <table className="rep-table">
                   <thead><tr><th>When</th><th>Date clicked</th><th>Came from</th></tr></thead>
                   <tbody>
-                    {clicks.recent.map((row, i) => (
+                    {filteredRecentClicks.map((row, i) => (
                       <tr key={i}>
                         <td>{formatRelativeTime(row.clicked_at)}</td>
                         <td>{formatLongDate(row.clicked_date)}</td>
@@ -1297,14 +1385,18 @@ export default function AdminDashboard() {
             <p className="rep-sub">Total count for each event type tracked.</p>
             {(tracking?.eventTypes || []).length === 0 ? <p className="rep-empty-small">No events yet.</p> : (
               <ol className="rep-toplist">
-                {tracking.eventTypes.map((row, i) => (
-                  <li key={row.event_type} className="rep-toprow rep-toprow--compact">
-                    <span className="rep-toprank">{i + 1}</span>
-                    <span className="rep-topdate">{EVENT_TYPE_LABELS[row.event_type] || row.event_type}</span>
-                    <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.event_count / eventTypeMax) * 100}%` }} /></span>
-                    <span className="rep-topcount">{row.event_count}</span>
-                  </li>
-                ))}
+                {tracking.eventTypes.map((row, i) => {
+                  const active = analyticsFilter?.type === "event_type" && analyticsFilter?.value === row.event_type;
+                  return (
+                    <li key={row.event_type} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                        onClick={() => applyAnalyticsFilter("event_type", row.event_type, `Event: ${EVENT_TYPE_LABELS[row.event_type] || row.event_type}`)}>
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{EVENT_TYPE_LABELS[row.event_type] || row.event_type}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.event_count / eventTypeMax) * 100}%` }} /></span>
+                      <span className="rep-topcount rep-topcount--link">{row.event_count}</span>
+                    </li>
+                  );
+                })}
               </ol>
             )}
           </section>
@@ -1312,20 +1404,24 @@ export default function AdminDashboard() {
           {/* Top CTAs full list */}
           <section className="rep-section">
             <h2 className="rep-h2">CTA clicks</h2>
-            <p className="rep-sub">Which buttons are getting clicked, and on which pages.</p>
+            <p className="rep-sub">Which buttons are getting clicked, and on which pages. Click a count to filter recent events.</p>
             {(tracking?.topCTAs || []).length === 0 ? <p className="rep-empty-small">No CTA clicks yet.</p> : (
               <ol className="rep-toplist">
-                {tracking.topCTAs.map((row, i) => (
-                  <li key={`${row.cta_id}-${row.page_url}`} className="rep-toprow">
-                    <span className="rep-toprank">{i + 1}</span>
-                    <span className="rep-topdate">
-                      <strong>{row.cta_id || "unknown"}</strong><br />
-                      <span style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>{shortenUrl(row.page_url)}</span>
-                    </span>
-                    <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topCTAMax) * 100}%` }} /></span>
-                    <span className="rep-topcount">{row.click_count}</span>
-                  </li>
-                ))}
+                {tracking.topCTAs.map((row, i) => {
+                  const active = analyticsFilter?.type === "cta" && analyticsFilter?.value === row.cta_id;
+                  return (
+                    <li key={`${row.cta_id}-${row.page_url}`} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                        onClick={() => applyAnalyticsFilter("cta", row.cta_id, `CTA: ${row.cta_id}`)}>
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">
+                        <strong>{row.cta_id || "unknown"}</strong><br />
+                        <span style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>{shortenUrl(row.page_url)}</span>
+                      </span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topCTAMax) * 100}%` }} /></span>
+                      <span className="rep-topcount rep-topcount--link">{row.click_count}</span>
+                    </li>
+                  );
+                })}
               </ol>
             )}
           </section>
@@ -1334,12 +1430,18 @@ export default function AdminDashboard() {
           <section className="rep-section">
             <h2 className="rep-h2">Recent events</h2>
             <p className="rep-sub">Last 50 events across the site.</p>
-            {(tracking?.recentEvents || []).length === 0 ? <p className="rep-empty-small">No events logged yet.</p> : (
+            {analyticsFilter && (analyticsFilter.type === "event_type" || analyticsFilter.type === "page" || analyticsFilter.type === "cta") && (
+              <div className="breakdown-filter-bar">
+                <span className="breakdown-filter-bar__label">Filtered by: <strong>{analyticsFilter.label}</strong> ({filteredRecentEvents.length} of {(tracking?.recentEvents || []).length})</span>
+                <button className="breakdown-filter-bar__clear" onClick={() => setAnalyticsFilter(null)}>{"\u2715"} Clear filter</button>
+              </div>
+            )}
+            {filteredRecentEvents.length === 0 ? <p className="rep-empty-small">{analyticsFilter ? "No matching events in recent data." : "No events logged yet."}</p> : (
               <div className="rep-table-wrap">
                 <table className="rep-table">
                   <thead><tr><th>When</th><th>Type</th><th>Page</th><th>Detail</th></tr></thead>
                   <tbody>
-                    {tracking.recentEvents.map((row, i) => (
+                    {filteredRecentEvents.map((row, i) => (
                       <tr key={i}>
                         <td>{formatRelativeTime(row.created_at)}</td>
                         <td>
