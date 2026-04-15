@@ -383,33 +383,48 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .rep-budget--5k-10k { background: rgba(191, 114, 86, 0.12); color: #8C472E; }
       .rep-budget--under-5k { background: rgba(44, 24, 16, 0.06); color: rgba(44, 24, 16, 0.55); }
 
-      /* ── Lead type sub-tabs ── */
-      .adm-subtabs {
-        display: flex; gap: 4px; margin-bottom: 20px; padding: 4px;
-        background: rgba(44, 24, 16, 0.04); border-radius: 6px;
+      /* ── Leads control panel (sub-tabs + filters unified) ── */
+      .lead-panel {
+        background: #fff;
+        border: 1px solid rgba(44, 24, 16, 0.12);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .lead-panel__tabs {
+        display: flex; gap: 4px; padding: 8px 12px;
         overflow-x: auto;
       }
+      .lead-panel__divider {
+        height: 1px;
+        background: rgba(44, 24, 16, 0.08);
+        margin: 0 12px;
+      }
+      .lead-panel__filters {
+        padding: 12px 16px;
+        display: flex; flex-direction: column; gap: 10px;
+      }
+
       .adm-subtab {
-        padding: 8px 16px; border: none; border-radius: 4px;
+        padding: 7px 14px; border: none; border-radius: 4px;
         background: transparent; cursor: pointer;
-        font-family: 'DM Sans', sans-serif; font-size: 13px;
-        font-weight: 500; letter-spacing: 0.03em; text-transform: uppercase;
-        color: rgba(44, 24, 16, 0.5); white-space: nowrap;
+        font-family: 'DM Sans', sans-serif; font-size: 12px;
+        font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+        color: rgba(44, 24, 16, 0.45); white-space: nowrap;
         transition: all 0.15s ease;
       }
-      .adm-subtab:hover { color: rgba(44, 24, 16, 0.8); background: rgba(44, 24, 16, 0.04); }
+      .adm-subtab:hover { color: rgba(44, 24, 16, 0.75); background: rgba(44, 24, 16, 0.04); }
       .adm-subtab--active {
-        background: var(--color-warm-canvas, #F5F0E8);
-        color: var(--color-brewery-dark, #2C1810);
-        box-shadow: 0 1px 3px rgba(44, 24, 16, 0.08);
+        background: rgba(46, 64, 9, 0.08);
+        color: var(--color-forest-olive, #2E4009);
       }
       .adm-subtab__count {
-        display: inline-block; margin-left: 6px; padding: 1px 7px;
+        display: inline-block; margin-left: 5px; padding: 1px 7px;
         border-radius: 10px; font-size: 11px; font-weight: 600;
         background: rgba(46, 64, 9, 0.12); color: #2E4009;
       }
       .adm-subtab--active .adm-subtab__count {
-        background: rgba(46, 64, 9, 0.18);
+        background: rgba(46, 64, 9, 0.2);
       }
 
       /* ── Cross-sell badges ── */
@@ -666,13 +681,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .rep-stat--clickable:hover { border-color: rgba(73,89,14,0.3); background: rgba(73,89,14,0.04); }
       .rep-stat--active { border-color: #49590E; background: rgba(73,89,14,0.06); }
 
-      /* ── Lead filter toolbar ── */
-      .lead-toolbar {
-        display: flex; flex-direction: column; gap: 10px;
-        margin-bottom: 20px; padding: 16px 20px;
-        background: #fff; border: 1px solid rgba(44,24,16,0.12);
-        border-radius: 4px;
-      }
+      /* ── Lead filter toolbar (inside lead-panel) ── */
       .lead-toolbar__search {
         display: flex; align-items: center; gap: 8px;
       }
@@ -814,7 +823,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         .rep-shell { padding: 24px 16px 64px; }
         .rep-title { font-size: 32px; }
         .adm-tab { padding: 8px 12px; font-size: 11px; letter-spacing: 0.06em; }
-        .lead-toolbar { padding: 12px; }
+        .lead-panel__tabs { padding: 6px 8px; gap: 2px; }
+        .lead-panel__filters { padding: 10px 12px; }
         .lead-toolbar__search { flex-wrap: wrap; }
         .lead-toolbar__input { max-width: none; }
         .lead-toolbar__filters { flex-direction: column; align-items: stretch; }

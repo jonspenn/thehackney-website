@@ -918,25 +918,30 @@ export default function AdminDashboard() {
       {/* ═══════ LEADS TAB (all revenue streams) ═══════ */}
       {activeTab === "leads" && !selectedLead && (
         <>
-          {/* Lead type sub-tabs */}
-          <div className="adm-subtabs">
-            {LEAD_TABS.map((lt) => (
-              <button
-                key={lt.type}
-                className={`adm-subtab${activeLeadType === lt.type ? " adm-subtab--active" : ""}`}
-                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); setBreakdownFilter(null); setLeadSearch(""); setLeadSearchDraft(""); }}
-                type="button"
-              >
-                {lt.label}
-                {(leads[lt.type]?.total || 0) > 0 && (
-                  <span className="adm-subtab__count">{leads[lt.type].total}</span>
-                )}
-              </button>
-            ))}
-          </div>
+          {/* ── Leads control panel (sub-tabs + filters as one component) ── */}
+          <div className="lead-panel">
+            {/* Lead type sub-tabs */}
+            <div className="lead-panel__tabs">
+              {LEAD_TABS.map((lt) => (
+                <button
+                  key={lt.type}
+                  className={`adm-subtab${activeLeadType === lt.type ? " adm-subtab--active" : ""}`}
+                  onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); setBreakdownFilter(null); setLeadSearch(""); setLeadSearchDraft(""); }}
+                  type="button"
+                >
+                  {lt.label}
+                  {(leads[lt.type]?.total || 0) > 0 && (
+                    <span className="adm-subtab__count">{leads[lt.type].total}</span>
+                  )}
+                </button>
+              ))}
+            </div>
 
-          {/* ── Filter / Sort / Search toolbar ── */}
-          <div className="lead-toolbar">
+            {/* Divider */}
+            <div className="lead-panel__divider" />
+
+            {/* Filter / Sort / Search */}
+            <div className="lead-panel__filters">
             <form className="lead-toolbar__search" onSubmit={(e) => { e.preventDefault(); setLeadSearch(leadSearchDraft.trim()); }}>
               <input
                 type="text"
@@ -1020,6 +1025,7 @@ export default function AdminDashboard() {
                 <button className="lead-toolbar__clear-all" onClick={() => { setLeadSearch(""); setLeadSearchDraft(""); setHeatFilter("all"); setBreakdownFilter(null); }}>Clear all</button>
               </div>
             )}
+            </div>
           </div>
 
           {/* ── Leads table (adapts columns per type) ── */}
