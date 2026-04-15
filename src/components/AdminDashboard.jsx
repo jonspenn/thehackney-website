@@ -1637,10 +1637,15 @@ export default function AdminDashboard() {
                     {actions.length > 0 && (
                       <div className="lp-journey-actions">
                         {actions.map(ev => {
-                          const label = JOURNEY_EVENT_LABELS[ev.event_type] || ev.event_type;
+                          let label = JOURNEY_EVENT_LABELS[ev.event_type] || ev.event_type;
                           const data = parseEventData(ev.event_data);
                           let detail = "";
-                          if (ev.event_type === "cta_click" && data?.track_id) detail = data.track_id;
+                          if (ev.event_type === "cta_click") {
+                            const ctaName = data?.cta_text || data?.track_id || data?.cta_id || "";
+                            const page = ev.page_url ? shortenUrl(ev.page_url) : "";
+                            label = ctaName ? `Clicked "${ctaName}"` : "Clicked CTA";
+                            if (page) detail = `on ${page}`;
+                          }
                           if (ev.event_type === "date_check" && data?.date) detail = data.date;
                           if (ev.event_type === "questionnaire_complete") detail = "All steps finished";
                           if (ev.event_type === "form_submit" && data?.form_type) detail = FORM_TYPE_LABELS[data.form_type] || data.form_type;
