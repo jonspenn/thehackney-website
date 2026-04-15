@@ -512,43 +512,57 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lead-row--selected { outline: 2px solid #2E4009; outline-offset: -2px; }
       .lead-row:hover { filter: brightness(0.97); }
 
-      /* ── Lead profile slide-out panel ── */
+      /* ── Lead profile full-page view ── */
 
-      .lp-backdrop {
-        position: fixed; inset: 0; background: rgba(44,24,16,0.3);
-        z-index: 900; animation: lpFadeIn 0.2s ease;
+      .lp-fullpage {
+        animation: lpFadeIn 0.2s ease;
       }
       @keyframes lpFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-      .lp-panel {
-        position: fixed; top: 0; right: 0; bottom: 0;
-        width: min(480px, 90vw); background: #F5F0E8;
-        z-index: 901; overflow-y: auto; box-shadow: -4px 0 24px rgba(44,24,16,0.15);
-        animation: lpSlideIn 0.25s ease;
-        padding: 0 0 40px;
+      .lp-back {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: none; border: 1px solid rgba(44,24,16,0.15);
+        border-radius: 4px; padding: 8px 16px;
+        font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+        color: #2C1810; cursor: pointer; transition: all 0.15s;
+        margin-bottom: 24px;
       }
-      @keyframes lpSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+      .lp-back:hover { background: rgba(44,24,16,0.05); border-color: rgba(44,24,16,0.25); }
 
-      .lp-close {
-        position: absolute; top: 12px; right: 16px;
-        background: none; border: none; font-size: 28px; color: rgba(44,24,16,0.5);
-        cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; transition: background 0.15s;
+      .lp-hero {
+        display: flex; align-items: center; gap: 24px;
+        padding: 24px 28px; margin-bottom: 24px;
+        background: rgba(44,24,16,0.025); border: 1px solid rgba(44,24,16,0.08);
+        border-radius: 6px;
       }
-      .lp-close:hover { background: rgba(44,24,16,0.08); color: #2C1810; }
-
-      .lp-header {
-        padding: 28px 24px 20px; text-align: center;
-        border-bottom: 1px solid rgba(44,24,16,0.08);
+      .lp-hero__score {
+        display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0;
       }
-      .lp-header__score { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 12px; }
-      .lp-header__tier {
+      .lp-hero__tier {
         font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 0.08em;
       }
-      .lp-name {
-        font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600;
-        color: #2C1810; margin: 0 0 16px;
+      .lp-hero__info { flex: 1; min-width: 0; }
+      .lp-hero__name {
+        font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 600;
+        color: #2C1810; margin: 0 0 6px; line-height: 1.2;
+      }
+      .lp-hero__contact {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+        font-family: 'DM Sans', sans-serif; font-size: 14px; color: rgba(44,24,16,0.5);
+        margin-bottom: 12px;
+      }
+      .lp-hero__link {
+        color: #2E4009; text-decoration: none; font-weight: 500;
+      }
+      .lp-hero__link:hover { text-decoration: underline; }
+
+      .lp-cols {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+        margin-bottom: 28px;
+      }
+      .lp-col {
+        display: flex; flex-direction: column; gap: 0;
       }
 
       /* Stage progression bar in header */
@@ -748,7 +762,9 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         .adm-tab { padding: 8px 12px; font-size: 11px; letter-spacing: 0.06em; }
         .lead-heat-chips { gap: 4px; }
         .lead-heat-chip { font-size: 11px; padding: 3px 8px; }
-        .lp-panel { width: 100vw; }
+        .lp-hero { flex-direction: column; text-align: center; padding: 16px; gap: 12px; }
+        .lp-hero__contact { justify-content: center; }
+        .lp-cols { grid-template-columns: 1fr; }
         .lp-detail-grid { grid-template-columns: 1fr; }
         .lp-journey-session { padding: 12px; }
         .lp-journey-page { font-size: 12px; }

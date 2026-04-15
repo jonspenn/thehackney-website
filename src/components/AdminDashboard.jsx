@@ -1461,7 +1461,7 @@ export default function AdminDashboard() {
         </>
       )}
 
-      {/* ═══════ LEAD PROFILE SLIDE-OUT PANEL ═══════ */}
+      {/* ═══════ FULL-PAGE LEAD PROFILE ═══════ */}
       {selectedLead && (() => {
         const lead = selectedLead;
         const sc = computeLeadScore(lead, activeLeadType);
@@ -1470,22 +1470,26 @@ export default function AdminDashboard() {
         const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unknown";
 
         return (
-          <>
-            {/* Backdrop */}
-            <div className="lp-backdrop" onClick={() => setSelectedLead(null)} />
-            {/* Panel */}
-            <div className="lp-panel">
-              {/* Header */}
-              <div className="lp-header">
-                <button className="lp-close" onClick={() => setSelectedLead(null)} type="button">&times;</button>
-                <div className="lp-header__score">
-                  <span className="lead-score-badge" style={{ background: tc.color, color: "#fff", width: 48, height: 48, fontSize: 18 }}>
-                    {sc.score}
-                  </span>
-                  <span className="lp-header__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
+          <div className="lp-fullpage">
+            {/* Back button */}
+            <button className="lp-back" onClick={() => setSelectedLead(null)} type="button">{"\u2190"} Back to leads</button>
+
+            {/* Hero header */}
+            <div className="lp-hero">
+              <div className="lp-hero__score">
+                <span className="lead-score-badge" style={{ background: tc.color, color: "#fff", width: 64, height: 64, fontSize: 24 }}>
+                  {sc.score}
+                </span>
+                <span className="lp-hero__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
+              </div>
+              <div className="lp-hero__info">
+                <h2 className="lp-hero__name">{name}</h2>
+                <div className="lp-hero__contact">
+                  <a href={`mailto:${lead.email}`} className="lp-hero__link">{lead.email}</a>
+                  {lead.phone && <> &middot; <a href={`tel:${lead.phone}`} className="lp-hero__link">{lead.phone}</a></>}
+                  {lead.company && <> &middot; {lead.company}</>}
                 </div>
-                <h2 className="lp-name">{name}</h2>
-                <div className="lp-stage-bar">
+                <div className="lp-stage-bar" style={{ marginTop: "12px" }}>
                   {STAGE_SEQUENCE.map((s, i) => (
                     <div key={s} className={`lp-stage-step${i <= stageIdx ? " lp-stage-step--active" : ""}`} style={i <= stageIdx ? { borderColor: tc.color, background: i === stageIdx ? tc.color : "transparent", color: i === stageIdx ? "#fff" : tc.color } : {}}>
                       {s}
@@ -1493,167 +1497,169 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               </div>
+            </div>
 
-              {/* Contact details */}
-              <div className="lp-section">
-                <h3 className="lp-section__title">Contact</h3>
-                <div className="lp-detail-grid">
-                  <div className="lp-detail">
-                    <span className="lp-detail__label">Email</span>
-                    <a href={`mailto:${lead.email}`} className="lp-detail__value lp-detail__link">{lead.email}</a>
-                  </div>
-                  <div className="lp-detail">
-                    <span className="lp-detail__label">Phone</span>
-                    {lead.phone ? <a href={`tel:${lead.phone}`} className="lp-detail__value lp-detail__link">{lead.phone}</a> : <span className="lp-detail__value lp-detail__muted">Not provided</span>}
-                  </div>
-                  {lead.company && (
+            {/* Two-column: left = details, right = score */}
+            <div className="lp-cols">
+              <div className="lp-col">
+                {/* Contact details */}
+                <div className="lp-section">
+                  <h3 className="lp-section__title">Contact</h3>
+                  <div className="lp-detail-grid">
                     <div className="lp-detail">
-                      <span className="lp-detail__label">Company</span>
-                      <span className="lp-detail__value">{lead.company}</span>
+                      <span className="lp-detail__label">Email</span>
+                      <a href={`mailto:${lead.email}`} className="lp-detail__value lp-detail__link">{lead.email}</a>
                     </div>
-                  )}
-                  <div className="lp-detail">
-                    <span className="lp-detail__label">Location</span>
-                    <span className="lp-detail__value">{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "Unknown"}</span>
+                    <div className="lp-detail">
+                      <span className="lp-detail__label">Phone</span>
+                      {lead.phone ? <a href={`tel:${lead.phone}`} className="lp-detail__value lp-detail__link">{lead.phone}</a> : <span className="lp-detail__value lp-detail__muted">Not provided</span>}
+                    </div>
+                    {lead.company && (
+                      <div className="lp-detail">
+                        <span className="lp-detail__label">Company</span>
+                        <span className="lp-detail__value">{lead.company}</span>
+                      </div>
+                    )}
+                    <div className="lp-detail">
+                      <span className="lp-detail__label">Location</span>
+                      <span className="lp-detail__value">{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "Unknown"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Event / form details */}
+                <div className="lp-section">
+                  <h3 className="lp-section__title">Event details</h3>
+                  <div className="lp-detail-grid">
+                    {lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Event date</span><span className="lp-detail__value">{lead.event_date}</span></div>}
+                    {lead.event_type_label && <div className="lp-detail"><span className="lp-detail__label">Event type</span><span className="lp-detail__value">{lead.event_type_label}</span></div>}
+                    {lead.guest_count && <div className="lp-detail"><span className="lp-detail__label">Guests</span><span className="lp-detail__value">{lead.guest_count}</span></div>}
+                    {lead.urgency_label && <div className="lp-detail"><span className="lp-detail__label">Urgency</span><span className="lp-detail__value">{lead.urgency_label}</span></div>}
+                    {lead.budget_label && <div className="lp-detail"><span className="lp-detail__label">Budget</span><span className="lp-detail__value">{lead.budget_label}</span></div>}
+                    {lead.wedding_year && !lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Wedding year</span><span className="lp-detail__value">{lead.wedding_year}</span></div>}
+                    {!lead.event_date && !lead.event_type_label && !lead.guest_count && !lead.urgency_label && !lead.budget_label && (
+                      <p className="lp-detail__muted" style={{ gridColumn: "1 / -1" }}>Brochure download only - no questionnaire data yet.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Cross-sell */}
+                {lead.cross_sell_labels?.length > 0 && (
+                  <div className="lp-section">
+                    <h3 className="lp-section__title">Also interested in</h3>
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      {lead.cross_sell_labels.map(label => (
+                        <span key={label} className="rep-cross-sell__badge">{label}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="lp-col">
+                {/* Score breakdown */}
+                <div className="lp-section">
+                  <h3 className="lp-section__title">Score breakdown</h3>
+                  <div className="lp-score-grid">
+                    {[
+                      { label: "Stage", val: sc.breakdown.stage, max: 40, desc: sc.stageLabel },
+                      { label: "Recency", val: sc.breakdown.recency, max: 25, desc: sc.daysSinceActivity <= 1 ? "Active today" : `${sc.daysSinceActivity}d ago` },
+                      { label: "Engagement", val: sc.breakdown.engagement, max: 15, desc: `${lead.sessions_before_conversion || 0} sessions, ${lead.total_page_views || 0} pages` },
+                      { label: "Date", val: sc.breakdown.dateProximity, max: 10, desc: lead.event_date || "No date" },
+                      { label: "Revenue", val: sc.breakdown.revenue, max: 10, desc: [lead.budget_label, lead.guest_count ? `${lead.guest_count} guests` : null].filter(Boolean).join(", ") || "Unknown" },
+                    ].map(row => (
+                      <div key={row.label} className="lp-score-row">
+                        <span className="lp-score-row__label">{row.label}</span>
+                        <div className="lp-score-row__bar">
+                          <div className="lp-score-row__fill" style={{ width: `${(row.val / row.max) * 100}%`, background: tc.color }} />
+                        </div>
+                        <span className="lp-score-row__val">{row.val}/{row.max}</span>
+                        <span className="lp-score-row__desc">{row.desc}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Score breakdown */}
-              <div className="lp-section">
-                <h3 className="lp-section__title">Score breakdown</h3>
-                <div className="lp-score-grid">
-                  {[
-                    { label: "Stage", val: sc.breakdown.stage, max: 40, desc: sc.stageLabel },
-                    { label: "Recency", val: sc.breakdown.recency, max: 25, desc: sc.daysSinceActivity <= 1 ? "Active today" : `${sc.daysSinceActivity}d ago` },
-                    { label: "Engagement", val: sc.breakdown.engagement, max: 15, desc: `${lead.sessions_before_conversion || 0} sessions, ${lead.total_page_views || 0} pages` },
-                    { label: "Date", val: sc.breakdown.dateProximity, max: 10, desc: lead.event_date || "No date" },
-                    { label: "Revenue", val: sc.breakdown.revenue, max: 10, desc: [lead.budget_label, lead.guest_count ? `${lead.guest_count} guests` : null].filter(Boolean).join(", ") || "Unknown" },
-                  ].map(row => (
-                    <div key={row.label} className="lp-score-row">
-                      <span className="lp-score-row__label">{row.label}</span>
-                      <div className="lp-score-row__bar">
-                        <div className="lp-score-row__fill" style={{ width: `${(row.val / row.max) * 100}%`, background: tc.color }} />
-                      </div>
-                      <span className="lp-score-row__val">{row.val}/{row.max}</span>
-                      <span className="lp-score-row__desc">{row.desc}</span>
+            {/* Full journey - full width below */}
+            <div className="lp-section">
+              <h3 className="lp-section__title">
+                Full journey
+                {journey && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}> - {journey.total_sessions} session{journey.total_sessions !== 1 ? "s" : ""}, {journey.total_events} event{journey.total_events !== 1 ? "s" : ""}</span>}
+              </h3>
+              {journeyLoading && <p className="lp-detail__muted">Loading journey...</p>}
+              {!journeyLoading && !journey && <p className="lp-detail__muted">No journey data available.</p>}
+              {!journeyLoading && journey && journey.sessions.length === 0 && <p className="lp-detail__muted">No sessions recorded for this visitor.</p>}
+              {!journeyLoading && journey && journey.sessions.map((sess, si) => {
+                const pageViews = sess.events.filter(e => e.event_type === "page_view");
+                const actions = sess.events.filter(e => e.event_type !== "page_view" && e.event_type !== "scroll_depth");
+                return (
+                  <div key={sess.session_id} className="lp-journey-session">
+                    <div className="lp-journey-session__header">
+                      <span className="lp-journey-session__num">Session {si + 1}</span>
+                      <span className="lp-journey-session__date">{formatAbsoluteTime(sess.started_at)}</span>
+                      {sess.duration != null && <span className="lp-journey-session__dur">{formatDuration(sess.duration)}</span>}
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Event / form details */}
-              <div className="lp-section">
-                <h3 className="lp-section__title">Event details</h3>
-                <div className="lp-detail-grid">
-                  {lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Event date</span><span className="lp-detail__value">{lead.event_date}</span></div>}
-                  {lead.event_type_label && <div className="lp-detail"><span className="lp-detail__label">Event type</span><span className="lp-detail__value">{lead.event_type_label}</span></div>}
-                  {lead.guest_count && <div className="lp-detail"><span className="lp-detail__label">Guests</span><span className="lp-detail__value">{lead.guest_count}</span></div>}
-                  {lead.urgency_label && <div className="lp-detail"><span className="lp-detail__label">Urgency</span><span className="lp-detail__value">{lead.urgency_label}</span></div>}
-                  {lead.budget_label && <div className="lp-detail"><span className="lp-detail__label">Budget</span><span className="lp-detail__value">{lead.budget_label}</span></div>}
-                  {lead.wedding_year && !lead.event_date && <div className="lp-detail"><span className="lp-detail__label">Wedding year</span><span className="lp-detail__value">{lead.wedding_year}</span></div>}
-                  {!lead.event_date && !lead.event_type_label && !lead.guest_count && !lead.urgency_label && !lead.budget_label && (
-                    <p className="lp-detail__muted" style={{ gridColumn: "1 / -1" }}>Brochure download only - no questionnaire data yet.</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Full journey */}
-              <div className="lp-section">
-                <h3 className="lp-section__title">
-                  Full journey
-                  {journey && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}> - {journey.total_sessions} session{journey.total_sessions !== 1 ? "s" : ""}, {journey.total_events} event{journey.total_events !== 1 ? "s" : ""}</span>}
-                </h3>
-                {journeyLoading && <p className="lp-detail__muted">Loading journey...</p>}
-                {!journeyLoading && !journey && <p className="lp-detail__muted">No journey data available.</p>}
-                {!journeyLoading && journey && journey.sessions.length === 0 && <p className="lp-detail__muted">No sessions recorded for this visitor.</p>}
-                {!journeyLoading && journey && journey.sessions.map((sess, si) => {
-                  const pageViews = sess.events.filter(e => e.event_type === "page_view");
-                  const actions = sess.events.filter(e => e.event_type !== "page_view" && e.event_type !== "scroll_depth");
-                  return (
-                    <div key={sess.session_id} className="lp-journey-session">
-                      {/* Session header */}
-                      <div className="lp-journey-session__header">
-                        <span className="lp-journey-session__num">Session {si + 1}</span>
-                        <span className="lp-journey-session__date">{formatAbsoluteTime(sess.started_at)}</span>
-                        {sess.duration != null && <span className="lp-journey-session__dur">{formatDuration(sess.duration)}</span>}
+                    <div className="lp-journey-session__source">
+                      {sess.ad_platform && <span className="lp-journey-tag lp-journey-tag--platform">{sess.ad_platform}</span>}
+                      <span className="lp-journey-tag">{sess.source}</span>
+                      {sess.campaign && <span className="lp-journey-tag">{sess.campaign}</span>}
+                      {sess.keyword && <span className="lp-journey-tag lp-journey-tag--keyword">{sess.keyword}</span>}
+                      {sess.device_type && <span className="lp-journey-tag">{sess.device_type}</span>}
+                    </div>
+                    {Object.keys(sess.click_ids).length > 0 && (
+                      <div className="lp-journey-session__clickids">
+                        {Object.entries(sess.click_ids).map(([k, v]) => (
+                          <span key={k} className="lp-journey-clickid" title={v}>{k}</span>
+                        ))}
                       </div>
-                      {/* Source attribution for this session */}
-                      <div className="lp-journey-session__source">
-                        {sess.ad_platform && <span className="lp-journey-tag lp-journey-tag--platform">{sess.ad_platform}</span>}
-                        <span className="lp-journey-tag">{sess.source}</span>
-                        {sess.campaign && <span className="lp-journey-tag">{sess.campaign}</span>}
-                        {sess.keyword && <span className="lp-journey-tag lp-journey-tag--keyword">{sess.keyword}</span>}
-                        {sess.device_type && <span className="lp-journey-tag">{sess.device_type}</span>}
-                      </div>
-                      {/* Click IDs if any */}
-                      {Object.keys(sess.click_ids).length > 0 && (
-                        <div className="lp-journey-session__clickids">
-                          {Object.entries(sess.click_ids).map(([k, v]) => (
-                            <span key={k} className="lp-journey-clickid" title={v}>{k}</span>
-                          ))}
-                        </div>
-                      )}
-                      {/* Pages visited */}
-                      <div className="lp-journey-pages">
-                        {pageViews.map((ev, ei) => {
-                          const nextEv = pageViews[ei + 1];
-                          let timeOnPage = null;
-                          if (nextEv) {
-                            const t1 = new Date(ev.created_at.replace(" ", "T") + "Z").getTime();
-                            const t2 = new Date(nextEv.created_at.replace(" ", "T") + "Z").getTime();
-                            timeOnPage = Math.round((t2 - t1) / 1000);
-                          }
-                          const path = (() => { try { return new URL(ev.page_url, "https://x").pathname; } catch { return ev.page_url; } })();
+                    )}
+                    <div className="lp-journey-pages">
+                      {pageViews.map((ev, ei) => {
+                        const nextEv = pageViews[ei + 1];
+                        let timeOnPage = null;
+                        if (nextEv) {
+                          const t1 = new Date(ev.created_at.replace(" ", "T") + "Z").getTime();
+                          const t2 = new Date(nextEv.created_at.replace(" ", "T") + "Z").getTime();
+                          timeOnPage = Math.round((t2 - t1) / 1000);
+                        }
+                        const path = (() => { try { return new URL(ev.page_url, "https://x").pathname; } catch { return ev.page_url; } })();
+                        return (
+                          <div key={ev.event_id} className="lp-journey-page">
+                            <span className="lp-journey-page__time">{formatTime(ev.created_at)}</span>
+                            <span className="lp-journey-page__path">{path}</span>
+                            {timeOnPage != null && <span className="lp-journey-page__dur">{formatDuration(timeOnPage)}</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {actions.length > 0 && (
+                      <div className="lp-journey-actions">
+                        {actions.map(ev => {
+                          const label = JOURNEY_EVENT_LABELS[ev.event_type] || ev.event_type;
+                          const data = parseEventData(ev.event_data);
+                          let detail = "";
+                          if (ev.event_type === "cta_click" && data?.track_id) detail = data.track_id;
+                          if (ev.event_type === "date_check" && data?.date) detail = data.date;
+                          if (ev.event_type === "questionnaire_complete") detail = "All steps finished";
+                          if (ev.event_type === "form_submit" && data?.form_type) detail = FORM_TYPE_LABELS[data.form_type] || data.form_type;
                           return (
-                            <div key={ev.event_id} className="lp-journey-page">
-                              <span className="lp-journey-page__time">{formatTime(ev.created_at)}</span>
-                              <span className="lp-journey-page__path">{path}</span>
-                              {timeOnPage != null && <span className="lp-journey-page__dur">{formatDuration(timeOnPage)}</span>}
+                            <div key={ev.event_id} className="lp-journey-action">
+                              <span className="lp-journey-action__dot" />
+                              <span className="lp-journey-action__time">{formatTime(ev.created_at)}</span>
+                              <span className="lp-journey-action__label">{label}</span>
+                              {detail && <span className="lp-journey-action__detail">{detail}</span>}
                             </div>
                           );
                         })}
                       </div>
-                      {/* Key actions during this session */}
-                      {actions.length > 0 && (
-                        <div className="lp-journey-actions">
-                          {actions.map(ev => {
-                            const label = JOURNEY_EVENT_LABELS[ev.event_type] || ev.event_type;
-                            const data = parseEventData(ev.event_data);
-                            let detail = "";
-                            if (ev.event_type === "cta_click" && data?.track_id) detail = data.track_id;
-                            if (ev.event_type === "date_check" && data?.date) detail = data.date;
-                            if (ev.event_type === "questionnaire_complete") detail = "All steps finished";
-                            if (ev.event_type === "form_submit" && data?.form_type) detail = FORM_TYPE_LABELS[data.form_type] || data.form_type;
-                            return (
-                              <div key={ev.event_id} className="lp-journey-action">
-                                <span className="lp-journey-action__dot" />
-                                <span className="lp-journey-action__time">{formatTime(ev.created_at)}</span>
-                                <span className="lp-journey-action__label">{label}</span>
-                                {detail && <span className="lp-journey-action__detail">{detail}</span>}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Cross-sell */}
-              {lead.cross_sell_labels?.length > 0 && (
-                <div className="lp-section">
-                  <h3 className="lp-section__title">Also interested in</h3>
-                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                    {lead.cross_sell_labels.map(label => (
-                      <span key={label} className="rep-cross-sell__badge">{label}</span>
-                    ))}
+                    )}
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
-          </>
+          </div>
         );
       })()}
     </div>
