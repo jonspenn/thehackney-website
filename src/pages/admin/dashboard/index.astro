@@ -759,13 +759,13 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
 
       /* ── Dialog (backdrop + card) ── */
       .lp-dialog-backdrop {
-        position: fixed; inset: 0; background: rgba(44,24,16,0.25); z-index: 100;
+        position: fixed; inset: 0; background: rgba(44,24,16,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 100;
         display: flex; align-items: center; justify-content: center;
       }
       .lp-dialog {
-        background: var(--warm-canvas); border-radius: 8px; padding: 24px;
-        min-width: 380px; max-width: 480px; box-shadow: 0 8px 32px rgba(44,24,16,0.15);
-        border: 1px solid var(--border-warm);
+        background: #F5F0E8; border-radius: 8px; padding: 24px;
+        min-width: 380px; max-width: 480px; box-shadow: 0 12px 40px rgba(44,24,16,0.3);
+        border: 1px solid rgba(44,24,16,0.12);
       }
       .lp-dialog--won { min-width: 420px; }
       .lp-dialog__title {
