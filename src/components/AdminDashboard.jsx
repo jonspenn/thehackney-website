@@ -584,10 +584,12 @@ export default function AdminDashboard() {
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
   const [journey, setJourney] = useState(null); // journey data for selected lead
   const [journeyLoading, setJourneyLoading] = useState(false);
+  const [expandedSessions, setExpandedSessions] = useState(new Set()); // collapsed by default
 
   function selectLead(lead) {
     setSelectedLead(lead);
     setJourney(null);
+    setExpandedSessions(new Set());
     if (lead?.contact_id) {
       setJourneyLoading(true);
       fetch(`/api/lead-journey?contact_id=${encodeURIComponent(lead.contact_id)}`, { cache: "no-store" })
@@ -1772,82 +1774,109 @@ export default function AdminDashboard() {
 
             {/* Full journey - full width below */}
             <div className="lp-section">
-              <h3 className="lp-section__title">
-                Full journey
-                {journey && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}> - {journey.total_sessions} session{journey.total_sessions !== 1 ? "s" : ""}, {journey.total_events} event{journey.total_events !== 1 ? "s" : ""}</span>}
-              </h3>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <h3 className="lp-section__title" style={{ margin: 0 }}>
+                  Full journey
+                  {journey && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}> - {journey.total_sessions} session{journey.total_sessions !== 1 ? "s" : ""}, {journey.total_events} event{journey.total_events !== 1 ? "s" : ""}</span>}
+                </h3>
+                {journey && journey.sessions.length > 0 && (
+                  <button type="button" className="lp-journey-expand-btn" onClick={() => {
+                    if (expandedSessions.size === journey.sessions.length) {
+                      setExpandedSessions(new Set());
+                    } else {
+                      setExpandedSessions(new Set(journey.sessions.map(s => s.session_id)));
+                    }
+                  }}>
+                    {expandedSessions.size === journey.sessions.length ? "Collapse all" : "Expand all"}
+                  </button>
+                )}
+              </div>
               {journeyLoading && <p className="lp-detail__muted">Loading journey...</p>}
               {!journeyLoading && !journey && <p className="lp-detail__muted">No journey data available.</p>}
               {!journeyLoading && journey && journey.sessions.length === 0 && <p className="lp-detail__muted">No sessions recorded for this visitor.</p>}
               {!journeyLoading && journey && journey.sessions.map((sess, si) => {
                 const pageViews = sess.events.filter(e => e.event_type === "page_view");
                 const actions = sess.events.filter(e => e.event_type !== "page_view" && e.event_type !== "scroll_depth");
+                const isOpen = expandedSessions.has(sess.session_id);
+                const pageSummary = pageViews.length + " page" + (pageViews.length !== 1 ? "s" : "");
+                const actionSummary = actions.length > 0 ? ", " + actions.length + " action" + (actions.length !== 1 ? "s" : "") : "";
                 return (
-                  <div key={sess.session_id} className="lp-journey-session">
-                    <div className="lp-journey-session__header">
+                  <div key={sess.session_id} className={"lp-journey-session" + (isOpen ? " lp-journey-session--open" : "")}>
+                    <button type="button" className="lp-journey-session__header" onClick={() => setExpandedSessions(prev => { const next = new Set(prev); if (next.has(sess.session_id)) next.delete(sess.session_id); else next.add(sess.session_id); return next; })}>
+                      <span className="lp-journey-session__chevron">{isOpen ? "\u25BC" : "\u25B6"}</span>
                       <span className="lp-journey-session__num">Session {si + 1}</span>
                       <span className="lp-journey-session__date">{formatAbsoluteTime(sess.started_at)}</span>
+                      <span className="lp-journey-session__source-inline">
+                        {sess.ad_platform && <span className="lp-journey-tag lp-journey-tag--platform">{sess.ad_platform}</span>}
+                        <span className="lp-journey-tag">{sess.source}</span>
+                        {sess.device_type && <span className="lp-journey-tag">{sess.device_type}</span>}
+                      </span>
+                      {!isOpen && <span className="lp-journey-session__summary">{pageSummary}{actionSummary}</span>}
                       {sess.duration != null && <span className="lp-journey-session__dur">{formatDuration(sess.duration)}</span>}
-                    </div>
-                    <div className="lp-journey-session__source">
-                      {sess.ad_platform && <span className="lp-journey-tag lp-journey-tag--platform">{sess.ad_platform}</span>}
-                      <span className="lp-journey-tag">{sess.source}</span>
-                      {sess.campaign && <span className="lp-journey-tag">{sess.campaign}</span>}
-                      {sess.keyword && <span className="lp-journey-tag lp-journey-tag--keyword">{sess.keyword}</span>}
-                      {sess.device_type && <span className="lp-journey-tag">{sess.device_type}</span>}
-                    </div>
-                    {Object.keys(sess.click_ids).length > 0 && (
-                      <div className="lp-journey-session__clickids">
-                        {Object.entries(sess.click_ids).map(([k, v]) => (
-                          <span key={k} className="lp-journey-clickid" title={v}>{k}</span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="lp-journey-pages">
-                      {pageViews.map((ev, ei) => {
-                        const nextEv = pageViews[ei + 1];
-                        let timeOnPage = null;
-                        if (nextEv) {
-                          const t1 = new Date(ev.created_at.replace(" ", "T") + (ev.created_at.includes("Z") ? "" : "Z")).getTime();
-                          const t2 = new Date(nextEv.created_at.replace(" ", "T") + (nextEv.created_at.includes("Z") ? "" : "Z")).getTime();
-                          const diff = Math.round((t2 - t1) / 1000);
-                          if (Number.isFinite(diff) && diff >= 0) timeOnPage = diff;
-                        }
-                        const path = (() => { try { return new URL(ev.page_url, "https://x").pathname; } catch { return ev.page_url; } })();
-                        return (
-                          <div key={ev.event_id} className="lp-journey-page">
-                            <span className="lp-journey-page__time">{formatTime(ev.created_at)}</span>
-                            <span className="lp-journey-page__path">{path}</span>
-                            {timeOnPage != null && <span className="lp-journey-page__dur">{formatDuration(timeOnPage)}</span>}
+                    </button>
+                    {isOpen && (
+                      <>
+                        <div className="lp-journey-session__source">
+                          {sess.ad_platform && <span className="lp-journey-tag lp-journey-tag--platform">{sess.ad_platform}</span>}
+                          <span className="lp-journey-tag">{sess.source}</span>
+                          {sess.campaign && <span className="lp-journey-tag">{sess.campaign}</span>}
+                          {sess.keyword && <span className="lp-journey-tag lp-journey-tag--keyword">{sess.keyword}</span>}
+                          {sess.device_type && <span className="lp-journey-tag">{sess.device_type}</span>}
+                        </div>
+                        {Object.keys(sess.click_ids).length > 0 && (
+                          <div className="lp-journey-session__clickids">
+                            {Object.entries(sess.click_ids).map(([k, v]) => (
+                              <span key={k} className="lp-journey-clickid" title={v}>{k}</span>
+                            ))}
                           </div>
-                        );
-                      })}
-                    </div>
-                    {actions.length > 0 && (
-                      <div className="lp-journey-actions">
-                        {actions.map(ev => {
-                          let label = JOURNEY_EVENT_LABELS[ev.event_type] || ev.event_type;
-                          const data = parseEventData(ev.event_data);
-                          let detail = "";
-                          if (ev.event_type === "cta_click") {
-                            const ctaName = data?.cta_text || data?.track_id || data?.cta_id || "";
-                            const page = ev.page_url ? shortenUrl(ev.page_url) : "";
-                            label = ctaName ? `Clicked "${ctaName}"` : "Clicked CTA";
-                            if (page) detail = `on ${page}`;
-                          }
-                          if (ev.event_type === "date_check" && data?.date) detail = data.date;
-                          if (ev.event_type === "questionnaire_complete") detail = "All steps finished";
-                          if (ev.event_type === "form_submit" && data?.form_type) detail = FORM_TYPE_LABELS[data.form_type] || data.form_type;
-                          return (
-                            <div key={ev.event_id} className="lp-journey-action">
-                              <span className="lp-journey-action__dot" />
-                              <span className="lp-journey-action__time">{formatTime(ev.created_at)}</span>
-                              <span className="lp-journey-action__label">{label}</span>
-                              {detail && <span className="lp-journey-action__detail">{detail}</span>}
-                            </div>
-                          );
-                        })}
-                      </div>
+                        )}
+                        <div className="lp-journey-pages">
+                          {pageViews.map((ev, ei) => {
+                            const nextEv = pageViews[ei + 1];
+                            let timeOnPage = null;
+                            if (nextEv) {
+                              const t1 = new Date(ev.created_at.replace(" ", "T") + (ev.created_at.includes("Z") ? "" : "Z")).getTime();
+                              const t2 = new Date(nextEv.created_at.replace(" ", "T") + (nextEv.created_at.includes("Z") ? "" : "Z")).getTime();
+                              const diff = Math.round((t2 - t1) / 1000);
+                              if (Number.isFinite(diff) && diff >= 0) timeOnPage = diff;
+                            }
+                            const path = (() => { try { return new URL(ev.page_url, "https://x").pathname; } catch { return ev.page_url; } })();
+                            return (
+                              <div key={ev.event_id} className="lp-journey-page">
+                                <span className="lp-journey-page__time">{formatTime(ev.created_at)}</span>
+                                <span className="lp-journey-page__path">{path}</span>
+                                {timeOnPage != null && <span className="lp-journey-page__dur">{formatDuration(timeOnPage)}</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {actions.length > 0 && (
+                          <div className="lp-journey-actions">
+                            {actions.map(ev => {
+                              let label = JOURNEY_EVENT_LABELS[ev.event_type] || ev.event_type;
+                              const data = parseEventData(ev.event_data);
+                              let detail = "";
+                              if (ev.event_type === "cta_click") {
+                                const ctaName = data?.cta_text || data?.track_id || data?.cta_id || "";
+                                const page = ev.page_url ? shortenUrl(ev.page_url) : "";
+                                label = ctaName ? `Clicked "${ctaName}"` : "Clicked CTA";
+                                if (page) detail = `on ${page}`;
+                              }
+                              if (ev.event_type === "date_check" && data?.date) detail = data.date;
+                              if (ev.event_type === "questionnaire_complete") detail = "All steps finished";
+                              if (ev.event_type === "form_submit" && data?.form_type) detail = FORM_TYPE_LABELS[data.form_type] || data.form_type;
+                              return (
+                                <div key={ev.event_id} className="lp-journey-action">
+                                  <span className="lp-journey-action__dot" />
+                                  <span className="lp-journey-action__time">{formatTime(ev.created_at)}</span>
+                                  <span className="lp-journey-action__label">{label}</span>
+                                  {detail && <span className="lp-journey-action__detail">{detail}</span>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 );

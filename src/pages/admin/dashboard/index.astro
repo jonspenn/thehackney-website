@@ -870,10 +870,42 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       /* ── Journey view ── */
       .lp-journey-session {
         border: 1px solid rgba(44,24,16,0.1); border-radius: 6px;
-        padding: 16px; margin-bottom: 16px; background: rgba(44,24,16,0.015);
+        padding: 0; margin-bottom: 8px; background: rgba(44,24,16,0.015);
+        overflow: hidden;
+      }
+      .lp-journey-session--open {
+        padding-bottom: 16px; margin-bottom: 16px;
       }
       .lp-journey-session__header {
-        display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;
+        display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        width: 100%; padding: 12px 16px; margin: 0; border: none; background: none;
+        cursor: pointer; text-align: left; font: inherit; color: inherit;
+        transition: background 0.15s;
+      }
+      .lp-journey-session__header:hover {
+        background: rgba(44,24,16,0.03);
+      }
+      .lp-journey-session--open .lp-journey-session__header {
+        margin-bottom: 10px; border-bottom: 1px solid rgba(44,24,16,0.06);
+      }
+      .lp-journey-session__chevron {
+        font-size: 9px; color: rgba(44,24,16,0.35); flex-shrink: 0; width: 12px;
+      }
+      .lp-journey-session__source-inline {
+        display: flex; gap: 4px; align-items: center;
+      }
+      .lp-journey-session__source-inline .lp-journey-tag {
+        font-size: 10px; padding: 1px 6px;
+      }
+      .lp-journey-session__summary {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(44,24,16,0.4);
+        margin-left: auto; white-space: nowrap;
+      }
+      .lp-journey-session--open .lp-journey-session__source,
+      .lp-journey-session--open .lp-journey-session__clickids,
+      .lp-journey-session--open .lp-journey-pages,
+      .lp-journey-session--open .lp-journey-actions {
+        padding-left: 16px; padding-right: 16px;
       }
       .lp-journey-session__num {
         font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
@@ -944,6 +976,13 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lp-journey-action__detail {
         font-size: 11px; color: rgba(44,24,16,0.4);
       }
+      .lp-journey-expand-btn {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+        color: #49590E; background: rgba(73,89,14,0.06); border: 1px solid rgba(73,89,14,0.15);
+        padding: 4px 12px; border-radius: 3px; cursor: pointer; white-space: nowrap;
+        transition: background 0.15s;
+      }
+      .lp-journey-expand-btn:hover { background: rgba(73,89,14,0.12); }
 
       @media (max-width: 480px) {
         .rep-shell { padding: 24px 16px 64px; }
