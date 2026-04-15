@@ -48,10 +48,10 @@ export async function onRequest(context) {
     const contactId = "c_hs_" + c.e.replace(/[^a-z0-9]/g, "").slice(0, 20);
 
     try {
-      // Create visitor record (required by FK constraint)
+      // Create visitor record (required by FK constraint on contacts.visitor_id)
       await env.DB.prepare(
-        `INSERT OR IGNORE INTO visitors (visitor_id, first_seen_at, last_seen_at, session_count)
-         VALUES (?, ?, ?, 1)`
+        `INSERT OR IGNORE INTO visitors (visitor_id, first_seen_at, last_seen_at, total_sessions, total_page_views)
+         VALUES (?, ?, ?, 0, 0)`
       ).bind(visitorId, c.wa + "T00:00:00Z", c.wa + "T00:00:00Z").run();
 
       // Create contact as customer
