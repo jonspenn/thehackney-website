@@ -107,7 +107,22 @@ export async function onRequestGet(context) {
     return json({ error: "Add ?confirm=yes to run. This inserts ~50 test contacts." }, 400);
   }
 
-  const results = { inserted: 0, errors: [] };
+  // ── Step 0: Clean up any previous test data ──
+  const cleanup = { contacts: 0, submissions: 0 };
+  try {
+    const delSub = await env.DB.prepare(
+      `DELETE FROM submissions WHERE email LIKE '%.test@example.com'`
+    ).run();
+    cleanup.submissions = delSub.meta?.changes || 0;
+    const delCon = await env.DB.prepare(
+      `DELETE FROM contacts WHERE email LIKE '%.test@example.com'`
+    ).run();
+    cleanup.contacts = delCon.meta?.changes || 0;
+  } catch (e) {
+    cleanup.error = e.message;
+  }
+
+  const results = { inserted: 0, errors: [], contactInserts: 0, submissionInserts: 0 };
 
   async function insertLead(lead, leadType, formType) {
     const contactId = id();
@@ -115,10 +130,10 @@ export async function onRequestGet(context) {
     const createdAt = iso(lead.daysAgo);
     const lastSeen = iso(Math.min(lead.daysAgo, 2));
 
+    // Insert contact (plain INSERT, no OR IGNORE - errors are caught explicitly)
     try {
-      // Insert contact
       await env.DB.prepare(`
-        INSERT OR IGNORE INTO contacts (
+        INSERT INTO contacts (
           contact_id, email, first_name, last_name, phone, company,
           lead_type, source_channel, source_keyword, source_campaign,
           gclid, fbclid,
@@ -182,8 +197,13 @@ export async function onRequestGet(context) {
         lead.hireFee ? "sat" : null,
         createdAt
       ).run();
+      results.contactInserts++;
+    } catch (err) {
+      results.errors.push(`CONTACT ${lead.email}: ${err.message}`);
+    }
 
-      // Insert submission
+    // Insert submission (separate try/catch so we see both errors)
+    try {
       const formData = {};
       if (lead.urgency) formData.booking_urgency = lead.urgency;
       if (lead.budget) formData.budget = lead.budget;
@@ -209,11 +229,12 @@ export async function onRequestGet(context) {
         lead.budget || null, leadType === "wedding" ? "wedding" : null, lead.weddingYear || null,
         lead.company || null, lead.first, lead.email, lead.phone || null
       ).run();
-
-      results.inserted++;
+      results.submissionInserts++;
     } catch (err) {
-      results.errors.push(`${lead.email}: ${err.message}`);
+      results.errors.push(`SUBMISSION ${lead.email}: ${err.message}`);
     }
+
+    if (results.contactInserts > 0 || results.submissionInserts > 0) results.inserted++;
   }
 
   // Insert all leads
@@ -235,8 +256,11 @@ export async function onRequestGet(context) {
 
   return json({
     ok: true,
-    message: `Inserted ${results.inserted} test leads`,
-    errors: results.errors.length > 0 ? results.errors : undefined,
+    cleanup,
+    contacts_created: results.contactInserts,
+    submissions_created: results.submissionInserts,
+    total_leads: results.inserted,
+    errors: results.errors.length > 0 ? results.errors : "none",
     note: "DELETE functions/api/seed-test-data.js after testing!",
   });
 }
