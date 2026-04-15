@@ -175,6 +175,9 @@ const MIGRATIONS = [
   { name: "ct_add_deal_value", sql: `ALTER TABLE contacts ADD COLUMN deal_value INTEGER` },
   { name: "ct_add_rate_card_tier", sql: `ALTER TABLE contacts ADD COLUMN rate_card_tier TEXT` },
 
+  // Soft delete
+  { name: "ct_add_deleted_at", sql: `ALTER TABLE contacts ADD COLUMN deleted_at TEXT` },
+
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,

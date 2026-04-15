@@ -467,6 +467,57 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         font-size: 12px;
         color: var(--color-dusty-coral);
         border-top: 1px solid var(--border-subtle);
+        display: flex; align-items: center; justify-content: space-between;
+      }
+      .lead-toolbar__recycle-btn {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+        padding: 4px 10px; border-radius: 4px; cursor: pointer;
+        background: none; border: 1px solid rgba(44,24,16,0.15); color: rgba(44,24,16,0.5);
+        transition: all 0.15s;
+      }
+      .lead-toolbar__recycle-btn:hover { border-color: rgba(44,24,16,0.3); color: rgba(44,24,16,0.7); }
+      .lead-toolbar__recycle-btn--active { background: rgba(44,24,16,0.06); color: #2C1810; border-color: rgba(44,24,16,0.2); }
+
+      /* Selection action bar */
+      .lead-panel__actions {
+        display: flex; align-items: center; gap: 12px;
+        padding: 8px 16px; background: rgba(140,71,46,0.06);
+        border-top: 1px solid rgba(140,71,46,0.15);
+        font-family: 'DM Sans', sans-serif; font-size: 12px;
+      }
+      .lead-panel__actions-count { font-weight: 700; color: #2C1810; }
+      .lead-panel__delete-btn {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+        padding: 5px 14px; border-radius: 4px; cursor: pointer;
+        background: #8C472E; color: #fff; border: none;
+      }
+      .lead-panel__delete-btn:hover { background: #6e3722; }
+      .lead-panel__restore-btn {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+        padding: 5px 14px; border-radius: 4px; cursor: pointer;
+        background: #2E4009; color: #fff; border: none;
+      }
+      .lead-panel__restore-btn:hover { background: #1f2d06; }
+      .lead-panel__confirm {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 12px; color: #2C1810;
+      }
+      .lead-panel__confirm-yes {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+        padding: 4px 12px; border-radius: 4px; cursor: pointer;
+        background: #8C472E; color: #fff; border: none;
+      }
+      .lead-panel__confirm-yes:hover { background: #6e3722; }
+      .lead-panel__confirm-yes--final { background: #6e3722; }
+      .lead-panel__confirm-yes--final:hover { background: #4a2517; }
+      .lead-panel__confirm-no {
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+        padding: 4px 12px; border-radius: 4px; cursor: pointer;
+        background: none; border: 1px solid rgba(44,24,16,0.2); color: rgba(44,24,16,0.6);
+      }
+      .lead-panel__confirm-no:hover { border-color: rgba(44,24,16,0.4); }
+      .lead-checkbox {
+        width: 15px; height: 15px; cursor: pointer; accent-color: #2E4009;
       }
 
       /* ── Cross-sell badges ── */

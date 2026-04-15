@@ -75,6 +75,7 @@ export async function onRequestGet(context) {
   const { env, request } = context;
   const url = new URL(request.url);
   const leadType = url.searchParams.get("type") || "wedding";
+  const showDeleted = url.searchParams.get("deleted") === "1";
 
   if (!VALID_TYPES.includes(leadType)) {
     return new Response(
@@ -114,12 +115,13 @@ export async function onRequestGet(context) {
         c.lost_at, c.lost_reason, c.lost_reason_note,
         c.cancelled_at, c.noshow_at,
         c.hire_fee, c.min_spend, c.deal_value, c.rate_card_tier,
+        c.deleted_at,
         s.form_type, s.form_data as submission_form_data, s.created_at as submitted_at,
         s.event_type, s.booking_urgency, s.guest_count, s.budget,
         s.wedding_year, s.event_date, s.brochure_type
       FROM contacts c
       LEFT JOIN submissions s ON s.contact_id = c.contact_id
-      WHERE c.lead_type = ?
+      WHERE c.lead_type = ? AND ${showDeleted ? "c.deleted_at IS NOT NULL" : "c.deleted_at IS NULL"}
       ORDER BY c.created_at DESC
       LIMIT 500
     `).bind(leadType).all();
@@ -230,6 +232,8 @@ export async function onRequestGet(context) {
           lost_reason_note: row.lost_reason_note || null,
           cancelled_at: row.cancelled_at || null,
           noshow_at: row.noshow_at || null,
+          // Soft delete
+          deleted_at: row.deleted_at || null,
           // Deal value
           hire_fee: row.hire_fee || null,
           min_spend: row.min_spend || null,

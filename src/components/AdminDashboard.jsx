@@ -40,6 +40,8 @@ export default function AdminDashboard() {
   const [journey, setJourney] = useState(null); // journey data for selected lead
   const [journeyLoading, setJourneyLoading] = useState(false);
   const [showFullJourney, setShowFullJourney] = useState(false); // full session log hidden by default
+  const [showRecycleBin, setShowRecycleBin] = useState(false);
+  const [deletedLeads, setDeletedLeads] = useState({}); // keyed by lead type
 
   function selectLead(lead, leadType) {
     setSelectedLead(lead);
@@ -54,6 +56,38 @@ export default function AdminDashboard() {
         .catch(() => {})
         .finally(() => setJourneyLoading(false));
     }
+  }
+
+  async function fetchDeletedLeads() {
+    const leadTypes = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
+    const results = await Promise.all(
+      leadTypes.map(t => fetch(`/api/leads?type=${t}&deleted=1`, { cache: "no-store" }).catch(() => null))
+    );
+    const data = {};
+    for (let i = 0; i < leadTypes.length; i++) {
+      if (results[i] && results[i].ok) {
+        const lj = await results[i].json();
+        if (lj.ok) data[leadTypes[i]] = lj;
+      }
+    }
+    setDeletedLeads(data);
+  }
+
+  async function handleDeleteOrRestore() {
+    // Refresh both active leads and deleted leads
+    const leadTypes = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
+    const [activeResults, deletedResults] = await Promise.all([
+      Promise.all(leadTypes.map(t => fetch(`/api/leads?type=${t}`, { cache: "no-store" }).catch(() => null))),
+      Promise.all(leadTypes.map(t => fetch(`/api/leads?type=${t}&deleted=1`, { cache: "no-store" }).catch(() => null))),
+    ]);
+    const activeData = {};
+    const delData = {};
+    for (let i = 0; i < leadTypes.length; i++) {
+      if (activeResults[i]?.ok) { const lj = await activeResults[i].json(); if (lj.ok) activeData[leadTypes[i]] = lj; }
+      if (deletedResults[i]?.ok) { const lj = await deletedResults[i].json(); if (lj.ok) delData[leadTypes[i]] = lj; }
+    }
+    setLeads(activeData);
+    setDeletedLeads(delData);
   }
 
   async function handleStatusChange(result) {
@@ -512,9 +546,18 @@ export default function AdminDashboard() {
       {activeTab === "leads" && !selectedLead && (
         <LeadTable
           leads={leads}
+          deletedLeads={deletedLeads}
           selectedLeadId={selectedLead?.contact_id}
           onSelectLead={selectLead}
           onLeadTypeChange={setActiveLeadType}
+          onDelete={handleDeleteOrRestore}
+          onRestore={handleDeleteOrRestore}
+          showRecycleBin={showRecycleBin}
+          onToggleRecycleBin={() => {
+            const next = !showRecycleBin;
+            setShowRecycleBin(next);
+            if (next) fetchDeletedLeads();
+          }}
         />
       )}
 

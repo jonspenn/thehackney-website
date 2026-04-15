@@ -17,13 +17,16 @@ import {
   computeLeadScore, computeFunnelStage, resolveSource,
 } from "./utils.js";
 
-export default function LeadTable({ leads, selectedLeadId, onSelectLead, onLeadTypeChange }) {
+export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelectLead, onLeadTypeChange, onDelete, onRestore, showRecycleBin, onToggleRecycleBin }) {
   const [activeLeadType, setActiveLeadType] = useState("wedding");
   const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
   const [heatFilter, setHeatFilter] = useState("all");
   const [breakdownFilter, setBreakdownFilter] = useState(null);
   const [leadSearch, setLeadSearch] = useState("");
   const [leadSearchDraft, setLeadSearchDraft] = useState("");
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // null | "confirm1" | "confirm2"
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   function changeLeadType(type) {
     setActiveLeadType(type);
@@ -32,13 +35,77 @@ export default function LeadTable({ leads, selectedLeadId, onSelectLead, onLeadT
     setBreakdownFilter(null);
     setLeadSearch("");
     setLeadSearchDraft("");
+    setSelectedIds(new Set());
+    setDeleteConfirm(null);
     if (onLeadTypeChange) onLeadTypeChange(type);
+  }
+
+  function toggleSelect(id) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === sortedLeads.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(sortedLeads.map(l => l.contact_id)));
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteConfirm || selectedIds.size === 0) return;
+    if (deleteConfirm === "confirm1") {
+      setDeleteConfirm("confirm2");
+      return;
+    }
+    // confirm2 - actually delete
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/lead-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contact_ids: [...selectedIds], action: "delete" }),
+      });
+      if (res.ok) {
+        setSelectedIds(new Set());
+        setDeleteConfirm(null);
+        if (onDelete) onDelete();
+      }
+    } catch (err) {
+      console.error("[lead-delete]", err);
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
+  async function handleRestore() {
+    if (selectedIds.size === 0) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/lead-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contact_ids: [...selectedIds], action: "restore" }),
+      });
+      if (res.ok) {
+        setSelectedIds(new Set());
+        if (onRestore) onRestore();
+      }
+    } catch (err) {
+      console.error("[lead-restore]", err);
+    } finally {
+      setDeleteLoading(false);
+    }
   }
 
   // Notify parent of initial type on first render
   useMemo(() => { if (onLeadTypeChange) onLeadTypeChange(activeLeadType); }, []);
 
-  const currentLeads = leads[activeLeadType];
+  const currentLeads = showRecycleBin ? deletedLeads?.[activeLeadType] : leads[activeLeadType];
 
   const scoredLeads = useMemo(() => {
     if (!currentLeads?.leads) return [];
@@ -217,8 +284,57 @@ export default function LeadTable({ leads, selectedLeadId, onSelectLead, onLeadT
           )}
         </div>
         <div className="lead-panel__status">
-          Showing {sortedLeads.length} of {scoredLeads.length} leads. Click a row to view full profile.
+          <span>
+            {showRecycleBin
+              ? `Recycle bin: ${sortedLeads.length} archived lead${sortedLeads.length !== 1 ? "s" : ""}.`
+              : `Showing ${sortedLeads.length} of ${scoredLeads.length} leads. Click a row to view full profile.`}
+          </span>
+          <button
+            type="button"
+            className={`lead-toolbar__recycle-btn${showRecycleBin ? " lead-toolbar__recycle-btn--active" : ""}`}
+            onClick={() => { onToggleRecycleBin?.(); setSelectedIds(new Set()); setDeleteConfirm(null); }}
+          >
+            {showRecycleBin ? "\u2190 Back to leads" : "\uD83D\uDDD1\uFE0F Recycle bin"}
+          </button>
         </div>
+        {/* Selection action bar */}
+        {selectedIds.size > 0 && (
+          <div className="lead-panel__actions">
+            <span className="lead-panel__actions-count">{selectedIds.size} selected</span>
+            {showRecycleBin ? (
+              <button
+                type="button"
+                className="lead-panel__restore-btn"
+                onClick={handleRestore}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? "Restoring\u2026" : `Restore ${selectedIds.size} lead${selectedIds.size !== 1 ? "s" : ""}`}
+              </button>
+            ) : !deleteConfirm ? (
+              <button
+                type="button"
+                className="lead-panel__delete-btn"
+                onClick={() => setDeleteConfirm("confirm1")}
+              >
+                Archive {selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""}
+              </button>
+            ) : deleteConfirm === "confirm1" ? (
+              <span className="lead-panel__confirm">
+                <span>Move {selectedIds.size} lead{selectedIds.size !== 1 ? "s" : ""} to recycle bin?</span>
+                <button type="button" className="lead-panel__confirm-yes" onClick={handleDelete}>Yes, archive</button>
+                <button type="button" className="lead-panel__confirm-no" onClick={() => setDeleteConfirm(null)}>Cancel</button>
+              </span>
+            ) : (
+              <span className="lead-panel__confirm">
+                <span style={{ fontWeight: 700 }}>Are you sure? This moves them out of the active leads list.</span>
+                <button type="button" className="lead-panel__confirm-yes lead-panel__confirm-yes--final" onClick={handleDelete} disabled={deleteLoading}>
+                  {deleteLoading ? "Archiving\u2026" : "Confirm archive"}
+                </button>
+                <button type="button" className="lead-panel__confirm-no" onClick={() => setDeleteConfirm(null)}>Cancel</button>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Leads table ── */}
@@ -230,6 +346,15 @@ export default function LeadTable({ leads, selectedLeadId, onSelectLead, onLeadT
             <table className="rep-table rep-table--sortable">
               <thead>
                 <tr>
+                  <th style={{ width: "36px", textAlign: "center" }}>
+                    <input
+                      type="checkbox"
+                      checked={sortedLeads.length > 0 && selectedIds.size === sortedLeads.length}
+                      onChange={toggleSelectAll}
+                      title="Select all"
+                      className="lead-checkbox"
+                    />
+                  </th>
                   <th onClick={() => toggleSort("score")} style={{ cursor: "pointer", width: "52px" }}>Score{sortIndicator("score")}</th>
                   <th style={{ width: "80px" }}>Stage</th>
                   <th onClick={() => toggleSort("created_at")} style={{ cursor: "pointer" }}>When{sortIndicator("created_at")}</th>
@@ -262,6 +387,15 @@ export default function LeadTable({ leads, selectedLeadId, onSelectLead, onLeadT
                       style={{ borderLeft: `4px solid ${tc.border}`, background: tc.bg, cursor: "pointer" }}
                       onClick={() => onSelectLead(lead, activeLeadType)}
                     >
+                      {/* Checkbox */}
+                      <td style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(lead.contact_id)}
+                          onChange={() => toggleSelect(lead.contact_id)}
+                          className="lead-checkbox"
+                        />
+                      </td>
                       {/* Score badge */}
                       <td>
                         <span
