@@ -665,6 +665,24 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .rep-stat--clickable { cursor: pointer; transition: all 0.15s; }
       .rep-stat--clickable:hover { border-color: rgba(73,89,14,0.3); background: rgba(73,89,14,0.04); }
       .rep-stat--active { border-color: #49590E; background: rgba(73,89,14,0.06); }
+
+      .lead-search {
+        position: relative; margin-bottom: 16px; max-width: 400px;
+      }
+      .lead-search__input {
+        width: 100%; padding: 10px 36px 10px 14px;
+        font-family: 'DM Sans', sans-serif; font-size: 14px; color: #2C1810;
+        background: #F5F0E8; border: 1px solid rgba(44,24,16,0.15);
+        border-radius: 4px; outline: none; transition: border-color 0.15s;
+      }
+      .lead-search__input::placeholder { color: rgba(44,24,16,0.35); }
+      .lead-search__input:focus { border-color: #49590E; }
+      .lead-search__clear {
+        position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; font-size: 14px; color: rgba(44,24,16,0.4);
+        cursor: pointer; padding: 4px 6px; line-height: 1;
+      }
+      .lead-search__clear:hover { color: #2C1810; }
       .breakdown-filter-bar {
         display: flex; align-items: center; gap: 12px; margin: 8px 0 16px;
         padding: 8px 14px; border-radius: 4px; background: rgba(73,89,14,0.06);

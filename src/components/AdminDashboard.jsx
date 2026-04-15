@@ -386,6 +386,7 @@ export default function AdminDashboard() {
   const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
   const [heatFilter, setHeatFilter] = useState("all"); // "all" | "hot" | "warm" | "cool" | "cold"
   const [breakdownFilter, setBreakdownFilter] = useState(null); // { field, value, label } or null
+  const [leadSearch, setLeadSearch] = useState("");
   const [analyticsFilter, setAnalyticsFilter] = useState(null); // { type, value, label } or null
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
   const [journey, setJourney] = useState(null); // journey data for selected lead
@@ -498,6 +499,15 @@ export default function AdminDashboard() {
         return val === breakdownFilter.value;
       });
     }
+    if (leadSearch.trim()) {
+      const q = leadSearch.trim().toLowerCase();
+      arr = arr.filter(l => {
+        const name = [l.first_name, l.last_name].filter(Boolean).join(" ").toLowerCase();
+        const email = (l.email || "").toLowerCase();
+        const phone = (l.phone || "").toLowerCase();
+        return name.includes(q) || email.includes(q) || phone.includes(q);
+      });
+    }
     const { field, dir } = leadSort;
     arr.sort((a, b) => {
       let va = a[field], vb = b[field];
@@ -517,7 +527,7 @@ export default function AdminDashboard() {
       return 0;
     });
     return arr;
-  }, [scoredLeads, leadSort, heatFilter, breakdownFilter]);
+  }, [scoredLeads, leadSort, heatFilter, breakdownFilter, leadSearch]);
 
   function applyAnalyticsFilter(type, value, label) {
     const current = analyticsFilter;
@@ -913,7 +923,7 @@ export default function AdminDashboard() {
               <button
                 key={lt.type}
                 className={`adm-subtab${activeLeadType === lt.type ? " adm-subtab--active" : ""}`}
-                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); setBreakdownFilter(null); }}
+                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); setBreakdownFilter(null); setLeadSearch(""); }}
                 type="button"
               >
                 {lt.label}
@@ -952,6 +962,20 @@ export default function AdminDashboard() {
                 </div>
               );
             })}
+          </div>
+
+          {/* ── Search bar ── */}
+          <div className="lead-search">
+            <input
+              type="text"
+              className="lead-search__input"
+              placeholder="Search by name, email, or phone\u2026"
+              value={leadSearch}
+              onChange={(e) => setLeadSearch(e.target.value)}
+            />
+            {leadSearch && (
+              <button className="lead-search__clear" onClick={() => setLeadSearch("")} type="button">{"\u2715"}</button>
+            )}
           </div>
 
           {/* ── Heat distribution bar ── */}
