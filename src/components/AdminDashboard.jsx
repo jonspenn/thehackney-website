@@ -279,8 +279,8 @@ const DEAD_DAYS = { wedding: 21, corporate: 14, supperclub: 10, "private-events"
 const TIER_CONFIG = {
   hot:  { label: "Hot",  color: "#8C472E", bg: "rgba(140,71,46,0.08)", border: "#8C472E" },
   warm: { label: "Warm", color: "#BF7256", bg: "rgba(191,114,86,0.06)", border: "#BF7256" },
-  cool: { label: "Cool", color: "#49590E", bg: "transparent",           border: "#49590E" },
-  cold: { label: "Cold", color: "#999",    bg: "transparent",           border: "#ccc" },
+  cool: { label: "Cool", color: "#2E4009", bg: "rgba(46,64,9,0.05)",   border: "#2E4009" },
+  cold: { label: "Cold", color: "rgba(44,24,16,0.35)", bg: "transparent", border: "rgba(44,24,16,0.15)" },
 };
 
 const STAGE_SEQUENCE = ["Brochure", "Quiz", "Call", "Tour"];
@@ -1075,7 +1075,7 @@ export default function AdminDashboard() {
                           <td>
                             <span
                               className="lead-score-badge"
-                              style={{ background: tc.color, color: "#fff" }}
+                              style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff" }}
                               title={`Stage ${sc.breakdown.stage} + Recency ${sc.breakdown.recency} + Engagement ${sc.breakdown.engagement} + Date ${sc.breakdown.dateProximity} + Revenue ${sc.breakdown.revenue}`}
                             >
                               {sc.score}
@@ -1382,7 +1382,7 @@ export default function AdminDashboard() {
             {/* Hero header */}
             <div className="lp-hero">
               <div className="lp-hero__score">
-                <span className="lead-score-badge" style={{ background: tc.color, color: "#fff", width: 64, height: 64, fontSize: 24 }}>
+                <span className="lead-score-badge" style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff", width: 64, height: 64, fontSize: 24 }}>
                   {sc.score}
                 </span>
                 <span className="lp-hero__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
@@ -1396,7 +1396,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="lp-stage-bar" style={{ marginTop: "12px" }}>
                   {STAGE_SEQUENCE.map((s, i) => (
-                    <div key={s} className={`lp-stage-step${i <= stageIdx ? " lp-stage-step--active" : ""}`} style={i <= stageIdx ? { borderColor: tc.color, background: i === stageIdx ? tc.color : "transparent", color: i === stageIdx ? "#fff" : tc.color } : {}}>
+                    <div key={s} className={`lp-stage-step${i <= stageIdx ? " lp-stage-step--active" : ""}`} style={i <= stageIdx ? { borderColor: tc.color, background: i === stageIdx ? (sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color) : "transparent", color: i === stageIdx ? (sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff") : tc.color } : {}}>
                       {s}
                     </div>
                   ))}

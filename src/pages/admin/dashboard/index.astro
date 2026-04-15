@@ -58,12 +58,17 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
     <style is:global>
       :root {
         --color-warm-canvas: #F5F0E8;
+        --color-warm-white: #FFFDF9;
         --color-brewery-dark: #2C1810;
         --color-forest-olive: #2E4009;
         --color-mid-olive: #49590E;
         --color-fired-brick: #8C472E;
         --color-dusty-coral: #BF7256;
         --color-mahogany: #40160C;
+        --border-warm: rgba(64, 22, 12, 0.10);
+        --border-subtle: rgba(64, 22, 12, 0.06);
+        --text-muted: rgba(44, 24, 16, 0.55);
+        --text-faint: rgba(44, 24, 16, 0.4);
         --serif: 'Cormorant Garamond', Georgia, serif;
         --sans: 'DM Sans', system-ui, sans-serif;
       }
@@ -138,7 +143,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         display: flex;
         gap: 4px;
         margin-bottom: 24px;
-        border-bottom: 1px solid rgba(44, 24, 16, 0.12);
+        border-bottom: 1px solid var(--border-warm);
         padding-bottom: 0;
         align-items: flex-end;
       }
@@ -164,8 +169,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       }
       .adm-tab--active {
         color: var(--color-brewery-dark);
-        background: #fff;
-        border-color: rgba(44, 24, 16, 0.12);
+        background: var(--color-warm-white);
+        border-color: var(--border-warm);
       }
       .adm-refresh {
         position: static;
@@ -183,8 +188,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .rep-totals--today { margin-bottom: 32px; }
       @media (max-width: 720px) { .rep-totals { grid-template-columns: repeat(2, 1fr); } }
       .rep-stat {
-        background: #fff;
-        border: 1px solid rgba(44, 24, 16, 0.12);
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
         border-radius: 2px;
         padding: 20px;
       }
@@ -227,8 +232,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       }
 
       .rep-empty {
-        background: #fff;
-        border: 1px solid rgba(44, 24, 16, 0.12);
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
         border-radius: 2px;
         padding: 32px;
         text-align: center;
@@ -260,8 +265,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         list-style: none;
         margin: 0;
         padding: 0;
-        background: #fff;
-        border: 1px solid rgba(44, 24, 16, 0.12);
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
         border-radius: 2px;
       }
       .rep-toprow {
@@ -270,7 +275,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         align-items: center;
         gap: 16px;
         padding: 12px 20px;
-        border-bottom: 1px solid rgba(44, 24, 16, 0.06);
+        border-bottom: 1px solid var(--border-subtle);
       }
       .rep-toprow:last-child { border-bottom: none; }
       .rep-toprow--compact { grid-template-columns: 32px minmax(140px, 1.2fr) 3fr 48px; padding: 10px 20px; }
@@ -291,8 +296,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       /* ── Device cards ── */
       .rep-device-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
       .rep-device-card {
-        background: #fff;
-        border: 1px solid rgba(44, 24, 16, 0.12);
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
         border-radius: 2px;
         padding: 20px;
         text-align: center;
@@ -313,8 +318,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
 
       /* ── Day of week chart ── */
       .rep-dow {
-        background: #fff;
-        border: 1px solid rgba(44, 24, 16, 0.12);
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
         border-radius: 2px;
         padding: 24px;
         display: grid;
@@ -333,7 +338,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       @media (max-width: 1000px) { .rep-heatmap { grid-template-columns: repeat(3, 1fr); } }
       @media (max-width: 720px) { .rep-heatmap { grid-template-columns: repeat(2, 1fr); } }
       @media (max-width: 480px) { .rep-heatmap { grid-template-columns: 1fr; } }
-      .rep-month { background: #fff; border: 1px solid rgba(44, 24, 16, 0.12); border-radius: 2px; padding: 14px; }
+      .rep-month { background: var(--color-warm-white); border: 1px solid var(--border-warm); border-radius: 2px; padding: 14px; }
       .rep-month__label { font-family: var(--serif); font-size: 16px; font-weight: 500; text-align: center; margin-bottom: 8px; }
       .rep-month__dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(44, 24, 16, 0.45); text-align: center; margin-bottom: 4px; }
       .rep-month__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
@@ -342,9 +347,9 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
 
       /* ── Tables ── */
       .rep-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .rep-table { width: 100%; background: #fff; border: 1px solid rgba(44, 24, 16, 0.12); border-collapse: collapse; border-radius: 2px; overflow: hidden; min-width: 600px; }
-      .rep-table th, .rep-table td { padding: 10px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid rgba(44, 24, 16, 0.06); }
-      .rep-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(44, 24, 16, 0.55); background: rgba(44, 24, 16, 0.02); }
+      .rep-table { width: 100%; background: var(--color-warm-white); border: 1px solid var(--border-warm); border-collapse: collapse; border-radius: 2px; overflow: hidden; min-width: 600px; }
+      .rep-table th, .rep-table td { padding: 10px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border-subtle); }
+      .rep-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-fired-brick); background: rgba(64, 22, 12, 0.03); }
       .rep-table tr:last-child td { border-bottom: none; }
       .rep-table__ref { color: rgba(44, 24, 16, 0.55); font-size: 12px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -385,8 +390,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
 
       /* ── Leads control panel (sub-tabs + filters unified) ── */
       .lead-panel {
-        background: #fff;
-        border: 1px solid rgba(44, 24, 16, 0.12);
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
         border-radius: 6px;
         margin-bottom: 8px;
         overflow: hidden;
@@ -415,8 +420,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       }
       .adm-subtab:hover { color: rgba(44, 24, 16, 0.75); background: rgba(44, 24, 16, 0.04); }
       .adm-subtab--active {
-        background: rgba(46, 64, 9, 0.08);
-        color: var(--color-forest-olive, #2E4009);
+        background: rgba(191, 114, 86, 0.10);
+        color: var(--color-fired-brick);
       }
       .adm-subtab__count {
         display: inline-block; margin-left: 5px; padding: 1px 7px;
@@ -429,8 +434,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lead-panel__status {
         padding: 8px 16px 10px;
         font-size: 12px;
-        color: rgba(44, 24, 16, 0.45);
-        border-top: 1px solid rgba(44, 24, 16, 0.06);
+        color: var(--color-dusty-coral);
+        border-top: 1px solid var(--border-subtle);
       }
 
       /* ── Cross-sell badges ── */
@@ -727,8 +732,8 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lead-toolbar__tag {
         display: inline-flex; align-items: center; gap: 4px;
         padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
-        font-family: 'DM Sans', sans-serif; color: #2E4009;
-        background: rgba(46,64,9,0.08); border: 1px solid rgba(46,64,9,0.15);
+        font-family: 'DM Sans', sans-serif; color: var(--color-fired-brick);
+        background: rgba(191, 114, 86, 0.08); border: 1px solid rgba(191, 114, 86, 0.18);
       }
       .lead-toolbar__tag button {
         background: none; border: none; color: rgba(44,24,16,0.4);
