@@ -575,18 +575,25 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lp-back {
         display: inline-flex; align-items: center; gap: 6px;
         background: none; border: 1px solid rgba(44,24,16,0.15);
-        border-radius: 4px; padding: 8px 16px;
-        font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+        border-radius: 4px; padding: 6px 14px;
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
         color: #2C1810; cursor: pointer; transition: all 0.15s;
-        margin-bottom: 24px;
+        margin-bottom: 12px;
       }
       .lp-back:hover { background: rgba(44,24,16,0.05); border-color: rgba(44,24,16,0.25); }
 
+      /* Card wrapper for the whole profile */
+      .lp-card {
+        background: rgba(44,24,16,0.015); border: 1px solid rgba(44,24,16,0.08);
+        border-radius: 6px; overflow: hidden;
+      }
+
       .lp-hero {
-        display: flex; align-items: center; gap: 24px;
-        padding: 24px 28px; margin-bottom: 24px;
-        background: rgba(44,24,16,0.025); border: 1px solid rgba(44,24,16,0.08);
-        border-radius: 6px;
+        display: flex; align-items: center; gap: 20px;
+        padding: 20px 24px 16px; margin-bottom: 0;
+        background: rgba(44,24,16,0.025); border: none;
+        border-bottom: 1px solid rgba(44,24,16,0.06);
+        border-radius: 0;
       }
       .lp-hero__score {
         display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0;
@@ -597,13 +604,13 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       }
       .lp-hero__info { flex: 1; min-width: 0; }
       .lp-hero__name {
-        font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 600;
-        color: #2C1810; margin: 0 0 6px; line-height: 1.2;
+        font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600;
+        color: #2C1810; margin: 0 0 4px; line-height: 1.2;
       }
       .lp-hero__contact {
         display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-        font-family: 'DM Sans', sans-serif; font-size: 14px; color: rgba(44,24,16,0.5);
-        margin-bottom: 12px;
+        font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(44,24,16,0.5);
+        margin-bottom: 8px;
       }
       .lp-hero__link {
         color: #2E4009; text-decoration: none; font-weight: 500;
@@ -611,11 +618,14 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lp-hero__link:hover { text-decoration: underline; }
 
       .lp-cols {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
-        margin-bottom: 28px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+        margin-bottom: 0;
       }
       .lp-col {
         display: flex; flex-direction: column; gap: 0;
+      }
+      .lp-col:first-child {
+        border-right: 1px solid rgba(44,24,16,0.06);
       }
 
       /* Stage progression bar in header */
@@ -720,18 +730,19 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
 
       /* Sections */
       .lp-section {
-        padding: 16px 24px;
+        padding: 14px 20px;
         border-bottom: 1px solid rgba(44,24,16,0.06);
       }
+      .lp-section:last-child { border-bottom: none; }
       .lp-section__title {
-        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 0.1em; color: rgba(44,24,16,0.4);
-        margin: 0 0 10px;
+        font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.1em; color: rgba(44,24,16,0.35);
+        margin: 0 0 8px;
       }
 
       /* Detail grid (label + value pairs) */
       .lp-detail-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px;
       }
       .lp-detail { display: flex; flex-direction: column; gap: 2px; }
       .lp-detail__label {
@@ -747,7 +758,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       .lp-detail__muted { font-size: 13px; color: rgba(44,24,16,0.4); font-style: italic; }
 
       /* Score breakdown bars */
-      .lp-score-grid { display: flex; flex-direction: column; gap: 8px; }
+      .lp-score-grid { display: flex; flex-direction: column; gap: 6px; }
       .lp-score-row {
         display: grid; grid-template-columns: 72px 1fr 40px; gap: 8px; align-items: center;
       }
@@ -878,24 +889,24 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       /* ── Journey view ── */
       /* Journey summary */
       .jny-stats {
-        display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;
-        padding: 14px 18px; background: rgba(44,24,16,0.02);
-        border: 1px solid rgba(44,24,16,0.08); border-radius: 6px;
+        display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px;
+        padding: 12px 16px; background: rgba(44,24,16,0.02);
+        border: 1px solid rgba(44,24,16,0.06); border-radius: 4px;
       }
-      .jny-stat { display: flex; flex-direction: column; min-width: 80px; }
+      .jny-stat { display: flex; flex-direction: column; min-width: 70px; }
       .jny-stat__val {
-        font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600;
+        font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600;
         color: #2C1810; line-height: 1.1;
       }
       .jny-stat__label {
-        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
-        color: rgba(44,24,16,0.45); text-transform: uppercase; letter-spacing: 0.04em;
+        font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 500;
+        color: rgba(44,24,16,0.4); text-transform: uppercase; letter-spacing: 0.04em;
       }
-      .jny-milestones { margin-bottom: 20px; }
+      .jny-milestones { margin-bottom: 14px; }
       .jny-milestones__title, .jny-toppages__title {
-        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
-        color: rgba(44,24,16,0.5); text-transform: uppercase; letter-spacing: 0.06em;
-        margin-bottom: 10px;
+        font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+        color: rgba(44,24,16,0.35); text-transform: uppercase; letter-spacing: 0.1em;
+        margin-bottom: 8px;
       }
       .jny-milestone {
         display: flex; align-items: center; gap: 8px; padding: 6px 0;
@@ -914,7 +925,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(44,24,16,0.4);
         margin-left: 4px;
       }
-      .jny-toppages { margin-bottom: 20px; }
+      .jny-toppages { margin-bottom: 14px; }
       .jny-toppage {
         display: flex; justify-content: space-between; align-items: center;
         padding: 4px 0; border-bottom: 1px solid rgba(44,24,16,0.04);
@@ -928,7 +939,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
       }
       /* Tags row (sources + attribution) */
       .jny-tags-row {
-        display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;
+        display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;
       }
       .jny-tags-group {
         display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
@@ -1061,9 +1072,10 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         .lead-toolbar__select { width: 100%; }
         .lead-heat-chips { gap: 4px; }
         .lead-heat-chip { font-size: 11px; padding: 3px 8px; }
-        .lp-hero { flex-direction: column; text-align: center; padding: 16px; gap: 12px; }
+        .lp-hero { flex-direction: column; text-align: center; padding: 14px; gap: 10px; }
         .lp-hero__contact { justify-content: center; }
         .lp-cols { grid-template-columns: 1fr; }
+        .lp-col:first-child { border-right: none; border-bottom: 1px solid rgba(44,24,16,0.06); }
         .lp-detail-grid { grid-template-columns: 1fr; }
         .lp-journey-session { padding: 12px; }
         .lp-journey-page { font-size: 12px; }

@@ -1607,6 +1607,8 @@ export default function AdminDashboard() {
             {/* Back button */}
             <button className="lp-back" onClick={() => setSelectedLead(null)} type="button">{"\u2190"} Back to leads</button>
 
+            {/* Profile card */}
+            <div className="lp-card">
             {/* Hero header */}
             <div className="lp-hero">
               <div className="lp-hero__score">
@@ -2060,6 +2062,7 @@ export default function AdminDashboard() {
                 );
               })()}
             </div>
+            </div>{/* end lp-card */}
           </div>
         );
       })()}
