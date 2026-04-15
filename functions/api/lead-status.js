@@ -132,11 +132,22 @@ export async function onRequestPost(context) {
            FROM contacts WHERE contact_id = ?`
         ).bind(contact_id).first();
 
-        if (!current || !current.funnel_stage) {
+        if (!current) {
           return json({ ok: false, error: "nothing_to_revert" }, 400);
         }
 
-        const stage = current.funnel_stage;
+        // Compute effective stage: use stored funnel_stage, or derive from timestamps
+        // (mirrors client-side computeFunnelStage logic)
+        let stage = current.funnel_stage;
+        if (!stage) {
+          if (current.won_at) stage = "won";
+          else if (current.lost_at) stage = "lost";
+          else if (current.proposal_at) stage = "proposal";
+          else if (current.noshow_at) stage = "noshow";
+          else if (current.cancelled_at) stage = "cancelled";
+          else if (current.meeting_at) stage = "meeting";
+          else return json({ ok: false, error: "nothing_to_revert" }, 400);
+        }
 
         // Clear the fields for the current manual stage, let computeFunnelStage recalculate
         switch (stage) {
