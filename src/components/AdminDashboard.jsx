@@ -612,7 +612,7 @@ export default function AdminDashboard() {
           <button
             key={tab.id}
             className={`adm-tab${activeTab === tab.id ? " adm-tab--active" : ""}`}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => { setActiveTab(tab.id); setSelectedLead(null); }}
             type="button"
           >
             {tab.label}
@@ -904,7 +904,7 @@ export default function AdminDashboard() {
       )}
 
       {/* ═══════ LEADS TAB (all revenue streams) ═══════ */}
-      {activeTab === "leads" && (
+      {activeTab === "leads" && !selectedLead && (
         <>
           {/* Lead type sub-tabs */}
           <div className="adm-subtabs">
