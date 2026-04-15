@@ -35,7 +35,7 @@ function formatEventDate(d) {
 }
 
 export default function BookingsView() {
-  const [hiddenYears, setHiddenYears] = useState(new Set());
+  const [hiddenYears, setHiddenYears] = useState(() => new Set(YEARS.filter(y => y !== CURRENT_YEAR)));
   const [hoveredMonth, setHoveredMonth] = useState(null);
   const [drillDown, setDrillDown] = useState(null); // { year, month } or null
 
