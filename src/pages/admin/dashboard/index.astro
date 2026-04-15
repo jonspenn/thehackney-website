@@ -653,8 +653,13 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         font-size: 11px; color: rgba(44,24,16,0.5); margin-top: 6px;
         font-weight: 500;
       }
-      .pipe-chart__year {
-        font-size: 10px; color: rgba(44,24,16,0.3); margin-top: 1px;
+      .pipe-chart__col--future { opacity: 0.3; }
+      .pipe-chart__col--future .pipe-chart__bars {
+        background: repeating-linear-gradient(
+          -45deg, transparent, transparent 3px,
+          rgba(44,24,16,0.04) 3px, rgba(44,24,16,0.04) 6px
+        );
+        border-radius: 2px;
       }
 
       /* ── Cross-sell badges ── */

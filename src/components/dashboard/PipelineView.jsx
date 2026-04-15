@@ -28,7 +28,8 @@ const TREND_METRICS = [
   { key: "new",       label: "New leads",  color: "#2C1810" },
   { key: "qualified", label: "Qualified",  color: "#49590E" },
   { key: "engaged",   label: "Engaged",    color: "#2E4009" },
-  { key: "meeting",   label: "Meeting+",   color: "#BF7256" },
+  { key: "call",      label: "Calls",      color: "#BF7256" },
+  { key: "tour",      label: "Tours",      color: "#40160C" },
   { key: "won",       label: "Won",        color: "#8C472E" },
   { key: "lost",      label: "Lost",       color: "rgba(44,24,16,0.25)" },
 ];
@@ -94,12 +95,14 @@ export default function PipelineView({ leads, onSelectLead }) {
 
   const totalTerminal = terminalCounts.lost + terminalCounts.cancelled + terminalCounts.noshow;
 
-  /* ── Monthly trends ── */
+  /* ── Monthly trends (always Jan-Dec current year) ── */
   const monthlyData = useMemo(() => {
     const currentLeads = leads[activeType]?.leads || [];
     if (currentLeads.length === 0) return { months: [], maxVal: 0 };
 
     const isHighIntent = activeType === "wedding" || activeType === "corporate" || activeType === "private-events";
+    const currentYear = new Date().getUTCFullYear();
+    const currentMonth = new Date().getUTCMonth(); // 0-based
 
     function toMonthKey(ts) {
       const d = parseTimestamp(ts);
@@ -107,25 +110,15 @@ export default function PipelineView({ leads, onSelectLead }) {
       return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
     }
 
-    let earliest = null;
-    for (const lead of currentLeads) {
-      const d = parseTimestamp(lead.created_at);
-      if (d && (!earliest || d < earliest)) earliest = d;
-    }
-    if (!earliest) return { months: [], maxVal: 0 };
-
-    const now = new Date();
+    /* Always Jan-Dec of current year */
     const monthKeys = [];
-    const cur = new Date(Date.UTC(earliest.getUTCFullYear(), earliest.getUTCMonth(), 1));
-    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-    while (cur <= end) {
-      monthKeys.push(`${cur.getUTCFullYear()}-${String(cur.getUTCMonth() + 1).padStart(2, "0")}`);
-      cur.setUTCMonth(cur.getUTCMonth() + 1);
+    for (let m = 1; m <= 12; m++) {
+      monthKeys.push(`${currentYear}-${String(m).padStart(2, "0")}`);
     }
 
     const buckets = {};
     for (const mk of monthKeys) {
-      buckets[mk] = { new: 0, qualified: 0, engaged: 0, meeting: 0, won: 0, lost: 0 };
+      buckets[mk] = { new: 0, qualified: 0, engaged: 0, call: 0, tour: 0, won: 0, lost: 0 };
     }
 
     for (const lead of currentLeads) {
@@ -143,9 +136,18 @@ export default function PipelineView({ leads, onSelectLead }) {
           const eKey = toMonthKey(engagedTs);
           if (eKey && buckets[eKey]) buckets[eKey].engaged++;
         }
-        if (lead.meeting_at) {
-          const mKey = toMonthKey(lead.meeting_at);
-          if (mKey && buckets[mKey]) buckets[mKey].meeting++;
+        /* Calls: use call_at if available, else infer from meeting_at + intent */
+        const callTs = lead.call_at || (lead.meeting_at && lead.clicked_discovery_call_at && !lead.clicked_venue_tour_at ? lead.meeting_at : null);
+        if (callTs) {
+          const cKey = toMonthKey(callTs);
+          if (cKey && buckets[cKey]) buckets[cKey].call++;
+        }
+        /* Tours: use tour_at if available, else infer from meeting_at + intent */
+        const tourTs = lead.tour_at || (lead.meeting_at && lead.clicked_venue_tour_at ? lead.meeting_at : null);
+        const fallbackTour = (!callTs && !tourTs && lead.meeting_at) ? lead.meeting_at : null;
+        if (tourTs || fallbackTour) {
+          const tKey = toMonthKey(tourTs || fallbackTour);
+          if (tKey && buckets[tKey]) buckets[tKey].tour++;
         }
         if (lead.won_at) {
           const wKey = toMonthKey(lead.won_at);
@@ -159,14 +161,16 @@ export default function PipelineView({ leads, onSelectLead }) {
     }
 
     let maxVal = 0;
-    const months = monthKeys.map(mk => {
+    const months = monthKeys.map((mk, idx) => {
       const [y, m] = mk.split("-");
+      const monthIdx = parseInt(m, 10) - 1; // 0-based
       const data = buckets[mk];
+      const isFuture = monthIdx > currentMonth;
       for (const v of Object.values(data)) { if (v > maxVal) maxVal = v; }
-      return { key: mk, label: `${SHORT_MONTHS[parseInt(m, 10) - 1]} ${y}`, shortLabel: SHORT_MONTHS[parseInt(m, 10) - 1], ...data };
+      return { key: mk, label: `${SHORT_MONTHS[monthIdx]} ${y}`, shortLabel: SHORT_MONTHS[monthIdx], isFuture, ...data };
     });
 
-    return { months, maxVal, isHighIntent };
+    return { months, maxVal, isHighIntent, currentYear };
   }, [leads, activeType]);
 
   return (
@@ -273,7 +277,7 @@ export default function PipelineView({ leads, onSelectLead }) {
             onClick={() => setTrendsOpen(p => !p)}
           >
             <span className={`pipe-collapse-toggle__arrow${trendsOpen ? " pipe-collapse-toggle__arrow--open" : ""}`}>{"\u25B6"}</span>
-            Monthly trends {!trendsOpen && <span className="pipe-collapse-toggle__summary">{monthlyData.months.length} month{monthlyData.months.length !== 1 ? "s" : ""}</span>}
+            Monthly trends {monthlyData.currentYear && ` ${monthlyData.currentYear}`} {!trendsOpen && <span className="pipe-collapse-toggle__summary">Jan - Dec</span>}
           </button>
 
           {trendsOpen && (
@@ -295,9 +299,9 @@ export default function PipelineView({ leads, onSelectLead }) {
                   const maxVal = monthlyData.maxVal || 1;
 
                   return (
-                    <div key={month.key} className="pipe-chart__col">
+                    <div key={month.key} className={`pipe-chart__col${month.isFuture ? " pipe-chart__col--future" : ""}`}>
                       <div className="pipe-chart__bars">
-                        {metrics.map(m => {
+                        {!month.isFuture && metrics.map(m => {
                           const val = month[m.key] || 0;
                           const pct = Math.max(0, (val / maxVal) * 100);
                           return (
@@ -313,9 +317,6 @@ export default function PipelineView({ leads, onSelectLead }) {
                         })}
                       </div>
                       <div className="pipe-chart__label">{month.shortLabel}</div>
-                      {month.key.endsWith("-01") && (
-                        <div className="pipe-chart__year">{month.key.split("-")[0]}</div>
-                      )}
                     </div>
                   );
                 })}

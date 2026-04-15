@@ -100,16 +100,17 @@ export const STAGE_SEQUENCE = ["Brochure", "Quiz", "Call", "Tour"];
 /* ── Funnel lifecycle ── */
 
 export const FUNNEL_STAGES = {
-  wedding:          ["lead", "qualified", "engaged", "meeting", "proposal", "won"],
-  corporate:        ["lead", "qualified", "engaged", "meeting", "proposal", "won"],
-  "private-events": ["lead", "qualified", "engaged", "meeting", "proposal", "won"],
+  wedding:          ["lead", "qualified", "engaged", "call", "tour", "proposal", "won"],
+  corporate:        ["lead", "qualified", "engaged", "call", "tour", "proposal", "won"],
+  "private-events": ["lead", "qualified", "engaged", "call", "tour", "proposal", "won"],
   supperclub:       ["signup", "engaged", "booked", "attended"],
   "cafe-bar":       ["signup", "engaged", "return"],
 };
 
 export const FUNNEL_LABELS = {
   lead: "Lead", qualified: "Qualified", engaged: "Engaged",
-  meeting: "Meeting", proposal: "Proposal", won: "Won",
+  call: "Call", tour: "Tour", proposal: "Proposal", won: "Won",
+  meeting: "Meeting", /* legacy - kept for backward compat */
   lost: "Lost", cancelled: "Cancelled", noshow: "No-show",
   signup: "Signup", booked: "Booked", attended: "Attended", return: "Return",
 };
@@ -118,7 +119,8 @@ export const STAGE_DEFINITIONS = {
   lead: "Downloaded a brochure or submitted a contact form",
   qualified: "Completed the wedding or event quiz",
   engaged: "Clicked to book a discovery call or venue tour",
-  meeting: "Had a venue tour or discovery call with Hugo",
+  call: "Had a discovery call with Hugo",
+  tour: "Had a venue tour at The Hackney",
   proposal: "Hugo has sent a proposal - waiting on their decision",
   won: "Booked - deposit received and date confirmed",
   lost: "Did not proceed - see lost reason below",
@@ -135,21 +137,24 @@ export const HEALTH_THRESHOLDS = {
     lead:      [7, 14],
     qualified: [3, 7],
     engaged:   [5, 10],
-    meeting:   [2, 5],
+    call:      [2, 5],
+    tour:      [3, 7],
     proposal:  [7, 14],
   },
   corporate: {
     lead:      [3, 7],
     qualified: [2, 5],
     engaged:   [3, 7],
-    meeting:   [1, 3],
+    call:      [1, 3],
+    tour:      [2, 5],
     proposal:  [5, 10],
   },
   "private-events": {
     lead:      [5, 10],
     qualified: [3, 7],
     engaged:   [5, 10],
-    meeting:   [2, 5],
+    call:      [2, 5],
+    tour:      [3, 7],
     proposal:  [7, 14],
   },
   supperclub: {

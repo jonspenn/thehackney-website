@@ -189,8 +189,9 @@ export function computeLeadScore(lead, leadType) {
   const now = Date.now();
 
   let stage = 8, stageLabel = "Brochure";
-  if (lead.clicked_venue_tour_at)       { stage = 30; stageLabel = "Tour"; }
-  else if (lead.clicked_discovery_call_at) { stage = 26; stageLabel = "Call"; }
+  /* Score reflects funnel progression: Tour > Call > Quiz > Brochure */
+  if (lead.tour_at || lead.clicked_venue_tour_at)       { stage = 30; stageLabel = "Tour"; }
+  else if (lead.call_at || lead.clicked_discovery_call_at) { stage = 26; stageLabel = "Call"; }
   else if (lead.form_types?.some(ft => ft.includes("quiz"))) { stage = 18; stageLabel = "Quiz"; }
 
   const INTENT_SCORE = { asap: 10, ready: 8, comparing: 5, browsing: 2 };
@@ -302,6 +303,8 @@ export function computeFunnelStage(lead, leadType) {
       stageEnteredAt = engagedAt;
     }
 
+    const callAt = parseTimestamp(lead.call_at);
+    const tourAt = parseTimestamp(lead.tour_at);
     const meetingAt = parseTimestamp(lead.meeting_at);
     const cancelledAt = parseTimestamp(lead.cancelled_at);
     const noshowAt = parseTimestamp(lead.noshow_at);
@@ -309,9 +312,18 @@ export function computeFunnelStage(lead, leadType) {
     const wonAt = parseTimestamp(lead.won_at);
     const lostAt = parseTimestamp(lead.lost_at);
 
-    if (cancelledAt && !meetingAt) { currentStage = "cancelled"; stageEnteredAt = cancelledAt; }
-    if (noshowAt && !meetingAt) { currentStage = "noshow"; stageEnteredAt = noshowAt; }
-    if (meetingAt) { completed.meeting = meetingAt; currentStage = "meeting"; stageEnteredAt = meetingAt; }
+    if (cancelledAt && !meetingAt && !callAt && !tourAt) { currentStage = "cancelled"; stageEnteredAt = cancelledAt; }
+    if (noshowAt && !meetingAt && !callAt && !tourAt) { currentStage = "noshow"; stageEnteredAt = noshowAt; }
+
+    /* Call / Tour split. Use dedicated fields if available, else infer from
+       legacy meeting_at + intent signals. Calls come before tours in the funnel. */
+    const effectiveCallAt = callAt || (meetingAt && !tourAt && lead.clicked_discovery_call_at && !lead.clicked_venue_tour_at ? meetingAt : null);
+    const effectiveTourAt = tourAt || (meetingAt && lead.clicked_venue_tour_at ? meetingAt : null);
+    /* If meeting_at exists but no intent signals at all, default to tour (most common meeting type) */
+    const fallbackTourAt = (!effectiveCallAt && !effectiveTourAt && meetingAt) ? meetingAt : null;
+
+    if (effectiveCallAt) { completed.call = effectiveCallAt; currentStage = "call"; stageEnteredAt = effectiveCallAt; }
+    if (effectiveTourAt || fallbackTourAt) { completed.tour = effectiveTourAt || fallbackTourAt; currentStage = "tour"; stageEnteredAt = effectiveTourAt || fallbackTourAt; }
     if (proposalAt) { completed.proposal = proposalAt; currentStage = "proposal"; stageEnteredAt = proposalAt; }
     if (wonAt) { completed.won = wonAt; currentStage = "won"; stageEnteredAt = wonAt; }
     if (lostAt) { currentStage = "lost"; stageEnteredAt = lostAt; }

@@ -478,6 +478,8 @@ function WonDialog({ lead, onConfirm, onCancel }) {
 
 const CONFIRM_LABELS = {
   meeting: "Mark as Had Meeting?",
+  call: "Mark as Had Call?",
+  tour: "Mark as Had Tour?",
   cancelled: "Mark as Cancelled?",
   noshow: "Mark as No-show?",
   proposal: "Mark as Sent Proposal?",
@@ -518,14 +520,25 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
 
   // Determine which buttons to show based on current funnel stage
   const stage = funnel.currentStage;
-  const manualStages = ["meeting", "cancelled", "noshow", "proposal", "won", "lost"];
+  const manualStages = ["call", "tour", "meeting", "cancelled", "noshow", "proposal", "won", "lost"];
   const isManualStage = manualStages.includes(stage);
-  const showMeeting = ["lead", "qualified", "engaged", "cancelled", "noshow"].includes(stage);
+  /* Show Had Call for early stages; show Had Tour once they've had a call or for early stages */
+  const showCall = ["lead", "qualified", "engaged", "cancelled", "noshow"].includes(stage);
+  const showTour = ["lead", "qualified", "engaged", "call", "cancelled", "noshow"].includes(stage);
   const showCancelled = ["engaged"].includes(stage);
   const showNoshow = ["engaged"].includes(stage);
-  const showProposal = ["meeting"].includes(stage);
-  const showWonBtn = ["meeting", "proposal"].includes(stage);
+  const showProposal = ["call", "tour", "meeting"].includes(stage);
+  const showWonBtn = ["call", "tour", "meeting", "proposal"].includes(stage);
   const showLostBtn = stage !== "lost" && stage !== "won";
+
+  /* Map call/tour actions to "meeting" API action until backend supports separate columns */
+  function handleAction(action) {
+    if (action === "call" || action === "tour") {
+      fireAction("meeting");
+    } else {
+      fireAction(action);
+    }
+  }
 
   return (
     <>
@@ -534,14 +547,15 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
         {confirmAction && (
           <span className="lp-actions__confirm">
             <span className="lp-actions__confirm-label">{CONFIRM_LABELS[confirmAction] || "Are you sure?"}</span>
-            <button className="lp-actions__btn lp-actions__btn--confirm-yes" onClick={() => fireAction(confirmAction)} disabled={saving} type="button">Yes</button>
+            <button className="lp-actions__btn lp-actions__btn--confirm-yes" onClick={() => handleAction(confirmAction)} disabled={saving} type="button">Yes</button>
             <button className="lp-actions__btn lp-actions__btn--confirm-no" onClick={() => setConfirmAction(null)} disabled={saving} type="button">No</button>
           </span>
         )}
         {!confirmAction && (
           <>
-            {isManualStage && <button className="lp-actions__btn lp-actions__btn--revert" onClick={() => requestAction("revert")} disabled={saving} type="button">↩ Undo {FUNNEL_LABELS[stage] || stage}</button>}
-            {showMeeting && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("meeting")} disabled={saving} type="button">Had Meeting</button>}
+            {isManualStage && <button className="lp-actions__btn lp-actions__btn--revert" onClick={() => requestAction("revert")} disabled={saving} type="button">{"\u21A9"} Undo {FUNNEL_LABELS[stage] || stage}</button>}
+            {showCall && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("call")} disabled={saving} type="button">Had Call</button>}
+            {showTour && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("tour")} disabled={saving} type="button">Had Tour</button>}
             {showCancelled && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => requestAction("cancelled")} disabled={saving} type="button">Cancelled</button>}
             {showNoshow && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => requestAction("noshow")} disabled={saving} type="button">No-show</button>}
             {showProposal && <button className="lp-actions__btn lp-actions__btn--proposal" onClick={() => requestAction("proposal")} disabled={saving} type="button">Sent Proposal</button>}
