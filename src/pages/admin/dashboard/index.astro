@@ -589,6 +589,61 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         color: rgba(44,24,16,0.4); font-style: italic;
       }
 
+      /* ── Pipeline monthly trends ── */
+      .pipe-trends {
+        margin-top: 16px; background: var(--color-warm-white);
+        border: 1px solid var(--border-warm); border-radius: 6px;
+        padding: 20px 24px 16px;
+      }
+      .pipe-trends__title {
+        font-family: 'Cormorant Garamond', serif; font-size: 20px;
+        font-weight: 600; color: var(--color-brewery-dark); margin: 0 0 2px;
+      }
+      .pipe-trends__sub {
+        font-size: 12px; color: rgba(44,24,16,0.45); margin: 0 0 16px;
+      }
+      .pipe-legend {
+        display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px;
+      }
+      .pipe-legend__item {
+        display: flex; align-items: center; gap: 5px;
+        font-size: 11px; color: rgba(44,24,16,0.6); font-weight: 500;
+      }
+      .pipe-legend__swatch {
+        width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+      }
+      .pipe-chart {
+        display: flex; gap: 2px; align-items: flex-end;
+        overflow-x: auto; padding-bottom: 4px; min-height: 180px;
+      }
+      .pipe-chart__col {
+        flex: 1; min-width: 36px; display: flex; flex-direction: column;
+        align-items: center;
+      }
+      .pipe-chart__bars {
+        display: flex; gap: 2px; align-items: flex-end;
+        height: 140px; width: 100%;
+        justify-content: center;
+      }
+      .pipe-chart__bar {
+        flex: 1; max-width: 14px; border-radius: 2px 2px 0 0;
+        position: relative; transition: height 0.3s;
+        min-width: 4px;
+      }
+      .pipe-chart__bar--empty { background: transparent !important; }
+      .pipe-chart__val {
+        position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+        font-size: 10px; font-weight: 600; color: var(--color-brewery-dark);
+        white-space: nowrap;
+      }
+      .pipe-chart__label {
+        font-size: 11px; color: rgba(44,24,16,0.5); margin-top: 6px;
+        font-weight: 500;
+      }
+      .pipe-chart__year {
+        font-size: 10px; color: rgba(44,24,16,0.3); margin-top: 1px;
+      }
+
       /* ── Cross-sell badges ── */
       .rep-cross-sell { display: flex; gap: 4px; flex-wrap: wrap; }
       .rep-cross-sell__badge {
