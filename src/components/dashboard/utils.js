@@ -303,8 +303,8 @@ export function computeFunnelStage(lead, leadType) {
       stageEnteredAt = engagedAt;
     }
 
-    const callAt = parseTimestamp(lead.call_at);
-    const tourAt = parseTimestamp(lead.tour_at);
+    const hadCallAt = parseTimestamp(lead.call_at);
+    const hadTourAt = parseTimestamp(lead.tour_at);
     const meetingAt = parseTimestamp(lead.meeting_at);
     const cancelledAt = parseTimestamp(lead.cancelled_at);
     const noshowAt = parseTimestamp(lead.noshow_at);
@@ -312,13 +312,13 @@ export function computeFunnelStage(lead, leadType) {
     const wonAt = parseTimestamp(lead.won_at);
     const lostAt = parseTimestamp(lead.lost_at);
 
-    if (cancelledAt && !meetingAt && !callAt && !tourAt) { currentStage = "cancelled"; stageEnteredAt = cancelledAt; }
-    if (noshowAt && !meetingAt && !callAt && !tourAt) { currentStage = "noshow"; stageEnteredAt = noshowAt; }
+    if (cancelledAt && !meetingAt && !hadCallAt && !hadTourAt) { currentStage = "cancelled"; stageEnteredAt = cancelledAt; }
+    if (noshowAt && !meetingAt && !hadCallAt && !hadTourAt) { currentStage = "noshow"; stageEnteredAt = noshowAt; }
 
     /* Call / Tour split. Use dedicated fields if available, else infer from
        legacy meeting_at + intent signals. Calls come before tours in the funnel. */
-    const effectiveCallAt = callAt || (meetingAt && !tourAt && lead.clicked_discovery_call_at && !lead.clicked_venue_tour_at ? meetingAt : null);
-    const effectiveTourAt = tourAt || (meetingAt && lead.clicked_venue_tour_at ? meetingAt : null);
+    const effectiveCallAt = hadCallAt || (meetingAt && !hadTourAt && lead.clicked_discovery_call_at && !lead.clicked_venue_tour_at ? meetingAt : null);
+    const effectiveTourAt = hadTourAt || (meetingAt && lead.clicked_venue_tour_at ? meetingAt : null);
     /* If meeting_at exists but no intent signals at all, default to tour (most common meeting type) */
     const fallbackTourAt = (!effectiveCallAt && !effectiveTourAt && meetingAt) ? meetingAt : null;
 
