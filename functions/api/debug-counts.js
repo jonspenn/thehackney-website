@@ -39,9 +39,35 @@ export async function onRequestGet({ env }) {
     GROUP BY form_type
   `).all();
 
+  // Check specifically for test seed contacts
+  const testContacts = await env.DB.prepare(`
+    SELECT contact_id, email, lead_type, deleted_at, created_at
+    FROM contacts
+    WHERE email LIKE '%.test@example.com'
+    ORDER BY created_at DESC
+    LIMIT 50
+  `).all();
+
+  // Check for ANY example.com contacts
+  const exampleContacts = await env.DB.prepare(`
+    SELECT contact_id, email, lead_type, deleted_at, created_at
+    FROM contacts
+    WHERE email LIKE '%@example.com'
+    ORDER BY created_at DESC
+    LIMIT 50
+  `).all();
+
+  // Get table schema
+  const schema = await env.DB.prepare(`
+    SELECT sql FROM sqlite_master WHERE name = 'contacts'
+  `).first();
+
   return new Response(JSON.stringify({
     contact_counts: counts.results,
     recent_contacts: recent.results,
     submission_counts: submissions.results,
+    test_contacts: testContacts.results,
+    example_contacts: exampleContacts.results,
+    contacts_schema: schema?.sql || "not found",
   }, null, 2), { headers: CORS });
 }
