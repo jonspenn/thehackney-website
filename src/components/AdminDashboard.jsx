@@ -385,6 +385,7 @@ export default function AdminDashboard() {
   const [activeLeadType, setActiveLeadType] = useState("wedding");
   const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
   const [heatFilter, setHeatFilter] = useState("all"); // "all" | "hot" | "warm" | "cool" | "cold"
+  const [breakdownFilter, setBreakdownFilter] = useState(null); // { field, value, label } or null
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
   const [journey, setJourney] = useState(null); // journey data for selected lead
   const [journeyLoading, setJourneyLoading] = useState(false);
@@ -489,6 +490,12 @@ export default function AdminDashboard() {
   const sortedLeads = useMemo(() => {
     let arr = [...scoredLeads];
     if (heatFilter !== "all") arr = arr.filter(l => l._score.tier === heatFilter);
+    if (breakdownFilter) {
+      arr = arr.filter(l => {
+        const val = l[breakdownFilter.field] || (breakdownFilter.field === "budget_label" ? "Not provided" : "Unknown");
+        return val === breakdownFilter.value;
+      });
+    }
     const { field, dir } = leadSort;
     arr.sort((a, b) => {
       let va = a[field], vb = b[field];
@@ -508,7 +515,7 @@ export default function AdminDashboard() {
       return 0;
     });
     return arr;
-  }, [scoredLeads, leadSort, heatFilter]);
+  }, [scoredLeads, leadSort, heatFilter, breakdownFilter]);
 
   function toggleSort(field) {
     setLeadSort(prev =>
@@ -827,7 +834,7 @@ export default function AdminDashboard() {
               <button
                 key={lt.type}
                 className={`adm-subtab${activeLeadType === lt.type ? " adm-subtab--active" : ""}`}
-                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); }}
+                onClick={() => { setActiveLeadType(lt.type); setLeadSort({ field: "score", dir: "desc" }); setHeatFilter("all"); setBreakdownFilter(null); }}
                 type="button"
               >
                 {lt.label}
@@ -929,14 +936,18 @@ export default function AdminDashboard() {
                   <h2 className="rep-h2">By urgency</h2>
                   {(currentLeads?.summary?.by_urgency || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
                     <ol className="rep-toplist">
-                      {currentLeads.summary.by_urgency.map((row, i) => (
-                        <li key={row.label} className="rep-toprow rep-toprow--compact">
-                          <span className="rep-toprank">{i + 1}</span>
-                          <span className="rep-topdate">{row.label}</span>
-                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_urgency[0]?.count || 1)) * 100}%` }} /></span>
-                          <span className="rep-topcount">{row.count}</span>
-                        </li>
-                      ))}
+                      {currentLeads.summary.by_urgency.map((row, i) => {
+                        const active = breakdownFilter?.field === "urgency_label" && breakdownFilter?.value === row.label;
+                        return (
+                          <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                              onClick={() => setBreakdownFilter(active ? null : { field: "urgency_label", value: row.label, label: `Urgency: ${row.label}` })}>
+                            <span className="rep-toprank">{i + 1}</span>
+                            <span className="rep-topdate">{row.label}</span>
+                            <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_urgency[0]?.count || 1)) * 100}%` }} /></span>
+                            <span className="rep-topcount rep-topcount--link">{row.count}</span>
+                          </li>
+                        );
+                      })}
                     </ol>
                   )}
                 </section>
@@ -944,14 +955,18 @@ export default function AdminDashboard() {
                   <h2 className="rep-h2">By budget</h2>
                   {(currentLeads?.summary?.by_budget || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
                     <ol className="rep-toplist">
-                      {currentLeads.summary.by_budget.map((row, i) => (
-                        <li key={row.label} className="rep-toprow rep-toprow--compact">
-                          <span className="rep-toprank">{i + 1}</span>
-                          <span className="rep-topdate">{row.label}</span>
-                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_budget[0]?.count || 1)) * 100}%` }} /></span>
-                          <span className="rep-topcount">{row.count}</span>
-                        </li>
-                      ))}
+                      {currentLeads.summary.by_budget.map((row, i) => {
+                        const active = breakdownFilter?.field === "budget_label" && breakdownFilter?.value === row.label;
+                        return (
+                          <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                              onClick={() => setBreakdownFilter(active ? null : { field: "budget_label", value: row.label, label: `Budget: ${row.label}` })}>
+                            <span className="rep-toprank">{i + 1}</span>
+                            <span className="rep-topdate">{row.label}</span>
+                            <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_budget[0]?.count || 1)) * 100}%` }} /></span>
+                            <span className="rep-topcount rep-topcount--link">{row.count}</span>
+                          </li>
+                        );
+                      })}
                     </ol>
                   )}
                 </section>
@@ -961,14 +976,18 @@ export default function AdminDashboard() {
                   <h2 className="rep-h2">By wedding year</h2>
                   {(currentLeads?.summary?.by_year || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
                     <ol className="rep-toplist">
-                      {currentLeads.summary.by_year.map((row, i) => (
-                        <li key={row.label} className="rep-toprow rep-toprow--compact">
-                          <span className="rep-toprank">{i + 1}</span>
-                          <span className="rep-topdate">{row.label}</span>
-                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_year[0]?.count || 1)) * 100}%` }} /></span>
-                          <span className="rep-topcount">{row.count}</span>
-                        </li>
-                      ))}
+                      {currentLeads.summary.by_year.map((row, i) => {
+                        const active = breakdownFilter?.field === "wedding_year" && breakdownFilter?.value === row.label;
+                        return (
+                          <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                              onClick={() => setBreakdownFilter(active ? null : { field: "wedding_year", value: row.label, label: `Year: ${row.label}` })}>
+                            <span className="rep-toprank">{i + 1}</span>
+                            <span className="rep-topdate">{row.label}</span>
+                            <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_year[0]?.count || 1)) * 100}%` }} /></span>
+                            <span className="rep-topcount rep-topcount--link">{row.count}</span>
+                          </li>
+                        );
+                      })}
                     </ol>
                   )}
                 </section>
@@ -984,14 +1003,18 @@ export default function AdminDashboard() {
                 <h2 className="rep-h2">By event type</h2>
                 {(currentLeads?.summary?.by_event_type || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
                   <ol className="rep-toplist">
-                    {currentLeads.summary.by_event_type.map((row, i) => (
-                      <li key={row.label} className="rep-toprow rep-toprow--compact">
-                        <span className="rep-toprank">{i + 1}</span>
-                        <span className="rep-topdate">{row.label}</span>
-                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_event_type[0]?.count || 1)) * 100}%` }} /></span>
-                        <span className="rep-topcount">{row.count}</span>
-                      </li>
-                    ))}
+                    {currentLeads.summary.by_event_type.map((row, i) => {
+                      const active = breakdownFilter?.field === "event_type_label" && breakdownFilter?.value === row.label;
+                      return (
+                        <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                            onClick={() => setBreakdownFilter(active ? null : { field: "event_type_label", value: row.label, label: `Event: ${row.label}` })}>
+                          <span className="rep-toprank">{i + 1}</span>
+                          <span className="rep-topdate">{row.label}</span>
+                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_event_type[0]?.count || 1)) * 100}%` }} /></span>
+                          <span className="rep-topcount rep-topcount--link">{row.count}</span>
+                        </li>
+                      );
+                    })}
                   </ol>
                 )}
               </section>
@@ -999,14 +1022,18 @@ export default function AdminDashboard() {
                 <h2 className="rep-h2">By guest count</h2>
                 {(currentLeads?.summary?.by_guest_count || []).length === 0 ? <p className="rep-empty-small">No data yet.</p> : (
                   <ol className="rep-toplist">
-                    {currentLeads.summary.by_guest_count.map((row, i) => (
-                      <li key={row.label} className="rep-toprow rep-toprow--compact">
-                        <span className="rep-toprank">{i + 1}</span>
-                        <span className="rep-topdate">{row.label}</span>
-                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_guest_count[0]?.count || 1)) * 100}%` }} /></span>
-                        <span className="rep-topcount">{row.count}</span>
-                      </li>
-                    ))}
+                    {currentLeads.summary.by_guest_count.map((row, i) => {
+                      const active = breakdownFilter?.field === "guest_count" && breakdownFilter?.value === row.label;
+                      return (
+                        <li key={row.label} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
+                            onClick={() => setBreakdownFilter(active ? null : { field: "guest_count", value: row.label, label: `Guests: ${row.label}` })}>
+                          <span className="rep-toprank">{i + 1}</span>
+                          <span className="rep-topdate">{row.label}</span>
+                          <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.count / (currentLeads.summary.by_guest_count[0]?.count || 1)) * 100}%` }} /></span>
+                          <span className="rep-topcount rep-topcount--link">{row.count}</span>
+                        </li>
+                      );
+                    })}
                   </ol>
                 )}
               </section>
@@ -1016,7 +1043,13 @@ export default function AdminDashboard() {
           {/* ── Leads table (adapts columns per type) ── */}
           <section className="rep-section">
             <h2 className="rep-h2">All {currentLeads?.lead_type_label || activeLeadType} leads</h2>
-            <p className="rep-sub">Sorted by lead score. Click headers to re-sort. Left border = heat tier.</p>
+            <p className="rep-sub">Sorted by lead score. Click headers to re-sort. Left border = heat tier.{breakdownFilter ? "" : " Click any chart number above to filter."}</p>
+            {breakdownFilter && (
+              <div className="breakdown-filter-bar">
+                <span className="breakdown-filter-bar__label">Filtered by: <strong>{breakdownFilter.label}</strong></span>
+                <button className="breakdown-filter-bar__clear" onClick={() => setBreakdownFilter(null)}>{"\u2715"} Clear filter</button>
+              </div>
+            )}
             {sortedLeads.length === 0 ? (
               <p className="rep-empty-small">No {currentLeads?.lead_type_label?.toLowerCase() || activeLeadType} leads yet. Form submissions will appear here.</p>
             ) : (

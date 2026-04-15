@@ -642,6 +642,25 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         grid-column: 2;
       }
 
+      /* ── Clickable breakdown rows ── */
+      .rep-toprow--clickable { cursor: pointer; transition: background 0.15s; }
+      .rep-toprow--clickable:hover { background: rgba(73,89,14,0.06); }
+      .rep-toprow--active { background: rgba(73,89,14,0.1); border-left: 3px solid #49590E; }
+      .rep-topcount--link { color: #49590E; font-weight: 700; cursor: pointer; }
+      .rep-toprow--clickable:hover .rep-topcount--link { text-decoration: underline; }
+      .breakdown-filter-bar {
+        display: flex; align-items: center; gap: 12px; margin: 8px 0 16px;
+        padding: 8px 14px; border-radius: 4px; background: rgba(73,89,14,0.06);
+        border: 1px solid rgba(73,89,14,0.15); font-family: 'DM Sans', sans-serif; font-size: 13px;
+      }
+      .breakdown-filter-bar__label { color: #2C1810; }
+      .breakdown-filter-bar__clear {
+        margin-left: auto; background: none; border: 1px solid rgba(44,24,16,0.15);
+        border-radius: 3px; padding: 3px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif;
+        color: rgba(44,24,16,0.6); cursor: pointer; transition: all 0.15s;
+      }
+      .breakdown-filter-bar__clear:hover { background: rgba(44,24,16,0.05); color: #2C1810; }
+
       /* ── Journey view ── */
       .lp-journey-session {
         border: 1px solid rgba(44,24,16,0.1); border-radius: 6px;
