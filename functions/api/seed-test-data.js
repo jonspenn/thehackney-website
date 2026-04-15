@@ -130,11 +130,13 @@ export async function onRequestGet(context) {
     const createdAt = iso(lead.daysAgo);
     const lastSeen = iso(Math.min(lead.daysAgo, 2));
 
+    const visitorId = "v_test_" + Math.random().toString(36).slice(2, 10);
+
     // Insert contact (plain INSERT, no OR IGNORE - errors are caught explicitly)
     try {
       await env.DB.prepare(`
         INSERT INTO contacts (
-          contact_id, email, first_name, last_name, phone, company,
+          contact_id, visitor_id, email, first_name, last_name, phone, company,
           lead_type, source_channel, source_keyword, source_campaign,
           gclid, fbclid,
           first_landing_page, conversion_page, sessions_before_conversion,
@@ -148,7 +150,7 @@ export async function onRequestGet(context) {
           hire_fee, min_spend, deal_value, rate_card_tier,
           created_at
         ) VALUES (
-          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?,
           ?, ?,
           ?, ?, ?,
@@ -163,7 +165,7 @@ export async function onRequestGet(context) {
           ?
         )
       `).bind(
-        contactId, lead.email, lead.first, lead.last, lead.phone || null, lead.company || null,
+        contactId, visitorId, lead.email, lead.first, lead.last, lead.phone || null, lead.company || null,
         leadType, lead.source || null, lead.keyword || null, lead.source?.split(" / ")[1] || null,
         lead.gclid || null, lead.fbclid || null,
         leadType === "wedding" ? "/weddings/" : leadType === "corporate" ? "/corporate/" : `/${leadType}/`,
