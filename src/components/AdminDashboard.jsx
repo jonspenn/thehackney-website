@@ -247,6 +247,7 @@ export default function AdminDashboard() {
     { id: "bookings", label: "Bookings" },
     { id: "customers", label: "Customers" },
     { id: "analytics", label: "Analytics" },
+    { id: "pricing", label: "Pricing", href: "/admin/dashboard/pricing-review/" },
   ];
 
   return (
@@ -254,14 +255,24 @@ export default function AdminDashboard() {
       {/* Tab nav */}
       <div className="adm-tabs">
         {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`adm-tab${activeTab === tab.id ? " adm-tab--active" : ""}`}
-            onClick={() => { setActiveTab(tab.id); setSelectedLead(null); }}
-            type="button"
-          >
-            {tab.label}
-          </button>
+          tab.href ? (
+            <a
+              key={tab.id}
+              className="adm-tab"
+              href={tab.href}
+            >
+              {tab.label}
+            </a>
+          ) : (
+            <button
+              key={tab.id}
+              className={`adm-tab${activeTab === tab.id ? " adm-tab--active" : ""}`}
+              onClick={() => { setActiveTab(tab.id); setSelectedLead(null); }}
+              type="button"
+            >
+              {tab.label}
+            </button>
+          )
         ))}
         <button className="rep-refresh adm-refresh" onClick={load} type="button" aria-label="Refresh data">Refresh</button>
       </div>
