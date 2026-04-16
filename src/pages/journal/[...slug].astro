@@ -77,7 +77,7 @@ const schema = JSON.stringify({
     <!-- Featured Image -->
     {post.data.image && (
       <div class="post-featured-image">
-        <div class="container">
+        <div class="container post-container">
           <img
             src={post.data.image}
             alt={post.data.imageAlt || post.data.title}
@@ -218,13 +218,10 @@ const schema = JSON.stringify({
 
   .post-featured-image img {
     width: 100%;
-    max-width: 720px;
     height: auto;
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 2px;
-    margin-inline: auto;
-    display: block;
   }
 
   .post-content {
