@@ -3,7 +3,7 @@
  * Owns its own sort/filter/search state. Reports lead selection + active type to parent.
  */
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import {
   URGENCY_LABELS, URGENCY_STAGE,
@@ -17,9 +17,37 @@ import {
   computeLeadScore, computeFunnelStage, resolveSource,
 } from "./utils.js";
 
+/** Per-lead-type sort preference is persisted in localStorage under this prefix. */
+const SORT_STORAGE_PREFIX = "thk_dashboard_leadsort_";
+const DEFAULT_SORT = { field: "created_at", dir: "desc" };
+
+function loadStoredSort(type) {
+  if (typeof window === "undefined") return DEFAULT_SORT;
+  try {
+    const raw = window.localStorage.getItem(SORT_STORAGE_PREFIX + type);
+    if (!raw) return DEFAULT_SORT;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed.field === "string" && (parsed.dir === "asc" || parsed.dir === "desc")) {
+      return parsed;
+    }
+  } catch (err) {
+    // corrupt or inaccessible storage - fall through to default
+  }
+  return DEFAULT_SORT;
+}
+
+function saveStoredSort(type, sort) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SORT_STORAGE_PREFIX + type, JSON.stringify(sort));
+  } catch (err) {
+    // quota exceeded / private mode - silently ignore
+  }
+}
+
 export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelectLead, onLeadTypeChange, onDelete, onRestore, showRecycleBin, onToggleRecycleBin }) {
   const [activeLeadType, setActiveLeadType] = useState("wedding");
-  const [leadSort, setLeadSort] = useState({ field: "created_at", dir: "desc" });
+  const [leadSort, setLeadSort] = useState(() => loadStoredSort("wedding"));
   const [heatFilter, setHeatFilter] = useState("all");
   const [breakdownFilter, setBreakdownFilter] = useState(null);
   const [leadSearch, setLeadSearch] = useState("");
@@ -30,7 +58,7 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
 
   function changeLeadType(type) {
     setActiveLeadType(type);
-    setLeadSort({ field: "created_at", dir: "desc" });
+    setLeadSort(loadStoredSort(type));
     setHeatFilter("all");
     setBreakdownFilter(null);
     setLeadSearch("");
@@ -104,6 +132,11 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
 
   // Notify parent of initial type on first render
   useMemo(() => { if (onLeadTypeChange) onLeadTypeChange(activeLeadType); }, []);
+
+  // Persist the current sort per lead type so it survives reloads
+  useEffect(() => {
+    saveStoredSort(activeLeadType, leadSort);
+  }, [activeLeadType, leadSort]);
 
   const currentLeads = showRecycleBin ? deletedLeads?.[activeLeadType] : leads[activeLeadType];
 
