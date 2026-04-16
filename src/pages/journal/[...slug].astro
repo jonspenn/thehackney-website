@@ -59,7 +59,7 @@ const schema = JSON.stringify({
 >
   <article class="journal-post">
     <!-- Post Header -->
-    <header class="post-header section">
+    <header class="post-header">
       <div class="container post-container">
         <a href="/journal/" class="back-link">&larr; Back to Journal</a>
         <div class="post-meta">
@@ -90,7 +90,7 @@ const schema = JSON.stringify({
     )}
 
     <!-- Post Content -->
-    <div class="post-content section">
+    <div class="post-content">
       <div class="container post-container">
         <div class="prose">
           <Content />
@@ -149,7 +149,7 @@ const schema = JSON.stringify({
     text-transform: uppercase;
     color: var(--dusty-coral);
     text-decoration: none;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     transition: color 0.2s ease;
   }
 
@@ -158,7 +158,8 @@ const schema = JSON.stringify({
   }
 
   .post-header {
-    padding-bottom: var(--space-lg);
+    padding-top: var(--space-lg);
+    padding-bottom: var(--space-sm);
   }
 
   .post-header .post-meta {
@@ -212,7 +213,7 @@ const schema = JSON.stringify({
   }
 
   .post-featured-image {
-    padding-block: var(--space-md);
+    padding-block: var(--space-sm);
   }
 
   .post-featured-image img {
@@ -227,7 +228,8 @@ const schema = JSON.stringify({
   }
 
   .post-content {
-    padding-top: var(--space-lg);
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
   }
 
   /* Prose styling for markdown content */
@@ -238,8 +240,8 @@ const schema = JSON.stringify({
 
   .prose :global(h2) {
     font-size: clamp(1.5rem, 3vw, 1.875rem);
-    margin-top: var(--space-xl);
-    margin-bottom: var(--space-md);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
   }
 
   .prose :global(h3) {
@@ -312,8 +314,8 @@ const schema = JSON.stringify({
   }
 
   .post-footer {
-    padding-top: var(--space-md);
-    padding-bottom: var(--space-lg);
+    padding-top: 0;
+    padding-bottom: var(--space-md);
   }
 
   @media (max-width: 768px) {
