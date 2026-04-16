@@ -27,7 +27,17 @@
  * Returns: { ok: true, contact_id: "..." }
  *
  * Binding: env.DB (D1 database `hackney-date-tracking`)
+ *
+ * Belt-and-braces fallback email (2026-04-16, safety net for 1 May launch):
+ *   Every valid submission also fires an independent Resend email to
+ *   env.LEAD_NOTIFICATION_EMAIL via functions/_lib/notify-lead.js. Fired
+ *   via ctx.waitUntil() so it doesn't add latency, and called BEFORE the
+ *   D1 write so even a total D1 outage still produces a human-readable
+ *   email Hugo/Eva/Jon can respond to manually. See tech-stack.md
+ *   "Lead notification fallback" section and website/LEARNINGS.md.
  */
+
+import { notifyLead } from "../_lib/notify-lead.js";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -147,6 +157,32 @@ export async function onRequestPost(context) {
     form_type: formType, email, first_name: firstName, phone,
     visitor_id: visitorId, ts: now,
   }));
+
+  // Belt-and-braces: fire an independent Resend email BEFORE we touch D1.
+  // Uses ctx.waitUntil so it doesn't block the response, but runs in parallel
+  // with the D1 work below. If D1 is completely broken, Hugo / Eva / Jon still
+  // get a human-readable notification with the full payload and can respond
+  // manually. See functions/_lib/notify-lead.js for why this NEVER throws.
+  //
+  // We fire with the post-validation, sanitised fields (not the raw body) so
+  // we don't forward any junk the client may have sent. form_data is passed
+  // through verbatim because the email dumps it raw for manual recovery.
+  const notifyBody = {
+    form_type: formType,
+    email,
+    first_name: firstName,
+    last_name: lastName,
+    phone,
+    company,
+    form_data: body.form_data || null,
+  };
+  const notifyMeta = {
+    visitorId,
+    now,
+    referrer,
+    userAgent,
+  };
+  context.waitUntil(notifyLead(notifyBody, notifyMeta, env));
 
   try {
     // ─── Identity resolution: find or create contact ───
