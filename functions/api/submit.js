@@ -151,8 +151,9 @@ export async function onRequestPost(context) {
   try {
     // ─── Identity resolution: find or create contact ───
     let contactId;
+    let revivedFromLost = false;
     const existing = await env.DB.prepare(
-      "SELECT contact_id, first_name, last_name, phone, company FROM contacts WHERE email = ?"
+      "SELECT contact_id, first_name, last_name, phone, company, funnel_stage, deleted_at FROM contacts WHERE email = ?"
     ).bind(email).first();
 
     if (existing) {
@@ -184,11 +185,37 @@ export async function onRequestPost(context) {
         binds.push(visitorId);
       }
 
+      // ── Auto-revive from Lost (Phase 1 reactivation) ──
+      // Any form submission is a Tier 1 signal. If this contact was marked Lost
+      // and has not been manually recycled (deleted_at IS NULL), pull them back
+      // into the active pipeline and stamp the revival source. We leave original
+      // attribution (first_utm_source / gclid / etc) untouched - source of record
+      // stays the first touch. Recycled contacts (deleted_at IS NOT NULL) are
+      // intentionally skipped: if Jon archived them, a new submission should not
+      // silently undo that decision.
+      if (existing.funnel_stage === "lost" && !existing.deleted_at) {
+        updates.push(
+          "lost_at = NULL",
+          "lost_reason = NULL",
+          "lost_reason_note = NULL",
+          "funnel_stage = NULL",
+          "stage_entered_at = NULL",
+          "re_engaged_at = ?",
+          "re_engagement_source = ?",
+        );
+        binds.push(now, `form_submit:${formType}`);
+        revivedFromLost = true;
+      }
+
       if (updates.length > 0) {
         binds.push(contactId);
         await env.DB.prepare(
           `UPDATE contacts SET ${updates.join(", ")} WHERE contact_id = ?`
         ).bind(...binds).run();
+      }
+
+      if (revivedFromLost) {
+        console.log("[submit] revived_from_lost", JSON.stringify({ contact_id: contactId, via: formType }));
       }
     } else {
       // New contact

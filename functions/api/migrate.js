@@ -204,6 +204,20 @@ const MIGRATIONS = [
   { name: "ct_add_contact_type", sql: `ALTER TABLE contacts ADD COLUMN contact_type TEXT DEFAULT 'lead'` },
   { name: "idx_contacts_type", sql: `CREATE INDEX IF NOT EXISTS idx_contacts_type ON contacts(contact_type)` },
 
+  // ── Contacts: Lost lead reactivation (Phase 1) ──
+  // Track when a lost lead was re-engaged and what signal triggered it so we can
+  // tell manual Re-opens apart from auto-revives driven by form_submit / CTA click
+  // / return page view. Audit trail sits alongside existing lost_at/lost_reason.
+  { name: "ct_add_re_engaged_at", sql: `ALTER TABLE contacts ADD COLUMN re_engaged_at TEXT` },
+  { name: "ct_add_re_engagement_source", sql: `ALTER TABLE contacts ADD COLUMN re_engagement_source TEXT` },
+  // ── Contacts: email permission state (independent of funnel stage) ──
+  // `do_not_contact = 1` blocks outbound marketing. Set by Klaviyo unsubscribe /
+  // hard-bounce webhook (Phase 2). Orthogonal to funnel_stage: a lead can be
+  // Lost-and-contactable OR Active-but-do-not-email. Left NULL/0 for now.
+  { name: "ct_add_do_not_contact", sql: `ALTER TABLE contacts ADD COLUMN do_not_contact INTEGER DEFAULT 0` },
+  { name: "ct_add_do_not_contact_at", sql: `ALTER TABLE contacts ADD COLUMN do_not_contact_at TEXT` },
+  { name: "ct_add_do_not_contact_reason", sql: `ALTER TABLE contacts ADD COLUMN do_not_contact_reason TEXT` },
+
   {
     name: "idx_contacts_email",
     sql: `CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email)`,

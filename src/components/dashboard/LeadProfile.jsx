@@ -483,6 +483,7 @@ const CONFIRM_LABELS = {
   cancelled: "Mark as Cancelled?",
   noshow: "Mark as No-show?",
   proposal: "Mark as Sent Proposal?",
+  reopen: "Re-open this lead?",
   revert: "Undo this stage?",
 };
 
@@ -520,7 +521,11 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
 
   // Determine which buttons to show based on current funnel stage
   const stage = funnel.currentStage;
-  const manualStages = ["call", "tour", "meeting", "cancelled", "noshow", "proposal", "won", "lost"];
+  // "lost" is deliberately NOT in manualStages here - the Undo button is for
+  // correcting a mis-click on Meeting / Proposal / Won etc. Re-opening a lost
+  // lead is a separate, intentional action (re-engagement, not correction) and
+  // gets its own button with its own confirmation copy.
+  const manualStages = ["call", "tour", "meeting", "cancelled", "noshow", "proposal", "won"];
   const isManualStage = manualStages.includes(stage);
   /* Show Had Call for early stages; show Had Tour once they've had a call or for early stages */
   const showCall = ["lead", "qualified", "engaged", "cancelled", "noshow"].includes(stage);
@@ -530,6 +535,7 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
   const showProposal = ["call", "tour", "meeting"].includes(stage);
   const showWonBtn = ["call", "tour", "meeting", "proposal"].includes(stage);
   const showLostBtn = stage !== "lost" && stage !== "won";
+  const showReopenBtn = stage === "lost";
 
   /* Map call/tour actions to "meeting" API action until backend supports separate columns */
   function handleAction(action) {
@@ -554,6 +560,7 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
         {!confirmAction && (
           <>
             {isManualStage && <button className="lp-actions__btn lp-actions__btn--revert" onClick={() => requestAction("revert")} disabled={saving} type="button">{"\u21A9"} Undo {FUNNEL_LABELS[stage] || stage}</button>}
+            {showReopenBtn && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("reopen")} disabled={saving} type="button">Re-open lead</button>}
             {showCall && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("call")} disabled={saving} type="button">Had Call</button>}
             {showTour && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("tour")} disabled={saving} type="button">Had Tour</button>}
             {showCancelled && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => requestAction("cancelled")} disabled={saving} type="button">Cancelled</button>}

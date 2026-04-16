@@ -147,6 +147,7 @@ export async function onRequestGet(context) {
         c.meeting_at, c.proposal_at, c.won_at,
         c.lost_at, c.lost_reason, c.lost_reason_note,
         c.cancelled_at, c.noshow_at,
+        c.re_engaged_at, c.re_engagement_source,
         c.hire_fee, c.min_spend, c.deal_value, c.rate_card_tier,
         c.deleted_at,
         s.form_type, s.form_data as submission_form_data, s.created_at as submitted_at,
@@ -266,6 +267,9 @@ export async function onRequestGet(context) {
           lost_reason_note: row.lost_reason_note || null,
           cancelled_at: row.cancelled_at || null,
           noshow_at: row.noshow_at || null,
+          // Re-engagement (Phase 1 Lost reactivation)
+          re_engaged_at: row.re_engaged_at || null,
+          re_engagement_source: row.re_engagement_source || null,
           // Soft delete
           deleted_at: row.deleted_at || null,
           // Deal value

@@ -10,6 +10,13 @@
  *
  * Also updates session ended_at and visitor total_page_views for page_view events.
  *
+ * Lost lead reactivation (Phase 1): if the visitor is stitched to a contact
+ * with funnel_stage='lost' and the event type is a Tier 1 signal (date_check
+ * or cta_click), auto-revive the lead immediately. For page_view, only revive
+ * if 7+ days have passed since lost_at - a single pageview the same day we
+ * marked them lost is not a signal. Form submissions (quiz / brochure /
+ * supper club signup) are handled in /api/submit, not here.
+ *
  * Binding: env.DB (D1 database `hackney-date-tracking`)
  */
 
@@ -91,6 +98,49 @@ export async function onRequestPost(context) {
       await env.DB.prepare(
         "UPDATE sessions SET ended_at = ? WHERE session_id = ?"
       ).bind(ts, sessionId).run();
+    }
+
+    // ── Auto-revive from Lost (Phase 1 reactivation) ──
+    // Tier 1 signals: date_check + cta_click → revive immediately.
+    // Weaker signals: page_view → revive only if 7+ days since lost_at.
+    // scroll_depth / questionnaire_step / questionnaire_abandon are passive and
+    // don't revive. questionnaire_start / questionnaire_complete fire via form_submit
+    // through /api/submit which handles revival there.
+    // We skip deleted contacts (recycle bin) so manual archives aren't undone silently.
+    const isTier1 = eventType === "date_check" || eventType === "cta_click";
+    const isReturnView = eventType === "page_view";
+    if (isTier1 || isReturnView) {
+      try {
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const gapClause = isReturnView ? "AND lost_at < ?" : "";
+        const result = await env.DB.prepare(
+          `UPDATE contacts
+           SET lost_at = NULL,
+               lost_reason = NULL,
+               lost_reason_note = NULL,
+               funnel_stage = NULL,
+               stage_entered_at = NULL,
+               re_engaged_at = ?,
+               re_engagement_source = ?
+           WHERE contact_id = (SELECT contact_id FROM visitors WHERE visitor_id = ? AND contact_id IS NOT NULL)
+             AND funnel_stage = 'lost'
+             AND deleted_at IS NULL
+             ${gapClause}`
+        ).bind(
+          ...(isReturnView
+            ? [ts, `${eventType}:return_view`, visitorId, sevenDaysAgo]
+            : [ts, eventType, visitorId])
+        ).run();
+
+        // Log only when we actually revived someone - D1 meta.changes tells us
+        if (result?.meta?.changes > 0) {
+          console.log("[track] revived_from_lost", JSON.stringify({
+            visitor_id: visitorId, via: eventType, session_id: sessionId,
+          }));
+        }
+      } catch (reviveErr) {
+        console.error("[track] revive check failed:", reviveErr.message);
+      }
     }
   } catch (err) {
     // Swallow - never break the UX over analytics

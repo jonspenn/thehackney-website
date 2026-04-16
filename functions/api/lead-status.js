@@ -2,16 +2,21 @@
  * POST /api/lead-status
  *
  * Updates a lead's funnel stage in D1. Used by Hugo from the admin dashboard
- * to record offline actions: meeting happened, proposal sent, won, lost.
+ * to record offline actions: meeting happened, proposal sent, won, lost, reopen.
  *
  * For "won" actions on wedding leads, accepts hire_fee and min_spend
  * (pre-filled from rate card lookup, confirmed/adjusted by Hugo).
  * deal_value = hire_fee + min_spend.
  *
+ * "reopen" is the manual Re-open button on Lost profiles - clears lost_at,
+ * lost_reason, lost_reason_note and nulls funnel_stage so computeFunnelStage
+ * falls back to whatever stage the lead had before (call/tour/etc via derived
+ * timestamps, or "lead" if nothing else). Stamps re_engaged_at for audit trail.
+ *
  * Body:
  *   {
  *     contact_id: string (required),
- *     action: "meeting" | "cancelled" | "noshow" | "proposal" | "won" | "lost" (required),
+ *     action: "meeting" | "cancelled" | "noshow" | "proposal" | "won" | "lost" | "reopen" | "revert" (required),
  *     lost_reason: string (required if action=lost),
  *     lost_reason_note: string (optional, for action=lost),
  *     hire_fee: number (optional, for action=won),
@@ -29,7 +34,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-const VALID_ACTIONS = ["meeting", "cancelled", "noshow", "proposal", "won", "lost", "revert"];
+const VALID_ACTIONS = ["meeting", "cancelled", "noshow", "proposal", "won", "lost", "reopen", "revert"];
 const VALID_LOST_REASONS = [
   "booked_elsewhere",
   "budget",
@@ -124,6 +129,21 @@ export async function onRequestPost(context) {
                lost_reason = ?, lost_reason_note = ?
                WHERE contact_id = ?`;
         binds = [now, now, lost_reason, lost_reason_note || null, contact_id];
+        break;
+
+      case "reopen":
+        // Manual Re-open from Lost profile: clear the lost state and stamp an
+        // audit trail. funnel_stage goes back to NULL so computeFunnelStage
+        // derives the stage from remaining timestamps (meeting_at / proposal_at /
+        // booking-intent clicks) and falls back to "lead" if none exist.
+        // Attribution (first_utm_source, gclid, etc) is left untouched on purpose -
+        // the original source is still the reason we got this lead, the revival
+        // source is a separate audit field.
+        sql = `UPDATE contacts SET lost_at = NULL, lost_reason = NULL, lost_reason_note = NULL,
+               funnel_stage = NULL, stage_entered_at = NULL,
+               re_engaged_at = ?, re_engagement_source = 'manual_reopen'
+               WHERE contact_id = ?`;
+        binds = [now, contact_id];
         break;
 
       case "revert": {
