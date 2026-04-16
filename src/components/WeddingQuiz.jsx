@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { submitFormWithRetry } from "../lib/form-submit.js";
 
 /* âââ Industrial Romance palette âââ */
 const BRAND = {
@@ -271,12 +272,16 @@ function StepGuests({ data, setData, onNext, onBack }) {
   );
 }
 
-function StepCapture({ data, setData, onNext, onBack, submitting }) {
+function StepCapture({ data, setData, onNext, onBack, submitting, submitError, clearSubmitError }) {
   /* Phone is optional - requiring it tanks form completion ~25-50% per UX research.
      First name + email is enough to qualify and follow up.
      Label says "so we can call you back quickly" - Baymard research shows explaining
      why you're collecting optional fields increases fill rates 20-30%. */
   const canSubmit = data.firstName?.trim() && data.email?.trim();
+
+  /* Clear the inline server error the moment the user starts editing the offending
+     field. They've acknowledged the message and are trying again. */
+  const clearErr = () => { if (submitError && clearSubmitError) clearSubmitError(); };
 
   const summaryPills = [
     data.month && data.year ? `${data.month} ${data.year}` : null,
@@ -319,7 +324,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
               className="wq-field__input"
               placeholder="you@email.com"
               value={data.email || ""}
-              onChange={e => setData({ ...data, email: e.target.value })}
+              onChange={e => { clearErr(); setData({ ...data, email: e.target.value }); }}
             />
           </div>
           <div className="wq-field">
@@ -335,6 +340,24 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
               onChange={e => setData({ ...data, phone: e.target.value })}
             />
           </div>
+          {submitError && (
+            <div
+              role="alert"
+              style={{
+                marginBottom: 12,
+                padding: "10px 14px",
+                background: "rgba(140,71,46,0.08)",
+                border: "1px solid rgba(140,71,46,0.35)",
+                borderRadius: 2,
+                color: "#8C472E",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 14,
+                lineHeight: 1.45,
+              }}
+            >
+              {submitError}
+            </div>
+          )}
           <button
             onClick={onNext}
             className="wq-btn wq-btn--primary wq-btn--full"
@@ -568,6 +591,7 @@ function pushDL(payload) {
 export default function WeddingQuiz() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const [completed, setCompleted] = useState(false);
   const [data, setData] = useState({
     month: "", year: "",
@@ -625,6 +649,7 @@ export default function WeddingQuiz() {
 
   async function handleCaptureSubmit() {
     setSubmitting(true);
+    setSubmitError(null);
 
     const formData = {
       wedding_date: data.month && data.year ? `${data.month} ${data.year}` : "",
@@ -632,35 +657,32 @@ export default function WeddingQuiz() {
       guest_count: data.guests,
     };
 
-    /* The lead is officially captured at this point - mark as completed
-       so beforeunload doesn't fire abandon. Budget step is post-capture. */
+    const outcome = await submitFormWithRetry({
+      form_type: "wedding-quiz",
+      email: data.email,
+      first_name: data.firstName,
+      phone: data.phone,
+      form_data: formData,
+    });
+
+    setSubmitting(false);
+    console.log("[WeddingQuiz] Submit outcome:", outcome);
+
+    /* Permanent failure (4xx / validation error): stay on capture step, show the
+       inline banner. The lead never reached D1 - advancing the UI would strand it. */
+    if (!outcome.ok && !outcome.queued) {
+      setSubmitError(outcome.userMessage);
+      return;
+    }
+
+    /* Success OR queued-for-retry: advance the funnel. The lead is either already
+       in D1 (success) or safely sitting in the localStorage queue waiting for the
+       server/network to recover. Either way, the user's data is captured. */
     pushDL({
       event: "wedding_quiz_complete",
       quiz_urgency: data.urgency,
       quiz_guests: data.guests,
     });
-
-    try {
-      const res = await fetch("/api/submit", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          form_type: "wedding-quiz",
-          email: data.email,
-          first_name: data.firstName,
-          phone: data.phone,
-          form_data: formData,
-        }),
-      });
-      const result = await res.json();
-      console.log("[WeddingQuiz] Submitted:", result);
-    } catch (err) {
-      // Fire-and-forget: the lead is captured in dataLayer already.
-      // D1 write failure must not block the user from proceeding.
-      console.error("[WeddingQuiz] Submit error:", err);
-    }
-
-    setSubmitting(false);
     setCompleted(true);
     goNext();
   }
@@ -697,7 +719,7 @@ export default function WeddingQuiz() {
       {step === 1 && <StepDate data={data} setData={setData} onNext={goNext} />}
       {step === 2 && <StepUrgency data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 3 && <StepGuests data={data} setData={setData} onNext={goNext} onBack={goBack} />}
-      {step === 4 && <StepCapture data={data} setData={setData} onNext={handleCaptureSubmit} onBack={goBack} submitting={submitting} />}
+      {step === 4 && <StepCapture data={data} setData={setData} onNext={handleCaptureSubmit} onBack={goBack} submitting={submitting} submitError={submitError} clearSubmitError={() => setSubmitError(null)} />}
       {step === 5 && <StepBudget data={data} setData={setData} onNext={handleBudgetNext} onBack={goBack} />}
       {step === 6 && <StepConfirmation data={data} />}
     </div>

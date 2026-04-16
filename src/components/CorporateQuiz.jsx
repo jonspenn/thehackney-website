@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { submitFormWithRetry } from "../lib/form-submit.js";
 
 /* ─── Industrial Romance palette ─── */
 const BRAND = {
@@ -273,8 +274,9 @@ function StepDate({ data, setData, onNext }) {
   );
 }
 
-function StepCapture({ data, setData, onNext, onBack, submitting }) {
+function StepCapture({ data, setData, onNext, onBack, submitting, submitError, clearSubmitError }) {
   const canSubmit = data.firstName?.trim() && data.email?.trim() && data.company?.trim();
+  const clearErr = () => { if (submitError && clearSubmitError) clearSubmitError(); };
 
   const eventLabel = EVENT_TYPE_OPTIONS.find(o => o.value === data.eventType)?.label;
   const guestLabel = GUEST_OPTIONS.find(o => o.value === data.guests)?.label;
@@ -330,7 +332,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
               className="wq-field__input"
               placeholder="you@company.com"
               value={data.email || ""}
-              onChange={e => setData({ ...data, email: e.target.value })}
+              onChange={e => { clearErr(); setData({ ...data, email: e.target.value }); }}
             />
           </div>
           <div className="wq-field">
@@ -346,6 +348,24 @@ function StepCapture({ data, setData, onNext, onBack, submitting }) {
               onChange={e => setData({ ...data, phone: e.target.value })}
             />
           </div>
+          {submitError && (
+            <div
+              role="alert"
+              style={{
+                marginBottom: 12,
+                padding: "10px 14px",
+                background: "rgba(140,71,46,0.08)",
+                border: "1px solid rgba(140,71,46,0.35)",
+                borderRadius: 2,
+                color: "#8C472E",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 14,
+                lineHeight: 1.45,
+              }}
+            >
+              {submitError}
+            </div>
+          )}
           <button
             onClick={onNext}
             className="wq-btn wq-btn--primary wq-btn--full"
@@ -547,6 +567,7 @@ function pushDL(payload) {
 export default function CorporateQuiz() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const [completed, setCompleted] = useState(false);
   const [data, setData] = useState({
     eventType: "",
@@ -599,6 +620,7 @@ export default function CorporateQuiz() {
 
   async function handleCaptureSubmit() {
     setSubmitting(true);
+    setSubmitError(null);
 
     const formData = {
       event_type: data.eventType,
@@ -606,32 +628,32 @@ export default function CorporateQuiz() {
       event_date: data.month && data.year ? `${data.month} ${data.year}` : "",
     };
 
+    const outcome = await submitFormWithRetry({
+      form_type: "corporate-quiz",
+      email: data.email,
+      first_name: data.firstName,
+      company: data.company,
+      phone: data.phone,
+      form_data: formData,
+    });
+
+    setSubmitting(false);
+    console.log("[CorporateQuiz] Submit outcome:", outcome);
+
+    // Permanent failure (4xx / bad data) - stay on this step, show the error
+    if (!outcome.ok && !outcome.queued) {
+      setSubmitError(outcome.userMessage);
+      return;
+    }
+
+    // Success OR transient failure queued for background retry - advance.
+    // dataLayer gets fired only once we know the lead is either captured or safely queued.
     pushDL({
       event: "corporate_quiz_complete",
       quiz_event_type: data.eventType,
       quiz_guests: data.guests,
     });
 
-    try {
-      const res = await fetch("/api/submit", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          form_type: "corporate-quiz",
-          email: data.email,
-          first_name: data.firstName,
-          company: data.company,
-          phone: data.phone,
-          form_data: formData,
-        }),
-      });
-      const result = await res.json();
-      console.log("[CorporateQuiz] Submitted:", result);
-    } catch (err) {
-      console.error("[CorporateQuiz] Submit error:", err);
-    }
-
-    setSubmitting(false);
     setCompleted(true);
     goNext();
   }
@@ -645,7 +667,7 @@ export default function CorporateQuiz() {
       {step === 1 && <StepDate data={data} setData={setData} onNext={goNext} />}
       {step === 2 && <StepEventType data={data} setData={setData} onNext={goNext} onBack={goBack}/>}
       {step === 3 && <StepGuests data={data} setData={setData} onNext={goNext} onBack={goBack} />}
-      {step === 4 && <StepCapture data={data} setData={setData} onNext={handleCaptureSubmit} onBack={goBack} submitting={submitting} />}
+      {step === 4 && <StepCapture data={data} setData={setData} onNext={handleCaptureSubmit} onBack={goBack} submitting={submitting} submitError={submitError} clearSubmitError={() => setSubmitError(null)} />}
       {step === 5 && <StepBudget data={data} setData={setData} onNext={goNext} onBack={goBack} />}
       {step === 6 && <StepConfirmation data={data} />}
     </div>
