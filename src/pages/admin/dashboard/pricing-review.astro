@@ -1,0 +1,592 @@
+---
+/**
+ * Pricing review page for James's sign-off.
+ *
+ * URL: /admin/dashboard/pricing-review/
+ *
+ * Protected by Cloudflare Access (same policy as the rest of
+ * /admin/dashboard/*). Only verified team emails can reach this page.
+ *
+ * Renders wedding-pricing.json as side-by-side year tables so James
+ * can eyeball the progression 2025 -> 2026 -> 2027 -> 2028 (DRAFT).
+ * Year-over-year cells are tinted to show where prices changed.
+ *
+ * Source of truth is src/data/wedding-pricing.json - this page is a
+ * read-only view. Edits happen in the JSON file, get pushed, and the
+ * page rebuilds.
+ *
+ * NOT linked from anywhere on the public site. Hidden from search.
+ *
+ * Audience: Jon, James, Hugo.
+ * Built 2026-04-16.
+ */
+import pricing from '../../../data/wedding-pricing.json';
+
+const years = ['2025', '2026', '2027', '2028'];
+
+const dayTypeOrder = {
+  'sun-thu': 1,
+  'fri': 2,
+  'sat': 3,
+  'dec-wed-fri': 4,
+  'dec-mon-tue': 5,
+};
+
+const dayTypeLabels = {
+  'sun-thu': 'Sun-Thu',
+  'fri': 'Friday',
+  'sat': 'Saturday',
+  'dec-wed-fri': 'Dec Wed-Fri',
+  'dec-mon-tue': 'Dec Mon-Tue',
+};
+
+const monthLabels = [
+  '', 'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+// year -> (month-dayType -> row) maps for lookup
+const yearMaps: Record<string, Record<string, { month: number; dayType: string; hire: number; min: number }>> = {};
+for (const y of years) {
+  yearMaps[y] = {};
+  for (const r of pricing.rateCards[y].rows) {
+    yearMaps[y][`${r.month}-${r.dayType}`] = r;
+  }
+}
+
+// unique (month, dayType) combos across all years, sorted chronologically
+const keySet = new Set<string>();
+for (const y of years) {
+  for (const r of pricing.rateCards[y].rows) {
+    keySet.add(`${r.month}-${r.dayType}`);
+  }
+}
+
+const rows = [...keySet]
+  .map(k => {
+    const firstDash = k.indexOf('-');
+    return {
+      key: k,
+      month: parseInt(k.slice(0, firstDash), 10),
+      dayType: k.slice(firstDash + 1),
+    };
+  })
+  .sort((a, b) =>
+    a.month !== b.month
+      ? a.month - b.month
+      : (dayTypeOrder[a.dayType] || 99) - (dayTypeOrder[b.dayType] || 99),
+  );
+
+const fmt = (n: number | undefined) => (n == null ? '-' : '£' + n.toLocaleString('en-GB'));
+
+function deltaClass(yearCurrent: string, yearPrior: string, key: string): string {
+  const cur = yearMaps[yearCurrent]?.[key];
+  const prior = yearMaps[yearPrior]?.[key];
+  if (!cur || !prior) return '';
+  const hireUp = cur.hire > prior.hire;
+  const minUp = cur.min > prior.min;
+  const hireDown = cur.hire < prior.hire;
+  const minDown = cur.min < prior.min;
+  if (hireUp || minUp) return 'cell-up';
+  if (hireDown || minDown) return 'cell-down';
+  return 'cell-flat';
+}
+
+function deltaString(yearCurrent: string, yearPrior: string, key: string): string {
+  const cur = yearMaps[yearCurrent]?.[key];
+  const prior = yearMaps[yearPrior]?.[key];
+  if (!cur || !prior) return '';
+  const hireDelta = cur.hire - prior.hire;
+  const minDelta = cur.min - prior.min;
+  if (hireDelta === 0 && minDelta === 0) return 'flat';
+  const parts: string[] = [];
+  if (hireDelta !== 0) parts.push(`hire ${hireDelta > 0 ? '+' : ''}£${hireDelta.toLocaleString('en-GB')}`);
+  if (minDelta !== 0) parts.push(`min ${minDelta > 0 ? '+' : ''}£${minDelta.toLocaleString('en-GB')}`);
+  return parts.join(', ');
+}
+
+// anomaly callouts pulled from 2028-pricing-extrapolation-2026-04.md
+const anomalies = [
+  {
+    title: 'Jan-Mar 2028 hire fee jump',
+    body: '2025 and 2026 held flat at £1,000. 2027 jumped to £1,300. Extrapolation takes 2028 to £1,750 (applies the 2026-to-2027 +30% ratio to 2027). If winter should stay cheaper to keep off-season volume, drop 2028 back to £1,500 or hold at £1,300.',
+  },
+  {
+    title: 'Jun-Sep 2028 Saturday hire fees',
+    body: 'Model raises Jun-Sep Saturday hire by £500 (rounded from the 2026-to-2027 +14% trend). If a softer increase is preferred, £3,500 is the next clean step down.',
+  },
+  {
+    title: 'Odd numbers in existing 2026 / 2027 brochure (NOT in rate card above)',
+    body: '"8 Hour Unlimited Drinks + Crement" is listed at £703 (2026) and £704 (2027) in the brochure - almost certainly £103 / £104 typos. Also: 2026 December Wed-Fri minimum spend (£5,000) is higher than December Saturday (£3,000) - intentional, or a row that got missed on update?',
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Hard noindex -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, nocache, max-snippet:0, max-image-preview:none, max-video-preview:0" />
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="ChatGPT-User" content="noindex, nofollow" />
+    <meta name="GPTBot" content="noindex, nofollow" />
+    <meta name="Google-Extended" content="noindex, nofollow" />
+    <meta name="ClaudeBot" content="noindex, nofollow" />
+    <meta name="anthropic-ai" content="noindex, nofollow" />
+    <meta name="PerplexityBot" content="noindex, nofollow" />
+
+    <meta name="referrer" content="no-referrer" />
+
+    <title>Pricing Review - The Hackney</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;700&display=swap"
+    />
+
+    <style>
+      :root {
+        --color-warm-canvas: #F5F0E8;
+        --color-brewery-dark: #2C1810;
+        --color-forest-olive: #2E4009;
+        --color-mid-olive: #49590E;
+        --color-fired-brick: #8C472E;
+        --color-dusty-coral: #BF7256;
+        --color-mahogany: #40160C;
+        --serif: 'Cormorant Garamond', Georgia, serif;
+        --sans: 'DM Sans', system-ui, sans-serif;
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: var(--sans);
+        background: var(--color-warm-canvas);
+        color: var(--color-brewery-dark);
+        -webkit-font-smoothing: antialiased;
+        padding: 32px 24px 96px;
+      }
+
+      .wrap {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .pr-back {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-dusty-coral);
+        text-decoration: none;
+        margin-bottom: 24px;
+      }
+      .pr-back:hover { color: var(--color-fired-brick); }
+
+      .pr-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--color-dusty-coral);
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        font-family: var(--serif);
+        font-size: 40px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        line-height: 1.15;
+        margin-bottom: 8px;
+        color: var(--color-brewery-dark);
+      }
+
+      .pr-subtitle {
+        font-size: 15px;
+        color: rgba(44, 24, 16, 0.65);
+        line-height: 1.6;
+        max-width: 700px;
+        margin-bottom: 24px;
+      }
+
+      .pr-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px 32px;
+        font-size: 12px;
+        color: rgba(44, 24, 16, 0.55);
+        padding: 14px 18px;
+        background: rgba(64, 22, 12, 0.04);
+        border: 1px solid rgba(64, 22, 12, 0.1);
+        border-radius: 2px;
+        margin-bottom: 40px;
+      }
+      .pr-meta strong {
+        font-weight: 700;
+        color: var(--color-brewery-dark);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-size: 11px;
+      }
+      .pr-meta-item { display: flex; flex-direction: column; gap: 4px; }
+
+      .pr-status-banner {
+        background: var(--color-fired-brick);
+        color: var(--color-warm-canvas);
+        padding: 14px 20px;
+        border-radius: 2px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 40px;
+        line-height: 1.5;
+      }
+      .pr-status-banner strong {
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      .pr-callouts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 14px;
+        margin-bottom: 40px;
+      }
+      .pr-callout {
+        background: rgba(191, 114, 86, 0.1);
+        border-left: 3px solid var(--color-fired-brick);
+        padding: 14px 16px;
+        border-radius: 2px;
+      }
+      .pr-callout h3 {
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--color-brewery-dark);
+      }
+      .pr-callout p {
+        font-size: 13px;
+        line-height: 1.5;
+        color: rgba(44, 24, 16, 0.8);
+      }
+
+      .pr-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 12px;
+        color: rgba(44, 24, 16, 0.7);
+        padding: 10px 0;
+        margin-bottom: 16px;
+      }
+      .pr-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .pr-legend-swatch {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 1px solid rgba(64, 22, 12, 0.2);
+        border-radius: 2px;
+      }
+
+      .pr-table-wrap {
+        overflow-x: auto;
+        border: 1px solid rgba(64, 22, 12, 0.15);
+        border-radius: 2px;
+        background: #fff;
+        margin-bottom: 32px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        min-width: 900px;
+      }
+
+      thead th {
+        background: rgba(140, 71, 46, 0.08);
+        color: var(--color-brewery-dark);
+        text-align: left;
+        padding: 12px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1.5px solid rgba(64, 22, 12, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+      thead th.draft {
+        background: var(--color-fired-brick);
+        color: var(--color-warm-canvas);
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid rgba(64, 22, 12, 0.07);
+        vertical-align: top;
+      }
+
+      tbody tr:hover td { background: rgba(140, 71, 46, 0.03); }
+
+      td.col-month {
+        font-weight: 600;
+        color: var(--color-brewery-dark);
+        white-space: nowrap;
+      }
+      td.col-daytype {
+        color: rgba(44, 24, 16, 0.75);
+        white-space: nowrap;
+      }
+
+      .price {
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .price-delta {
+        display: block;
+        font-size: 10.5px;
+        color: rgba(44, 24, 16, 0.5);
+        margin-top: 2px;
+        letter-spacing: 0.02em;
+      }
+
+      .cell-up {
+        background: rgba(46, 64, 9, 0.06);
+      }
+      .cell-down {
+        background: rgba(140, 71, 46, 0.1);
+      }
+      .cell-flat {
+        /* no tint */
+      }
+
+      td.draft-col {
+        background: rgba(140, 71, 46, 0.08);
+        border-left: 2px solid var(--color-fired-brick);
+      }
+      td.draft-col.cell-up {
+        background: rgba(140, 71, 46, 0.14);
+      }
+
+      /* month grouping: thicker border between different months */
+      tr.month-first td { border-top: 1.5px solid rgba(64, 22, 12, 0.15); }
+      tr.month-first:first-child td { border-top: none; }
+
+      /* season labels */
+      tr.season-divider td {
+        background: rgba(44, 24, 16, 0.06);
+        padding: 8px 14px;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--color-dusty-coral);
+      }
+
+      .pr-footer {
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid rgba(64, 22, 12, 0.15);
+        font-size: 13px;
+        color: rgba(44, 24, 16, 0.6);
+        line-height: 1.6;
+      }
+      .pr-footer strong {
+        color: var(--color-brewery-dark);
+        font-weight: 700;
+      }
+      .pr-footer a {
+        color: var(--color-dusty-coral);
+        text-decoration: underline;
+      }
+
+      .pr-print-btn {
+        float: right;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        background: transparent;
+        color: var(--color-brewery-dark);
+        border: 1px solid rgba(64, 22, 12, 0.3);
+        border-radius: 2px;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+      .pr-print-btn:hover {
+        background: var(--color-mid-olive);
+        color: var(--color-warm-canvas);
+        border-color: var(--color-mid-olive);
+      }
+
+      @media (max-width: 640px) {
+        h1 { font-size: 28px; }
+        body { padding: 20px 14px 64px; }
+      }
+
+      /* Print view: landscape, remove non-essentials */
+      @media print {
+        @page { size: A4 landscape; margin: 12mm; }
+        body { padding: 0; background: #fff; color: #000; }
+        .pr-back, .pr-print-btn { display: none; }
+        .pr-status-banner { background: #fff; color: #000; border: 2px solid #000; }
+        .pr-callouts { page-break-after: always; }
+        .pr-table-wrap { overflow: visible; border: none; }
+        table { font-size: 10px; min-width: 0; }
+        thead th { background: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        thead th.draft { background: #333 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        td.draft-col { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .cell-up { background: #f0f5e8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .cell-down { background: #fbeae4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <a href="/admin/dashboard/" class="pr-back">&larr; Back to dashboard</a>
+
+      <button class="pr-print-btn" onclick="window.print()" type="button">Print / Save PDF</button>
+
+      <p class="pr-eyebrow">Wedding Pricing Review</p>
+      <h1>Rate card 2025 - 2028</h1>
+      <p class="pr-subtitle">
+        Side-by-side view of every row in the wedding rate card, pulled
+        directly from the site's pricing data. Green tint = price rose
+        year-over-year, brick tint = price fell, no tint = flat.
+      </p>
+
+      <div class="pr-meta">
+        <div class="pr-meta-item">
+          <strong>Last updated</strong>
+          <span>{pricing.lastUpdated}</span>
+        </div>
+        <div class="pr-meta-item">
+          <strong>Currency</strong>
+          <span>{pricing.currency} (VAT {pricing.vat})</span>
+        </div>
+        <div class="pr-meta-item">
+          <strong>Cell format</strong>
+          <span>Hire fee / Minimum spend</span>
+        </div>
+        <div class="pr-meta-item">
+          <strong>Source file</strong>
+          <span><code>src/data/wedding-pricing.json</code></span>
+        </div>
+      </div>
+
+      <div class="pr-status-banner">
+        <strong>2028 is DRAFT:</strong> extrapolated from the 2026 &rarr;
+        2027 trend per row (hire rounded to nearest &pound;250, min spend
+        to nearest &pound;500). Pending James's sign-off before
+        publication. 2028 is currently only visible in the brochure
+        capture form's wedding-year dropdown - no prices are shown
+        publicly yet.
+      </div>
+
+      <div class="pr-callouts">
+        {anomalies.map(a => (
+          <div class="pr-callout">
+            <h3>{a.title}</h3>
+            <p>{a.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="pr-legend">
+        <span class="pr-legend-item">
+          <span class="pr-legend-swatch" style="background: rgba(46, 64, 9, 0.06)"></span>
+          Price increased vs prior year
+        </span>
+        <span class="pr-legend-item">
+          <span class="pr-legend-swatch" style="background: rgba(140, 71, 46, 0.1)"></span>
+          Price decreased vs prior year
+        </span>
+        <span class="pr-legend-item">
+          <span class="pr-legend-swatch" style="border-color: rgba(140, 71, 46, 0.6); background: rgba(140, 71, 46, 0.08)"></span>
+          2028 draft column
+        </span>
+      </div>
+
+      <div class="pr-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Day type</th>
+              <th>2025</th>
+              <th>2026</th>
+              <th>2027</th>
+              <th class="draft">2028 DRAFT</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, idx) => {
+              const isFirstOfMonth = idx === 0 || rows[idx - 1].month !== row.month;
+              const r25 = yearMaps['2025'][row.key];
+              const r26 = yearMaps['2026'][row.key];
+              const r27 = yearMaps['2027'][row.key];
+              const r28 = yearMaps['2028'][row.key];
+              const d26 = deltaClass('2026', '2025', row.key);
+              const d27 = deltaClass('2027', '2026', row.key);
+              const d28 = deltaClass('2028', '2027', row.key);
+              const delta26str = deltaString('2026', '2025', row.key);
+              const delta27str = deltaString('2027', '2026', row.key);
+              const delta28str = deltaString('2028', '2027', row.key);
+              return (
+                <tr class={isFirstOfMonth ? 'month-first' : ''}>
+                  <td class="col-month">{isFirstOfMonth ? monthLabels[row.month] : ''}</td>
+                  <td class="col-daytype">{dayTypeLabels[row.dayType] || row.dayType}</td>
+                  <td class="price">{r25 ? `${fmt(r25.hire)} / ${fmt(r25.min)}` : '-'}</td>
+                  <td class={`price ${d26}`}>
+                    {r26 ? `${fmt(r26.hire)} / ${fmt(r26.min)}` : '-'}
+                    {r26 && delta26str && delta26str !== 'flat' && <span class="price-delta">{delta26str}</span>}
+                  </td>
+                  <td class={`price ${d27}`}>
+                    {r27 ? `${fmt(r27.hire)} / ${fmt(r27.min)}` : '-'}
+                    {r27 && delta27str && delta27str !== 'flat' && <span class="price-delta">{delta27str}</span>}
+                  </td>
+                  <td class={`price draft-col ${d28}`}>
+                    {r28 ? `${fmt(r28.hire)} / ${fmt(r28.min)}` : '-'}
+                    {r28 && delta28str && delta28str !== 'flat' && <span class="price-delta">{delta28str}</span>}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pr-footer">
+        <p style="margin-bottom: 12px;">
+          <strong>How to use this page:</strong> review each row of the
+          2028 column against 2027. Where the draft doesn't feel right,
+          note the month, day type, and the correction. Jon will update
+          <code>wedding-pricing.json</code> and push - the page rebuilds
+          automatically and the calendar + quiz + brochure flow pick up
+          the new numbers.
+        </p>
+        <p>
+          <strong>Full extrapolation rationale and per-row change log:</strong>
+          see <code>sales &amp; marketing/collateral/2025/wedding/2028-pricing-extrapolation-2026-04.md</code>
+          in the Hackney Drive folder.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
