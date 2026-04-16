@@ -132,7 +132,7 @@ export default function TrackingReport() {
   }, [data]);
 
   if (loading) {
-    return <div className="rep-state">Loading tracking data\u2026</div>;
+    return <div className="rep-state">Loading tracking data…</div>;
   }
   if (error) {
     return (

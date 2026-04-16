@@ -243,7 +243,7 @@ export default function AdminDashboard({ pricing }) {
   }, [clicks, analyticsFilter]);
 
   /* ── loading / error states ── */
-  if (loading) return <div className="rep-state">Loading dashboard data\u2026</div>;
+  if (loading) return <div className="rep-state">Loading dashboard data…</div>;
   if (error) return (
     <div className="rep-state rep-state--error">
       Could not load data: {error}<br />

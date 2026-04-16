@@ -241,7 +241,7 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
             <input
               type="text"
               className="lead-toolbar__input"
-              placeholder="Search name, email, or phone\u2026"
+              placeholder="Search name, email, or phone…"
               value={leadSearchDraft}
               onChange={(e) => setLeadSearchDraft(e.target.value)}
             />
@@ -350,7 +350,7 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
                 onClick={handleRestore}
                 disabled={deleteLoading}
               >
-                {deleteLoading ? "Restoring\u2026" : `Restore ${selectedIds.size} lead${selectedIds.size !== 1 ? "s" : ""}`}
+                {deleteLoading ? "Restoring…" : `Restore ${selectedIds.size} lead${selectedIds.size !== 1 ? "s" : ""}`}
               </button>
             ) : !deleteConfirm ? (
               <button
@@ -370,7 +370,7 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
               <span className="lead-panel__confirm">
                 <span style={{ fontWeight: 700 }}>Are you sure? This moves them out of the active leads list.</span>
                 <button type="button" className="lead-panel__confirm-yes lead-panel__confirm-yes--final" onClick={handleDelete} disabled={deleteLoading}>
-                  {deleteLoading ? "Archiving\u2026" : "Confirm archive"}
+                  {deleteLoading ? "Archiving…" : "Confirm archive"}
                 </button>
                 <button type="button" className="lead-panel__confirm-no" onClick={() => setDeleteConfirm(null)}>Cancel</button>
               </span>

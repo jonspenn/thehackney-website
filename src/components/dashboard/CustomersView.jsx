@@ -188,7 +188,7 @@ export default function CustomersView({ onSelectCustomer }) {
             <input
               type="text"
               className="lead-toolbar__input"
-              placeholder="Search name, email, or phone\u2026"
+              placeholder="Search name, email, or phone…"
               value={searchDraft}
               onChange={(e) => setSearchDraft(e.target.value)}
             />
@@ -214,7 +214,7 @@ export default function CustomersView({ onSelectCustomer }) {
       {/* ── Table ── */}
       <div style={{ marginTop: "4px" }}>
         {loading && customers.length === 0 ? (
-          <p className="rep-empty-small">Loading customers\u2026</p>
+          <p className="rep-empty-small">Loading customers…</p>
         ) : filtered.length === 0 ? (
           <p className="rep-empty-small">No {currentData?.lead_type_label?.toLowerCase() || activeType} customers yet.</p>
         ) : (
