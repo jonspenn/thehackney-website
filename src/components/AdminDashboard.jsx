@@ -26,10 +26,11 @@ import LeadTable from "./dashboard/LeadTable.jsx";
 import PipelineView from "./dashboard/PipelineView.jsx";
 import BookingsView from "./dashboard/BookingsView.jsx";
 import CustomersView from "./dashboard/CustomersView.jsx";
+import PricingView from "./dashboard/PricingView.jsx";
 
 /* ───────── main component ───────── */
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ pricing }) {
   const [tracking, setTracking] = useState(null);
   const [clicks, setClicks] = useState(null);
   const [contacts, setContacts] = useState(null);
@@ -266,7 +267,7 @@ export default function AdminDashboard() {
     { id: "customers", label: "Customers" },
     { id: "lost", label: `Lost${totalLostCount > 0 ? ` (${totalLostCount})` : ""}` },
     { id: "analytics", label: "Analytics" },
-    { id: "pricing", label: "Pricing", href: "/admin/dashboard/pricing-review/" },
+    { id: "pricing", label: "Pricing" },
   ];
 
   return (
@@ -626,6 +627,11 @@ export default function AdminDashboard() {
           onLeadTypeChange={setActiveLeadType}
           mode="lost"
         />
+      )}
+
+      {/* ═══════ PRICING TAB ═══════ */}
+      {activeTab === "pricing" && !selectedLead && (
+        <PricingView pricing={pricing} />
       )}
 
       {activeTab === "analytics" && (

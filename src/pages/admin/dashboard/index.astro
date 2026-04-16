@@ -18,6 +18,7 @@
  * Built 2026-04-14.
  */
 import AdminDashboard from '../../../components/AdminDashboard.jsx';
+import pricing from '../../../data/wedding-pricing.json';
 ---
 
 <!doctype html>
@@ -1566,6 +1567,247 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         .lp-journey-session { padding: 12px; }
         .lp-journey-page { font-size: 12px; }
       }
+
+      /* ═══════ Pricing tab (PricingView.jsx) ═══════ */
+      .pr-view { display: block; }
+      .pr-view-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      .pr-view-head .rep-h2 { margin-top: 0; }
+      .pr-print-btn { flex-shrink: 0; align-self: flex-start; }
+
+      .pr-section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .pr-h3 {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 500;
+        margin: 0;
+        color: var(--color-brewery-dark);
+      }
+
+      /* Meta strip - matches rep-totals feel */
+      .pr-meta {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      @media (max-width: 720px) { .pr-meta { grid-template-columns: repeat(2, 1fr); } }
+      .pr-meta-card {
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
+        border-radius: 2px;
+        padding: 16px 18px;
+      }
+      .pr-meta-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(44, 24, 16, 0.55);
+        margin-bottom: 6px;
+      }
+      .pr-meta-value {
+        font-family: var(--sans);
+        font-size: 14px;
+        color: var(--color-brewery-dark);
+        font-variant-numeric: tabular-nums;
+      }
+      .pr-meta-value code {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        font-size: 12px;
+        background: rgba(64, 22, 12, 0.06);
+        padding: 1px 6px;
+        border-radius: 2px;
+      }
+
+      /* Status banner */
+      .pr-status-banner {
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
+        border-left: 3px solid var(--color-fired-brick);
+        border-radius: 2px;
+        padding: 14px 18px;
+        font-size: 13px;
+        color: var(--color-brewery-dark);
+        margin-bottom: 32px;
+        line-height: 1.5;
+      }
+      .pr-status-banner strong {
+        font-weight: 700;
+        color: var(--color-fired-brick);
+        letter-spacing: 0.02em;
+      }
+
+      /* Anomaly callouts */
+      .pr-callouts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+      .pr-callout {
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
+        border-left: 3px solid var(--color-dusty-coral);
+        border-radius: 2px;
+        padding: 16px 18px;
+      }
+      .pr-callout h3 {
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin: 0 0 8px;
+        color: var(--color-brewery-dark);
+      }
+      .pr-callout p {
+        font-size: 13px;
+        line-height: 1.55;
+        margin: 0;
+        color: rgba(44, 24, 16, 0.75);
+      }
+
+      /* Legend */
+      .pr-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 12px;
+        color: rgba(44, 24, 16, 0.65);
+        margin-bottom: 14px;
+      }
+      .pr-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+      .pr-legend-swatch {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 1px solid rgba(64, 22, 12, 0.2);
+        border-radius: 2px;
+      }
+
+      /* Table - scoped to .pr-table to avoid bleeding into other dashboard tables */
+      .pr-table-wrap {
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
+        border-radius: 2px;
+        overflow-x: auto;
+        margin-bottom: 32px;
+      }
+      .pr-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        min-width: 900px;
+      }
+      .pr-table thead th {
+        background: rgba(44, 24, 16, 0.04);
+        color: var(--color-brewery-dark);
+        text-align: left;
+        padding: 12px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-warm);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+      .pr-table thead th.draft {
+        background: var(--color-fired-brick);
+        color: var(--color-warm-canvas);
+      }
+      .pr-table tbody td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border-subtle);
+        vertical-align: top;
+      }
+      .pr-table tbody tr:last-child td { border-bottom: none; }
+      .pr-table tbody tr:hover td { background: rgba(140, 71, 46, 0.025); }
+      .pr-table td.col-month {
+        font-weight: 700;
+        color: var(--color-brewery-dark);
+        white-space: nowrap;
+      }
+      .pr-table td.col-daytype {
+        color: rgba(44, 24, 16, 0.75);
+        white-space: nowrap;
+      }
+      .pr-table .price {
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .pr-table .price-delta {
+        display: block;
+        font-size: 10.5px;
+        color: rgba(44, 24, 16, 0.5);
+        margin-top: 2px;
+        letter-spacing: 0.02em;
+      }
+      .pr-table .cell-up { background: rgba(46, 64, 9, 0.07); }
+      .pr-table .cell-down { background: rgba(140, 71, 46, 0.09); }
+      .pr-table .cell-flat { /* no tint */ }
+      .pr-table td.draft-col {
+        background: rgba(140, 71, 46, 0.06);
+        border-left: 2px solid var(--color-fired-brick);
+      }
+      .pr-table td.draft-col.cell-up { background: rgba(140, 71, 46, 0.13); }
+      .pr-table tr.month-first td { border-top: 1px solid var(--border-warm); }
+      .pr-table tr.month-first:first-child td { border-top: none; }
+
+      /* Footer */
+      .pr-footer {
+        background: var(--color-warm-white);
+        border: 1px solid var(--border-warm);
+        border-radius: 2px;
+        padding: 20px 24px;
+        font-size: 13px;
+        color: rgba(44, 24, 16, 0.75);
+        line-height: 1.6;
+      }
+      .pr-footer p { margin: 0 0 12px; }
+      .pr-footer p:last-child { margin-bottom: 0; }
+      .pr-footer strong { color: var(--color-brewery-dark); font-weight: 700; }
+      .pr-footer code {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        font-size: 12px;
+        background: rgba(64, 22, 12, 0.06);
+        padding: 1px 6px;
+        border-radius: 2px;
+      }
+
+      /* Print view: landscape, remove non-essentials.
+         Only the Pricing tab content is in the DOM when activeTab === "pricing",
+         so we only need to hide dashboard chrome (shell header, tabs, refresh, footer). */
+      @media print {
+        @page { size: A4 landscape; margin: 12mm; }
+        body { padding: 0; background: #fff; color: #000; }
+        .rep-shell { padding: 0; max-width: none; }
+        .rep-eyebrow, .rep-title, .rep-lede, .rep-footer,
+        .adm-tabs, .rep-refresh, .pr-print-btn { display: none !important; }
+        .pr-view-head { margin-bottom: 12px; }
+        .pr-status-banner { background: #fff; color: #000; border: 2px solid #000; }
+        .pr-callouts { page-break-after: always; }
+        .pr-table-wrap { overflow: visible; border: none; background: #fff; }
+        .pr-table { font-size: 10px; min-width: 0; }
+        .pr-table thead th { background: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .pr-table thead th.draft { background: #333 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .pr-table td.draft-col { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .pr-table .cell-up { background: #f0f5e8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .pr-table .cell-down { background: #fbeae4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      }
     </style>
   </head>
   <body>
@@ -1577,7 +1819,7 @@ import AdminDashboard from '../../../components/AdminDashboard.jsx';
         traffic sources. Auto-refreshes every 60 seconds.
       </p>
 
-      <AdminDashboard client:load />
+      <AdminDashboard client:load pricing={pricing} />
 
       <div class="rep-footer">
         Protected by Cloudflare Access. First-party data only.
