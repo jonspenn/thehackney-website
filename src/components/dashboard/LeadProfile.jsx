@@ -19,13 +19,53 @@ import {
   shortenUrl, parseEventData,
   parseTimestamp, daysBetween,
   computeLeadScore, computeFunnelStage,
+  resolveSource,
 } from "./utils.js";
 
 /* ── Sub-sections ── */
 
+/* KeyLight - secondary 48px indicator circle shown alongside the primary score badge.
+   One visual system for every at-a-glance metric on the hero (days, urgency, source).
+   Variants are driven by inline colour props so we don't balloon the CSS surface. */
+function KeyLight({ value, label, color, bg, border, title, ariaLabel }) {
+  return (
+    <div className="lp-hero__kl" title={title} aria-label={ariaLabel || title}>
+      <span
+        className="lp-hero__kl-badge"
+        style={{
+          background: bg,
+          color: color,
+          borderColor: border || "transparent",
+        }}
+      >
+        {value}
+      </span>
+      <span className="lp-hero__kl-label">{label}</span>
+    </div>
+  );
+}
+
+/* Urgency stage 0-4 colour ramp. Matches the table chip logic but fills the circle
+   so it reads as a gauge light rather than a pill. Stage 0 is muted (no signal),
+   4 is Fired Brick (urgent). Uses brand palette only - no fresh colours. */
+const URGENCY_KEYLIGHT = {
+  0: { bg: "rgba(44,24,16,0.05)", color: "rgba(44,24,16,0.55)", border: "rgba(44,24,16,0.1)" },
+  1: { bg: "rgba(191,114,86,0.12)", color: "#BF7256", border: "transparent" },
+  2: { bg: "#BF7256", color: "#fff", border: "transparent" },
+  3: { bg: "#2E4009", color: "#fff", border: "transparent" },
+  4: { bg: "#8C472E", color: "#fff", border: "transparent" },
+};
+const URGENCY_SHORT_LABELS = {
+  0: "No signal",
+  1: "Browsing",
+  2: "Shortlist",
+  3: "Ready",
+  4: "Urgent",
+};
+
 function FunnelTrack({ funnel, tc }) {
   return (
-    <div className="lp-funnel" style={{ marginTop: "16px" }}>
+    <div className="lp-funnel" style={{ marginTop: "10px" }}>
       {funnel.stages.map((stageKey, i) => {
         const isCompleted = !!funnel.completed[stageKey];
         const isCurrent = funnel.currentStage === stageKey;
@@ -702,20 +742,52 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
       <div className="lp-card">
         {/* Hero header */}
         <div className="lp-hero">
-          <div className="lp-hero__score">
-            <span className="lead-score-badge" style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff", width: 64, height: 64, fontSize: 24 }}>
-              {sc.score}
-            </span>
-            <span className="lp-hero__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
-          </div>
-          {daysInSystem !== null && (
-            <div className="lp-hero__age">
-              <span className="lp-hero__age-badge">
-                {daysInSystem === 0 ? "<1" : daysInSystem}
+          {/* Key lights: score is the primary 64px badge; the rest are 48px peers.
+              One visual grammar so Hugo can scan score / urgency / age / source at a glance. */}
+          <div className="lp-hero__keylights">
+            <div className="lp-hero__score">
+              <span className="lead-score-badge" style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff", width: 64, height: 64, fontSize: 24 }}>
+                {sc.score}
               </span>
-              <span className="lp-hero__age-label">{daysInSystem === 1 ? "day" : "days"}</span>
+              <span className="lp-hero__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
             </div>
-          )}
+            {(() => {
+              const urgencyStage = URGENCY_STAGE[lead.urgency] ?? 0;
+              const uk = URGENCY_KEYLIGHT[urgencyStage];
+              return (
+                <KeyLight
+                  value={urgencyStage}
+                  label={URGENCY_SHORT_LABELS[urgencyStage]}
+                  color={uk.color}
+                  bg={uk.bg}
+                  border={uk.border}
+                  title={`Urgency: ${URGENCY_SHORT_LABELS[urgencyStage]} (stage ${urgencyStage})`}
+                />
+              );
+            })()}
+            {daysInSystem !== null && (
+              <div className="lp-hero__age">
+                <span className="lp-hero__age-badge">
+                  {daysInSystem === 0 ? "<1" : daysInSystem}
+                </span>
+                <span className="lp-hero__age-label">{daysInSystem === 1 ? "day" : "days"}</span>
+              </div>
+            )}
+            {(() => {
+              const src = resolveSource(lead.source_channel);
+              const initial = (src.label || "?").charAt(0).toUpperCase();
+              return (
+                <KeyLight
+                  value={initial}
+                  label={src.label}
+                  color={src.color}
+                  bg={src.bg}
+                  border={src.color}
+                  title={`Source: ${src.label}${lead.source_channel ? ` (${lead.source_channel})` : ""}`}
+                />
+              );
+            })()}
+          </div>
           <div className="lp-hero__info">
             <h2 className="lp-hero__name">{name}</h2>
             <div className="lp-hero__contact">
