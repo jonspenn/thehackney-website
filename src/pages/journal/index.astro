@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import HeroSection from '../../components/HeroSection.astro';
 import { getCollection } from 'astro:content';
 import FinalCTA from '../../components/FinalCTA.astro';
 
@@ -31,21 +30,15 @@ const schema = JSON.stringify({
   description="Stories from a restored 1856 brewery on Hackney Road. Heritage, weddings, local guides, and life at The Hackney."
   schema={schema}
 >
-  <!-- Hero -->
-  <div class="journal-hero-wrap">
-    <HeroSection
-      bg="light"
-      height="auto"
-      align="center"
-      eyebrow="Journal"
-      heading="Stories From Hackney Road"
-      subtext="Heritage, weddings, and life at a restored 1856 brewery in the heart of East London."
-    />
-  </div>
-
-  <!-- Posts -->
-  <section class="journal-list section">
+  <!-- Journal listing — single unified section -->
+  <section class="journal-listing section">
     <div class="container">
+      <header class="journal-header">
+        <span class="eyebrow">Journal</span>
+        <h1>Stories From Hackney Road</h1>
+        <p class="journal-intro">Heritage, weddings, and life at a restored 1856 brewery in the heart of East London.</p>
+      </header>
+
       {posts.length === 0 ? (
         <p>Coming soon.</p>
       ) : (
@@ -88,6 +81,7 @@ const schema = JSON.stringify({
   </section>
 
   <!-- CTA -->
+
   <FinalCTA
     eyebrow="Your Celebration"
     heading="Start Planning Your Day"
@@ -98,24 +92,39 @@ const schema = JSON.stringify({
 </Base>
 
 <style>
-  /* Tighten the journal hero — less vertical padding than default */
-  .journal-hero-wrap :global(.hero-section) {
-    padding: var(--space-lg) 0;
-  }
-
-  .journal-hero-wrap {
-  }
-
-  /* Scope the hero H1 down for the journal index - keeps visual
-     hierarchy below the article H1.
-     Wrapper div avoids leaking into contact page hero. */
-  .journal-hero-wrap :global(.hero-section-content h1) {
-    font-size: clamp(2rem, 4.5vw, 3.25rem);
-  }
-
-  .journal-list {
-    padding-top: var(--space-lg);
+  /* Journal listing — unified section with header + grid */
+  .journal-listing {
+    padding-top: var(--space-xl);
     padding-bottom: var(--space-lg);
+  }
+
+  .journal-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto var(--space-xl);
+  }
+
+  .journal-header .eyebrow {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin-bottom: var(--space-sm);
+  }
+
+  .journal-header h1 {
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    margin-bottom: var(--space-md);
+  }
+
+  .journal-intro {
+    font-size: 1.125rem;
+    line-height: 1.65;
+    opacity: 0.8;
+    max-width: none;
   }
 
   .posts-grid {
@@ -256,8 +265,12 @@ const schema = JSON.stringify({
   }
 
   @media (max-width: 768px) {
-    .journal-list {
-      padding-top: var(--space-sm);
+    .journal-listing {
+      padding-top: var(--space-lg);
+    }
+
+    .journal-header {
+      margin-bottom: var(--space-lg);
     }
 
     .posts-grid {
