@@ -19,7 +19,7 @@ import {
 
 export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelectLead, onLeadTypeChange, onDelete, onRestore, showRecycleBin, onToggleRecycleBin }) {
   const [activeLeadType, setActiveLeadType] = useState("wedding");
-  const [leadSort, setLeadSort] = useState({ field: "score", dir: "desc" });
+  const [leadSort, setLeadSort] = useState({ field: "created_at", dir: "desc" });
   const [heatFilter, setHeatFilter] = useState("all");
   const [breakdownFilter, setBreakdownFilter] = useState(null);
   const [leadSearch, setLeadSearch] = useState("");
@@ -30,7 +30,7 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
 
   function changeLeadType(type) {
     setActiveLeadType(type);
-    setLeadSort({ field: "score", dir: "desc" });
+    setLeadSort({ field: "created_at", dir: "desc" });
     setHeatFilter("all");
     setBreakdownFilter(null);
     setLeadSearch("");
@@ -357,7 +357,7 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
                   </th>
                   <th onClick={() => toggleSort("score")} style={{ cursor: "pointer", width: "52px" }}>Score{sortIndicator("score")}</th>
                   <th style={{ width: "80px" }}>Stage</th>
-                  <th onClick={() => toggleSort("created_at")} style={{ cursor: "pointer" }}>When{sortIndicator("created_at")}</th>
+                  <th onClick={() => toggleSort("created_at")} style={{ cursor: "pointer" }}>Created{sortIndicator("created_at")}</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>Phone</th>
