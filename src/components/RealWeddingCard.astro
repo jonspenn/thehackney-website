@@ -1,14 +1,14 @@
 ---
 // Card for the /real-weddings/ listing grid.
 // 4:5 portrait aspect ratio, warm overlay with couple + date + credit, 2px radius.
-// Props follow the realWeddings collection shape.
+// Missing image falls back to a tinted placeholder panel with the couple name rendered large.
 export interface Props {
   slug: string;
   couple: string;
   weddingDate: Date;
   photographer?: string;
-  image: string;
-  imageAlt: string;
+  image?: string;
+  imageAlt?: string;
 }
 
 const { slug, couple, weddingDate, photographer, image, imageAlt } = Astro.props;
@@ -21,7 +21,13 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
 
 <a href={`/real-weddings/${slug}/`} class="rw-card" aria-label={`${couple} - ${formattedDate} - read their story`}>
   <div class="rw-card-media">
-    <img src={image} alt={imageAlt} loading="lazy" width="800" height="1000" />
+    {image ? (
+      <img src={image} alt={imageAlt || couple} loading="lazy" width="800" height="1000" />
+    ) : (
+      <div class="rw-card-placeholder" aria-hidden="true">
+        <span>{couple}</span>
+      </div>
+    )}
   </div>
   <div class="rw-card-body">
     <h2 class="rw-card-couple">{couple}</h2>
@@ -43,13 +49,10 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
     box-shadow: 0 1px 0 rgba(64, 22, 12, 0.05);
     transition: transform 200ms ease, box-shadow 200ms ease;
   }
-
-  .rw-card:hover,
-  .rw-card:focus-visible {
+  .rw-card:hover, .rw-card:focus-visible {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(64, 22, 12, 0.12);
   }
-
   .rw-card-media {
     position: relative;
     width: 100%;
@@ -57,7 +60,6 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
     overflow: hidden;
     background: #e8dfce;
   }
-
   .rw-card-media img {
     width: 100%;
     height: 100%;
@@ -65,16 +67,27 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
     display: block;
     transition: transform 400ms ease;
   }
+  .rw-card:hover .rw-card-media img { transform: scale(1.02); }
 
-  .rw-card:hover .rw-card-media img {
-    transform: scale(1.02);
+  .rw-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(46, 64, 9, 0.92), rgba(44, 24, 16, 0.96));
+    color: #f5f0e8;
+    padding: 2rem;
+    text-align: center;
+  }
+  .rw-card-placeholder span {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
   }
 
-  .rw-card-body {
-    padding: 1rem 0 0.25rem 0;
-    text-align: left;
-  }
-
+  .rw-card-body { padding: 1rem 0 0.25rem 0; text-align: left; }
   .rw-card-couple {
     font-family: var(--font-heading);
     font-size: 1.5rem;
@@ -83,7 +96,6 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
     color: var(--brewery-dark);
     letter-spacing: -0.01em;
   }
-
   .rw-card-meta {
     font-family: var(--font-body);
     font-size: 0.8125rem;
@@ -92,14 +104,9 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
     opacity: 0.75;
     margin: 0;
   }
-
-  .rw-card-credit {
-    opacity: 0.85;
-  }
+  .rw-card-credit { opacity: 0.85; }
 
   @media (min-width: 768px) {
-    .rw-card-couple {
-      font-size: 1.75rem;
-    }
+    .rw-card-couple { font-size: 1.75rem; }
   }
 </style>

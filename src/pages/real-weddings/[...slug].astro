@@ -35,7 +35,7 @@ const schema = JSON.stringify({
   "headline": post.data.title,
   "description": post.data.description,
   "datePublished": post.data.pubDate.toISOString(),
-  "image": `https://thehackney-website.pages.dev${post.data.image}`,
+  ...(post.data.image && { "image": `https://thehackney-website.pages.dev${post.data.image}` }),
   "author": {
     "@type": "Organization",
     "name": "The Hackney",
@@ -80,18 +80,20 @@ const schema = JSON.stringify({
       </div>
     </header>
 
-    <div class="rw-post-hero">
-      <div class="container rw-container">
-        <img
-          src={post.data.image}
-          alt={post.data.imageAlt}
-          width="1600"
-          height="1067"
-          loading="eager"
-          fetchpriority="high"
-        />
+    {post.data.image && (
+      <div class="rw-post-hero">
+        <div class="container rw-container">
+          <img
+            src={post.data.image}
+            alt={post.data.imageAlt || post.data.couple}
+            width="1600"
+            height="1067"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
       </div>
-    </div>
+    )}
 
     {post.body && post.body.trim().length > 0 && (
       <div class="rw-post-narration">

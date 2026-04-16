@@ -22,23 +22,24 @@ const realWeddings = defineCollection({
   type: 'content',
   schema: z.object({
     // Post metadata
-    title: z.string(), // "Couple Name - A Sentence About Their Day", title case, under 65 chars, no em dashes
-    description: z.string(), // 120-155 chars, reads as a sentence about this couple's wedding
-    weddingDate: z.coerce.date(), // Actual wedding date (not publish date)
-    pubDate: z.coerce.date(), // Original Shopify publish date preserves content-age signals on redirect
+    title: z.string(),
+    description: z.string(),
+    weddingDate: z.coerce.date(),
+    pubDate: z.coerce.date(),
 
     // Couple + credits
-    couple: z.string(), // "FirstName & FirstName"
+    couple: z.string(),
     photographer: z.string().optional(),
     photographerUrl: z.string().url().optional(),
     guestCount: z.number().optional(),
-    season: z.enum(['spring', 'summer', 'autumn', 'winter']).optional(), // Populated but not surfaced in v1
+    season: z.enum(['spring', 'summer', 'autumn', 'winter']).optional(),
 
-    // Hero image (renders on listing card + individual post hero)
-    image: z.string(), // Path to WebP, under 150KB
-    imageAlt: z.string(),
+    // Hero image - optional so couples without processed photos can still ship as narration-only.
+    // Card + template handle missing image gracefully.
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
 
-    // Gallery - ordered; drives alternating full-width / two-up layout in template
+    // Gallery - optional array of images. Absent = narration-only post.
     gallery: z
       .array(
         z.object({
@@ -46,7 +47,7 @@ const realWeddings = defineCollection({
           alt: z.string(),
         })
       )
-      .min(1),
+      .optional(),
 
     // Lifecycle
     draft: z.boolean().default(false),
