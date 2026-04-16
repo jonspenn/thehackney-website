@@ -86,7 +86,23 @@
 /blogs/the-hackney-handbook /journal/ 301
 /blogs/real-weddings /real-weddings/ 301
 
-# --- Blog posts: Real Weddings (now point to /real-weddings/[slug]/, section built 2026-04-16) ---
+# --- Blog posts: Real Weddings (canonical Shopify slugs use possessive -s suffix, verified live 2026-04-16; also keep the no-s variants as defensive 301s) ---
+/blogs/real-weddings/charlotte-stephens-wedding-at-the-hackney /real-weddings/charlotte-stephen/ 301
+/blogs/real-weddings/hannah-pierss-wedding-at-the-hackney /real-weddings/hannah-piers/ 301
+/blogs/real-weddings/sian-joshs-wedding-at-the-hackney /real-weddings/sian-josh/ 301
+/blogs/real-weddings/jenny-and-stevens-wedding-at-the-hackney /real-weddings/jenny-steven/ 301
+/blogs/real-weddings/lucy-michelles-wedding-at-the-hackney /real-weddings/lucy-michelle/ 301
+/blogs/real-weddings/helen-michaels-wedding-at-the-hackney /real-weddings/helen-michael/ 301
+/blogs/real-weddings/james-and-matthews-wedding-at-the-hackney /real-weddings/james-matthew/ 301
+/blogs/real-weddings/zoe-and-toms-wedding-at-the-hackney /real-weddings/zoe-tom/ 301
+/blogs/real-weddings/fiona-jamess-wedding-at-the-hackney /real-weddings/fiona-james/ 301
+/blogs/real-weddings/verity-andys-wedding-at-the-hackney /real-weddings/verity-andy/ 301
+/blogs/real-weddings/amy-johns-wedding-at-the-hackney /real-weddings/amy-john/ 301
+/blogs/real-weddings/tom-and-danielles-wedding-at-the-hackney /real-weddings/tom-danielle/ 301
+/blogs/real-weddings/connie-jordans-wedding-at-the-hackney /real-weddings/connie-jordan/ 301
+/blogs/real-weddings/kate-jamess-wedding-at-the-hackney /real-weddings/kate-james/ 301
+
+# Defensive 301s for the no-s slug variants that were never live on Shopify but may have been referenced externally:
 /blogs/real-weddings/charlotte-stephen-wedding-at-the-hackney /real-weddings/charlotte-stephen/ 301
 /blogs/real-weddings/hannah-piers-wedding-at-the-hackney /real-weddings/hannah-piers/ 301
 /blogs/real-weddings/sian-josh-wedding-at-the-hackney /real-weddings/sian-josh/ 301
