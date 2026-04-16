@@ -98,6 +98,11 @@ const schema = JSON.stringify({
 </Base>
 
 <style>
+  /* Tighten the journal hero — less vertical padding than default */
+  .journal-hero-wrap :global(.hero-section) {
+    padding: var(--space-lg) 0;
+  }
+
   /* Scope the hero H1 down for the journal index - keeps visual
      hierarchy below the article H1.
      Wrapper div avoids leaking into contact page hero. */
