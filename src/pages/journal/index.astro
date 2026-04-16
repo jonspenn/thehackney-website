@@ -36,7 +36,7 @@ const schema = JSON.stringify({
     <HeroSection
       bg="light"
       height="auto"
-      align="left"
+      align="center"
       eyebrow="Journal"
       heading="Stories From Hackney Road"
       subtext="Heritage, weddings, and life at a restored 1856 brewery in the heart of East London."
@@ -98,12 +98,11 @@ const schema = JSON.stringify({
 </Base>
 
 <style>
-  /* Scope the hero H1 down for the journal index - prevents orphan
-     and keeps visual hierarchy below the article H1.
+  /* Scope the hero H1 down for the journal index - keeps visual
+     hierarchy below the article H1.
      Wrapper div avoids leaking into contact page hero. */
   .journal-hero-wrap :global(.hero-section-content h1) {
     font-size: clamp(2rem, 4.5vw, 3.25rem);
-    max-width: 16ch;
   }
 
   .journal-list {
