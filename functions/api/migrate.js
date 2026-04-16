@@ -1,10 +1,25 @@
 /**
  * POST /api/migrate
  *
- * One-shot migration endpoint. Creates the contacts and submissions tables
- * in D1 if they don't already exist. Safe to call multiple times (IF NOT EXISTS).
+ * Safety-net migration endpoint for D1 schema drift.
  *
- * Call once after deploy, then optionally remove this file.
+ * IMPORTANT: The canonical schema for this database lives in wrangler
+ * migrations at `/migrations/*.sql`. That is the source of truth for
+ * table creation. In particular `/migrations/0002_create_tracking_tables.sql`
+ * defines the full relational schema (visitors, sessions, events, contacts,
+ * external_events) with NOT NULL and FOREIGN KEY constraints.
+ *
+ * This endpoint exists because many columns were added incrementally via
+ * ALTER TABLE during active development, and we needed an HTTP-callable
+ * way to apply them without shelling into wrangler. Every migration below
+ * is idempotent (`IF NOT EXISTS` or `ALTER TABLE ADD COLUMN` caught on
+ * duplicate-column error) and safe to re-run.
+ *
+ * The two `CREATE TABLE IF NOT EXISTS` statements (contacts, submissions)
+ * are kept as a last-resort bootstrap. They intentionally mirror the
+ * constraints in `/migrations/0002_create_tracking_tables.sql` so that a
+ * fresh DB rebuilt from this endpoint would not drift from live. If you
+ * change either, update the matching wrangler migration in the same commit.
  *
  * Binding: env.DB (D1 database `hackney-date-tracking`)
  */
@@ -17,15 +32,21 @@ const CORS_HEADERS = {
 
 const MIGRATIONS = [
   {
+    // Mirrors /migrations/0002_create_tracking_tables.sql (4. contacts):
+    //   visitor_id NOT NULL + FOREIGN KEY to visitors(visitor_id).
+    // `company` is not in the canonical 0002 schema; it is added below via
+    // `add_company` ALTER TABLE for older environments. A fresh DB created
+    // from this bootstrap gets `company` applied on the subsequent migration
+    // pass (ADD COLUMN is no-op when the column already exists, otherwise
+    // adds it). The two paths converge to the same shape.
     name: "contacts",
     sql: `CREATE TABLE IF NOT EXISTS contacts (
       contact_id TEXT PRIMARY KEY,
-      visitor_id TEXT,
+      visitor_id TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       first_name TEXT,
       last_name TEXT,
       phone TEXT,
-      company TEXT,
       lead_type TEXT,
       source_channel TEXT,
       source_keyword TEXT,
@@ -35,7 +56,8 @@ const MIGRATIONS = [
       klaviyo_profile_id TEXT,
       form_data TEXT,
       questionnaire_data TEXT,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (visitor_id) REFERENCES visitors(visitor_id)
     )`,
   },
   {
