@@ -144,13 +144,20 @@ const schema = JSON.stringify({
   .post-card {
     display: flex;
     flex-direction: column;
+    background: #fff;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(44, 24, 16, 0.06), 0 4px 12px rgba(44, 24, 16, 0.04);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .post-card:hover {
+    box-shadow: 0 2px 6px rgba(44, 24, 16, 0.1), 0 8px 24px rgba(44, 24, 16, 0.06);
   }
 
   .post-card-image-link {
     display: block;
-    margin-bottom: var(--space-sm);
     overflow: hidden;
-    border-radius: 2px;
   }
 
   .post-card-image {
@@ -166,7 +173,7 @@ const schema = JSON.stringify({
   }
 
   .post-card-body {
-    padding-top: var(--space-sm, 0.75rem);
+    padding: var(--space-md) var(--space-md) var(--space-md);
   }
 
   .post-category {
