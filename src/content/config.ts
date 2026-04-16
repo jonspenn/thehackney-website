@@ -10,6 +10,7 @@ const journal = defineCollection({
     category: z.enum(['Heritage', 'Weddings', 'Local Guide', 'Events', 'Food & Drink']),
     image: z.string().optional(),
     imageAlt: z.string().optional(),
+    keywords: z.array(z.string()).optional(),
     author: z.string().default('The Hackney'),
     draft: z.boolean().default(false),
   }),
