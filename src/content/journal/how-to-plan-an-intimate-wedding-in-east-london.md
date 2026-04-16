@@ -85,4 +85,4 @@ If you are planning an intimate wedding in East London, here is what to think ab
 
 The best way to know whether a venue works for your wedding is to stand in it. At The Hackney, Hugo runs every tour personally - he will walk you through the space, talk through how the day works, and answer the questions that matter to you.
 
-[Check your date](/check-your-date/?utm_source=website&utm_medium=blog-cta&utm_campaign=intimate-wedding-east-london) to see if your preferred date is available, or [get in touch](/contact/?utm_source=website&utm_medium=blog-cta&utm_campaign=intimate-wedding-east-london) to book a tour.
+[Check availability on the calendar](/check-your-date/) to see if your preferred date is open, or [get in touch](/contact/) to book a tour.

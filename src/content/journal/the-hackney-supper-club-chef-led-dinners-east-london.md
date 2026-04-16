@@ -60,7 +60,3 @@ If you want the drop first, the [supper club list](/supper-club/#signup) is how.
 If you want to cook a supper club at The Hackney, we are actively booking the rest of 2026 and into 2027. You bring the menu and the team. We bring the room, the service, the bar, and the audience on the list. The kitchen is yours for the day.
 
 Details and the enquiry route are on the [supper club page](/supper-club/#chefs).
-
----
-
-*The Hackney is at 503 Hackney Road, London E2 9ED. Supper clubs run in the main hall, which seats up to sixty for weddings and private dinners and is dressed down to forty for the series.*

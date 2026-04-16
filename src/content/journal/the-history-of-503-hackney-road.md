@@ -43,6 +43,6 @@ Today The Hackney is an exclusive hire venue for weddings, corporate events, and
 
 The building that John Chandler built, that the Mills family held, and that we restored is the same building you walk into today. The timber beams overhead, the brick underfoot, the light through the skylight - 170 years of Hackney Road, still standing.
 
----
+If you would like to see the building for yourself, [check availability on the calendar](/check-your-date/) or read more about [what The Hackney is today](/about/).
 
-*The historical details in this article are verified against the Post Office Directory, Brewery History Society records, Victoria County History of Middlesex, and HM Land Registry. Full source documentation is held internally.*
+> The historical details in this article are verified against the Post Office Directory, Brewery History Society records, Victoria County History of Middlesex, and HM Land Registry. Full source documentation is held internally.

@@ -91,4 +91,4 @@ There is limited street parking on Hackney Road and the surrounding residential 
 
 If you are coming to The Hackney for a tour, a tasting, or an event, build the day around it. This is a neighbourhood that rewards time - the more you explore, the more you understand why so many couples choose to celebrate here.
 
-[Check your date](/check-your-date/?utm_source=website&utm_medium=blog-cta&utm_campaign=things-to-do-near-the-hackney) to see if your preferred date is available, or drop into the [cafe-bar](/cafe-bar/?utm_source=website&utm_medium=blog-cta&utm_campaign=things-to-do-near-the-hackney) to see the space for yourself.
+[Check availability on the calendar](/check-your-date/) to see if your preferred date is open, or drop into the [cafe-bar](/cafe-bar/) any day of the week to see the space for yourself.

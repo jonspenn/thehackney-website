@@ -75,4 +75,4 @@ The other practical advantage of a brewery venue is styling efficiency. Because 
 
 A brewery venue either clicks or it does not. You know within thirty seconds of walking in whether the space feels right. At The Hackney, Hugo runs every venue tour personally and will walk you through exactly how your day would work in this building.
 
-[Check your date](/check-your-date/?utm_source=website&utm_medium=blog-cta&utm_campaign=brewery-wedding-venue) to see availability, or [get in touch](/contact/?utm_source=website&utm_medium=blog-cta&utm_campaign=brewery-wedding-venue) to arrange a tour.
+[Check availability on the calendar](/check-your-date/) to see if your date is open, or [get in touch](/contact/) to arrange a tour.
