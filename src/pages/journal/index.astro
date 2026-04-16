@@ -134,23 +134,11 @@ const schema = JSON.stringify({
     margin-inline: auto;
   }
 
-  /* Last odd card spans full width as a horizontal layout */
+  /* Last odd card centres itself instead of stretching full-width */
   .post-card:last-child:nth-child(odd) {
     grid-column: 1 / -1;
-    flex-direction: row;
-    gap: var(--space-lg);
-  }
-
-  .post-card:last-child:nth-child(odd) .post-card-image-link {
-    flex: 0 0 45%;
-    margin-bottom: 0;
-  }
-
-  .post-card:last-child:nth-child(odd) .post-card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    max-width: 520px;
+    margin-inline: auto;
   }
 
   .post-card {
@@ -268,15 +256,8 @@ const schema = JSON.stringify({
       gap: var(--space-lg);
     }
 
-    /* On mobile, orphan card reverts to vertical like all others */
     .post-card:last-child:nth-child(odd) {
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .post-card:last-child:nth-child(odd) .post-card-image-link {
-      flex: none;
-      margin-bottom: var(--space-sm);
+      max-width: none;
     }
 
   }
