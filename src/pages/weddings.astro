@@ -400,7 +400,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     />
 
     <div class="wedding-stories">
-      <article class="wedding-story">
+      <a href="/real-weddings/sian-josh/" class="wedding-story" aria-label="Read Sian and Josh's wedding story">
         <div class="wedding-story-image">
           <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-real-wedding-sian-josh-red-london-bus.webp" data-bg-pos="center center" role="img" aria-label="Sian and Josh on a red London bus with colourful bouquet"></div>
         </div>
@@ -408,9 +408,9 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
           <h3>Sian &amp; Josh</h3>
           <p class="wedding-story-meta">May 2025</p>
         </div>
-      </article>
+      </a>
 
-      <article class="wedding-story">
+      <a href="/real-weddings/charlotte-stephen/" class="wedding-story" aria-label="Read Charlotte and Stephen's wedding story">
         <div class="wedding-story-image">
           <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-real-wedding-charlotte-stephen-winter-garden-pink-installation.webp" data-bg-pos="center center" role="img" aria-label="Charlotte and Stephen in the Winter Garden at The Hackney, dressed with hot pink florals and disco balls"></div>
         </div>
@@ -418,9 +418,9 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
           <h3>Charlotte &amp; Stephen</h3>
           <p class="wedding-story-meta">August 2024</p>
         </div>
-      </article>
+      </a>
 
-      <article class="wedding-story">
+      <a href="/real-weddings/kate-james/" class="wedding-story" aria-label="Read Kate and James's wedding story">
         <div class="wedding-story-image">
           <div class="wedding-story-image-bg lazy-bg" data-bg="/images/hackney-real-wedding-kate-james-cocktails-disco-ball.webp" data-bg-pos="center center" role="img" aria-label="Kate and James with cocktails under the disco ball at The Hackney"></div>
         </div>
@@ -428,7 +428,11 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
           <h3>Kate &amp; James</h3>
           <p class="wedding-story-meta">August 2023</p>
         </div>
-      </article>
+      </a>
+    </div>
+
+    <div class="section-see-all">
+      <a href="/real-weddings/" class="see-all-link">See all real weddings <span aria-hidden="true">&rarr;</span></a>
     </div>
 
     <div class="section-cta-center">
@@ -1191,6 +1195,29 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     .pricing-form-status[data-state="error"] {
       color: #c0392b;
     }
+
+  /* Section 8 - real wedding cards are now links; treat hover/focus like the old article + add See All link */
+  a.wedding-story { text-decoration: none; color: inherit; display: block; }
+  a.wedding-story:hover .wedding-story-image-bg,
+  a.wedding-story:focus-visible .wedding-story-image-bg {
+    transform: scale(1.02);
+  }
+  .wedding-story-image-bg { transition: transform 400ms ease; }
+  .section-see-all { text-align: center; margin: 2rem 0 1.25rem 0; }
+  .see-all-link {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: color 150ms ease;
+  }
+  .see-all-link:hover, .see-all-link:focus-visible { color: var(--fired-brick); }
+
 </style>
 
 <script>

@@ -1,0 +1,359 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import FinalCTA from '../../components/FinalCTA.astro';
+import PhotoGallery from '../../components/PhotoGallery.jsx';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('realWeddings', ({ data }) => !data.draft))
+    .sort((a, b) => b.data.weddingDate.valueOf() - a.data.weddingDate.valueOf());
+
+  // Pre-compute prev/next so each generated page knows its neighbours.
+  // Sort is newest-first, so "prev" is the newer wedding, "next" is the older.
+  return posts.map((post, i) => ({
+    params: { slug: post.slug },
+    props: {
+      post,
+      prev: i > 0 ? posts[i - 1] : null,
+      next: i < posts.length - 1 ? posts[i + 1] : null,
+    },
+  }));
+}
+
+const { post, prev, next } = Astro.props;
+const { Content } = await post.render();
+
+const formattedDate = post.data.weddingDate.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "datePublished": post.data.pubDate.toISOString(),
+  "image": `https://thehackney-website.pages.dev${post.data.image}`,
+  "author": {
+    "@type": "Organization",
+    "name": "The Hackney",
+    "url": "https://thehackney-website.pages.dev"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Hackney",
+    "url": "https://thehackney-website.pages.dev"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `https://thehackney-website.pages.dev/real-weddings/${post.slug}/`
+  }
+});
+---
+
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  ogImage={post.data.image}
+  schema={schema}
+>
+  <article class="rw-post">
+    <header class="rw-post-header">
+      <div class="container rw-container">
+        <a href="/real-weddings/" class="back-link">&larr; All Real Weddings</a>
+        <span class="eyebrow">Real Weddings</span>
+        <h1>{post.data.couple}</h1>
+        <p class="rw-post-meta">
+          <time datetime={post.data.weddingDate.toISOString()}>{formattedDate}</time>
+          {post.data.guestCount && <span class="rw-post-sep"> - </span>}
+          {post.data.guestCount && <span>Approx {post.data.guestCount} guests</span>}
+          {post.data.photographer && <span class="rw-post-sep"> - </span>}
+          {post.data.photographer && post.data.photographerUrl && (
+            <a href={post.data.photographerUrl} rel="nofollow noopener" target="_blank">Photos by {post.data.photographer}</a>
+          )}
+          {post.data.photographer && !post.data.photographerUrl && (
+            <span>Photos by {post.data.photographer}</span>
+          )}
+        </p>
+      </div>
+    </header>
+
+    <div class="rw-post-hero">
+      <div class="container rw-container">
+        <img
+          src={post.data.image}
+          alt={post.data.imageAlt}
+          width="1600"
+          height="1067"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+
+    {post.body && post.body.trim().length > 0 && (
+      <div class="rw-post-narration">
+        <div class="container rw-container">
+          <div class="prose">
+            <Content />
+          </div>
+        </div>
+      </div>
+    )}
+
+    {post.data.gallery && post.data.gallery.length > 0 && (
+      <div class="rw-post-gallery-wrap">
+        <div class="container">
+          <PhotoGallery client:visible images={post.data.gallery} />
+        </div>
+      </div>
+    )}
+
+    <footer class="rw-post-footer">
+      <div class="container rw-container">
+        <div class="rw-post-divider"></div>
+        <nav class="rw-prev-next" aria-label="More real weddings">
+          {prev ? (
+            <a href={`/real-weddings/${prev.slug}/`} class="rw-prev-next-link rw-prev">
+              <span class="rw-prev-next-label">Previous wedding</span>
+              <span class="rw-prev-next-couple">{prev.data.couple}</span>
+            </a>
+          ) : <span />}
+          {next ? (
+            <a href={`/real-weddings/${next.slug}/`} class="rw-prev-next-link rw-next">
+              <span class="rw-prev-next-label">Next wedding</span>
+              <span class="rw-prev-next-couple">{next.data.couple}</span>
+            </a>
+          ) : <span />}
+        </nav>
+        <div class="rw-post-back">
+          <a href="/real-weddings/" class="back-link">&larr; All Real Weddings</a>
+        </div>
+      </div>
+    </footer>
+  </article>
+
+  <FinalCTA
+    eyebrow="Your Wedding"
+    heading="Start Planning Your Day at The Hackney"
+    body="See your date on our live calendar and get pricing for your wedding."
+    primaryCTA={{ label: "See The Calendar", href: "/check-your-date/" }}
+    utmCampaign="real-weddings-post"
+  />
+</Base>
+
+<style>
+  .rw-post {
+    background: var(--warm-canvas);
+    padding-top: var(--space-md);
+  }
+
+  .rw-container {
+    max-width: 820px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    text-decoration: none;
+    margin-bottom: var(--space-sm);
+    transition: color 0.2s ease;
+  }
+  .back-link:hover { color: var(--fired-brick); }
+
+  .rw-post-header { padding-top: var(--space-md); padding-bottom: var(--space-sm); }
+  .rw-post-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 0.25rem 0 0.75rem 0;
+    color: var(--brewery-dark);
+  }
+
+  .rw-post-meta {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    letter-spacing: 0.03em;
+    color: var(--brewery-dark);
+    opacity: 0.75;
+    margin: 0;
+  }
+  .rw-post-meta a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .rw-post-meta a:hover { color: var(--fired-brick); }
+  .rw-post-sep { opacity: 0.5; margin: 0 0.25rem; }
+
+  .rw-post-hero {
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
+  }
+  .rw-post-hero img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 2px;
+    display: block;
+  }
+
+  .rw-post-narration { padding-top: var(--space-sm); padding-bottom: var(--space-md); }
+  .prose { font-size: 1.0625rem; line-height: 1.75; }
+  .prose :global(p) { margin: 0 0 1.15rem 0; }
+  .prose :global(h2) {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+  }
+
+  .rw-post-gallery-wrap { padding-top: var(--space-sm); padding-bottom: var(--space-lg); }
+
+  .rw-post-footer { padding-top: var(--space-md); padding-bottom: var(--space-lg); }
+  .rw-post-divider {
+    height: 1px;
+    background: rgba(64, 22, 12, 0.15);
+    margin-bottom: var(--space-md);
+  }
+  .rw-prev-next {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+  .rw-prev-next-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-decoration: none;
+    padding: 1rem 0;
+    color: var(--brewery-dark);
+    border-radius: 2px;
+  }
+  .rw-next { text-align: right; align-items: flex-end; }
+  .rw-prev-next-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+  }
+  .rw-prev-next-couple {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+  }
+  .rw-prev-next-link:hover .rw-prev-next-couple { color: var(--fired-brick); }
+  .rw-post-back { margin-top: var(--space-sm); }
+
+  /* Gallery styles live with the page so the React island only ships behaviour, not layout rules. */
+  :global(.rw-gallery) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  :global(.rw-gallery-full),
+  :global(.rw-gallery-pair) {
+    display: grid;
+    gap: 1rem;
+  }
+  :global(.rw-gallery-full) { grid-template-columns: 1fr; }
+  :global(.rw-gallery-pair) { grid-template-columns: 1fr; }
+  @media (min-width: 700px) {
+    :global(.rw-gallery) { gap: 1.5rem; }
+    :global(.rw-gallery-full),
+    :global(.rw-gallery-pair) { gap: 1.5rem; }
+    :global(.rw-gallery-pair) { grid-template-columns: 1fr 1fr; }
+  }
+  :global(.rw-gallery-tile) {
+    display: block;
+    width: 100%;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: zoom-in;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  :global(.rw-gallery-tile img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 400ms ease;
+  }
+  :global(.rw-gallery-tile:hover img),
+  :global(.rw-gallery-tile:focus-visible img) {
+    transform: scale(1.02);
+  }
+
+  /* Lightbox */
+  :global(.rw-lightbox) {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(44, 24, 16, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  :global(.rw-lightbox-figure) {
+    margin: 0;
+    max-width: min(95vw, 1400px);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  :global(.rw-lightbox-figure img) {
+    max-width: 100%;
+    max-height: 88vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 2px;
+    background: #2c1810;
+  }
+  :global(.rw-lightbox-count) {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+    color: #f5f0e8;
+    opacity: 0.75;
+  }
+  :global(.rw-lightbox-close),
+  :global(.rw-lightbox-prev),
+  :global(.rw-lightbox-next) {
+    position: absolute;
+    background: rgba(245, 240, 232, 0.1);
+    color: #f5f0e8;
+    border: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 150ms ease;
+  }
+  :global(.rw-lightbox-close:hover),
+  :global(.rw-lightbox-prev:hover),
+  :global(.rw-lightbox-next:hover) { background: rgba(245, 240, 232, 0.2); }
+  :global(.rw-lightbox-close) { top: 1rem; right: 1rem; }
+  :global(.rw-lightbox-prev) { left: 1rem; top: 50%; transform: translateY(-50%); }
+  :global(.rw-lightbox-next) { right: 1rem; top: 50%; transform: translateY(-50%); }
+
+  @media (max-width: 600px) {
+    .rw-prev-next { grid-template-columns: 1fr; }
+    .rw-next { text-align: left; align-items: flex-start; }
+  }
+</style>

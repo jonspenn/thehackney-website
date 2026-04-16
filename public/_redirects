@@ -29,7 +29,7 @@
 /pages/availability-calendar-the-hackney-e2 /check-your-date/ 301
 /pages/virtual-tour-the-hackney-e2 /about/ 301
 /pages/what-to-expect /weddings/ 301
-/pages/real-weddings /weddings/ 301
+/pages/real-weddings /real-weddings/ 301
 /pages/why-couples-choose-the-hackney /weddings/ 301
 /pages/privacy-policy-the-hackney-e2 /privacy/ 301
 /pages/music-guidelines-and-policies /contact/ 301
@@ -84,23 +84,23 @@
 
 # --- Blog indexes ---
 /blogs/the-hackney-handbook /journal/ 301
-/blogs/real-weddings /weddings/ 301
+/blogs/real-weddings /real-weddings/ 301
 
-# --- Blog posts: Real Weddings (redirect to /weddings/ until real-weddings section built) ---
-/blogs/real-weddings/charlotte-stephen-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/hannah-piers-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/sian-josh-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/jenny-steven-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/lucy-michelle-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/helen-michael-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/james-matthew-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/zoe-tom-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/fiona-james-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/verity-andy-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/amy-john-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/tom-danielle-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/connie-jordan-wedding-at-the-hackney /weddings/ 301
-/blogs/real-weddings/kate-james-wedding-at-the-hackney /weddings/ 301
+# --- Blog posts: Real Weddings (now point to /real-weddings/[slug]/, section built 2026-04-16) ---
+/blogs/real-weddings/charlotte-stephen-wedding-at-the-hackney /real-weddings/charlotte-stephen/ 301
+/blogs/real-weddings/hannah-piers-wedding-at-the-hackney /real-weddings/hannah-piers/ 301
+/blogs/real-weddings/sian-josh-wedding-at-the-hackney /real-weddings/sian-josh/ 301
+/blogs/real-weddings/jenny-steven-wedding-at-the-hackney /real-weddings/jenny-steven/ 301
+/blogs/real-weddings/lucy-michelle-wedding-at-the-hackney /real-weddings/lucy-michelle/ 301
+/blogs/real-weddings/helen-michael-wedding-at-the-hackney /real-weddings/helen-michael/ 301
+/blogs/real-weddings/james-matthew-wedding-at-the-hackney /real-weddings/james-matthew/ 301
+/blogs/real-weddings/zoe-tom-wedding-at-the-hackney /real-weddings/zoe-tom/ 301
+/blogs/real-weddings/fiona-james-wedding-at-the-hackney /real-weddings/fiona-james/ 301
+/blogs/real-weddings/verity-andy-wedding-at-the-hackney /real-weddings/verity-andy/ 301
+/blogs/real-weddings/amy-john-wedding-at-the-hackney /real-weddings/amy-john/ 301
+/blogs/real-weddings/tom-danielle-wedding-at-the-hackney /real-weddings/tom-danielle/ 301
+/blogs/real-weddings/connie-jordan-wedding-at-the-hackney /real-weddings/connie-jordan/ 301
+/blogs/real-weddings/kate-james-wedding-at-the-hackney /real-weddings/kate-james/ 301
 
 # --- Blog posts: The Hackney Handbook (redirect to /journal/) ---
 /blogs/the-hackney-handbook/5-reasons-why-hackney-is-the-best-place-to-host-a-wedding-reception /journal/ 301

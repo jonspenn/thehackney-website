@@ -1,0 +1,117 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import RealWeddingCard from '../../components/RealWeddingCard.astro';
+import FinalCTA from '../../components/FinalCTA.astro';
+
+const posts = (await getCollection('realWeddings', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.weddingDate.valueOf() - a.data.weddingDate.valueOf());
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Real Weddings at The Hackney",
+  "description": "Real couples who celebrated at The Hackney - a restored 1856 brewery on Hackney Road.",
+  "url": "https://thehackney-website.pages.dev/real-weddings/",
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Hackney"
+  }
+});
+---
+
+<Base
+  title="Real Weddings at The Hackney"
+  description="Real couples who celebrated at The Hackney. East London wedding venue in a restored 1856 brewery on Hackney Road."
+  schema={schema}
+>
+  <section class="rw-listing section">
+    <div class="container">
+      <header class="rw-listing-header">
+        <span class="eyebrow">Real Weddings</span>
+        <h1>Real Weddings at The Hackney</h1>
+        <p class="rw-listing-intro">
+          Every couple shapes the day around how they want to feel. These are the people who chose our brewery and made it theirs.
+        </p>
+      </header>
+
+      {posts.length === 0 ? (
+        <p class="rw-empty">Coming soon.</p>
+      ) : (
+        <div class="rw-grid">
+          {posts.map((post) => (
+            <RealWeddingCard
+              slug={post.slug}
+              couple={post.data.couple}
+              weddingDate={post.data.weddingDate}
+              photographer={post.data.photographer}
+              image={post.data.image}
+              imageAlt={post.data.imageAlt}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <FinalCTA
+    eyebrow="Your Wedding"
+    heading="Start Planning Yours"
+    body="See your date on our live calendar and get pricing for your wedding at The Hackney."
+    primaryCTA={{ label: "See The Calendar", href: "/check-your-date/" }}
+    utmCampaign="real-weddings-listing"
+  />
+</Base>
+
+<style>
+  .rw-listing {
+    background: var(--warm-canvas);
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .rw-listing-header {
+    max-width: 720px;
+    margin: 0 auto 3rem auto;
+    text-align: center;
+  }
+
+  .rw-listing-header h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0.5rem 0 1rem 0;
+    color: var(--brewery-dark);
+  }
+
+  .rw-listing-intro {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--brewery-dark);
+    opacity: 0.85;
+    margin: 0;
+  }
+
+  .rw-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 700px) {
+    .rw-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3rem 2.5rem;
+    }
+  }
+
+  .rw-empty {
+    text-align: center;
+    font-family: var(--font-body);
+    color: var(--brewery-dark);
+    opacity: 0.7;
+    padding: 4rem 0;
+  }
+</style>
