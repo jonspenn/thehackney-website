@@ -43,15 +43,22 @@ export const BUDGET_LABELS = {
   "20k-plus": "\u00A320K+",
 };
 
+/* Event type display labels - MUST stay in sync with EVENT_TYPE_OPTIONS in
+   src/components/CorporateQuiz.jsx (and EVENT_TYPE_LABEL in functions/api/leads.js
+   + CustomersView.jsx). Unknown enum values fall through to the raw string. */
 export const EVENT_TYPE_DISPLAY = {
-  "photo-film": "Photo/Film Shoot",
+  // Current CorporateQuiz options (16 Apr 2026)
+  conference: "Conference or Seminar",
+  "team-day": "Team Day or Offsite",
+  "launch-showcase": "Launch, Showcase or Press Event",
+  "photo-film": "Photography or Film Shoot",
+  other: "Something else",
+  // Legacy values still present in D1 from older quiz versions.
   "team-building": "Team Building",
-  conference: "Conference",
   meeting: "Meeting",
   "product-launch": "Product Launch",
   "christmas-party": "Christmas Party",
   "summer-party": "Summer Party",
-  other: "Other",
 };
 
 export const EVENT_TYPE_LABELS = {

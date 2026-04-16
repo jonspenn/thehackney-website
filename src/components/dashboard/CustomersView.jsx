@@ -11,15 +11,26 @@ import { useEffect, useMemo, useState } from "react";
 import { LEAD_TABS } from "./constants.js";
 import { formatRelativeTime, resolveSource } from "./utils.js";
 
+/* Event type labels for the Customers view - MUST stay in sync with
+   EVENT_TYPE_OPTIONS in src/components/CorporateQuiz.jsx. When the quiz changes,
+   update this map, EVENT_TYPE_DISPLAY in dashboard/constants.js, and
+   EVENT_TYPE_LABEL in functions/api/leads.js together. Extra entries below
+   (wedding/corporate/private-events) are lead_type values that flow through
+   the same column - not event_type enum values. */
 const EVENT_TYPE_LABEL = {
-  "photo-film": "Photo/Film Shoot",
+  // Current CorporateQuiz options (16 Apr 2026)
+  conference: "Conference or Seminar",
+  "team-day": "Team Day or Offsite",
+  "launch-showcase": "Launch, Showcase or Press Event",
+  "photo-film": "Photography or Film Shoot",
+  other: "Something else",
+  // Legacy event_type values still present in D1.
   "team-building": "Team Building",
-  conference: "Conference",
   meeting: "Meeting",
   "product-launch": "Product Launch",
   "christmas-party": "Christmas Party",
   "summer-party": "Summer Party",
-  other: "Other",
+  // Lead-type pass-throughs used by this column.
   wedding: "Wedding",
   corporate: "Corporate",
   "private-events": "Private Event",

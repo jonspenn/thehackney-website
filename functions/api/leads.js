@@ -52,16 +52,25 @@ const LEAD_TYPE_LABEL = {
   "cafe-bar": "Cafe-Bar",
 };
 
-/* Event type labels */
+/* Event type labels - MUST stay in sync with EVENT_TYPE_OPTIONS in
+   src/components/CorporateQuiz.jsx. When the quiz gains or renames an option,
+   update this map, EVENT_TYPE_DISPLAY in src/components/dashboard/constants.js,
+   and EVENT_TYPE_LABEL in src/components/dashboard/CustomersView.jsx together.
+   Unknown enum values fall through to the raw string (ugly but non-fatal). */
 const EVENT_TYPE_LABEL = {
-  "photo-film": "Photo/Film Shoot",
+  // Current CorporateQuiz options (16 Apr 2026)
+  conference: "Conference or Seminar",
+  "team-day": "Team Day or Offsite",
+  "launch-showcase": "Launch, Showcase or Press Event",
+  "photo-film": "Photography or Film Shoot",
+  other: "Something else",
+  // Legacy values still present in D1 from older quiz versions. Keep so
+  // historical rows render a human label rather than the raw enum string.
   "team-building": "Team Building",
-  conference: "Conference",
   meeting: "Meeting",
   "product-launch": "Product Launch",
   "christmas-party": "Christmas Party",
   "summer-party": "Summer Party",
-  other: "Other",
 };
 
 /* Which form types map to which lead types */
