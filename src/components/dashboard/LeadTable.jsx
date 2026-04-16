@@ -10,7 +10,11 @@ import {
   TIER_CONFIG,
   FUNNEL_LABELS, HEALTH_COLORS,
   LEAD_TABS,
+  LOST_REASONS,
 } from "./constants.js";
+
+/** Lookup for lost-reason enum → human label. Unknown reasons fall through to raw value. */
+const LOST_REASON_LABEL = Object.fromEntries(LOST_REASONS.map((r) => [r.value, r.label]));
 
 import {
   formatRelativeTime,
@@ -45,7 +49,8 @@ function saveStoredSort(type, sort) {
   }
 }
 
-export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelectLead, onLeadTypeChange, onDelete, onRestore, showRecycleBin, onToggleRecycleBin }) {
+export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelectLead, onLeadTypeChange, onDelete, onRestore, showRecycleBin, onToggleRecycleBin, mode = "active" }) {
+  const isLostMode = mode === "lost";
   const [activeLeadType, setActiveLeadType] = useState("wedding");
   const [leadSort, setLeadSort] = useState(() => loadStoredSort("wedding"));
   const [heatFilter, setHeatFilter] = useState("all");
@@ -318,17 +323,21 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
         </div>
         <div className="lead-panel__status">
           <span>
-            {showRecycleBin
+            {isLostMode
+              ? `${sortedLeads.length} lost lead${sortedLeads.length !== 1 ? "s" : ""}. Click a row to view full profile.`
+              : showRecycleBin
               ? `Recycle bin: ${sortedLeads.length} archived lead${sortedLeads.length !== 1 ? "s" : ""}.`
               : `Showing ${sortedLeads.length} of ${scoredLeads.length} leads. Click a row to view full profile.`}
           </span>
-          <button
-            type="button"
-            className={`lead-toolbar__recycle-btn${showRecycleBin ? " lead-toolbar__recycle-btn--active" : ""}`}
-            onClick={() => { onToggleRecycleBin?.(); setSelectedIds(new Set()); setDeleteConfirm(null); }}
-          >
-            {showRecycleBin ? "\u2190 Back to leads" : "\uD83D\uDDD1\uFE0F Recycle bin"}
-          </button>
+          {!isLostMode && (
+            <button
+              type="button"
+              className={`lead-toolbar__recycle-btn${showRecycleBin ? " lead-toolbar__recycle-btn--active" : ""}`}
+              onClick={() => { onToggleRecycleBin?.(); setSelectedIds(new Set()); setDeleteConfirm(null); }}
+            >
+              {showRecycleBin ? "\u2190 Back to leads" : "\uD83D\uDDD1\uFE0F Recycle bin"}
+            </button>
+          )}
         </div>
         {/* Selection action bar */}
         {selectedIds.size > 0 && (
@@ -391,6 +400,8 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
                   <th onClick={() => toggleSort("score")} style={{ cursor: "pointer", width: "52px" }}>Score{sortIndicator("score")}</th>
                   <th style={{ width: "80px" }}>Stage</th>
                   <th onClick={() => toggleSort("created_at")} style={{ cursor: "pointer" }}>Created{sortIndicator("created_at")}</th>
+                  {isLostMode && <th onClick={() => toggleSort("lost_at")} style={{ cursor: "pointer" }}>Lost{sortIndicator("lost_at")}</th>}
+                  {isLostMode && <th>Lost reason</th>}
                   <th>Name</th>
                   <th>Email</th>
                   <th>Phone</th>
@@ -471,6 +482,23 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
                           <span className="lead-last-seen">seen {sc.daysSinceActivity}d ago</span>
                         )}
                       </td>
+                      {isLostMode && (
+                        <td>{lead.lost_at ? formatRelativeTime(lead.lost_at) : "\u2014"}</td>
+                      )}
+                      {isLostMode && (
+                        <td>
+                          {lead.lost_reason ? (
+                            <span title={lead.lost_reason_note || ""}>
+                              <strong>{LOST_REASON_LABEL[lead.lost_reason] || lead.lost_reason}</strong>
+                              {lead.lost_reason_note && (
+                                <span style={{ display: "block", fontSize: "12px", color: "rgba(44,24,16,0.6)", marginTop: "2px" }}>
+                                  {lead.lost_reason_note}
+                                </span>
+                              )}
+                            </span>
+                          ) : "\u2014"}
+                        </td>
+                      )}
                       <td>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
                       <td>{lead.email}</td>
                       <td>{lead.phone || "\u2014"}</td>

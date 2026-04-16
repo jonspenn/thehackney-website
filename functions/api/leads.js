@@ -85,6 +85,10 @@ export async function onRequestGet(context) {
   const url = new URL(request.url);
   const leadType = url.searchParams.get("type") || "wedding";
   const showDeleted = url.searchParams.get("deleted") === "1";
+  // stage filter: "active" (default) excludes won + lost; "lost" returns only lost;
+  // "all" returns everything (debug / backward-compat). Ignored when showDeleted=1
+  // because the recycle bin always shows everything regardless of stage.
+  const stageParam = (url.searchParams.get("stage") || "active").toLowerCase();
 
   if (!VALID_TYPES.includes(leadType)) {
     return new Response(
@@ -98,6 +102,26 @@ export async function onRequestGet(context) {
       status: 500,
       headers: { ...CORS_HEADERS, "content-type": "application/json" },
     });
+  }
+
+  // Build stage filter fragment. Kept as a raw SQL string (no user input - values
+  // are enumerated above) so it can be interpolated directly into the WHERE clause.
+  // When showDeleted is on we skip this entirely; the recycle bin shows everything
+  // regardless of stage so rows stay recoverable from one place.
+  let stageClause = "";
+  if (!showDeleted) {
+    if (stageParam === "lost") {
+      // Lost tab: only rows that have been explicitly marked lost
+      stageClause = "AND (c.funnel_stage = 'lost' OR c.lost_at IS NOT NULL)";
+    } else if (stageParam === "all") {
+      // Debug / backward-compat: no stage filter
+      stageClause = "";
+    } else {
+      // Default "active" view - main Leads tab. Excludes won (moved to Customers)
+      // and lost (moved to new Lost tab). Cancelled/noshow stay in Leads because
+      // they may still rebook - only Lost is a terminal state.
+      stageClause = "AND c.won_at IS NULL AND c.lost_at IS NULL AND (c.funnel_stage IS NULL OR c.funnel_stage NOT IN ('won', 'lost'))";
+    }
   }
 
   try {
@@ -130,7 +154,7 @@ export async function onRequestGet(context) {
         s.wedding_year, s.event_date, s.brochure_type
       FROM contacts c
       LEFT JOIN submissions s ON s.contact_id = c.contact_id
-      WHERE c.lead_type = ? AND (c.contact_type IS NULL OR c.contact_type = 'lead') AND ${showDeleted ? "c.deleted_at IS NOT NULL" : "c.deleted_at IS NULL"}
+      WHERE c.lead_type = ? AND (c.contact_type IS NULL OR c.contact_type = 'lead') AND ${showDeleted ? "c.deleted_at IS NOT NULL" : "c.deleted_at IS NULL"} ${stageClause}
       ORDER BY c.created_at DESC
       LIMIT 500
     `).bind(leadType).all();

@@ -34,6 +34,7 @@ export default function AdminDashboard() {
   const [clicks, setClicks] = useState(null);
   const [contacts, setContacts] = useState(null);
   const [leads, setLeads] = useState({}); // keyed by lead type: { wedding: {...}, corporate: {...}, ... }
+  const [lostLeads, setLostLeads] = useState({}); // keyed by lead type - funnel_stage='lost' only
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
@@ -94,19 +95,26 @@ export default function AdminDashboard() {
   }
 
   async function handleStatusChange(result) {
-    // Re-fetch leads for the current type so the table + profile reflect the update
+    // Re-fetch active + lost buckets for the current type so both views reflect
+    // the update (e.g. marking a lead Lost removes it from Leads and adds it to
+    // the Lost tab in one refresh cycle).
     try {
-      const res = await fetch(`/api/leads?type=${activeLeadType}`, { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.ok) {
-          setLeads(prev => ({ ...prev, [activeLeadType]: data }));
-          // Update the selected lead with fresh data
-          if (selectedLead) {
-            const updated = data.leads.find(l => l.contact_id === selectedLead.contact_id);
-            if (updated) setSelectedLead(updated);
-          }
-        }
+      const [activeRes, lostRes] = await Promise.all([
+        fetch(`/api/leads?type=${activeLeadType}`, { cache: "no-store" }),
+        fetch(`/api/leads?type=${activeLeadType}&stage=lost`, { cache: "no-store" }),
+      ]);
+      const activeJson = activeRes.ok ? await activeRes.json() : null;
+      const lostJson = lostRes.ok ? await lostRes.json() : null;
+
+      if (activeJson?.ok) setLeads(prev => ({ ...prev, [activeLeadType]: activeJson }));
+      if (lostJson?.ok) setLostLeads(prev => ({ ...prev, [activeLeadType]: lostJson }));
+
+      // Update the selected lead with fresh data - check active first, then lost
+      if (selectedLead) {
+        const fromActive = activeJson?.ok && activeJson.leads.find(l => l.contact_id === selectedLead.contact_id);
+        const fromLost = lostJson?.ok && lostJson.leads.find(l => l.contact_id === selectedLead.contact_id);
+        const updated = fromActive || fromLost;
+        if (updated) setSelectedLead(updated);
       }
     } catch (err) {
       console.error("[status-refresh]", err);
@@ -133,19 +141,28 @@ export default function AdminDashboard() {
         const ctJson = await ctRes.json();
         if (ctJson.ok) setContacts(ctJson);
       }
-      // Fetch leads for all revenue streams in parallel
+      // Fetch active + lost leads for all revenue streams in parallel.
+      // Active = excludes won (moved to Customers) + lost (moved to Lost tab).
+      // Cancelled / noshow remain in active because they may still rebook.
       const leadTypes = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
-      const leadResults = await Promise.all(
-        leadTypes.map(t => fetch(`/api/leads?type=${t}`, { cache: "no-store" }).catch(() => null))
-      );
+      const [activeResults, lostResults] = await Promise.all([
+        Promise.all(leadTypes.map(t => fetch(`/api/leads?type=${t}`, { cache: "no-store" }).catch(() => null))),
+        Promise.all(leadTypes.map(t => fetch(`/api/leads?type=${t}&stage=lost`, { cache: "no-store" }).catch(() => null))),
+      ]);
       const leadsData = {};
+      const lostData = {};
       for (let i = 0; i < leadTypes.length; i++) {
-        if (leadResults[i] && leadResults[i].ok) {
-          const lj = await leadResults[i].json();
+        if (activeResults[i]?.ok) {
+          const lj = await activeResults[i].json();
           if (lj.ok) leadsData[leadTypes[i]] = lj;
+        }
+        if (lostResults[i]?.ok) {
+          const lj = await lostResults[i].json();
+          if (lj.ok) lostData[leadTypes[i]] = lj;
         }
       }
       setLeads(leadsData);
+      setLostLeads(lostData);
     } catch (err) {
       setError(err.message || "Failed to load");
     } finally {
@@ -239,6 +256,7 @@ export default function AdminDashboard() {
 
   // Total leads across all types for the tab badge
   const totalLeadsCount = LEAD_TABS.reduce((sum, lt) => sum + (leads[lt.type]?.total || 0), 0);
+  const totalLostCount = LEAD_TABS.reduce((sum, lt) => sum + (lostLeads[lt.type]?.total || 0), 0);
 
   const tabs = [
     { id: "overview", label: "Overview" },
@@ -246,6 +264,7 @@ export default function AdminDashboard() {
     { id: "pipeline", label: "Pipeline" },
     { id: "bookings", label: "Bookings" },
     { id: "customers", label: "Customers" },
+    { id: "lost", label: `Lost${totalLostCount > 0 ? ` (${totalLostCount})` : ""}` },
     { id: "analytics", label: "Analytics" },
     { id: "pricing", label: "Pricing", href: "/admin/dashboard/pricing-review/" },
   ];
@@ -595,6 +614,17 @@ export default function AdminDashboard() {
       {activeTab === "customers" && !selectedLead && (
         <CustomersView
           onSelectCustomer={selectLead}
+        />
+      )}
+
+      {/* ═══════ LOST TAB ═══════ */}
+      {activeTab === "lost" && !selectedLead && (
+        <LeadTable
+          leads={lostLeads}
+          selectedLeadId={selectedLead?.contact_id}
+          onSelectLead={selectLead}
+          onLeadTypeChange={setActiveLeadType}
+          mode="lost"
         />
       )}
 

@@ -68,7 +68,9 @@ export async function onRequestGet(context) {
         s.form_data as submission_form_data
       FROM contacts c
       LEFT JOIN submissions s ON s.contact_id = c.contact_id
-      WHERE c.lead_type = ? AND c.contact_type = 'customer'
+      WHERE c.lead_type = ?
+        AND (c.deleted_at IS NULL)
+        AND (c.contact_type = 'customer' OR c.funnel_stage = 'won' OR c.won_at IS NOT NULL)
       ORDER BY c.won_at DESC
       LIMIT 1000
     `).bind(leadType).all();
