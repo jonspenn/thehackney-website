@@ -107,14 +107,32 @@ const schema = JSON.stringify({
     </footer>
   </article>
 
-  <!-- CTA -->
-  <FinalCTA
-    eyebrow="Visit Us"
-    heading="See The Building For Yourself"
-    body="Book a tour with Hugo and experience 170 years of Hackney Road history in person."
-    primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
-    utmCampaign="journal-post"
-  />
+  <!-- Category-aware CTA -->
+  {post.data.category === 'Weddings' ? (
+    <FinalCTA
+      eyebrow="Your Wedding"
+      heading="Ready to Check Your Date?"
+      body="See every booked date on our live calendar and get pricing for your wedding at The Hackney."
+      primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+      utmCampaign="journal-weddings"
+    />
+  ) : post.data.category === 'Food & Drink' ? (
+    <FinalCTA
+      eyebrow="Supper Club"
+      heading="Join Us at the Table"
+      body="Chef-led dinners, seasonal menus, and long tables in a restored 1856 brewery. Limited seats."
+      primaryCTA={{ label: "Book A Seat", href: "/supper-club/" }}
+      utmCampaign="journal-food"
+    />
+  ) : (
+    <FinalCTA
+      eyebrow="Visit Us"
+      heading="See The Building For Yourself"
+      body="Book a tour with Hugo and experience 170 years of Hackney Road history in person."
+      primaryCTA={{ label: "Check Your Date", href: "/check-your-date/" }}
+      utmCampaign="journal-post"
+    />
+  )}
 </Base>
 
 <style>
@@ -199,10 +217,11 @@ const schema = JSON.stringify({
 
   .post-featured-image img {
     width: 100%;
-    max-width: 960px;
+    max-width: 720px;
     height: auto;
     aspect-ratio: 16 / 9;
     object-fit: cover;
+    border-radius: 2px;
   }
 
   .post-content {
@@ -216,6 +235,7 @@ const schema = JSON.stringify({
   }
 
   .prose :global(h2) {
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
     margin-top: var(--space-xl);
     margin-bottom: var(--space-md);
   }
@@ -248,11 +268,29 @@ const schema = JSON.stringify({
   .prose :global(ul),
   .prose :global(ol) {
     margin-bottom: var(--space-md);
-    padding-left: var(--space-lg);
+    padding-left: var(--space-md);
+  }
+
+  .prose :global(ul) {
+    list-style: none;
+  }
+
+  .prose :global(ul li) {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+
+  .prose :global(ul li)::before {
+    content: '\2013';
+    position: absolute;
+    left: 0;
+    color: var(--dusty-coral);
+    font-weight: 500;
   }
 
   .prose :global(li) {
     margin-bottom: var(--space-xs);
+    max-width: 65ch;
   }
 
   .prose :global(img) {
