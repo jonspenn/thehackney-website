@@ -58,20 +58,19 @@ const schema = JSON.stringify({
                 </a>
               )}
               <div class="post-card-body">
-                <div class="post-meta">
-                  <span class="post-category">{post.data.category}</span>
+                <span class="post-category">{post.data.category}</span>
+                <h2 class="post-title">
+                  <a href={`/journal/${post.slug}/`}>{post.data.title}</a>
+                </h2>
+                <p class="post-excerpt">{post.data.description}</p>
+                <div class="post-card-footer">
                   <span class="post-date">
                     <time datetime={post.data.pubDate.toISOString()}>
                       {post.data.pubDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </time>
                   </span>
-                  <span class="post-reading-time">{readingTime(post.body || '')}</span>
+                  <a href={`/journal/${post.slug}/`} class="post-read-more">Read the full story <span class="arrow">&rarr;</span></a>
                 </div>
-                <h2 class="post-title">
-                  <a href={`/journal/${post.slug}/`}>{post.data.title}</a>
-                </h2>
-                <p class="post-excerpt">{post.data.description}</p>
-                <a href={`/journal/${post.slug}/`} class="post-read-more">Read the full story <span class="arrow">&rarr;</span></a>
               </div>
             </article>
           ))}
@@ -178,42 +177,30 @@ const schema = JSON.stringify({
     transform: scale(1.02);
   }
 
-  .post-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-sm);
-    font-family: var(--font-body);
-    font-size: 0.8125rem;
-    letter-spacing: 0.05em;
-  }
-
   .post-category {
+    display: block;
+    font-family: var(--font-body);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--dusty-coral);
     font-size: 0.75rem;
+    margin-bottom: var(--space-xs, 0.5rem);
   }
 
-  .post-date,
-  .post-reading-time {
+  .post-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: var(--space-xs, 0.5rem);
+  }
+
+  .post-date {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
     color: var(--brewery-dark);
-    opacity: 0.55;
-  }
-
-  .post-date::before,
-  .post-reading-time::before {
-    content: '';
-    display: inline-block;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: var(--brewery-dark);
-    opacity: 0.3;
-    vertical-align: middle;
-    margin-right: var(--space-sm);
+    opacity: 0.45;
   }
 
   h2.post-title {
@@ -248,7 +235,6 @@ const schema = JSON.stringify({
     color: var(--dusty-coral);
     text-decoration: none;
     transition: color 0.2s ease;
-    margin-top: auto;
   }
 
   .post-read-more .arrow {
@@ -289,8 +275,5 @@ const schema = JSON.stringify({
       margin-bottom: var(--space-sm);
     }
 
-    .post-meta {
-      gap: var(--space-sm);
-    }
   }
 </style>
