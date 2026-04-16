@@ -62,19 +62,12 @@ const schema = JSON.stringify({
     <header class="post-header">
       <div class="container post-container">
         <a href="/journal/" class="back-link">&larr; Back to Journal</a>
-        <div class="post-meta">
-          <span class="post-category">{post.data.category}</span>
-          <span class="post-date">
-            <time datetime={post.data.pubDate.toISOString()}>{formattedDate}</time>
-          </span>
-          <span class="post-reading-time">{readingTime(post.body || '')}</span>
-        </div>
         <h1>{post.data.title}</h1>
         <p class="post-description">{post.data.description}</p>
       </div>
     </header>
 
-    <!-- Featured Image -->
+    <!-- Featured Image + Meta -->
     {post.data.image && (
       <div class="post-featured-image">
         <div class="container post-container">
@@ -85,6 +78,13 @@ const schema = JSON.stringify({
             height="675"
             loading="eager"
           />
+          <div class="post-meta">
+            <span class="post-category">{post.data.category}</span>
+            <span class="post-date">
+              <time datetime={post.data.pubDate.toISOString()}>{formattedDate}</time>
+            </span>
+            <span class="post-reading-time">{readingTime(post.body || '')}</span>
+          </div>
         </div>
       </div>
     )}
@@ -159,15 +159,33 @@ const schema = JSON.stringify({
 
   .post-header {
     padding-top: var(--space-md);
-    padding-bottom: var(--space-xs);
+    padding-bottom: 0;
   }
 
-  .post-header .post-meta {
+  .post-header h1 {
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    margin-bottom: var(--space-sm);
+    max-width: 30ch;
+  }
+
+  .post-description {
+    font-size: 1.125rem;
+    line-height: 1.65;
+    opacity: 0.8;
+    max-width: 55ch;
+  }
+
+  .post-featured-image {
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-md);
+  }
+
+  .post-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-sm);
-    margin-bottom: var(--space-sm);
+    margin-top: var(--space-sm);
     font-family: var(--font-body);
     font-size: 0.8125rem;
   }
@@ -197,23 +215,6 @@ const schema = JSON.stringify({
     opacity: 0.3;
     vertical-align: middle;
     margin-right: var(--space-sm);
-  }
-
-  .post-header h1 {
-    font-size: clamp(2rem, 4.5vw, 3.5rem);
-    margin-bottom: var(--space-md);
-    max-width: 30ch;
-  }
-
-  .post-description {
-    font-size: 1.125rem;
-    line-height: 1.65;
-    opacity: 0.8;
-    max-width: 55ch;
-  }
-
-  .post-featured-image {
-    padding-block: var(--space-sm);
   }
 
   .post-featured-image img {
@@ -316,8 +317,8 @@ const schema = JSON.stringify({
   }
 
   @media (max-width: 768px) {
-    .post-header .post-meta {
-      gap: var(--space-sm);
+    .post-meta {
+      gap: var(--space-xs);
     }
 
     .post-header h1 {
