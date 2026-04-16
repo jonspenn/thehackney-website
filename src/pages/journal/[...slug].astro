@@ -158,7 +158,8 @@ const schema = JSON.stringify({
   }
 
   .post-header {
-    padding-bottom: 0;
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
   }
 
   .post-header .post-meta {
@@ -213,6 +214,7 @@ const schema = JSON.stringify({
 
   .post-featured-image {
     padding-block: var(--space-md);
+    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
   }
 
   .post-featured-image img {
@@ -227,7 +229,7 @@ const schema = JSON.stringify({
   }
 
   .post-content {
-    padding-top: 0;
+    padding-top: var(--space-lg);
   }
 
   /* Prose styling for markdown content */
@@ -308,13 +310,13 @@ const schema = JSON.stringify({
   }
 
   .post-divider {
-    height: 1px;
-    background: rgba(44, 24, 16, 0.1);
-    margin-bottom: var(--space-lg);
+    display: none;
   }
 
   .post-footer {
-    padding-bottom: var(--space-xl);
+    padding-top: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-top: 1px solid rgba(44, 24, 16, 0.08);
   }
 
   @media (max-width: 768px) {
