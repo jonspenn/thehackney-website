@@ -650,6 +650,42 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
   const firstSeen = parseTimestamp(lead.first_seen_at || lead.created_at);
   const daysInSystem = firstSeen ? Math.max(0, Math.floor((Date.now() - firstSeen.getTime()) / 86400000)) : null;
 
+  // Dates this lead clicked on the /check-your-date/ calendar.
+  // Data source: D1 events table, event_type = "date_check", wired from AvailabilityCalendar.
+  // PRD: pages/calendar/prd-sys-date-click-history.md (Phase 1).
+  // We collect unique ISO dates with their most recent click timestamp, then sort
+  // most-recently-clicked first so Hugo sees the freshest intent at the top.
+  let datesChecked = [];
+  if (journey && journey.sessions) {
+    const latestByDate = {};
+    journey.sessions.forEach(s => {
+      (s.events || []).forEach(e => {
+        if (e.event_type !== "date_check") return;
+        const data = parseEventData(e.event_data);
+        const d = data && data.date;
+        if (!d) return;
+        if (!latestByDate[d] || (e.created_at || "") > latestByDate[d]) {
+          latestByDate[d] = e.created_at || "";
+        }
+      });
+    });
+    datesChecked = Object.entries(latestByDate)
+      .sort((a, b) => (b[1] || "").localeCompare(a[1] || ""))
+      .map(([d]) => d);
+  }
+  const DATES_VISIBLE = 5;
+  const formatCheckedDate = (iso) => {
+    // "2026-04-19" -> "Sat 19 Apr 2026". Parsed in UTC to avoid timezone drift
+    // (the calendar stores the day the user clicked, not a moment in time).
+    const parts = (iso || "").split("-");
+    if (parts.length !== 3) return iso;
+    const dt = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
+    if (isNaN(dt.getTime())) return iso;
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${days[dt.getUTCDay()]} ${dt.getUTCDate()} ${months[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`;
+  };
+
   return (
     <div className="lp-fullpage">
       {/* Back button */}
@@ -772,6 +808,24 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
 
           <ScoreBreakdown sc={sc} tc={tc} lead={lead} />
         </div>
+
+        {/* Dates checked - hidden entirely when the lead has not used the calendar */}
+        {datesChecked.length > 0 && (
+          <div className="lp-section lp-dates">
+            <h3 className="lp-section__title">
+              Dates checked
+              <span className="lp-dates__count">{datesChecked.length}</span>
+            </h3>
+            <div className="lp-dates__list">
+              {datesChecked.slice(0, DATES_VISIBLE).map(d => (
+                <span key={d} className="lp-dates__tag">{formatCheckedDate(d)}</span>
+              ))}
+              {datesChecked.length > DATES_VISIBLE && (
+                <span className="lp-dates__more">+{datesChecked.length - DATES_VISIBLE} more</span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Journey */}
         <div className="lp-section">

@@ -196,7 +196,13 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
 
   function handleDateClick(cell) {
     if (!cell.isAvailable) return;
+    // Anonymous aggregate (demand signal, feeds dynamic pricing model)
     trackDateClick(cell.dateStr);
+    // Identity-stitched (appears on the lead profile once visitor becomes a contact)
+    // See pages/calendar/prd-sys-date-click-history.md Phase 1
+    if (typeof window !== "undefined" && window.__thk) {
+      try { window.__thk.track("date_check", { date: cell.dateStr }); } catch { /* no-op */ }
+    }
     if (onSelectDate) onSelectDate(cell.dateStr);
   }
 
