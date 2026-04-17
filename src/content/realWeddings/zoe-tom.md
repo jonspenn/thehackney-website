@@ -6,6 +6,23 @@ pubDate: 2025-03-15
 couple: "Zoe & Tom"
 photographer: "Dan McCourt"
 season: "spring"
+image: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-hero.webp"
+imageAlt: "Zoe & Tom on their wedding day at The Hackney"
+gallery:
+  - src: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-01.webp"
+    alt: "Zoe & Tom - wedding photo 1 at The Hackney"
+  - src: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-02.webp"
+    alt: "Zoe & Tom - wedding photo 2 at The Hackney"
+  - src: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-03.webp"
+    alt: "Zoe & Tom - wedding photo 3 at The Hackney"
+  - src: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-04.webp"
+    alt: "Zoe & Tom - wedding photo 4 at The Hackney"
+  - src: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-05.webp"
+    alt: "Zoe & Tom - wedding photo 5 at The Hackney"
+  - src: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-06.webp"
+    alt: "Zoe & Tom - wedding photo 6 at The Hackney"
+  - src: "/images/real-weddings/zoe-tom/hackney-real-wedding-zoe-tom-07.webp"
+    alt: "Zoe & Tom - wedding photo 7 at The Hackney"
 draft: false
 ---
 
