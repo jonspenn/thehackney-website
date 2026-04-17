@@ -6,6 +6,7 @@ pubDate: 2024-05-04
 couple: "Tom & Danielle"
 photographer: "Ollie Hinds"
 season: "spring"
+youtubeFilmId: "BVkvVECn7sU"
 image: "/images/real-weddings/tom-danielle/hackney-real-wedding-tom-danielle-hero.webp"
 imageAlt: "Tom & Danielle on their wedding day at The Hackney"
 gallery:

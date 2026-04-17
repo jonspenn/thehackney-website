@@ -6,6 +6,7 @@ pubDate: 2024-08-16
 couple: "Charlotte & Stephen"
 photographer: "This Modern Revelry"
 season: "summer"
+youtubeFilmId: "UEDQqvHBh0g"
 image: "/images/real-weddings/charlotte-stephen/hackney-real-wedding-charlotte-stephen-hero.webp"
 imageAlt: "Charlotte & Stephen on their wedding day at The Hackney"
 gallery:

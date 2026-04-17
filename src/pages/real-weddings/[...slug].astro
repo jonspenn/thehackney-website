@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import FinalCTA from '../../components/FinalCTA.astro';
 import PhotoGallery from '../../components/PhotoGallery.jsx';
+import YouTubeFacade from '../../components/YouTubeFacade.astro';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('realWeddings', ({ data }) => !data.draft))
@@ -29,7 +30,7 @@ const formattedDate = post.data.weddingDate.toLocaleDateString('en-GB', {
   year: 'numeric',
 });
 
-const schema = JSON.stringify({
+const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": post.data.title,
@@ -50,7 +51,27 @@ const schema = JSON.stringify({
     "@type": "WebPage",
     "@id": `https://thehackney-website.pages.dev/real-weddings/${post.slug}/`
   }
-});
+};
+
+// If this post has a YouTube film, append a VideoObject so search engines can understand the video.
+// Embed URL intentionally points at the lite-facade page URL (our page) rather than the raw YouTube URL
+// so engagement credit routes back to our site where possible.
+const videoSchema = post.data.youtubeFilmId ? {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": `${post.data.couple} wedding film at The Hackney`,
+  "description": post.data.description,
+  "thumbnailUrl": `https://i.ytimg.com/vi/${post.data.youtubeFilmId}/hqdefault.jpg`,
+  "uploadDate": post.data.pubDate.toISOString(),
+  "contentUrl": `https://www.youtube.com/watch?v=${post.data.youtubeFilmId}`,
+  "embedUrl": `https://www.youtube-nocookie.com/embed/${post.data.youtubeFilmId}`,
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Hackney"
+  }
+} : null;
+
+const schema = JSON.stringify(videoSchema ? [articleSchema, videoSchema] : articleSchema);
 ---
 
 <Base
@@ -110,6 +131,18 @@ const schema = JSON.stringify({
           <div class="prose">
             <Content />
           </div>
+        </div>
+      </div>
+    )}
+
+    {post.data.youtubeFilmId && (
+      <div class="rw-post-film">
+        <div class="container rw-container">
+          <YouTubeFacade
+            videoId={post.data.youtubeFilmId}
+            title={`${post.data.couple} wedding film`}
+            caption="Wedding film"
+          />
         </div>
       </div>
     )}
@@ -224,6 +257,8 @@ const schema = JSON.stringify({
     margin-bottom: var(--space-sm);
   }
 
+
+  .rw-post-film { padding-top: var(--space-sm); padding-bottom: var(--space-md); }
   .rw-post-gallery-wrap { padding-top: var(--space-sm); padding-bottom: var(--space-lg); }
 
   .rw-post-footer { padding-top: var(--space-md); padding-bottom: var(--space-lg); }

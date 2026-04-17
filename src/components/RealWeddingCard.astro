@@ -45,13 +45,14 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
     color: inherit;
     border-radius: 2px;
     overflow: hidden;
-    background: var(--warm-canvas);
-    box-shadow: 0 1px 0 rgba(64, 22, 12, 0.05);
-    transition: transform 200ms ease, box-shadow 200ms ease;
+    background: rgba(255, 255, 255, 0.3); /* matches journal card - subtle lift off Warm Canvas */
+    border: 1px solid rgba(44, 24, 16, 0.04);
+    transition: border-color 300ms ease, transform 200ms ease, box-shadow 200ms ease;
   }
   .rw-card:hover, .rw-card:focus-visible {
+    border-color: rgba(44, 24, 16, 0.1); /* matches journal card hover */
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(64, 22, 12, 0.12);
+    box-shadow: 0 4px 16px rgba(64, 22, 12, 0.08);
   }
   .rw-card-media {
     position: relative;
@@ -87,7 +88,7 @@ const formattedDate = weddingDate.toLocaleDateString('en-GB', {
     letter-spacing: -0.01em;
   }
 
-  .rw-card-body { padding: 1rem 0 0.25rem 0; text-align: left; }
+  .rw-card-body { padding: 1rem 1rem 1rem 1rem; text-align: left; }
   .rw-card-couple {
     font-family: var(--font-heading);
     font-size: 1.5rem;

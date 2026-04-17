@@ -6,6 +6,7 @@ pubDate: 2025-04-05
 couple: "James & Matthew"
 photographer: "Mike Plunkett"
 season: "spring"
+youtubeFilmId: "jHW9ilpXumg"
 image: "/images/real-weddings/james-matthew/hackney-real-wedding-james-matthew-hero.webp"
 imageAlt: "James & Matthew on their wedding day at The Hackney"
 gallery:

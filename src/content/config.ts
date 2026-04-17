@@ -34,6 +34,10 @@ const realWeddings = defineCollection({
     guestCount: z.number().optional(),
     season: z.enum(['spring', 'summer', 'autumn', 'winter']).optional(),
 
+    // YouTube film (optional). Rendered as a lite-facade on the post page - thumbnail + play button only,
+    // iframe loads on click so it costs nothing on page load (no YouTube JS, no 3rd-party cookies).
+    youtubeFilmId: z.string().optional(),
+
     // Hero image - optional so couples without processed photos can still ship as narration-only.
     // Card + template handle missing image gracefully.
     image: z.string().optional(),

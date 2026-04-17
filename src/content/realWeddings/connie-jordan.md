@@ -6,6 +6,7 @@ pubDate: 2023-12-21
 couple: "Connie & Jordan"
 photographer: "This Modern Revelry"
 season: "winter"
+youtubeFilmId: "lTpNfhUb_5Y"
 image: "/images/real-weddings/connie-jordan/hackney-real-wedding-connie-jordan-hero.webp"
 imageAlt: "Connie & Jordan on their wedding day at The Hackney"
 gallery:

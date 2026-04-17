@@ -6,6 +6,7 @@ pubDate: 2023-08-11
 couple: "Kate & James"
 photographer: "This Modern Revelry"
 season: "summer"
+youtubeFilmId: "obF87yjKwJM"
 image: "/images/real-weddings/kate-james/hackney-real-wedding-kate-james-hero.webp"
 imageAlt: "Kate & James on their wedding day at The Hackney"
 gallery:

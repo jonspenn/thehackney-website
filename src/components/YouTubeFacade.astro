@@ -1,0 +1,135 @@
+---
+// Lite YouTube facade - renders a thumbnail + play button. Clicking replaces the facade
+// with the real YouTube iframe. Zero Core Web Vitals cost on page load: no JS library,
+// no YouTube scripts, no 3rd-party cookies until the user actively chooses to play.
+//
+// Pattern follows Google's own "lite-youtube" recommendation. About 30 lines of JS, all inline.
+//
+// Props:
+//   videoId   - YouTube video ID (e.g. "UEDQqvHBh0g")
+//   title     - a11y label for the play button, also used as the iframe title
+//   caption?  - optional caption rendered below the video (subtle, brand-voice)
+export interface Props {
+  videoId: string;
+  title: string;
+  caption?: string;
+}
+const { videoId, title, caption } = Astro.props;
+// YouTube offers several thumbnail sizes; maxresdefault.jpg is the HD version but not always
+// present. hqdefault.jpg is always available at 480x360. We'll use hqdefault as the safe default.
+const thumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+---
+
+<figure class="rw-film">
+  <button
+    type="button"
+    class="rw-film-facade"
+    data-video-id={videoId}
+    aria-label={`Play wedding film: ${title}`}
+  >
+    <img src={thumb} alt="" loading="lazy" width="1280" height="720" />
+    <span class="rw-film-play" aria-hidden="true">
+      <svg viewBox="0 0 68 48" width="68" height="48">
+        <path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55C3.97 2.33 2.27 4.81 1.48 7.74.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#f00"></path>
+        <path d="M45 24 27 14v20" fill="#fff"></path>
+      </svg>
+    </span>
+  </button>
+  {caption && <figcaption class="rw-film-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .rw-film {
+    margin: 0 0 var(--space-md) 0;
+  }
+  .rw-film-facade {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: #000;
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 16 / 9;
+  }
+  .rw-film-facade img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0.88;
+    transition: opacity 200ms ease, transform 400ms ease;
+  }
+  .rw-film-facade:hover img,
+  .rw-film-facade:focus-visible img {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+  .rw-film-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .rw-film-play svg {
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+    transition: transform 200ms ease;
+  }
+  .rw-film-facade:hover .rw-film-play svg,
+  .rw-film-facade:focus-visible .rw-film-play svg {
+    transform: scale(1.06);
+  }
+  .rw-film-caption {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--brewery-dark);
+    opacity: 0.7;
+    margin: 0.5rem 0 0 0;
+    text-align: center;
+  }
+
+  /* After click - iframe wrapper replaces the facade inline */
+  .rw-film-iframe {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 2px;
+    overflow: hidden;
+    background: #000;
+  }
+  .rw-film-iframe iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+</style>
+
+<script>
+  // Self-contained - no dependencies. Upgrades every facade on the page to play the real iframe
+  // when clicked. Loads privacy-enhanced youtube-nocookie.com so cookies are minimised.
+  document.querySelectorAll('.rw-film-facade').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const facade = e.currentTarget as HTMLElement;
+      const videoId = facade.dataset.videoId;
+      if (!videoId) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'rw-film-iframe';
+
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+      iframe.title = facade.getAttribute('aria-label')?.replace(/^Play wedding film:\s*/, '') || 'Wedding film';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+
+      wrapper.appendChild(iframe);
+      facade.replaceWith(wrapper);
+    });
+  });
+</script>

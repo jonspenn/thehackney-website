@@ -6,6 +6,7 @@ pubDate: 2024-06-07
 couple: "Amy & John"
 photographer: "This Modern Revelry"
 season: "summer"
+youtubeFilmId: "WRPCRdmiWQk"
 image: "/images/real-weddings/amy-john/hackney-real-wedding-amy-john-hero.webp"
 imageAlt: "Amy & John on their wedding day at The Hackney"
 gallery:

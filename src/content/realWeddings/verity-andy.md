@@ -6,6 +6,7 @@ pubDate: 2024-06-08
 couple: "Verity & Andy"
 photographer: "Ollie Hinds"
 season: "summer"
+youtubeFilmId: "763EMmx8Yio"
 image: "/images/real-weddings/verity-andy/hackney-real-wedding-verity-andy-hero.webp"
 imageAlt: "Verity & Andy on their wedding day at The Hackney"
 gallery:

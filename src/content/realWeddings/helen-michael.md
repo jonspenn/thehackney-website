@@ -6,6 +6,7 @@ pubDate: 2025-04-17
 couple: "Helen & Michael"
 photographer: "Daniel Ackerley Photography"
 season: "spring"
+youtubeFilmId: "TTY0umy8pKA"
 image: "/images/real-weddings/helen-michael/hackney-real-wedding-helen-michael-hero.webp"
 imageAlt: "Helen & Michael on their wedding day at The Hackney"
 gallery:

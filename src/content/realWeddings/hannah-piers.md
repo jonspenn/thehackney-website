@@ -6,6 +6,7 @@ pubDate: 2025-07-19
 couple: "Hannah & Piers"
 photographer: "Mark Horton"
 season: "summer"
+youtubeFilmId: "le23hlBXlW0"
 image: "/images/real-weddings/hannah-piers/hackney-real-wedding-hannah-piers-hero.webp"
 imageAlt: "Hannah & Piers on their wedding day at The Hackney"
 gallery:

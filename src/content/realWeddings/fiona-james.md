@@ -6,6 +6,7 @@ pubDate: 2024-11-10
 couple: "Fiona & James"
 photographer: "This Modern Revelry"
 season: "autumn"
+youtubeFilmId: "yqwRwDl_AxQ"
 image: "/images/real-weddings/fiona-james/hackney-real-wedding-fiona-james-hero.webp"
 imageAlt: "Fiona & James on their wedding day at The Hackney"
 gallery:
