@@ -45,6 +45,17 @@
   /* Layout */
   --max-width: 1200px;
   --header-height: 96px;
+
+  /* Card system (sitewide) -- every card-like surface uses these tokens so we don't drift.
+     If a card needs a visual variation (dark-bg card, stat card, etc.), define a new set of tokens.
+     Never hardcode background/border/radius/padding on card components. */
+  --card-bg: rgba(255, 255, 255, 0.3);
+  --card-border-color: rgba(44, 24, 16, 0.04);
+  --card-border-color-hover: rgba(44, 24, 16, 0.1);
+  --card-radius: 2px;
+  --card-pad-x: var(--space-lg);   /* 32px horizontal breathing room */
+  --card-pad-y: var(--space-md);   /* 16px vertical */
+  --card-shadow-hover: 0 4px 16px rgba(64, 22, 12, 0.08);
 }
 
 /* --- Reset / Base --- */
