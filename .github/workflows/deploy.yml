@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Validate design tokens
+        # Fails the build if DESIGN.md and src/styles/global.css have drifted.
+        # No npm deps required; pure Node script.
+        run: node scripts/validate-design-tokens.mjs
+
       - name: Install dependencies
         run: npm ci
 
