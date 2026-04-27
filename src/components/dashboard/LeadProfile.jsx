@@ -28,7 +28,6 @@ import {
   TIER_CONFIG,
   FUNNEL_LABELS, HEALTH_COLORS, STAGE_DEFINITIONS,
   STAGE_PRIMARY_ACTION,
-  STAGE_PILL_COLORS,
   LEAD_TYPE_LABELS,
   EVENT_TYPE_DISPLAY,
   JOURNEY_EVENT_LABELS,
@@ -42,6 +41,17 @@ import {
   computeLeadScore, computeFunnelStage,
   resolveSource,
 } from "./utils.js";
+
+import {
+  StagePill,
+  ScoreRing,
+  resolveRingDisplay,
+  MetadataStrip,
+  MetadataCell,
+  AttributeRow,
+  ActivityTimelineRow,
+  CardSurface,
+} from "./primitives/index.js";
 
 /* ── Funnel track (unchanged from v0 - already battle-tested) ── */
 
@@ -650,65 +660,8 @@ function StageActions({ lead, funnel, activeLeadType, onStatusChange }) {
   );
 }
 
-/* ── Score breakdown (ring headline + compact bars below - PRD Option B) ── */
-
-function ScoreRing({ score, tierLabel, tierColor, size = "lg" }) {
-  // size === "lg" -> 96px ring, used legacy in the score column (no longer rendered there)
-  // size === "sm" -> 64px ring, used in the metadata strip cell 1
-  const isSm = size === "sm";
-  const dim = isSm ? 64 : 96;
-  const center = dim / 2;
-  const stroke = isSm ? 5 : 6;
-  const radius = isSm ? 27 : 42;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - Math.max(0, Math.min(100, score)) / 100);
-  const cls = isSm ? "lp-score-ring lp-score-ring--sm" : "lp-score-ring";
-  return (
-    <div className={cls}>
-      <svg width={dim} height={dim} viewBox={`0 0 ${dim} ${dim}`}>
-        <circle cx={center} cy={center} r={radius} fill="none" stroke="rgba(64,22,12,0.12)" strokeWidth={stroke} />
-        <circle
-          cx={center} cy={center} r={radius} fill="none"
-          stroke="#2E4009" strokeWidth={stroke}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          transform={`rotate(-90 ${center} ${center})`}
-          strokeLinecap="round"
-        />
-      </svg>
-      <div className="lp-score-ring__inner">
-        <div className="lp-score-ring__num">{score}</div>
-        <div className="lp-score-ring__tier" style={{ color: tierColor }}>{tierLabel}</div>
-      </div>
-    </div>
-  );
-}
-
-/* Resolve ring score/tier - shared by metadata strip + (legacy) score column.
- * Returns { score, tierLabel, tierColor } applying Won/Lost short-circuits. */
-function resolveRingDisplay(sc, lead, funnel) {
-  const TIER_RING_COLORS = {
-    hot:  "#8C472E",            // Fired Brick
-    warm: "#BF7256",            // Dusty Coral
-    cool: "#2E4009",            // Forest Olive
-    cold: "rgba(44,24,16,0.5)", // Brewery Dark @ 50%
-  };
-  let ringScore = sc.score;
-  let ringTierLabel = (TIER_CONFIG[sc.tier] && TIER_CONFIG[sc.tier].label) || "Cool";
-  let ringTierColor = TIER_RING_COLORS[sc.tier] || TIER_RING_COLORS.cool;
-
-  const isWon = lead.contact_type === "customer" || (funnel && funnel.currentStage === "won");
-  const isLost = funnel && funnel.currentStage === "lost";
-  if (isWon) {
-    ringScore = 100;
-    ringTierLabel = "Won";
-    ringTierColor = "#2E4009";
-  } else if (isLost) {
-    ringTierLabel = "Lost";
-    ringTierColor = "rgba(64,22,12,0.6)";
-  }
-  return { score: ringScore, tierLabel: ringTierLabel, tierColor: ringTierColor };
-}
+/* ── Score breakdown (ring headline + compact bars below - PRD Option B) ──
+   ScoreRing + resolveRingDisplay are now imported from ./primitives.   */
 
 function ScoreBreakdownColumn({ sc, lead, funnel }) {
   const rows = [
@@ -962,48 +915,9 @@ function buildLeadMilestones(lead, journey) {
   });
 }
 
-/* ── Activity summary (Stitch-style: heading + tabs + iconised milestones) ── */
-
-/* Inline SVG paths per milestone kind. Stroke-only, 16x16 viewBox 0 0 20 20.
- * Mahogany-tinted (warn) variants used for Lost / Cancelled / No-show. */
-const MILESTONE_ICONS = {
-  form_submit:               { paths: <><path d="M3 5h14v10H3z"/><path d="M3 5l7 6 7-6"/></> },
-  cta_click:                 { paths: <><path d="M9 3l7 7-3 1 2 5-2 1-2-5-3 2z"/></> },
-  date_check:                { paths: <><path d="M3 5h14v12H3z"/><path d="M3 8h14M7 3v4M13 3v4"/></> },
-  brochure_download:         { paths: <><path d="M10 3v9M6 8l4 4 4-4M3 17h14"/></> },
-  questionnaire_complete:    { paths: <><path d="M5 4h10v12H5z"/><path d="M7 8l1 1 2-2M7 12l1 1 2-2"/></> },
-  questionnaire_start:       { paths: <><path d="M5 4h10v12H5z"/><path d="M7 8l1 1 2-2M7 12l1 1 2-2"/></> },
-  first_visit:               { paths: <><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z"/><circle cx="10" cy="10" r="2.5"/></> },
-  meeting_at:                { paths: <><path d="M5 3h3l1 4-2 1a8 8 0 005 5l1-2 4 1v3a1 1 0 01-1 1A12 12 0 014 4a1 1 0 011-1z"/></> },
-  call_at:                   { paths: <><path d="M5 3h3l1 4-2 1a8 8 0 005 5l1-2 4 1v3a1 1 0 01-1 1A12 12 0 014 4a1 1 0 011-1z"/></> },
-  tour_at:                   { paths: <><path d="M10 2a5 5 0 015 5c0 4-5 11-5 11s-5-7-5-11a5 5 0 015-5z"/><circle cx="10" cy="7" r="2"/></> },
-  proposal_at:               { paths: <><path d="M5 2h7l3 3v13H5z"/><path d="M12 2v3h3M7 9h6M7 12h6M7 15h4"/></> },
-  won_at:                    { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4"/></> },
-  lost_at:                   { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 7l6 6M13 7l-6 6"/></>, warn: true },
-  cancelled_at:              { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 7l6 6M13 7l-6 6"/></>, warn: true },
-  noshow_at:                 { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 7l6 6M13 7l-6 6"/></>, warn: true },
-};
-
-function MilestoneIcon({ kind }) {
-  const cfg = MILESTONE_ICONS[kind];
-  if (!cfg) {
-    /* Fallback dot for unmapped kinds */
-    return (
-      <span className="activity-mini__icon">
-        <svg viewBox="0 0 20 20" fill="currentColor" stroke="none">
-          <circle cx="10" cy="10" r="3.5" />
-        </svg>
-      </span>
-    );
-  }
-  return (
-    <span className={`activity-mini__icon${cfg.warn ? " activity-mini__icon--warn" : ""}`}>
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        {cfg.paths}
-      </svg>
-    </span>
-  );
-}
+/* ── Activity summary (Stitch-style: heading + tabs + iconised milestones) ──
+   MilestoneIcon and the icon path map now live in ./primitives/activity-icons.jsx
+   and ActivityTimelineRow wraps the row markup.                       */
 
 function ActivitySummaryColumn({ lead, journey, journeyLoading, showFullJourney, setShowFullJourney }) {
   const [activeTab, setActiveTab] = useState("all");
@@ -1078,17 +992,14 @@ function ActivitySummaryColumn({ lead, journey, journeyLoading, showFullJourney,
       {renderHeader()}
       <div className="activity-mini activity-mini--timeline">
         {top.map((m, i) => (
-          <div key={`${m.time}-${i}`} className="activity-mini__row">
-            <MilestoneIcon kind={m.kind} />
-            <div className="activity-mini__row-body">
-              <div className="activity-mini__row-top">
-                <div className="activity-mini__title">{m.title}</div>
-                <div className="activity-mini__when">{formatMilestoneTime(m.time)}</div>
-              </div>
-              {m.detail && <div className="activity-mini__detail">{m.detail}</div>}
-              {m.box && <div className="activity-mini__detail-box">{m.box}</div>}
-            </div>
-          </div>
+          <ActivityTimelineRow
+            key={`${m.time}-${i}`}
+            icon={m.kind}
+            title={m.title}
+            when={formatMilestoneTime(m.time)}
+            detail={m.detail}
+            detailBox={m.box}
+          />
         ))}
       </div>
       <button type="button" className="activity-mini__link" onClick={() => setShowFullJourney(prev => !prev)}>
@@ -1115,35 +1026,30 @@ function EventDetailsColumn({ lead }) {
     <div className="lp-body-col">
       <h3 className="lp-body-col__title"><span>Event details</span></h3>
       {/* Contact rows - moved here from identity strip (2026-04-27 redesign) */}
-      <div className="lp-attr-row">
-        <span className="lp-attr-row__label">Email</span>
-        <span className={`lp-attr-row__value${lead.email ? "" : " lp-attr-row__value--empty"}`}>
-          {lead.email ? (
-            <a href={`mailto:${lead.email}`} className="lp-attr-row__link">{lead.email}</a>
-          ) : "Not provided"}
-        </span>
-      </div>
-      <div className="lp-attr-row">
-        <span className="lp-attr-row__label">Phone</span>
-        <span className={`lp-attr-row__value${lead.phone ? "" : " lp-attr-row__value--empty"}`}>
-          {lead.phone ? (
-            <a href={`tel:${lead.phone}`} className="lp-attr-row__link">{lead.phone}</a>
-          ) : "Not provided"}
-        </span>
-      </div>
+      <AttributeRow
+        label="Email"
+        empty={!lead.email}
+        value={lead.email
+          ? <a href={`mailto:${lead.email}`} className="lp-attr-row__link">{lead.email}</a>
+          : "Not provided"}
+      />
+      <AttributeRow
+        label="Phone"
+        empty={!lead.phone}
+        value={lead.phone
+          ? <a href={`tel:${lead.phone}`} className="lp-attr-row__link">{lead.phone}</a>
+          : "Not provided"}
+      />
       {rows.map(r => (
-        <div key={r.label} className="lp-attr-row">
-          <span className="lp-attr-row__label">{r.label}</span>
-          <span className={`lp-attr-row__value${r.empty ? " lp-attr-row__value--empty" : ""}`}>
-            {r.empty ? "Not provided" : r.value}
-          </span>
-        </div>
+        <AttributeRow
+          key={r.label}
+          label={r.label}
+          empty={!!r.empty}
+          value={r.empty ? "Not provided" : r.value}
+        />
       ))}
       {lead.cross_sell_labels?.length > 0 && (
-        <div className="lp-attr-row">
-          <span className="lp-attr-row__label">Also wants</span>
-          <span className="lp-attr-row__value">{lead.cross_sell_labels.join(", ")}</span>
-        </div>
+        <AttributeRow label="Also wants" value={lead.cross_sell_labels.join(", ")} />
       )}
     </div>
   );
@@ -1159,12 +1065,9 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
   const initials = (lead.first_name || "?").charAt(0).toUpperCase() + (lead.last_name || "").charAt(0).toUpperCase();
   const src = resolveSource(lead.source_channel);
 
-  /* ── Identity strip derived data (2026-04-27 redesign) ── */
-  /* Stage pill: background + colour driven by STAGE_PILL_COLORS, label from
-     FUNNEL_LABELS, uppercase. Defaults to Forest Olive tint if stage unknown. */
-  const stagePillCfg = STAGE_PILL_COLORS[funnel.currentStage] || STAGE_PILL_COLORS.lead;
-  const stagePillLabel = (FUNNEL_LABELS[funnel.currentStage] || funnel.currentStage || "").toUpperCase();
-  const stagePill = stagePillLabel ? { bg: stagePillCfg.bg, color: stagePillCfg.color, label: stagePillLabel } : null;
+  /* ── Identity strip derived data (2026-04-27 redesign) ──
+     Stage pill rendered via the <StagePill> primitive (driven by
+     STAGE_PILL_COLORS + FUNNEL_LABELS internally). */
 
   /* Subtitle: "{Event type} · {Event date}" - Dusty Coral tracked uppercase.
      Event type comes from activeLeadType (wedding / corporate / etc.) plus
@@ -1218,18 +1121,14 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
 
       <div className="lp-card-stack">
         {/* ── Card 1: Identity + Metadata ── */}
-        <div className="lp-card lp-card--header">
+        <CardSurface variant="header">
         {/* ── Band 1: Identity strip (compact 2-row layout - 2026-04-27 redesign) ── */}
         <div className="lp-id-strip">
           <span className="lp-id-strip__avatar" aria-hidden="true">{initials || "?"}</span>
           <div className="lp-id-text">
             <div className="lp-id-name-row">
               <h2 className="lp-id-strip__name">{name}</h2>
-              {stagePill && (
-                <span className="lp-stage-pill" style={{ background: stagePill.bg, color: stagePill.color }}>
-                  {stagePill.label}
-                </span>
-              )}
+              <StagePill stage={funnel.currentStage} />
             </div>
             <p className="lp-id-subtitle">{idSubtitle}</p>
           </div>
@@ -1253,46 +1152,42 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
         </div>
 
         {/* ── Band 2: Metadata strip ── */}
-        <div className="lp-meta-strip">
+        <MetadataStrip>
           {/* Score - circular ring (size sm = 64px) replaces the old text pill */}
-          <div className="lp-meta-cell lp-meta-cell--ring">
-            <span className="lp-meta-cell__eyebrow">Score</span>
+          <MetadataCell eyebrow="Score" variant="ring">
             {(() => {
               const ring = resolveRingDisplay(sc, lead, funnel);
               return <ScoreRing size="sm" score={ring.score} tierLabel={ring.tierLabel} tierColor={ring.tierColor} />;
             })()}
-          </div>
+          </MetadataCell>
           {/* Projected value */}
-          <div className="lp-meta-cell">
-            <span className="lp-meta-cell__eyebrow">Projected value</span>
+          <MetadataCell eyebrow="Projected value">
             {projectedValue ? (
               <span className="lp-meta-cell__value">{projectedValue}</span>
             ) : (
               <span className="lp-meta-cell__value lp-meta-cell__value--muted">Not yet estimated</span>
             )}
-          </div>
+          </MetadataCell>
           {/* Lead source */}
-          <div className="lp-meta-cell">
-            <span className="lp-meta-cell__eyebrow">Lead source</span>
+          <MetadataCell eyebrow="Lead source">
             <span className="lp-meta-cell__value">
               <span className="lp-meta-cell__dot" style={{ background: src.color }} />
               {src.label}
             </span>
-          </div>
+          </MetadataCell>
           {/* Last visit (v2 will replace with last_touched_by) */}
-          <div className="lp-meta-cell">
-            <span className="lp-meta-cell__eyebrow">Last visit</span>
+          <MetadataCell eyebrow="Last visit">
             {lastVisitText ? (
               <span className="lp-meta-cell__value">{lastVisitText.replace("Last visit ", "")}</span>
             ) : (
               <span className="lp-meta-cell__value lp-meta-cell__value--muted">No activity</span>
             )}
-          </div>
-        </div>
-        </div>{/* end lp-card--header */}
+          </MetadataCell>
+        </MetadataStrip>
+        </CardSurface>{/* end lp-card--header */}
 
         {/* ── Card 2: Funnel hero ── */}
-        <div className="lp-card lp-card--funnel">
+        <CardSurface variant="funnel">
         {/* ── Band 3: Funnel hero ── */}
         <div className="lp-funnel-hero">
           <FunnelTrack funnel={funnel} tc={tc} />
@@ -1327,17 +1222,17 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             <StageActions lead={lead} funnel={funnel} activeLeadType={activeLeadType} onStatusChange={onStatusChange} />
           </div>
         </div>
-        </div>{/* end lp-card--funnel */}
+        </CardSurface>{/* end lp-card--funnel */}
 
         {/* ── Cards 3-5: Body row of three separate cards ── */}
         <div className="lp-body-row">
-          <div className="lp-card lp-card--event">
+          <CardSurface variant="event">
             <EventDetailsColumn lead={lead} />
-          </div>
-          <div className="lp-card lp-card--score">
+          </CardSurface>
+          <CardSurface variant="score">
             <ScoreBreakdownColumn sc={sc} lead={lead} funnel={funnel} />
-          </div>
-          <div className="lp-card lp-card--activity">
+          </CardSurface>
+          <CardSurface variant="activity">
             <ActivitySummaryColumn
               lead={lead}
               journey={journey}
@@ -1345,18 +1240,18 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
               showFullJourney={showFullJourney}
               setShowFullJourney={setShowFullJourney}
             />
-          </div>
+          </CardSurface>
         </div>
 
         {/* Full timeline drill-in - sits below the body row, full width.
             Only renders when toggled. */}
         {showFullJourney && (
-          <div className="lp-card lp-card--timeline">
+          <CardSurface variant="timeline">
             <div className="lp-section">
               <h3 className="lp-section__title">Full timeline</h3>
               <JourneySummary journey={journey} showFullJourney={showFullJourney} setShowFullJourney={setShowFullJourney} />
             </div>
-          </div>
+          </CardSurface>
         )}
       </div>{/* end lp-card-stack */}
     </div>

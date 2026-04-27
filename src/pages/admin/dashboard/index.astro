@@ -905,6 +905,39 @@ import pricing from '../../../data/wedding-pricing.json';
       }
       .lp-back:hover { background: rgba(44,24,16,0.05); border-color: rgba(44,24,16,0.25); }
 
+      /* ============================================================
+         === Dashboard primitives ===================================
+         ============================================================
+         The CSS below powers the reusable primitives extracted into
+         src/components/dashboard/primitives/. Each primitive maps to a
+         set of class names; consumers (LeadProfile, future PipelineView,
+         etc.) import the JSX wrapper and these styles resolve.
+
+           CardSurface          → .lp-card (+ .lp-card-stack stack helper)
+           StagePill            → .lp-stage-pill
+           ScoreRing            → .lp-score-ring (+ .lp-score-ring--sm,
+                                  .lp-score-ring__inner / __num / __tier)
+           MetadataStrip / Cell → .lp-meta-strip, .lp-meta-cell
+                                  (+ --ring, __eyebrow, __value,
+                                  __value--muted, __dot)
+           AttributeRow         → .lp-attr-row (+ __label / __value /
+                                  __value--empty / __link)
+           ActivityTimelineRow  → .activity-mini__row, __icon (+ --warn),
+                                  __row-body, __row-top, __title, __when,
+                                  __detail, __detail-box
+           SoftPill             → inline styles (no shared class)
+           EyebrowLabel         → inline styles (no shared class)
+
+         The active rules live in this file in their original positions
+         so cascade order is preserved. The comment block above is the
+         single source of truth for "where does primitive X live".
+
+         When adding a new primitive: register the CSS here in the same
+         pattern (BEM class + variants), add the JSX in primitives/,
+         export from primitives/index.js, and update DESIGN.md if the
+         primitive introduces a new token.
+         ============================================================ */
+
       /* Stack of separate profile cards (id+meta / funnel / body) */
       .lp-card-stack {
         display: flex;
