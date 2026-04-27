@@ -96,10 +96,10 @@ export const MONTH_LABELS = ["January", "February", "March", "April", "May", "Ju
 export const DEAD_DAYS = { wedding: 21, corporate: 14, supperclub: 10, "private-events": 10, "cafe-bar": 10 };
 
 export const TIER_CONFIG = {
-  hot:  { label: "Hot",  color: "#8C472E", bg: "rgba(140,71,46,0.08)", border: "#8C472E" },
-  warm: { label: "Warm", color: "#BF7256", bg: "rgba(191,114,86,0.06)", border: "#BF7256" },
-  cool: { label: "Cool", color: "#2E4009", bg: "rgba(46,64,9,0.05)",   border: "#2E4009" },
-  cold: { label: "Cold", color: "rgba(44,24,16,0.35)", bg: "transparent", border: "rgba(44,24,16,0.15)" },
+  hot:  { label: "Hot",  color: "#2E4009", bg: "rgba(46,64,9,0.12)",   border: "#2E4009" },
+  warm: { label: "Warm", color: "#BF7256", bg: "rgba(191,114,86,0.12)", border: "#BF7256" },
+  cool: { label: "Cool", color: "#8C472E", bg: "rgba(140,71,46,0.12)", border: "#8C472E" },
+  cold: { label: "Cold", color: "#40160C", bg: "rgba(64,22,12,0.10)",  border: "rgba(64,22,12,0.25)" },
 };
 
 export const STAGE_SEQUENCE = ["Brochure", "Quiz", "Call", "Tour"];

@@ -19,10 +19,10 @@
 import { TIER_CONFIG } from "../constants.js";
 
 const TIER_RING_COLORS = {
-  hot:  "#8C472E",            // Fired Brick
+  hot:  "#2E4009",            // Forest Olive (best leads - traffic-light green)
   warm: "#BF7256",            // Dusty Coral
-  cool: "#2E4009",            // Forest Olive
-  cold: "rgba(44,24,16,0.5)", // Brewery Dark @ 50%
+  cool: "#8C472E",            // Fired Brick (cooling off - traffic-light red/brown)
+  cold: "#40160C",            // Mahogany (dying/dead)
 };
 
 export function resolveRingDisplay(sc, lead, funnel) {
