@@ -798,6 +798,7 @@ function buildLeadMilestones(lead, journey) {
       const src = resolveSource(firstSession.source || "");
       out.push({
         time: firstSession.started_at,
+        kind: "first_visit",
         title: `First visit · ${src.label}`,
         detail: firstSession.ad_platform ? `via ${firstSession.ad_platform}` : "",
       });
@@ -809,6 +810,7 @@ function buildLeadMilestones(lead, journey) {
       const fl = d?.form_type ? (FORM_TYPE_LABELS[d.form_type] || d.form_type) : "form";
       out.push({
         time: e.created_at,
+        kind: "form_submit",
         title: `Submitted ${fl}`,
         detail: d?.form_action || "",
       });
@@ -823,6 +825,7 @@ function buildLeadMilestones(lead, journey) {
       const page = e.page_url ? shortenUrl(e.page_url) : "";
       out.push({
         time: e.created_at,
+        kind: "cta_click",
         title: `Clicked "${ctaName}"`,
         detail: page ? `on ${page}` : "",
       });
@@ -834,6 +837,7 @@ function buildLeadMilestones(lead, journey) {
       const dateLabel = d?.date ? formatEventDate(d.date) : "a date";
       out.push({
         time: e.created_at,
+        kind: "date_check",
         title: `Checked ${dateLabel}`,
         detail: "",
       });
@@ -845,6 +849,7 @@ function buildLeadMilestones(lead, journey) {
       const which = d?.brochure_type ? ` (${d.brochure_type})` : "";
       out.push({
         time: e.created_at,
+        kind: "brochure_download",
         title: `Downloaded brochure${which}`,
         detail: "",
       });
@@ -858,6 +863,7 @@ function buildLeadMilestones(lead, journey) {
         const stream = d?.stream || d?.questionnaire_type || lead.lead_type || "";
         out.push({
           time: e.created_at,
+          kind: "questionnaire_complete",
           title: stream ? `Completed ${stream} quiz` : "Completed questionnaire",
           detail: "",
         });
@@ -868,6 +874,7 @@ function buildLeadMilestones(lead, journey) {
         const e = qStart[0];
         out.push({
           time: e.created_at,
+          kind: "questionnaire_start",
           title: "Started questionnaire",
           detail: "Not completed",
         });
@@ -892,36 +899,45 @@ function buildLeadMilestones(lead, journey) {
   );
 
   if (effectiveCallAt && effectiveCallAt !== effectiveTourAt) {
-    out.push({ time: effectiveCallAt, title: "Had call", detail: "" });
+    out.push({ time: effectiveCallAt, kind: "call_at", title: "Had call", detail: "" });
   }
   if (effectiveTourAt) {
-    out.push({ time: effectiveTourAt, title: "Had tour", detail: "" });
+    out.push({ time: effectiveTourAt, kind: "tour_at", title: "Had tour", detail: "" });
   }
   /* If meeting_at is set but neither call nor tour was inferred from it, surface as a generic meeting. */
   if (lead.meeting_at && lead.meeting_at !== effectiveCallAt && lead.meeting_at !== effectiveTourAt) {
-    out.push({ time: lead.meeting_at, title: "Had meeting", detail: "" });
+    out.push({ time: lead.meeting_at, kind: "meeting_at", title: "Had meeting", detail: "" });
   }
   if (lead.proposal_at) {
-    out.push({ time: lead.proposal_at, title: "Sent proposal", detail: "" });
+    out.push({ time: lead.proposal_at, kind: "proposal_at", title: "Sent proposal", detail: "" });
   }
   if (lead.won_at) {
     const dv = lead.deal_value ? ` · £${Number(lead.deal_value).toLocaleString()}` : "";
-    out.push({ time: lead.won_at, title: `Marked Won${dv}`, detail: "" });
+    const tierLabel = lead.tier ? lead.tier : (lead.deal_tier || "");
+    out.push({
+      time: lead.won_at,
+      kind: "won_at",
+      title: `Marked Won${dv}`,
+      detail: "",
+      box: lead.deal_value ? `Deal value: £${Number(lead.deal_value).toLocaleString()}${tierLabel ? ` · ${tierLabel}` : ""}` : "",
+    });
   }
   if (lead.lost_at) {
     const reasonLabel = (LOST_REASONS.find(r => r.value === lead.lost_reason) || {}).label;
     const reason = reasonLabel ? ` · ${reasonLabel}` : "";
     out.push({
       time: lead.lost_at,
+      kind: "lost_at",
       title: `Marked Lost${reason}`,
-      detail: lead.lost_reason_note || "",
+      detail: "",
+      box: lead.lost_reason_note ? `Reason: ${lead.lost_reason_note}` : "",
     });
   }
   if (lead.cancelled_at) {
-    out.push({ time: lead.cancelled_at, title: "Cancelled", detail: "" });
+    out.push({ time: lead.cancelled_at, kind: "cancelled_at", title: "Cancelled", detail: "" });
   }
   if (lead.noshow_at) {
-    out.push({ time: lead.noshow_at, title: "No-show", detail: "" });
+    out.push({ time: lead.noshow_at, kind: "noshow_at", title: "No-show", detail: "" });
   }
 
   /* Sort DESC and dedupe by (time + title) so we don't show two
@@ -936,14 +952,100 @@ function buildLeadMilestones(lead, journey) {
   });
 }
 
-/* ── Activity summary (top 4 event milestones + drill-in toggle) ── */
+/* ── Activity summary (Stitch-style: heading + tabs + iconised milestones) ── */
+
+/* Inline SVG paths per milestone kind. Stroke-only, 16x16 viewBox 0 0 20 20.
+ * Mahogany-tinted (warn) variants used for Lost / Cancelled / No-show. */
+const MILESTONE_ICONS = {
+  form_submit:               { paths: <><path d="M3 5h14v10H3z"/><path d="M3 5l7 6 7-6"/></> },
+  cta_click:                 { paths: <><path d="M9 3l7 7-3 1 2 5-2 1-2-5-3 2z"/></> },
+  date_check:                { paths: <><path d="M3 5h14v12H3z"/><path d="M3 8h14M7 3v4M13 3v4"/></> },
+  brochure_download:         { paths: <><path d="M10 3v9M6 8l4 4 4-4M3 17h14"/></> },
+  questionnaire_complete:    { paths: <><path d="M5 4h10v12H5z"/><path d="M7 8l1 1 2-2M7 12l1 1 2-2"/></> },
+  questionnaire_start:       { paths: <><path d="M5 4h10v12H5z"/><path d="M7 8l1 1 2-2M7 12l1 1 2-2"/></> },
+  first_visit:               { paths: <><path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z"/><circle cx="10" cy="10" r="2.5"/></> },
+  meeting_at:                { paths: <><path d="M5 3h3l1 4-2 1a8 8 0 005 5l1-2 4 1v3a1 1 0 01-1 1A12 12 0 014 4a1 1 0 011-1z"/></> },
+  call_at:                   { paths: <><path d="M5 3h3l1 4-2 1a8 8 0 005 5l1-2 4 1v3a1 1 0 01-1 1A12 12 0 014 4a1 1 0 011-1z"/></> },
+  tour_at:                   { paths: <><path d="M10 2a5 5 0 015 5c0 4-5 11-5 11s-5-7-5-11a5 5 0 015-5z"/><circle cx="10" cy="7" r="2"/></> },
+  proposal_at:               { paths: <><path d="M5 2h7l3 3v13H5z"/><path d="M12 2v3h3M7 9h6M7 12h6M7 15h4"/></> },
+  won_at:                    { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4"/></> },
+  lost_at:                   { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 7l6 6M13 7l-6 6"/></>, warn: true },
+  cancelled_at:              { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 7l6 6M13 7l-6 6"/></>, warn: true },
+  noshow_at:                 { paths: <><circle cx="10" cy="10" r="7"/><path d="M7 7l6 6M13 7l-6 6"/></>, warn: true },
+};
+
+function MilestoneIcon({ kind }) {
+  const cfg = MILESTONE_ICONS[kind];
+  if (!cfg) {
+    /* Fallback dot for unmapped kinds */
+    return (
+      <span className="activity-mini__icon">
+        <svg viewBox="0 0 20 20" fill="currentColor" stroke="none">
+          <circle cx="10" cy="10" r="3.5" />
+        </svg>
+      </span>
+    );
+  }
+  return (
+    <span className={`activity-mini__icon${cfg.warn ? " activity-mini__icon--warn" : ""}`}>
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        {cfg.paths}
+      </svg>
+    </span>
+  );
+}
 
 function ActivitySummaryColumn({ lead, journey, journeyLoading, showFullJourney, setShowFullJourney }) {
+  const [activeTab, setActiveTab] = useState("all");
+
+  /* Header (heading + tabs) is shared across loading / empty / populated states.
+   * Tabs remain clickable even when there's no data so the placeholder copy
+   * for EMAILS / NOTES still renders. */
+  const renderHeader = () => (
+    <div className="activity-mini__head">
+      <h3 className="activity-mini__heading">Activity timeline</h3>
+      <div className="activity-mini__tabs">
+        {[
+          { id: "all", label: "ALL" },
+          { id: "emails", label: "EMAILS" },
+          { id: "notes", label: "NOTES" },
+        ].map(t => (
+          <button
+            key={t.id}
+            type="button"
+            className={`activity-mini__tab${activeTab === t.id ? " activity-mini__tab--active" : ""}`}
+            onClick={() => setActiveTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   if (journeyLoading) {
     return (
       <div className="lp-body-col">
-        <h3 className="lp-body-col__title"><span>Activity</span></h3>
+        {renderHeader()}
         <p className="activity-mini__empty">Loading...</p>
+      </div>
+    );
+  }
+
+  /* Tabs other than ALL are visual placeholders until email/note tracking lands. */
+  if (activeTab === "emails") {
+    return (
+      <div className="lp-body-col">
+        {renderHeader()}
+        <p className="activity-mini__empty">Email tracking coming soon</p>
+      </div>
+    );
+  }
+  if (activeTab === "notes") {
+    return (
+      <div className="lp-body-col">
+        {renderHeader()}
+        <p className="activity-mini__empty">Notes coming soon</p>
       </div>
     );
   }
@@ -953,29 +1055,29 @@ function ActivitySummaryColumn({ lead, journey, journeyLoading, showFullJourney,
   if (milestones.length === 0) {
     return (
       <div className="lp-body-col">
-        <h3 className="lp-body-col__title"><span>Activity</span></h3>
+        {renderHeader()}
         <p className="activity-mini__empty">No activity yet</p>
       </div>
     );
   }
 
   const top = milestones.slice(0, 4);
-  const sessionCount = journey && journey.total_sessions ? journey.total_sessions : 0;
 
   return (
     <div className="lp-body-col">
-      <h3 className="lp-body-col__title">
-        <span>Activity</span>
-        {sessionCount > 0 && (
-          <span className="lp-body-col__title-meta">{sessionCount} session{sessionCount !== 1 ? "s" : ""}</span>
-        )}
-      </h3>
+      {renderHeader()}
       <div className="activity-mini activity-mini--timeline">
         {top.map((m, i) => (
           <div key={`${m.time}-${i}`} className="activity-mini__row">
-            <div className="activity-mini__title">{m.title}</div>
-            <div className="activity-mini__when">{formatMilestoneTime(m.time)}</div>
-            {m.detail && <div className="activity-mini__detail">{m.detail}</div>}
+            <MilestoneIcon kind={m.kind} />
+            <div className="activity-mini__row-body">
+              <div className="activity-mini__row-top">
+                <div className="activity-mini__title">{m.title}</div>
+                <div className="activity-mini__when">{formatMilestoneTime(m.time)}</div>
+              </div>
+              {m.detail && <div className="activity-mini__detail">{m.detail}</div>}
+              {m.box && <div className="activity-mini__detail-box">{m.box}</div>}
+            </div>
           </div>
         ))}
       </div>
