@@ -805,7 +805,9 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
     <div className="lp-fullpage">
       <button className="lp-back" onClick={onBack} type="button">{"←"} Back to leads</button>
 
-      <div className="lp-card">
+      <div className="lp-card-stack">
+        {/* ── Card 1: Identity + Metadata ── */}
+        <div className="lp-card lp-card--header">
         {/* ── Band 1: Identity strip ── */}
         <div className="lp-id-strip">
           <span className="lp-id-strip__avatar" aria-hidden="true">{initials || "?"}</span>
@@ -871,7 +873,10 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             )}
           </div>
         </div>
+        </div>{/* end lp-card--header */}
 
+        {/* ── Card 2: Funnel hero ── */}
+        <div className="lp-card lp-card--funnel">
         {/* ── Band 3: Funnel hero ── */}
         <div className="lp-funnel-hero">
           <FunnelTrack funnel={funnel} tc={tc} />
@@ -906,7 +911,10 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             <StageActions lead={lead} funnel={funnel} activeLeadType={activeLeadType} onStatusChange={onStatusChange} />
           </div>
         </div>
+        </div>{/* end lp-card--funnel */}
 
+        {/* ── Card 3: 3-column body + timeline drill-in ── */}
+        <div className="lp-card lp-card--body">
         {/* ── Band 4: 3-column body ── */}
         <div className="lp-body">
           <EventDetailsColumn lead={lead} />
@@ -928,7 +936,8 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
             <JourneySummary journey={journey} showFullJourney={showFullJourney} setShowFullJourney={setShowFullJourney} />
           </div>
         )}
-      </div>{/* end lp-card */}
+        </div>{/* end lp-card--body */}
+      </div>{/* end lp-card-stack */}
     </div>
   );
 }

@@ -890,11 +890,18 @@ import pricing from '../../../data/wedding-pricing.json';
       }
       .lp-back:hover { background: rgba(44,24,16,0.05); border-color: rgba(44,24,16,0.25); }
 
-      /* Card wrapper for the whole profile */
+      /* Stack of separate profile cards (id+meta / funnel / body) */
+      .lp-card-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+
+      /* Card wrapper - now applied to each of the three sibling cards */
       .lp-card {
         background: rgba(255,255,255,0.7); border: 1px solid rgba(64,22,12,0.14);
         border-radius: 2px; overflow: hidden;
-        margin-bottom: 32px;
       }
 
       .lp-hero {
@@ -1237,12 +1244,13 @@ import pricing from '../../../data/wedding-pricing.json';
       }
       .lp-id-strip__hubspot:hover { text-decoration: underline; }
 
-      /* Band 2: Metadata strip - 4 cells, generous vertical padding */
+      /* Band 2: Metadata strip - 4 cells, generous vertical padding.
+         No border-bottom: this is now the bottom band of Card 1, the card
+         border closes it instead. */
       .lp-meta-strip {
         display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
         padding: 24px 32px;
         background: rgba(255,255,255,0.5);
-        border-bottom: 1px solid rgba(64,22,12,0.1);
       }
       .lp-meta-cell {
         display: flex; flex-direction: column; gap: 10px;
@@ -1267,10 +1275,9 @@ import pricing from '../../../data/wedding-pricing.json';
         width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
       }
 
-      /* Band 3: Funnel hero */
+      /* Band 3: Funnel hero - now its own card (Card 2). No border-bottom. */
       .lp-funnel-hero {
         padding: 32px 32px; background: rgba(255,255,255,0.7);
-        border-bottom: 1px solid rgba(64,22,12,0.1);
       }
       .stage-callout {
         display: flex; align-items: flex-start; justify-content: space-between;
