@@ -25,6 +25,7 @@ import { useState, useEffect } from "react";
 import {
   FORM_TYPE_LABELS,
   URGENCY_LABELS,
+  URGENCY_STAGE,
   TIER_CONFIG,
   FUNNEL_LABELS, HEALTH_COLORS, STAGE_DEFINITIONS,
   STAGE_PRIMARY_ACTION,
@@ -43,7 +44,7 @@ import {
 } from "./utils.js";
 
 import {
-  StagePill,
+  SoftPill,
   ScoreRing,
   resolveRingDisplay,
   MetadataStrip,
@@ -52,6 +53,17 @@ import {
   ActivityTimelineRow,
   CardSurface,
 } from "./primitives/index.js";
+
+/* ── Urgency surface (2026-04-27 redesign) ──
+   Compact labels for the identity-strip pill. The numeric urgency stage
+   0-4 comes from URGENCY_STAGE[lead.urgency]. Stage 0 (no signal) renders
+   no pill at all. SoftPill variants `urgency-1..4` carry the colour ramp. */
+const URGENCY_SHORT_LABELS = {
+  1: "Browsing",
+  2: "Shortlisting",
+  3: "Ready to book",
+  4: "Urgent",
+};
 
 /* ── Funnel track (unchanged from v0 - already battle-tested) ── */
 
@@ -1128,7 +1140,18 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
           <div className="lp-id-text">
             <div className="lp-id-name-row">
               <h2 className="lp-id-strip__name">{name}</h2>
-              <StagePill stage={funnel.currentStage} />
+              {(() => {
+                /* Urgency pill - drives Hugo's prioritisation. Stage 0 / null
+                   renders nothing so the slot reads as a clean blank. The
+                   funnel track below is the single source of stage truth. */
+                const uStage = URGENCY_STAGE[lead.urgency];
+                if (!uStage) return null;
+                return (
+                  <SoftPill variant={`urgency-${uStage}`}>
+                    {URGENCY_SHORT_LABELS[uStage]}
+                  </SoftPill>
+                );
+              })()}
             </div>
             <p className="lp-id-subtitle">{idSubtitle}</p>
           </div>
@@ -1194,21 +1217,16 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
 
           <div className="stage-callout">
             <div className="stage-callout__head">
-              <p className="stage-callout__eyebrow">Current stage</p>
-              <div className="stage-callout__row">
-                <h3 className="lp-stage-name" style={
-                  funnel.currentStage === "lost" ? { color: "#8C472E" } :
-                  funnel.currentStage === "won" ? { color: "#2E4009" } : {}
-                }>
-                  {FUNNEL_LABELS[funnel.currentStage] || funnel.currentStage}
-                </h3>
-                {stuckThresholds && hc && (
+              {/* Stuck pill stays - carries health + time-in-stage info that
+                  isn't available anywhere else on the card. */}
+              {stuckThresholds && hc && (
+                <div className="stage-callout__row">
                   <span className="lp-stage-stuck">
                     <span className="lp-stage-stuck__dot" style={{ background: hc.color }} />
                     {hc.label} {"·"} {funnel.daysInStage}d in stage
                   </span>
-                )}
-              </div>
+                </div>
+              )}
               {(stageDef || funnel.stageEnteredAt) && (
                 <p className="stage-callout__def">
                   {stageDef}
