@@ -1434,6 +1434,27 @@ import pricing from '../../../data/wedding-pricing.json';
         color: rgba(44,24,16,0.4); font-style: italic; font-weight: 400;
       }
 
+      /* Score ring (PRD Option B headline visual, sits above .lp-sb-row bars) */
+      .lp-score-ring {
+        position: relative; width: 96px; height: 96px;
+        margin: 0 auto 16px;
+      }
+      .lp-score-ring__inner {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 4px;
+      }
+      .lp-score-ring__num {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 500; font-size: 32px; line-height: 1;
+        color: #2C1810; letter-spacing: -0.01em;
+      }
+      .lp-score-ring__tier {
+        font-family: 'DM Sans', system-ui, sans-serif;
+        font-weight: 500; font-size: 10px;
+        text-transform: uppercase; letter-spacing: 0.13em;
+      }
+
       /* Score-bar rows for column 2 of body */
       .lp-sb-row {
         display: grid; grid-template-columns: 60px 1fr 32px; gap: 8px;

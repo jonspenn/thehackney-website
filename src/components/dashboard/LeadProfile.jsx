@@ -644,9 +644,34 @@ function StageActions({ lead, funnel, activeLeadType, onStatusChange }) {
   );
 }
 
-/* ── Score breakdown (compact bars - PRD Option A default) ── */
+/* ── Score breakdown (ring headline + compact bars below - PRD Option B) ── */
 
-function ScoreBreakdownColumn({ sc, lead }) {
+function ScoreRing({ score, tierLabel, tierColor }) {
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - Math.max(0, Math.min(100, score)) / 100);
+  return (
+    <div className="lp-score-ring">
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <circle cx="48" cy="48" r={radius} fill="none" stroke="rgba(64,22,12,0.12)" strokeWidth="6" />
+        <circle
+          cx="48" cy="48" r={radius} fill="none"
+          stroke="#2E4009" strokeWidth="6"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          transform="rotate(-90 48 48)"
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="lp-score-ring__inner">
+        <div className="lp-score-ring__num">{score}</div>
+        <div className="lp-score-ring__tier" style={{ color: tierColor }}>{tierLabel}</div>
+      </div>
+    </div>
+  );
+}
+
+function ScoreBreakdownColumn({ sc, lead, funnel }) {
   const rows = [
     { label: "Stage", val: sc.breakdown.stage, max: 30 },
     { label: "Intent", val: sc.breakdown.intent, max: 10 },
@@ -655,12 +680,39 @@ function ScoreBreakdownColumn({ sc, lead }) {
     { label: "Date", val: sc.breakdown.dateProximity, max: 10 },
     { label: "Revenue", val: sc.breakdown.revenue, max: 10 },
   ];
+
+  // Tier colours match the brand palette + tier thresholds in computeLeadScore.
+  const TIER_RING_COLORS = {
+    hot:  "#8C472E",            // Fired Brick
+    warm: "#BF7256",            // Dusty Coral
+    cool: "#2E4009",            // Forest Olive
+    cold: "rgba(44,24,16,0.5)", // Brewery Dark @ 50%
+  };
+
+  // Won / Lost short-circuit (mirrors computeLeadScore: Won = 100/hot already).
+  let ringScore = sc.score;
+  let ringTierLabel = (TIER_CONFIG[sc.tier] && TIER_CONFIG[sc.tier].label) || "Cool";
+  let ringTierColor = TIER_RING_COLORS[sc.tier] || TIER_RING_COLORS.cool;
+
+  const isWon = lead.contact_type === "customer" || (funnel && funnel.currentStage === "won");
+  const isLost = funnel && funnel.currentStage === "lost";
+
+  if (isWon) {
+    ringScore = 100;
+    ringTierLabel = "Won";
+    ringTierColor = "#2E4009"; // Forest Olive
+  } else if (isLost) {
+    ringTierLabel = "Lost";
+    ringTierColor = "rgba(64,22,12,0.6)"; // Mahogany @ 60%
+  }
+
   return (
     <div className="lp-body-col">
       <h3 className="lp-body-col__title">
         <span>Score breakdown</span>
         <span className="lp-body-col__title-meta">Total {sc.score}</span>
       </h3>
+      <ScoreRing score={ringScore} tierLabel={ringTierLabel} tierColor={ringTierColor} />
       {rows.map(row => (
         <div key={row.label} className="lp-sb-row">
           <span className="lp-sb-row__label">{row.label}</span>
@@ -918,7 +970,7 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
         {/* ── Band 4: 3-column body ── */}
         <div className="lp-body">
           <EventDetailsColumn lead={lead} />
-          <ScoreBreakdownColumn sc={sc} lead={lead} />
+          <ScoreBreakdownColumn sc={sc} lead={lead} funnel={funnel} />
           <ActivitySummaryColumn
             journey={journey}
             journeyLoading={journeyLoading}
