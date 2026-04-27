@@ -90,28 +90,43 @@ import pricing from '../../../data/wedding-pricing.json';
         padding: 48px 32px 96px;
       }
 
+      /* Dashboard page header - tightened to a single row (2026-04-27).
+         Eyebrow + title left, auto-refresh meta right. ~60px total height. */
+      .rep-header {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 16px; margin: 0 0 24px;
+      }
+      .rep-header__left { min-width: 0; }
       .rep-eyebrow {
         font-family: var(--sans);
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         letter-spacing: 0.18em;
         text-transform: uppercase;
         color: var(--color-dusty-coral);
-        margin: 0 0 8px;
+        margin: 0 0 2px;
       }
       .rep-title {
         font-family: var(--serif);
-        font-size: 42px;
+        font-size: 28px;
         font-weight: 500;
-        margin: 0 0 8px;
+        margin: 0;
         color: var(--color-brewery-dark);
         letter-spacing: -0.01em;
+        line-height: 1.05;
       }
+      .rep-header__meta {
+        font-family: var(--sans);
+        font-size: 12px;
+        color: rgba(44, 24, 16, 0.55);
+        margin: 0; flex-shrink: 0; text-align: right;
+      }
+      /* Legacy rep-lede kept for backwards-compatibility (unused on dashboard) */
       .rep-lede {
         font-family: var(--sans);
         font-size: 14px;
         max-width: 640px;
-        margin: 0 0 32px;
+        margin: 0 0 24px;
         color: rgba(44, 24, 16, 0.7);
       }
 
@@ -1199,50 +1214,78 @@ import pricing from '../../../data/wedding-pricing.json';
 
       /* ── 5-band lead profile redesign (prd-sys-lead-profile.md) ── */
 
-      /* Band 1: Identity strip - bigger avatar, generous padding */
+      /* Band 1: Identity strip - compact 2-row layout (2026-04-27 redesign).
+         Avatar (left) + 2-row text (centre) + actions (right). Total height
+         ~96-104px. Email/phone moved to Event details column. */
       .lp-id-strip {
         display: grid;
-        grid-template-columns: auto 1fr;
-        grid-template-rows: auto auto;
-        column-gap: 24px;
-        row-gap: 8px;
+        grid-template-columns: auto 1fr auto;
+        column-gap: 16px;
         align-items: center;
-        padding: 32px 32px; background: rgba(255,255,255,0.7);
+        padding: 24px 28px; background: rgba(255,255,255,0.7);
         border-bottom: 1px solid rgba(64,22,12,0.1);
       }
       .lp-id-strip__avatar {
-        grid-row: 1 / span 2;
-        grid-column: 1;
-        width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+        width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
         background: #2E4009; color: #F5F0E8;
-        font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 600;
+        font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
         text-transform: uppercase; letter-spacing: 0.02em;
-        align-self: center;
+      }
+      .lp-id-text {
+        display: grid; grid-template-rows: auto auto; gap: 4px;
+        min-width: 0;
+      }
+      .lp-id-name-row {
+        display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+        min-width: 0;
       }
       .lp-id-strip__name {
-        grid-row: 1; grid-column: 2;
-        font-family: 'Cormorant Garamond', Georgia, serif; font-size: 34px; font-weight: 500;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 30px; font-weight: 500;
         color: #2C1810; margin: 0; line-height: 1.05; letter-spacing: -0.015em;
-        align-self: end;
       }
-      .lp-id-strip__meta {
-        grid-row: 2; grid-column: 2;
-        display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-        font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(44,24,16,0.65);
-        min-width: 0;
-        align-self: start;
+      .lp-stage-pill {
+        display: inline-flex; align-items: center; height: 22px;
+        padding: 0 10px; border-radius: 2px;
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+        text-transform: uppercase; letter-spacing: 0.04em;
+        white-space: nowrap; flex-shrink: 0;
       }
-      .lp-id-strip__sep { color: rgba(44,24,16,0.3); padding: 0 2px; }
-      .lp-id-strip__link {
+      .lp-id-subtitle {
+        margin: 0;
+        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+        text-transform: uppercase; letter-spacing: 0.13em;
+        color: #BF7256; line-height: 1.2;
+      }
+      .lp-id-actions {
+        display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+      }
+      .lp-id-actions__btn {
+        font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 500;
+        height: 30px; padding: 0 14px; border-radius: 2px;
+        border: 1px solid; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 4px;
+        text-decoration: none;
+        transition: all 0.15s ease;
+      }
+      .lp-id-actions__btn--ghost {
+        background: transparent; color: #2C1810; border-color: rgba(64,22,12,0.24);
+      }
+      .lp-id-actions__btn--ghost:hover {
+        background: rgba(140,71,46,0.05);
+      }
+      .lp-id-actions__btn--primary {
+        background: #49590E; color: #F5F0E8; border-color: #49590E;
+      }
+      .lp-id-actions__btn--primary:hover {
+        background: #2E4009; border-color: #2E4009;
+      }
+      /* Email / phone link styling inside Event Details (moved from id strip) */
+      .lp-attr-row__link {
         color: #BF7256; text-decoration: none; font-weight: 500;
       }
-      .lp-id-strip__link:hover { text-decoration: underline; }
-      .lp-id-strip__hubspot {
-        color: #BF7256; text-decoration: none; font-weight: 500;
-        font-family: 'DM Sans', sans-serif; font-size: 11px;
-      }
-      .lp-id-strip__hubspot:hover { text-decoration: underline; }
+      .lp-attr-row__link:hover { text-decoration: underline; }
 
       /* Band 2: Metadata strip - 4 cells, generous vertical padding.
          No border-bottom: this is now the bottom band of Card 1, the card
@@ -1859,7 +1902,9 @@ import pricing from '../../../data/wedding-pricing.json';
 
       @media (max-width: 480px) {
         .rep-shell { padding: 24px 16px 64px; }
-        .rep-title { font-size: 32px; }
+        .rep-header { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 16px; }
+        .rep-header__meta { text-align: left; }
+        .rep-title { font-size: 24px; }
         .adm-tab { padding: 8px 12px; font-size: 11px; letter-spacing: 0.06em; }
         .lead-panel__tabs { padding: 6px 8px; gap: 2px; }
         .lead-panel__filters { padding: 10px 12px; }
@@ -1877,9 +1922,17 @@ import pricing from '../../../data/wedding-pricing.json';
         .lp-journey-session { padding: 12px; }
         .lp-journey-page { font-size: 12px; }
         /* 5-band redesign mobile adjustments (~60% of desktop padding) */
-        .lp-id-strip { padding: 20px 18px; column-gap: 16px; row-gap: 6px; }
-        .lp-id-strip__avatar { width: 48px; height: 48px; font-size: 18px; }
-        .lp-id-strip__name { font-size: 26px; }
+        .lp-id-strip {
+          padding: 18px 16px; column-gap: 12px;
+          grid-template-columns: auto 1fr;
+        }
+        .lp-id-strip__avatar { width: 40px; height: 40px; font-size: 14px; }
+        .lp-id-strip__name { font-size: 24px; }
+        .lp-id-actions {
+          grid-column: 1 / -1; margin-top: 12px;
+          flex-wrap: wrap; width: 100%;
+        }
+        .lp-id-actions__btn { flex: 1; justify-content: center; }
         .lp-meta-strip { grid-template-columns: 1fr 1fr; gap: 20px 16px; padding: 18px 18px; }
         .lp-meta-cell__value { font-size: 14px; }
         .lp-funnel-hero { padding: 20px 18px; }
@@ -2118,7 +2171,7 @@ import pricing from '../../../data/wedding-pricing.json';
         @page { size: A4 landscape; margin: 12mm; }
         body { padding: 0; background: #fff; color: #000; }
         .rep-shell { padding: 0; max-width: none; }
-        .rep-eyebrow, .rep-title, .rep-lede, .rep-footer,
+        .rep-header, .rep-eyebrow, .rep-title, .rep-lede, .rep-footer,
         .adm-tabs, .rep-refresh, .pr-print-btn { display: none !important; }
         .pr-view-head { margin-bottom: 12px; }
         .pr-status-banner { background: #fff; color: #000; border: 2px solid #000; }
@@ -2135,12 +2188,13 @@ import pricing from '../../../data/wedding-pricing.json';
   </head>
   <body>
     <div class="rep-shell">
-      <p class="rep-eyebrow">Internal - The Hackney</p>
-      <h1 class="rep-title">Dashboard</h1>
-      <p class="rep-lede">
-        Everything in one place. Visitor tracking, date clicks, CTA performance,
-        traffic sources. Auto-refreshes every 60 seconds.
-      </p>
+      <header class="rep-header">
+        <div class="rep-header__left">
+          <p class="rep-eyebrow">Internal &middot; The Hackney</p>
+          <h1 class="rep-title">Dashboard</h1>
+        </div>
+        <p class="rep-header__meta">Auto-refreshes every 60s</p>
+      </header>
 
       <AdminDashboard client:load pricing={pricing} />
 

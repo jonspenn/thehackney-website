@@ -25,6 +25,9 @@ import {
   TIER_CONFIG,
   FUNNEL_LABELS, HEALTH_COLORS, STAGE_DEFINITIONS,
   STAGE_PRIMARY_ACTION,
+  STAGE_PILL_COLORS,
+  LEAD_TYPE_LABELS,
+  EVENT_TYPE_DISPLAY,
   JOURNEY_EVENT_LABELS,
   LOST_REASONS,
 } from "./constants.js";
@@ -801,6 +804,23 @@ function EventDetailsColumn({ lead }) {
   return (
     <div className="lp-body-col">
       <h3 className="lp-body-col__title"><span>Event details</span></h3>
+      {/* Contact rows - moved here from identity strip (2026-04-27 redesign) */}
+      <div className="lp-attr-row">
+        <span className="lp-attr-row__label">Email</span>
+        <span className={`lp-attr-row__value${lead.email ? "" : " lp-attr-row__value--empty"}`}>
+          {lead.email ? (
+            <a href={`mailto:${lead.email}`} className="lp-attr-row__link">{lead.email}</a>
+          ) : "Not provided"}
+        </span>
+      </div>
+      <div className="lp-attr-row">
+        <span className="lp-attr-row__label">Phone</span>
+        <span className={`lp-attr-row__value${lead.phone ? "" : " lp-attr-row__value--empty"}`}>
+          {lead.phone ? (
+            <a href={`tel:${lead.phone}`} className="lp-attr-row__link">{lead.phone}</a>
+          ) : "Not provided"}
+        </span>
+      </div>
       {rows.map(r => (
         <div key={r.label} className="lp-attr-row">
           <span className="lp-attr-row__label">{r.label}</span>
@@ -828,6 +848,35 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
   const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unknown";
   const initials = (lead.first_name || "?").charAt(0).toUpperCase() + (lead.last_name || "").charAt(0).toUpperCase();
   const src = resolveSource(lead.source_channel);
+
+  /* ── Identity strip derived data (2026-04-27 redesign) ── */
+  /* Stage pill: background + colour driven by STAGE_PILL_COLORS, label from
+     FUNNEL_LABELS, uppercase. Defaults to Forest Olive tint if stage unknown. */
+  const stagePillCfg = STAGE_PILL_COLORS[funnel.currentStage] || STAGE_PILL_COLORS.lead;
+  const stagePillLabel = (FUNNEL_LABELS[funnel.currentStage] || funnel.currentStage || "").toUpperCase();
+  const stagePill = stagePillLabel ? { bg: stagePillCfg.bg, color: stagePillCfg.color, label: stagePillLabel } : null;
+
+  /* Subtitle: "{Event type} · {Event date}" - Dusty Coral tracked uppercase.
+     Event type comes from activeLeadType (wedding / corporate / etc.) plus
+     for corporate the more specific event_type_label if present.
+     Event date is formatted "MMM YYYY" or "Date TBC". */
+  const eventTypeLabel = (() => {
+    if (activeLeadType === "corporate" && lead.event_type) {
+      return EVENT_TYPE_DISPLAY[lead.event_type] || LEAD_TYPE_LABELS[activeLeadType] || activeLeadType;
+    }
+    return LEAD_TYPE_LABELS[activeLeadType] || activeLeadType || "Lead";
+  })();
+  const eventDateLabel = (() => {
+    const raw = lead.event_date;
+    if (!raw) return "Date TBC";
+    /* event_date is typically YYYY-MM-DD; parse safely. */
+    const safe = raw.includes("T") ? raw : raw + "T00:00:00Z";
+    const d = new Date(safe);
+    if (Number.isNaN(d.getTime())) return raw;
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  })();
+  const idSubtitle = `${eventTypeLabel} · ${eventDateLabel}`;
 
   /* ── Band 2 metadata: derive last visit from journey when no
      last_touched_by column exists yet (v2 deferral). ── */
@@ -860,32 +909,37 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
       <div className="lp-card-stack">
         {/* ── Card 1: Identity + Metadata ── */}
         <div className="lp-card lp-card--header">
-        {/* ── Band 1: Identity strip ── */}
+        {/* ── Band 1: Identity strip (compact 2-row layout - 2026-04-27 redesign) ── */}
         <div className="lp-id-strip">
           <span className="lp-id-strip__avatar" aria-hidden="true">{initials || "?"}</span>
-          <h2 className="lp-id-strip__name">{name}</h2>
-          <span className="lp-id-strip__meta">
-            {lead.email && (
-              <a href={`mailto:${lead.email}`} className="lp-id-strip__link">{lead.email}</a>
-            )}
-            {lead.phone && (
-              <>
-                <span className="lp-id-strip__sep">{"·"}</span>
-                <a href={`tel:${lead.phone}`} className="lp-id-strip__link">{lead.phone}</a>
-              </>
-            )}
+          <div className="lp-id-text">
+            <div className="lp-id-name-row">
+              <h2 className="lp-id-strip__name">{name}</h2>
+              {stagePill && (
+                <span className="lp-stage-pill" style={{ background: stagePill.bg, color: stagePill.color }}>
+                  {stagePill.label}
+                </span>
+              )}
+            </div>
+            <p className="lp-id-subtitle">{idSubtitle}</p>
+          </div>
+          <div className="lp-id-actions">
             {lead.hubspot_contact_id && (
-              <>
-                <span className="lp-id-strip__sep">{"·"}</span>
-                <a
-                  href={`https://app.hubspot.com/contacts/25870094/contact/${lead.hubspot_contact_id}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="lp-id-strip__hubspot"
-                  title="Open in HubSpot"
-                >HubSpot {"↗"}</a>
-              </>
+              <a
+                href={`https://app.hubspot.com/contacts/25870094/contact/${lead.hubspot_contact_id}`}
+                target="_blank" rel="noopener noreferrer"
+                className="lp-id-actions__btn lp-id-actions__btn--ghost"
+                title="Open in HubSpot"
+              >Open in HubSpot {"↗"}</a>
             )}
-          </span>
+            {funnel.currentStage === "won" && (
+              <button
+                type="button"
+                className="lp-id-actions__btn lp-id-actions__btn--primary"
+                onClick={() => { /* placeholder - finalise booking flow */ }}
+              >Finalise booking</button>
+            )}
+          </div>
         </div>
 
         {/* ── Band 2: Metadata strip ── */}

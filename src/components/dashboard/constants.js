@@ -238,3 +238,31 @@ export const STAGE_PRIMARY_ACTION = {
   tour:      { action: "proposal", label: "Sent proposal" },
   proposal:  { action: "won",      label: "Won" },
 };
+
+/* ── Stage pill colours (identity strip) ──
+   Soft-tinted pill rendered next to the lead's name. Background uses the
+   stage's tier-of-stage colour at low opacity, with text at full saturation.
+   See prd-sys-lead-profile.md > Identity strip redesign (2026-04-27). */
+export const STAGE_PILL_COLORS = {
+  /* Pre-meeting funnel stages - Forest Olive (cool/early) */
+  lead:      { bg: "rgba(46,64,9,0.18)",  color: "#2E4009" },
+  qualified: { bg: "rgba(46,64,9,0.18)",  color: "#2E4009" },
+  engaged:   { bg: "rgba(46,64,9,0.18)",  color: "#2E4009" },
+  /* Active conversations - Dusty Coral / Mahogany */
+  call:      { bg: "rgba(191,114,86,0.18)", color: "rgba(64,22,12,0.85)" },
+  tour:      { bg: "rgba(191,114,86,0.18)", color: "rgba(64,22,12,0.85)" },
+  meeting:   { bg: "rgba(191,114,86,0.18)", color: "rgba(64,22,12,0.85)" },
+  /* Proposal sent - Fired Brick */
+  proposal:  { bg: "rgba(140,71,46,0.18)",  color: "rgba(64,22,12,0.85)" },
+  /* Won - Forest Olive at higher opacity */
+  won:       { bg: "rgba(46,64,9,0.22)",   color: "#2E4009" },
+  /* Lost / Cancelled / No-show - Mahogany muted */
+  lost:      { bg: "rgba(64,22,12,0.14)",  color: "rgba(64,22,12,0.6)" },
+  cancelled: { bg: "rgba(64,22,12,0.14)",  color: "rgba(64,22,12,0.6)" },
+  noshow:    { bg: "rgba(64,22,12,0.14)",  color: "rgba(64,22,12,0.6)" },
+  /* Supper club / cafe-bar low-intent stages - default to Forest Olive */
+  signup:    { bg: "rgba(46,64,9,0.18)",  color: "#2E4009" },
+  booked:    { bg: "rgba(46,64,9,0.22)",  color: "#2E4009" },
+  attended:  { bg: "rgba(46,64,9,0.22)",  color: "#2E4009" },
+  return:    { bg: "rgba(46,64,9,0.22)",  color: "#2E4009" },
+};
