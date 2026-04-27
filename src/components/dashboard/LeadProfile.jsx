@@ -729,9 +729,216 @@ function ScoreBreakdownColumn({ sc, lead, funnel }) {
   );
 }
 
-/* ── Activity summary (last 4 sessions + drill-in toggle) ── */
+/* ── Milestone-builder + relative-time helper for the compact Activity column ── */
 
-function ActivitySummaryColumn({ journey, journeyLoading, showFullJourney, setShowFullJourney }) {
+/* Richer relative-time formatter than utils.formatRelativeTime - uses
+ * "Today HH:MM", "Yesterday", "Tue 23 Apr" tiers like the Stitch reference. */
+function formatMilestoneTime(iso) {
+  if (!iso) return "";
+  const safe = iso.includes("T") ? iso : iso.replace(" ", "T") + "Z";
+  const then = new Date(safe);
+  if (Number.isNaN(then.getTime())) return iso;
+  const now = new Date();
+  const diffMs = now.getTime() - then.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  /* Same calendar day in local time → "Today HH:MM" */
+  const sameDay = then.toDateString() === now.toDateString();
+  if (sameDay) {
+    return `Today ${then.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
+  }
+  /* Yesterday in local time */
+  const yest = new Date(now); yest.setDate(now.getDate() - 1);
+  if (then.toDateString() === yest.toDateString()) return "Yesterday";
+  /* Within last 7 days → "Tue 23 Apr" */
+  const days = Math.floor((now - then) / 86400000);
+  if (days < 7) {
+    return then.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  }
+  /* Else absolute "23 Apr" or "23 Apr 2025" if different year */
+  if (then.getFullYear() === now.getFullYear()) {
+    return then.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  }
+  return then.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/* Format a YYYY-MM-DD wedding date as "12 Sep 2026" */
+function formatEventDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr.length === 10 ? dateStr + "T00:00:00Z" : dateStr);
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+}
+
+/* Returns an array of { time, title, detail } sorted DESC.
+ *
+ * Sources:
+ *   - journey events (form_submit, cta_click w/ booking intent, date_check,
+ *     brochure_download, questionnaire_complete/start, plus first-visit anchor)
+ *   - manual lead-status timestamps on the contact (meeting_at, call_at,
+ *     tour_at, proposal_at, won_at, lost_at, cancelled_at, noshow_at)
+ *
+ * Skips page_view + questionnaire_step (too noisy for the compact column).
+ */
+function buildLeadMilestones(lead, journey) {
+  const out = [];
+
+  /* ── Journey-derived milestones ── */
+  if (journey && journey.sessions && journey.sessions.length > 0) {
+    const allEvents = journey.sessions.flatMap(s => s.events.map(e => ({
+      ...e,
+      session_source: s.source,
+      session_ad_platform: s.ad_platform,
+    })));
+
+    /* First-visit anchor (uses first session, not first event, so source is meaningful) */
+    const firstSession = journey.sessions[0];
+    if (firstSession) {
+      const src = resolveSource(firstSession.source || "");
+      out.push({
+        time: firstSession.started_at,
+        title: `First visit · ${src.label}`,
+        detail: firstSession.ad_platform ? `via ${firstSession.ad_platform}` : "",
+      });
+    }
+
+    /* form_submit */
+    allEvents.filter(e => e.event_type === "form_submit").forEach(e => {
+      const d = parseEventData(e.event_data);
+      const fl = d?.form_type ? (FORM_TYPE_LABELS[d.form_type] || d.form_type) : "form";
+      out.push({
+        time: e.created_at,
+        title: `Submitted ${fl}`,
+        detail: d?.form_action || "",
+      });
+    });
+
+    /* cta_click - only booking-intent ones (tour, call, book) */
+    allEvents.filter(e => e.event_type === "cta_click").forEach(e => {
+      const d = parseEventData(e.event_data);
+      const text = (d?.cta_text || d?.track_id || d?.cta_id || "").toLowerCase();
+      if (!(text.includes("tour") || text.includes("call") || text.includes("book"))) return;
+      const ctaName = d?.cta_text || d?.track_id || d?.cta_id || "CTA";
+      const page = e.page_url ? shortenUrl(e.page_url) : "";
+      out.push({
+        time: e.created_at,
+        title: `Clicked "${ctaName}"`,
+        detail: page ? `on ${page}` : "",
+      });
+    });
+
+    /* date_check - one milestone per check (limited to top 4 anyway) */
+    allEvents.filter(e => e.event_type === "date_check").forEach(e => {
+      const d = parseEventData(e.event_data);
+      const dateLabel = d?.date ? formatEventDate(d.date) : "a date";
+      out.push({
+        time: e.created_at,
+        title: `Checked ${dateLabel}`,
+        detail: "",
+      });
+    });
+
+    /* brochure_download */
+    allEvents.filter(e => e.event_type === "brochure_download").forEach(e => {
+      const d = parseEventData(e.event_data);
+      const which = d?.brochure_type ? ` (${d.brochure_type})` : "";
+      out.push({
+        time: e.created_at,
+        title: `Downloaded brochure${which}`,
+        detail: "",
+      });
+    });
+
+    /* questionnaire_complete - prefer over start */
+    const qComplete = allEvents.filter(e => e.event_type === "questionnaire_complete");
+    if (qComplete.length > 0) {
+      qComplete.forEach(e => {
+        const d = parseEventData(e.event_data);
+        const stream = d?.stream || d?.questionnaire_type || lead.lead_type || "";
+        out.push({
+          time: e.created_at,
+          title: stream ? `Completed ${stream} quiz` : "Completed questionnaire",
+          detail: "",
+        });
+      });
+    } else {
+      const qStart = allEvents.filter(e => e.event_type === "questionnaire_start");
+      if (qStart.length > 0) {
+        const e = qStart[0];
+        out.push({
+          time: e.created_at,
+          title: "Started questionnaire",
+          detail: "Not completed",
+        });
+      }
+    }
+  }
+
+  /* ── Manual lead-status milestones (from contact record) ── */
+  /* call_at: prefer explicit call_at column, else infer from meeting_at when
+   * the lead has discovery-call intent and no tour intent. */
+  const effectiveCallAt = lead.call_at || (
+    lead.meeting_at && lead.clicked_discovery_call_at && !lead.clicked_venue_tour_at
+      ? lead.meeting_at
+      : null
+  );
+  /* tour_at: prefer explicit tour_at column, else infer from meeting_at when
+   * tour intent is present (or as default fallback for legacy meetings). */
+  const effectiveTourAt = lead.tour_at || (
+    lead.meeting_at && (lead.clicked_venue_tour_at || (!lead.clicked_discovery_call_at && !effectiveCallAt))
+      ? lead.meeting_at
+      : null
+  );
+
+  if (effectiveCallAt && effectiveCallAt !== effectiveTourAt) {
+    out.push({ time: effectiveCallAt, title: "Had call", detail: "" });
+  }
+  if (effectiveTourAt) {
+    out.push({ time: effectiveTourAt, title: "Had tour", detail: "" });
+  }
+  /* If meeting_at is set but neither call nor tour was inferred from it, surface as a generic meeting. */
+  if (lead.meeting_at && lead.meeting_at !== effectiveCallAt && lead.meeting_at !== effectiveTourAt) {
+    out.push({ time: lead.meeting_at, title: "Had meeting", detail: "" });
+  }
+  if (lead.proposal_at) {
+    out.push({ time: lead.proposal_at, title: "Sent proposal", detail: "" });
+  }
+  if (lead.won_at) {
+    const dv = lead.deal_value ? ` · £${Number(lead.deal_value).toLocaleString()}` : "";
+    out.push({ time: lead.won_at, title: `Marked Won${dv}`, detail: "" });
+  }
+  if (lead.lost_at) {
+    const reasonLabel = (LOST_REASONS.find(r => r.value === lead.lost_reason) || {}).label;
+    const reason = reasonLabel ? ` · ${reasonLabel}` : "";
+    out.push({
+      time: lead.lost_at,
+      title: `Marked Lost${reason}`,
+      detail: lead.lost_reason_note || "",
+    });
+  }
+  if (lead.cancelled_at) {
+    out.push({ time: lead.cancelled_at, title: "Cancelled", detail: "" });
+  }
+  if (lead.noshow_at) {
+    out.push({ time: lead.noshow_at, title: "No-show", detail: "" });
+  }
+
+  /* Sort DESC and dedupe by (time + title) so we don't show two
+   * identical rows when meeting_at + tour_at coincide. */
+  const seen = new Set();
+  out.sort((a, b) => (b.time || "").localeCompare(a.time || ""));
+  return out.filter(m => {
+    const k = `${m.time}|${m.title}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
+/* ── Activity summary (top 4 event milestones + drill-in toggle) ── */
+
+function ActivitySummaryColumn({ lead, journey, journeyLoading, showFullJourney, setShowFullJourney }) {
   if (journeyLoading) {
     return (
       <div className="lp-body-col">
@@ -740,7 +947,10 @@ function ActivitySummaryColumn({ journey, journeyLoading, showFullJourney, setSh
       </div>
     );
   }
-  if (!journey || !journey.sessions || journey.sessions.length === 0) {
+
+  const milestones = buildLeadMilestones(lead, journey);
+
+  if (milestones.length === 0) {
     return (
       <div className="lp-body-col">
         <h3 className="lp-body-col__title"><span>Activity</span></h3>
@@ -749,37 +959,25 @@ function ActivitySummaryColumn({ journey, journeyLoading, showFullJourney, setSh
     );
   }
 
-  /* Most recent first, take 4 */
-  const recent = [...journey.sessions]
-    .sort((a, b) => (b.started_at || "").localeCompare(a.started_at || ""))
-    .slice(0, 4);
+  const top = milestones.slice(0, 4);
+  const sessionCount = journey && journey.total_sessions ? journey.total_sessions : 0;
 
   return (
     <div className="lp-body-col">
       <h3 className="lp-body-col__title">
         <span>Activity</span>
-        <span className="lp-body-col__title-meta">{journey.total_sessions} session{journey.total_sessions !== 1 ? "s" : ""}</span>
+        {sessionCount > 0 && (
+          <span className="lp-body-col__title-meta">{sessionCount} session{sessionCount !== 1 ? "s" : ""}</span>
+        )}
       </h3>
-      <div className="activity-mini">
-        {recent.map(s => {
-          const pageCount = s.events ? s.events.filter(e => e.event_type === "page_view").length : 0;
-          const src = resolveSource(s.source || "");
-          return (
-            <div key={s.session_id} className="activity-mini__row">
-              <div className="activity-mini__top">
-                <span className="activity-mini__when">{formatRelativeTime(s.started_at)}</span>
-                <span className="activity-mini__src">
-                  <span className="activity-mini__src-dot" style={{ background: src.color }} />
-                  {src.label}
-                </span>
-              </div>
-              <div className="activity-mini__stats">
-                {pageCount} page{pageCount !== 1 ? "s" : ""}
-                {s.duration != null ? ` · ${formatDuration(s.duration)}` : ""}
-              </div>
-            </div>
-          );
-        })}
+      <div className="activity-mini activity-mini--timeline">
+        {top.map((m, i) => (
+          <div key={`${m.time}-${i}`} className="activity-mini__row">
+            <div className="activity-mini__title">{m.title}</div>
+            <div className="activity-mini__when">{formatMilestoneTime(m.time)}</div>
+            {m.detail && <div className="activity-mini__detail">{m.detail}</div>}
+          </div>
+        ))}
       </div>
       <button type="button" className="activity-mini__link" onClick={() => setShowFullJourney(prev => !prev)}>
         {showFullJourney ? "Hide full timeline" : "View full timeline →"}
@@ -1026,6 +1224,7 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
           <EventDetailsColumn lead={lead} />
           <ScoreBreakdownColumn sc={sc} lead={lead} funnel={funnel} />
           <ActivitySummaryColumn
+            lead={lead}
             journey={journey}
             journeyLoading={journeyLoading}
             showFullJourney={showFullJourney}
