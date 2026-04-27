@@ -321,7 +321,7 @@ import pricing from '../../../data/wedding-pricing.json';
       .rep-device-card {
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
-        border-radius: 2px;
+        border-radius: 8px;
         padding: 20px;
         text-align: center;
       }
@@ -343,7 +343,7 @@ import pricing from '../../../data/wedding-pricing.json';
       .rep-dow {
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
-        border-radius: 2px;
+        border-radius: 8px;
         padding: 24px;
         display: grid;
         grid-template-columns: repeat(7, 1fr);
@@ -361,7 +361,7 @@ import pricing from '../../../data/wedding-pricing.json';
       @media (max-width: 1000px) { .rep-heatmap { grid-template-columns: repeat(3, 1fr); } }
       @media (max-width: 720px) { .rep-heatmap { grid-template-columns: repeat(2, 1fr); } }
       @media (max-width: 480px) { .rep-heatmap { grid-template-columns: 1fr; } }
-      .rep-month { background: var(--color-warm-white); border: 1px solid var(--border-warm); border-radius: 2px; padding: 14px; }
+      .rep-month { background: var(--color-warm-white); border: 1px solid var(--border-warm); border-radius: 8px; padding: 14px; }
       .rep-month__label { font-family: var(--serif); font-size: 16px; font-weight: 500; text-align: center; margin-bottom: 8px; }
       .rep-month__dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(44, 24, 16, 0.45); text-align: center; margin-bottom: 4px; }
       .rep-month__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
@@ -374,7 +374,7 @@ import pricing from '../../../data/wedding-pricing.json';
       .rep-table-wrap::-webkit-scrollbar-track { background: rgba(44,24,16,0.04); border-radius: 4px; }
       .rep-table-wrap::-webkit-scrollbar-thumb { background: rgba(44,24,16,0.18); border-radius: 4px; }
       .rep-table-wrap::-webkit-scrollbar-thumb:hover { background: rgba(44,24,16,0.3); }
-      .rep-table { width: 100%; background: var(--color-warm-white); border: 1px solid var(--border-warm); border-collapse: collapse; border-radius: 2px; overflow: hidden; min-width: 600px; }
+      .rep-table { width: 100%; background: var(--color-warm-white); border: 1px solid var(--border-warm); border-collapse: collapse; border-radius: 8px; overflow: hidden; min-width: 600px; }
       .rep-table th, .rep-table td { padding: 10px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border-subtle); }
       .rep-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-fired-brick); background: rgba(64, 22, 12, 0.03); }
       .rep-table tr:last-child td { border-bottom: none; }
@@ -446,7 +446,7 @@ import pricing from '../../../data/wedding-pricing.json';
       .lead-panel {
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
-        border-radius: 6px;
+        border-radius: 8px;
         margin-bottom: 8px;
         overflow: hidden;
       }
@@ -915,8 +915,8 @@ import pricing from '../../../data/wedding-pricing.json';
 
       /* Card wrapper - now applied to each of the three sibling cards */
       .lp-card {
-        background: rgba(255,255,255,0.7); border: 1px solid rgba(64,22,12,0.14);
-        border-radius: 2px; overflow: hidden;
+        background: rgba(255,255,255,0.7); border: 1px solid rgba(64,22,12,0.10);
+        border-radius: 8px; overflow: hidden;
       }
 
       .lp-hero {
@@ -1408,7 +1408,7 @@ import pricing from '../../../data/wedding-pricing.json';
 
       /* Body row - three separate cards (event / score / activity) sitting
          beneath the funnel hero with 16px gaps between them. Each card uses
-         the standard .lp-card chrome (rgba bg + Mahogany 14% border + 2px). */
+         the standard .lp-card chrome (rgba bg + Mahogany 10% border + 8px). */
       .lp-body-row {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2102,7 +2102,7 @@ import pricing from '../../../data/wedding-pricing.json';
       .pr-meta-card {
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
-        border-radius: 2px;
+        border-radius: 8px;
         padding: 16px 18px;
       }
       .pr-meta-label {
@@ -2132,7 +2132,7 @@ import pricing from '../../../data/wedding-pricing.json';
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
         border-left: 3px solid var(--color-fired-brick);
-        border-radius: 2px;
+        border-radius: 8px;
         padding: 14px 18px;
         font-size: 13px;
         color: var(--color-brewery-dark);
@@ -2156,7 +2156,7 @@ import pricing from '../../../data/wedding-pricing.json';
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
         border-left: 3px solid var(--color-dusty-coral);
-        border-radius: 2px;
+        border-radius: 8px;
         padding: 16px 18px;
       }
       .pr-callout h3 {
@@ -2197,7 +2197,7 @@ import pricing from '../../../data/wedding-pricing.json';
       .pr-table-wrap {
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
-        border-radius: 2px;
+        border-radius: 8px;
         overflow-x: auto;
         margin-bottom: 32px;
       }
@@ -2267,7 +2267,7 @@ import pricing from '../../../data/wedding-pricing.json';
       .pr-footer {
         background: var(--color-warm-white);
         border: 1px solid var(--border-warm);
-        border-radius: 2px;
+        border-radius: 8px;
         padding: 20px 24px;
         font-size: 13px;
         color: rgba(44, 24, 16, 0.75);

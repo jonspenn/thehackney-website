@@ -1,7 +1,7 @@
 ---
 name: The Hackney - Industrial Romance
 description: Machine-readable design tokens for thehackney.co. Source of truth is src/styles/global.css; this file mirrors those tokens in YAML for design agents (Stitch, Lovable, Figma Make, future Claude sessions). Validated in CI by scripts/validate-design-tokens.mjs.
-last-updated: 2026-04-26
+last-updated: 2026-04-27
 
 colors:
   # Core palette
@@ -75,6 +75,7 @@ layout:
   header-height: "96px"
 
 cards:
+  # Public site cards (default - applies to thehackney.co marketing pages)
   background: "rgba(255, 255, 255, 0.3)"
   border-color: "rgba(44, 24, 16, 0.04)"
   border-color-hover: "rgba(44, 24, 16, 0.1)"
@@ -82,6 +83,9 @@ cards:
   padding-x: "2rem"
   padding-y: "1rem"
   shadow-hover: "0 4px 16px rgba(64, 22, 12, 0.08)"
+  # Dashboard cards (internal admin at /admin/* - softer language than the public site)
+  radius-dashboard: "8px"
+  border-color-dashboard: "rgba(64, 22, 12, 0.10)"
 
 buttons:
   radius: "2px"
@@ -141,9 +145,15 @@ One CTA per section, always.
 
 ### Cards
 
-2px radius (sharp/architectural, not rounded). Translucent white background (30% opacity over the page background). 32px horizontal padding, 16px vertical. Soft mahogany-tinted hover shadow.
+**Public site cards** (default): 2px radius (sharp/architectural, not rounded). Translucent white background (30% opacity over the page background). 32px horizontal padding, 16px vertical. Soft mahogany-tinted hover shadow.
 
-All cards site-wide consume the `--card-*` CSS custom properties (declared in `:root`). Never hardcode card chrome on individual components.
+All public-site cards consume the `--card-*` CSS custom properties (declared in `:root` of `global.css`). Never hardcode card chrome on individual components.
+
+**Dashboard cards** (`/admin/*` only): 8px radius, Mahogany 10% border (`rgba(64, 22, 12, 0.10)`). The internal admin dashboard is its own visual language - softer corners read as a tooling surface rather than a customer-facing marketing page. The 2px sharp rule was a public-site decision; carrying it into the dashboard makes Stitch-derived layouts feel rigid where they should feel like an interface to work in.
+
+Dashboard card chrome is currently inlined in `src/pages/admin/dashboard/index.astro` rather than tokenised, because the dashboard CSS is page-scoped. If the dashboard grows to multiple Astro pages, lift these into their own `--dashboard-card-*` tokens.
+
+Pills, buttons, and small UI elements stay at 2px on both surfaces - the radius bump is for big content containers only.
 
 ## Do's and Don'ts
 
