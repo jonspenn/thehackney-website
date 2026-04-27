@@ -1,17 +1,32 @@
 /**
- * LeadProfile - Full-page lead profile with hero, details, score breakdown, and journey.
- * Extracted from AdminDashboard.jsx for reuse and maintainability.
+ * LeadProfile - 5-band lead profile.
+ *
+ * Bands (top to bottom):
+ *   1. .lp-id-strip       - one quiet row, avatar + name + meta
+ *   2. .lp-meta-strip     - 4 cells: Score / Projected value / Lead source / Last visit
+ *   3. .lp-funnel-hero    - funnel track + stage callout + stage-aware actions
+ *   4. .lp-body           - 3 cols: Event details / Score breakdown / Activity summary
+ *   5. Dialogs            - Won / Lost / confirmation (unchanged)
+ *
+ * See sales & marketing/website/pages/dashboard/prd-sys-lead-profile.md.
+ *
+ * V1 deferrals (handled in v2):
+ *   - last_touched_at / last_touched_by schema migration. Falls back to
+ *     deriving "Last visit" from the journey's most-recent session timestamp.
+ *   - Circular score ring (Option B). Defaults to compact bars (Option A).
+ *   - Pin/star toggle, click-to-advance funnel, inline edit on event details.
  */
 
 import { useState, useEffect } from "react";
 
 import {
-  FORM_TYPE_LABELS, LEAD_TYPE_LABELS,
-  URGENCY_LABELS, URGENCY_STAGE, BUDGET_LABELS,
+  FORM_TYPE_LABELS,
+  URGENCY_LABELS,
   TIER_CONFIG,
   FUNNEL_LABELS, HEALTH_COLORS, STAGE_DEFINITIONS,
+  STAGE_PRIMARY_ACTION,
   JOURNEY_EVENT_LABELS,
-  LOST_REASONS, DAY_TYPE_LABELS,
+  LOST_REASONS,
 } from "./constants.js";
 
 import {
@@ -22,50 +37,11 @@ import {
   resolveSource,
 } from "./utils.js";
 
-/* ── Sub-sections ── */
-
-/* KeyLight - secondary 48px indicator circle shown alongside the primary score badge.
-   One visual system for every at-a-glance metric on the hero (days, urgency, source).
-   Variants are driven by inline colour props so we don't balloon the CSS surface. */
-function KeyLight({ value, label, color, bg, border, title, ariaLabel }) {
-  return (
-    <div className="lp-hero__kl" title={title} aria-label={ariaLabel || title}>
-      <span
-        className="lp-hero__kl-badge"
-        style={{
-          background: bg,
-          color: color,
-          borderColor: border || "transparent",
-        }}
-      >
-        {value}
-      </span>
-      <span className="lp-hero__kl-label">{label}</span>
-    </div>
-  );
-}
-
-/* Urgency stage 0-4 colour ramp. Matches the table chip logic but fills the circle
-   so it reads as a gauge light rather than a pill. Stage 0 is muted (no signal),
-   4 is Fired Brick (urgent). Uses brand palette only - no fresh colours. */
-const URGENCY_KEYLIGHT = {
-  0: { bg: "rgba(44,24,16,0.05)", color: "rgba(44,24,16,0.55)", border: "rgba(44,24,16,0.1)" },
-  1: { bg: "rgba(191,114,86,0.12)", color: "#BF7256", border: "transparent" },
-  2: { bg: "#BF7256", color: "#fff", border: "transparent" },
-  3: { bg: "#2E4009", color: "#fff", border: "transparent" },
-  4: { bg: "#8C472E", color: "#fff", border: "transparent" },
-};
-const URGENCY_SHORT_LABELS = {
-  0: "No signal",
-  1: "Browsing",
-  2: "Shortlist",
-  3: "Ready",
-  4: "Urgent",
-};
+/* ── Funnel track (unchanged from v0 - already battle-tested) ── */
 
 function FunnelTrack({ funnel, tc }) {
   return (
-    <div className="lp-funnel" style={{ marginTop: "10px" }}>
+    <div className="lp-funnel">
       {funnel.stages.map((stageKey, i) => {
         const isCompleted = !!funnel.completed[stageKey];
         const isCurrent = funnel.currentStage === stageKey;
@@ -100,7 +76,7 @@ function FunnelTrack({ funnel, tc }) {
           <div key={stageKey} className={`lp-funnel__step${isCurrent ? " lp-funnel__step--current" : ""}${isFuture ? " lp-funnel__step--future" : ""}`}>
             {i > 0 && <div className="lp-funnel__line" style={isCompleted || isCurrent ? lineStyle : {}} />}
             <div className={dotClass} style={dotStyle}>
-              {isCompleted && !isCurrent && <span className="lp-funnel__check">{"\u2713"}</span>}
+              {isCompleted && !isCurrent && <span className="lp-funnel__check">{"✓"}</span>}
               {isCurrent && !isLost && !isCancelled && !isNoshow && funnel.health && (
                 <span className="lp-funnel__pulse" />
               )}
@@ -112,18 +88,16 @@ function FunnelTrack({ funnel, tc }) {
             {isCurrent && funnel.health && (
               <span className="lp-funnel__health" style={{ color: hc.color, background: hc.bg }}>
                 {funnel.daysInStage === 0 ? "Today" : `${funnel.daysInStage}d`}
-                {funnel.health !== "green" && <span className="lp-funnel__health-label"> - {hc.label}</span>}
               </span>
             )}
           </div>
         );
       })}
-      {/* Lost / cancelled / no-show indicator */}
       {(funnel.currentStage === "lost" || funnel.currentStage === "cancelled" || funnel.currentStage === "noshow") && (
         <div className="lp-funnel__step lp-funnel__step--current">
           <div className="lp-funnel__line" />
           <div className={`lp-funnel__dot lp-funnel__dot--current`} style={{ background: funnel.currentStage === "lost" ? "#8C472E" : "#BF7256", borderColor: funnel.currentStage === "lost" ? "#8C472E" : "#BF7256" }}>
-            <span style={{ color: "#fff", fontSize: "10px", fontWeight: 700 }}>{funnel.currentStage === "lost" ? "\u2717" : "\u2014"}</span>
+            <span style={{ color: "#fff", fontSize: "10px", fontWeight: 700 }}>{funnel.currentStage === "lost" ? "✗" : "—"}</span>
           </div>
           <span className="lp-funnel__label">{FUNNEL_LABELS[funnel.currentStage]}</span>
           {funnel.lostReason && (
@@ -135,6 +109,8 @@ function FunnelTrack({ funnel, tc }) {
   );
 }
 
+/* ── Full journey drill-in (kept for "View full timeline" toggle) ── */
+
 function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
   if (!journey || journey.sessions.length === 0) return null;
 
@@ -145,11 +121,9 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
   const lastDate = lastSession.started_at;
   const totalPages = allEvents.filter(e => e.event_type === "page_view").length;
 
-  // Key milestones
   const milestones = [];
-  milestones.push({ time: firstDate, icon: "\uD83D\uDC41", label: "First visit", detail: firstSession.source + (firstSession.ad_platform ? " (" + firstSession.ad_platform + ")" : "") });
+  milestones.push({ time: firstDate, icon: "👁", label: "First visit", detail: firstSession.source + (firstSession.ad_platform ? " (" + firstSession.ad_platform + ")" : "") });
 
-  // Unique pages visited (top 5)
   const pageCounts = {};
   allEvents.filter(e => e.event_type === "page_view").forEach(e => {
     const p = (() => { try { return new URL(e.page_url, "https://x").pathname; } catch { return e.page_url; } })();
@@ -157,31 +131,27 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
   });
   const topPages = Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  // Date checks
   const dateChecks = allEvents.filter(e => e.event_type === "date_check");
   const checkedDates = [...new Set(dateChecks.map(e => { const d = parseEventData(e.event_data); return d?.date || ""; }).filter(Boolean))];
   if (dateChecks.length > 0) {
-    milestones.push({ time: dateChecks[0].created_at, icon: "\uD83D\uDCC5", label: "Checked " + checkedDates.length + " date" + (checkedDates.length !== 1 ? "s" : ""), detail: checkedDates.slice(0, 3).join(", ") + (checkedDates.length > 3 ? " + " + (checkedDates.length - 3) + " more" : "") });
+    milestones.push({ time: dateChecks[0].created_at, icon: "📅", label: "Checked " + checkedDates.length + " date" + (checkedDates.length !== 1 ? "s" : ""), detail: checkedDates.slice(0, 3).join(", ") + (checkedDates.length > 3 ? " + " + (checkedDates.length - 3) + " more" : "") });
   }
 
-  // Questionnaire events
   const quizComplete = allEvents.filter(e => e.event_type === "questionnaire_complete");
   const quizStart = allEvents.filter(e => e.event_type === "questionnaire_start");
   if (quizComplete.length > 0) {
-    milestones.push({ time: quizComplete[0].created_at, icon: "\u2705", label: "Completed questionnaire", detail: "" });
+    milestones.push({ time: quizComplete[0].created_at, icon: "✅", label: "Completed questionnaire", detail: "" });
   } else if (quizStart.length > 0) {
-    milestones.push({ time: quizStart[0].created_at, icon: "\uD83D\uDCDD", label: "Started questionnaire", detail: "Not completed" });
+    milestones.push({ time: quizStart[0].created_at, icon: "📝", label: "Started questionnaire", detail: "Not completed" });
   }
 
-  // Form submissions
   const formSubmits = allEvents.filter(e => e.event_type === "form_submit");
   formSubmits.forEach(e => {
     const d = parseEventData(e.event_data);
     const fl = d?.form_type ? (FORM_TYPE_LABELS[d.form_type] || d.form_type) : "Form";
-    milestones.push({ time: e.created_at, icon: "\uD83D\uDCE8", label: "Submitted " + fl, detail: "" });
+    milestones.push({ time: e.created_at, icon: "📨", label: "Submitted " + fl, detail: "" });
   });
 
-  // CTA clicks (book tour / book call)
   const ctaClicks = allEvents.filter(e => e.event_type === "cta_click");
   const bookingCtas = ctaClicks.filter(e => {
     const d = parseEventData(e.event_data);
@@ -191,25 +161,22 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
   bookingCtas.forEach(e => {
     const d = parseEventData(e.event_data);
     const ctaName = d?.cta_text || d?.track_id || d?.cta_id || "CTA";
-    milestones.push({ time: e.created_at, icon: "\uD83D\uDCDE", label: "Clicked " + ctaName, detail: "" });
+    milestones.push({ time: e.created_at, icon: "📞", label: "Clicked " + ctaName, detail: "" });
   });
 
-  // Brochure downloads
   const brochureDownloads = allEvents.filter(e => e.event_type === "brochure_download");
   if (brochureDownloads.length > 0) {
-    milestones.push({ time: brochureDownloads[0].created_at, icon: "\uD83D\uDCC4", label: "Downloaded brochure", detail: brochureDownloads.length > 1 ? brochureDownloads.length + " times" : "" });
+    milestones.push({ time: brochureDownloads[0].created_at, icon: "📄", label: "Downloaded brochure", detail: brochureDownloads.length > 1 ? brochureDownloads.length + " times" : "" });
   }
 
-  // Last activity
   const firstD = firstDate.substring(0, 10);
   const lastD = lastDate.substring(0, 10);
   if (firstD !== lastD) {
-    milestones.push({ time: lastDate, icon: "\uD83D\uDD53", label: "Last seen", detail: journey.total_sessions + " sessions over " + daysBetween(parseTimestamp(firstDate), parseTimestamp(lastDate)) + " days" });
+    milestones.push({ time: lastDate, icon: "🕓", label: "Last seen", detail: journey.total_sessions + " sessions over " + daysBetween(parseTimestamp(firstDate), parseTimestamp(lastDate)) + " days" });
   }
 
   milestones.sort((a, b) => (a.time || "").localeCompare(b.time || ""));
 
-  // Source breakdown
   const sourceCounts = {};
   journey.sessions.forEach(s => {
     let label = s.source || "Direct";
@@ -219,7 +186,6 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
     sourceCounts[label] = (sourceCounts[label] || 0) + 1;
   });
 
-  // Ad attribution
   const adPlatforms = {};
   const campaigns = {};
   const keywords = {};
@@ -236,31 +202,14 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
 
   return (
     <>
-      {/* Stats row */}
       <div className="jny-stats">
-        <div className="jny-stat">
-          <span className="jny-stat__val">{journey.total_sessions}</span>
-          <span className="jny-stat__label">sessions</span>
-        </div>
-        <div className="jny-stat">
-          <span className="jny-stat__val">{totalPages}</span>
-          <span className="jny-stat__label">pages viewed</span>
-        </div>
-        <div className="jny-stat">
-          <span className="jny-stat__val">{Object.keys(pageCounts).length}</span>
-          <span className="jny-stat__label">unique pages</span>
-        </div>
-        <div className="jny-stat">
-          <span className="jny-stat__val">{dateChecks.length}</span>
-          <span className="jny-stat__label">date checks</span>
-        </div>
-        <div className="jny-stat">
-          <span className="jny-stat__val">{daysSpan === 0 ? "Same day" : daysSpan + "d"}</span>
-          <span className="jny-stat__label">time span</span>
-        </div>
+        <div className="jny-stat"><span className="jny-stat__val">{journey.total_sessions}</span><span className="jny-stat__label">sessions</span></div>
+        <div className="jny-stat"><span className="jny-stat__val">{totalPages}</span><span className="jny-stat__label">pages viewed</span></div>
+        <div className="jny-stat"><span className="jny-stat__val">{Object.keys(pageCounts).length}</span><span className="jny-stat__label">unique pages</span></div>
+        <div className="jny-stat"><span className="jny-stat__val">{dateChecks.length}</span><span className="jny-stat__label">date checks</span></div>
+        <div className="jny-stat"><span className="jny-stat__val">{daysSpan === 0 ? "Same day" : daysSpan + "d"}</span><span className="jny-stat__label">time span</span></div>
       </div>
 
-      {/* Sources + Attribution tags */}
       <div className="jny-tags-row">
         <div className="jny-tags-group">
           <span className="jny-tags-group__label">Sources</span>
@@ -287,7 +236,6 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
         )}
       </div>
 
-      {/* Key milestones */}
       <div className="jny-milestones">
         <div className="jny-milestones__title">Key moments</div>
         {milestones.map((m, mi) => (
@@ -300,7 +248,6 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
         ))}
       </div>
 
-      {/* Top pages */}
       <div className="jny-toppages">
         <div className="jny-toppages__title">Most viewed pages</div>
         {topPages.map(([page, count]) => (
@@ -311,7 +258,6 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
         ))}
       </div>
 
-      {/* Expandable full session log */}
       <button type="button" className="jny-expand-btn" onClick={() => setShowFullJourney(prev => !prev)}>
         {showFullJourney ? "Hide full session log" : "Show full session log (" + journey.total_sessions + " sessions)"}
       </button>
@@ -393,7 +339,7 @@ function JourneySummary({ journey, showFullJourney, setShowFullJourney }) {
   );
 }
 
-/* ── Status action dialogs ── */
+/* ── Status action dialogs (unchanged) ── */
 
 function LostDialog({ onConfirm, onCancel }) {
   const [reason, setReason] = useState("");
@@ -426,7 +372,6 @@ function WonDialog({ lead, onConfirm, onCancel }) {
   const [minSpend, setMinSpend] = useState("");
   const [error, setError] = useState(null);
 
-  // Fetch rate card on mount
   useEffect(() => {
     if (!lead.event_date) return;
     setLoading(true);
@@ -527,13 +472,16 @@ const CONFIRM_LABELS = {
   revert: "Undo this stage?",
 };
 
-function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
+/* ── Stage actions (rendered inside the funnel hero callout) ──
+   Stage-aware primary button driven by STAGE_PRIMARY_ACTION (constants.js).
+   All other actions remain ghost buttons. Lost is a danger-ghost button. */
+
+function StageActions({ lead, funnel, activeLeadType, onStatusChange }) {
   const [showLost, setShowLost] = useState(false);
   const [showWon, setShowWon] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [confirmAction, setConfirmAction] = useState(null); // pending confirmation
+  const [confirmAction, setConfirmAction] = useState(null);
 
-  // Don't show actions for low-intent streams (supper club, cafe-bar)
   const isLowIntent = activeLeadType === "supperclub" || activeLeadType === "cafe-bar";
   if (isLowIntent) return null;
 
@@ -554,20 +502,18 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
     setSaving(false);
   }
 
-  // First click sets confirmAction, second click (Confirm) fires it
-  function requestAction(action) {
-    setConfirmAction(action);
+  function requestAction(action) { setConfirmAction(action); }
+
+  function handleAction(action) {
+    if (action === "call" || action === "tour") fireAction("meeting");
+    else fireAction(action);
   }
 
-  // Determine which buttons to show based on current funnel stage
   const stage = funnel.currentStage;
-  // "lost" is deliberately NOT in manualStages here - the Undo button is for
-  // correcting a mis-click on Meeting / Proposal / Won etc. Re-opening a lost
-  // lead is a separate, intentional action (re-engagement, not correction) and
-  // gets its own button with its own confirmation copy.
   const manualStages = ["call", "tour", "meeting", "cancelled", "noshow", "proposal", "won"];
   const isManualStage = manualStages.includes(stage);
-  /* Show Had Call for early stages; show Had Tour once they've had a call or for early stages */
+  const primary = STAGE_PRIMARY_ACTION[stage] || null;
+
   const showCall = ["lead", "qualified", "engaged", "cancelled", "noshow"].includes(stage);
   const showTour = ["lead", "qualified", "engaged", "call", "cancelled", "noshow"].includes(stage);
   const showCancelled = ["engaged"].includes(stage);
@@ -577,39 +523,109 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
   const showLostBtn = stage !== "lost" && stage !== "won";
   const showReopenBtn = stage === "lost";
 
-  /* Map call/tour actions to "meeting" API action until backend supports separate columns */
-  function handleAction(action) {
-    if (action === "call" || action === "tour") {
-      fireAction("meeting");
-    } else {
-      fireAction(action);
-    }
+  /* Decide which button on this stage acts as the Mid Olive primary. */
+  function isPrimaryAction(action) { return primary && primary.action === action; }
+
+  function callBtn() {
+    if (!showCall) return null;
+    const variant = isPrimaryAction("call") ? "primary" : "ghost";
+    return (
+      <button key="call" className={`lp-stage-actions__btn lp-stage-actions__btn--${variant}`}
+        onClick={() => requestAction("call")} disabled={saving} type="button">Had call</button>
+    );
   }
+  function tourBtn() {
+    if (!showTour) return null;
+    const variant = isPrimaryAction("tour") ? "primary" : "ghost";
+    return (
+      <button key="tour" className={`lp-stage-actions__btn lp-stage-actions__btn--${variant}`}
+        onClick={() => requestAction("tour")} disabled={saving} type="button">Had tour</button>
+    );
+  }
+  function proposalBtn() {
+    if (!showProposal) return null;
+    const variant = isPrimaryAction("proposal") ? "primary" : "ghost";
+    return (
+      <button key="proposal" className={`lp-stage-actions__btn lp-stage-actions__btn--${variant}`}
+        onClick={() => requestAction("proposal")} disabled={saving} type="button">Sent proposal</button>
+    );
+  }
+  function wonBtn() {
+    if (!showWonBtn) return null;
+    const variant = isPrimaryAction("won") ? "primary" : "ghost";
+    return (
+      <button key="won" className={`lp-stage-actions__btn lp-stage-actions__btn--${variant}`}
+        onClick={() => setShowWon(true)} disabled={saving} type="button">Won</button>
+    );
+  }
+  function cancelBtn() {
+    if (!showCancelled) return null;
+    return (
+      <button key="cancelled" className="lp-stage-actions__btn lp-stage-actions__btn--ghost"
+        onClick={() => requestAction("cancelled")} disabled={saving} type="button">Cancelled</button>
+    );
+  }
+  function noshowBtn() {
+    if (!showNoshow) return null;
+    return (
+      <button key="noshow" className="lp-stage-actions__btn lp-stage-actions__btn--ghost"
+        onClick={() => requestAction("noshow")} disabled={saving} type="button">No-show</button>
+    );
+  }
+  function lostBtn() {
+    if (!showLostBtn) return null;
+    return (
+      <button key="lost" className="lp-stage-actions__btn lp-stage-actions__btn--danger"
+        onClick={() => setShowLost(true)} disabled={saving} type="button">Mark as lost</button>
+    );
+  }
+  function revertBtn() {
+    if (!isManualStage) return null;
+    return (
+      <button key="revert" className="lp-stage-actions__btn lp-stage-actions__btn--ghost"
+        onClick={() => requestAction("revert")} disabled={saving} type="button">{"↩"} Undo {FUNNEL_LABELS[stage] || stage}</button>
+    );
+  }
+  function reopenBtn() {
+    if (!showReopenBtn) return null;
+    return (
+      <button key="reopen" className="lp-stage-actions__btn lp-stage-actions__btn--ghost"
+        onClick={() => requestAction("reopen")} disabled={saving} type="button">Re-open lead</button>
+    );
+  }
+
+  /* Order: primary first (driven by STAGE_PRIMARY_ACTION), then secondary
+     ghosts in their natural funnel order, then revert + lost at the end. */
+  const orderedRenderers = (() => {
+    const out = [];
+    if (primary) {
+      const map = { call: callBtn, tour: tourBtn, proposal: proposalBtn, won: wonBtn };
+      const fn = map[primary.action];
+      if (fn) out.push(fn());
+    }
+    [callBtn, tourBtn, proposalBtn, wonBtn].forEach(fn => {
+      const node = fn();
+      if (node && !out.find(n => n && n.key === node.key)) out.push(node);
+    });
+    out.push(cancelBtn());
+    out.push(noshowBtn());
+    out.push(reopenBtn());
+    out.push(revertBtn());
+    out.push(lostBtn());
+    return out.filter(Boolean);
+  })();
 
   return (
     <>
-      <div className="lp-actions">
-        <span className="lp-actions__label">Actions</span>
+      <div className="lp-stage-actions">
         {confirmAction && (
-          <span className="lp-actions__confirm">
-            <span className="lp-actions__confirm-label">{CONFIRM_LABELS[confirmAction] || "Are you sure?"}</span>
-            <button className="lp-actions__btn lp-actions__btn--confirm-yes" onClick={() => handleAction(confirmAction)} disabled={saving} type="button">Yes</button>
-            <button className="lp-actions__btn lp-actions__btn--confirm-no" onClick={() => setConfirmAction(null)} disabled={saving} type="button">No</button>
+          <span className="lp-stage-actions__confirm">
+            <span className="lp-stage-actions__confirm-label">{CONFIRM_LABELS[confirmAction] || "Are you sure?"}</span>
+            <button className="lp-stage-actions__btn lp-stage-actions__btn--primary" onClick={() => handleAction(confirmAction)} disabled={saving} type="button">Yes</button>
+            <button className="lp-stage-actions__btn lp-stage-actions__btn--ghost" onClick={() => setConfirmAction(null)} disabled={saving} type="button">No</button>
           </span>
         )}
-        {!confirmAction && (
-          <>
-            {isManualStage && <button className="lp-actions__btn lp-actions__btn--revert" onClick={() => requestAction("revert")} disabled={saving} type="button">{"\u21A9"} Undo {FUNNEL_LABELS[stage] || stage}</button>}
-            {showReopenBtn && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("reopen")} disabled={saving} type="button">Re-open lead</button>}
-            {showCall && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("call")} disabled={saving} type="button">Had Call</button>}
-            {showTour && <button className="lp-actions__btn lp-actions__btn--meeting" onClick={() => requestAction("tour")} disabled={saving} type="button">Had Tour</button>}
-            {showCancelled && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => requestAction("cancelled")} disabled={saving} type="button">Cancelled</button>}
-            {showNoshow && <button className="lp-actions__btn lp-actions__btn--cancel" onClick={() => requestAction("noshow")} disabled={saving} type="button">No-show</button>}
-            {showProposal && <button className="lp-actions__btn lp-actions__btn--proposal" onClick={() => requestAction("proposal")} disabled={saving} type="button">Sent Proposal</button>}
-            {showWonBtn && <button className="lp-actions__btn lp-actions__btn--won" onClick={() => setShowWon(true)} disabled={saving} type="button">Won</button>}
-            {showLostBtn && <button className="lp-actions__btn lp-actions__btn--lost" onClick={() => setShowLost(true)} disabled={saving} type="button">Mark as Lost</button>}
-          </>
-        )}
+        {!confirmAction && orderedRenderers}
       </div>
       {showLost && (
         <LostDialog
@@ -628,59 +644,125 @@ function ActionButtons({ lead, funnel, activeLeadType, onStatusChange }) {
   );
 }
 
-/* ── Deal value display ── */
+/* ── Score breakdown (compact bars - PRD Option A default) ── */
 
-function DealValueBadge({ lead }) {
-  if (!lead.deal_value) return null;
+function ScoreBreakdownColumn({ sc, lead }) {
+  const rows = [
+    { label: "Stage", val: sc.breakdown.stage, max: 30 },
+    { label: "Intent", val: sc.breakdown.intent, max: 10 },
+    { label: "Recency", val: sc.breakdown.recency, max: 25 },
+    { label: "Engage", val: sc.breakdown.engagement, max: 15 },
+    { label: "Date", val: sc.breakdown.dateProximity, max: 10 },
+    { label: "Revenue", val: sc.breakdown.revenue, max: 10 },
+  ];
   return (
-    <div className="lp-deal-value">
-      <span className="lp-deal-value__label">Deal value</span>
-      <span className="lp-deal-value__amount">&pound;{lead.deal_value.toLocaleString()}</span>
-      {lead.hire_fee != null && lead.min_spend != null && (
-        <span className="lp-deal-value__breakdown">Hire &pound;{lead.hire_fee.toLocaleString()} + Min spend &pound;{lead.min_spend.toLocaleString()}</span>
-      )}
-      {lead.rate_card_tier && (
-        <span className="lp-deal-value__tier">Rate card: {lead.rate_card_tier}</span>
-      )}
+    <div className="lp-body-col">
+      <h3 className="lp-body-col__title">
+        <span>Score breakdown</span>
+        <span className="lp-body-col__title-meta">Total {sc.score}</span>
+      </h3>
+      {rows.map(row => (
+        <div key={row.label} className="lp-sb-row">
+          <span className="lp-sb-row__label">{row.label}</span>
+          <div className="lp-sb-row__bar">
+            <div className="lp-sb-row__fill" style={{ width: `${(row.val / row.max) * 100}%` }} />
+          </div>
+          <span className="lp-sb-row__val">{row.val}/{row.max}</span>
+        </div>
+      ))}
     </div>
   );
 }
 
-/* ── Collapsible score breakdown ── */
+/* ── Activity summary (last 4 sessions + drill-in toggle) ── */
 
-function ScoreBreakdown({ sc, tc, lead }) {
-  const [expanded, setExpanded] = useState(false);
-  const rows = [
-    { label: "Stage", val: sc.breakdown.stage, max: 30, desc: sc.stageLabel },
-    { label: "Intent", val: sc.breakdown.intent, max: 10, desc: URGENCY_LABELS[lead.urgency] || "No signal" },
-    { label: "Recency", val: sc.breakdown.recency, max: 25, desc: sc.daysSinceActivity <= 1 ? "Active today" : `${sc.daysSinceActivity}d ago` },
-    { label: "Engagement", val: sc.breakdown.engagement, max: 15, desc: `${lead.sessions_before_conversion || 0} sessions, ${lead.total_page_views || 0} pages` },
-    { label: "Date", val: sc.breakdown.dateProximity, max: 10, desc: lead.event_date || "No date" },
-    { label: "Revenue", val: sc.breakdown.revenue, max: 10, desc: [lead.budget_label, lead.guest_count ? `${lead.guest_count} guests` : null].filter(Boolean).join(", ") || "Unknown" },
-  ];
+function ActivitySummaryColumn({ journey, journeyLoading, showFullJourney, setShowFullJourney }) {
+  if (journeyLoading) {
+    return (
+      <div className="lp-body-col">
+        <h3 className="lp-body-col__title"><span>Activity</span></h3>
+        <p className="activity-mini__empty">Loading...</p>
+      </div>
+    );
+  }
+  if (!journey || !journey.sessions || journey.sessions.length === 0) {
+    return (
+      <div className="lp-body-col">
+        <h3 className="lp-body-col__title"><span>Activity</span></h3>
+        <p className="activity-mini__empty">No activity yet</p>
+      </div>
+    );
+  }
+
+  /* Most recent first, take 4 */
+  const recent = [...journey.sessions]
+    .sort((a, b) => (b.started_at || "").localeCompare(a.started_at || ""))
+    .slice(0, 4);
 
   return (
-    <div className="lp-col">
-      <div className="lp-section">
-        <button type="button" className="lp-score-toggle" onClick={() => setExpanded(e => !e)}>
-          <h3 className="lp-section__title" style={{ margin: 0 }}>Score breakdown</h3>
-          <span className="lp-score-toggle__arrow">{expanded ? "\u25B2" : "\u25BC"}</span>
-        </button>
-        {expanded && (
-          <div className="lp-score-grid" style={{ marginTop: "12px" }}>
-            {rows.map(row => (
-              <div key={row.label} className="lp-score-row">
-                <span className="lp-score-row__label">{row.label}</span>
-                <div className="lp-score-row__bar">
-                  <div className="lp-score-row__fill" style={{ width: `${(row.val / row.max) * 100}%`, background: tc.color }} />
-                </div>
-                <span className="lp-score-row__val">{row.val}/{row.max}</span>
-                <span className="lp-score-row__desc">{row.desc}</span>
+    <div className="lp-body-col">
+      <h3 className="lp-body-col__title">
+        <span>Activity</span>
+        <span className="lp-body-col__title-meta">{journey.total_sessions} session{journey.total_sessions !== 1 ? "s" : ""}</span>
+      </h3>
+      <div className="activity-mini">
+        {recent.map(s => {
+          const pageCount = s.events ? s.events.filter(e => e.event_type === "page_view").length : 0;
+          const src = resolveSource(s.source || "");
+          return (
+            <div key={s.session_id} className="activity-mini__row">
+              <div className="activity-mini__top">
+                <span className="activity-mini__when">{formatRelativeTime(s.started_at)}</span>
+                <span className="activity-mini__src">
+                  <span className="activity-mini__src-dot" style={{ background: src.color }} />
+                  {src.label}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
+              <div className="activity-mini__stats">
+                {pageCount} page{pageCount !== 1 ? "s" : ""}
+                {s.duration != null ? ` · ${formatDuration(s.duration)}` : ""}
+              </div>
+            </div>
+          );
+        })}
       </div>
+      <button type="button" className="activity-mini__link" onClick={() => setShowFullJourney(prev => !prev)}>
+        {showFullJourney ? "Hide full timeline" : "View full timeline →"}
+      </button>
+    </div>
+  );
+}
+
+/* ── Event details column ── */
+
+function EventDetailsColumn({ lead }) {
+  const rows = [
+    { label: "Event date", value: lead.event_date || lead.wedding_year, empty: !lead.event_date && !lead.wedding_year },
+    lead.event_type_label ? { label: "Event type", value: lead.event_type_label } : null,
+    { label: "Guests", value: lead.guest_count, empty: !lead.guest_count },
+    { label: "Urgency", value: lead.urgency_label, empty: !lead.urgency_label },
+    { label: "Budget", value: lead.budget_label, empty: !lead.budget_label },
+    { label: "Location", value: [lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || null, empty: !lead.ip_city && !lead.ip_country },
+    lead.company ? { label: "Company", value: lead.company } : null,
+  ].filter(Boolean);
+
+  return (
+    <div className="lp-body-col">
+      <h3 className="lp-body-col__title"><span>Event details</span></h3>
+      {rows.map(r => (
+        <div key={r.label} className="lp-attr-row">
+          <span className="lp-attr-row__label">{r.label}</span>
+          <span className={`lp-attr-row__value${r.empty ? " lp-attr-row__value--empty" : ""}`}>
+            {r.empty ? "Not provided" : r.value}
+          </span>
+        </div>
+      ))}
+      {lead.cross_sell_labels?.length > 0 && (
+        <div className="lp-attr-row">
+          <span className="lp-attr-row__label">Also wants</span>
+          <span className="lp-attr-row__value">{lead.cross_sell_labels.join(", ")}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -692,230 +774,160 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
   const tc = TIER_CONFIG[sc.tier];
   const funnel = computeFunnelStage(lead, activeLeadType);
   const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unknown";
+  const initials = (lead.first_name || "?").charAt(0).toUpperCase() + (lead.last_name || "").charAt(0).toUpperCase();
+  const src = resolveSource(lead.source_channel);
 
-  // Days in system
-  const firstSeen = parseTimestamp(lead.first_seen_at || lead.created_at);
-  const daysInSystem = firstSeen ? Math.max(0, Math.floor((Date.now() - firstSeen.getTime()) / 86400000)) : null;
-
-  // Dates this lead clicked on the /check-your-date/ calendar.
-  // Data source: D1 events table, event_type = "date_check", wired from AvailabilityCalendar.
-  // PRD: pages/calendar/prd-sys-date-click-history.md (Phase 1).
-  // We collect unique ISO dates with their most recent click timestamp, then sort
-  // most-recently-clicked first so Hugo sees the freshest intent at the top.
-  let datesChecked = [];
-  if (journey && journey.sessions) {
-    const latestByDate = {};
-    journey.sessions.forEach(s => {
-      (s.events || []).forEach(e => {
-        if (e.event_type !== "date_check") return;
-        const data = parseEventData(e.event_data);
-        const d = data && data.date;
-        if (!d) return;
-        if (!latestByDate[d] || (e.created_at || "") > latestByDate[d]) {
-          latestByDate[d] = e.created_at || "";
-        }
-      });
-    });
-    datesChecked = Object.entries(latestByDate)
-      .sort((a, b) => (b[1] || "").localeCompare(a[1] || ""))
-      .map(([d]) => d);
+  /* ── Band 2 metadata: derive last visit from journey when no
+     last_touched_by column exists yet (v2 deferral). ── */
+  let lastVisitText = null;
+  if (journey && journey.sessions && journey.sessions.length > 0) {
+    const mostRecent = journey.sessions
+      .reduce((acc, s) => (!acc || (s.started_at || "") > (acc.started_at || "") ? s : acc), null);
+    if (mostRecent) {
+      lastVisitText = `Last visit ${formatRelativeTime(mostRecent.started_at)}`;
+    }
   }
-  const DATES_VISIBLE = 5;
-  const formatCheckedDate = (iso) => {
-    // "2026-04-19" -> "Sat 19 Apr 2026". Parsed in UTC to avoid timezone drift
-    // (the calendar stores the day the user clicked, not a moment in time).
-    const parts = (iso || "").split("-");
-    if (parts.length !== 3) return iso;
-    const dt = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
-    if (isNaN(dt.getTime())) return iso;
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return `${days[dt.getUTCDay()]} ${dt.getUTCDate()} ${months[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`;
-  };
+
+  /* Projected value: prefer recorded deal_value, otherwise leave blank/muted. */
+  const projectedValue = lead.deal_value
+    ? `£${lead.deal_value.toLocaleString()}`
+    : null;
+
+  /* Stage callout text: definition + a single muted "last touch" line. */
+  const stageDef = STAGE_DEFINITIONS[funnel.currentStage] || "";
+  const stuckThresholds = funnel.health === "amber" || funnel.health === "red";
+  const hc = funnel.health ? HEALTH_COLORS[funnel.health] : null;
+
+  /* Won / lost stages display the stage name with a small Forest Olive or
+     Fired Brick coloured stage name, but the band still renders cleanly. */
 
   return (
     <div className="lp-fullpage">
-      {/* Back button */}
-      <button className="lp-back" onClick={onBack} type="button">{"\u2190"} Back to leads</button>
+      <button className="lp-back" onClick={onBack} type="button">{"←"} Back to leads</button>
 
-      {/* Profile card */}
       <div className="lp-card">
-        {/* Hero header */}
-        <div className="lp-hero">
-          {/* Key lights: score is the primary 64px badge; the rest are 48px peers.
-              One visual grammar so Hugo can scan score / urgency / age / source at a glance. */}
-          <div className="lp-hero__keylights">
-            <div className="lp-hero__score">
-              <span className="lead-score-badge" style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff", width: 64, height: 64, fontSize: 24 }}>
-                {sc.score}
-              </span>
-              <span className="lp-hero__tier" style={{ color: tc.color }}>{sc.tier === "cold" && sc.isDead ? "Dead" : tc.label}</span>
-            </div>
-            {(() => {
-              const urgencyStage = URGENCY_STAGE[lead.urgency] ?? 0;
-              const uk = URGENCY_KEYLIGHT[urgencyStage];
-              return (
-                <KeyLight
-                  value={urgencyStage}
-                  label={URGENCY_SHORT_LABELS[urgencyStage]}
-                  color={uk.color}
-                  bg={uk.bg}
-                  border={uk.border}
-                  title={`Urgency: ${URGENCY_SHORT_LABELS[urgencyStage]} (stage ${urgencyStage})`}
-                />
-              );
-            })()}
-            {daysInSystem !== null && (
-              <div className="lp-hero__age">
-                <span className="lp-hero__age-badge">
-                  {daysInSystem === 0 ? "<1" : daysInSystem}
-                </span>
-                <span className="lp-hero__age-label">{daysInSystem === 1 ? "day" : "days"}</span>
-              </div>
+        {/* ── Band 1: Identity strip ── */}
+        <div className="lp-id-strip">
+          <span className="lp-id-strip__avatar" aria-hidden="true">{initials || "?"}</span>
+          <h2 className="lp-id-strip__name">{name}</h2>
+          <span className="lp-id-strip__meta">
+            {lead.email && (
+              <a href={`mailto:${lead.email}`} className="lp-id-strip__link">{lead.email}</a>
             )}
-            {(() => {
-              const src = resolveSource(lead.source_channel);
-              const initial = (src.label || "?").charAt(0).toUpperCase();
-              return (
-                <KeyLight
-                  value={initial}
-                  label={src.label}
-                  color={src.color}
-                  bg={src.bg}
-                  border={src.color}
-                  title={`Source: ${src.label}${lead.source_channel ? ` (${lead.source_channel})` : ""}`}
-                />
-              );
-            })()}
-          </div>
-          <div className="lp-hero__info">
-            <h2 className="lp-hero__name">{name}</h2>
-            <div className="lp-hero__contact">
-              <a href={`mailto:${lead.email}`} className="lp-hero__link">{lead.email}</a>
-              {lead.phone && <> &middot; <a href={`tel:${lead.phone}`} className="lp-hero__link">{lead.phone}</a></>}
-              {lead.company && <> &middot; {lead.company}</>}
-              {lead.hubspot_contact_id && (
-                <> &middot; <a
+            {lead.phone && (
+              <>
+                <span className="lp-id-strip__sep">{"·"}</span>
+                <a href={`tel:${lead.phone}`} className="lp-id-strip__link">{lead.phone}</a>
+              </>
+            )}
+            {lead.hubspot_contact_id && (
+              <>
+                <span className="lp-id-strip__sep">{"·"}</span>
+                <a
                   href={`https://app.hubspot.com/contacts/25870094/contact/${lead.hubspot_contact_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cust-hs-link"
+                  target="_blank" rel="noopener noreferrer"
+                  className="lp-id-strip__hubspot"
                   title="Open in HubSpot"
-                >HubSpot</a></>
-              )}
-            </div>
-
-            <FunnelTrack funnel={funnel} tc={tc} />
-
-            {/* Current stage definition */}
-            {STAGE_DEFINITIONS[funnel.currentStage] && (
-              <div className="lp-stage-def">
-                <span className="lp-stage-def__stage">{FUNNEL_LABELS[funnel.currentStage]}</span>
-                <span className="lp-stage-def__text">{STAGE_DEFINITIONS[funnel.currentStage]}</span>
-              </div>
+                >HubSpot {"↗"}</a>
+              </>
             )}
+          </span>
+        </div>
 
-            {/* Engagement depth bar */}
-            <div className="lp-funnel-engagement" style={{ marginTop: "8px" }}>
-              <span className="lp-funnel-engagement__label">Engagement</span>
-              <span className="lp-funnel-engagement__detail">
-                {funnel.engagementSignals.sessions} session{funnel.engagementSignals.sessions !== 1 ? "s" : ""}, {funnel.engagementSignals.pages} pages
-              </span>
-              <div className="lp-funnel-engagement__bar">
-                <div className="lp-funnel-engagement__fill" style={{ width: `${Math.min((funnel.engagementSignals.sessions * 8 + funnel.engagementSignals.pages * 2), 100)}%` }} />
-              </div>
-            </div>
+        {/* ── Band 2: Metadata strip ── */}
+        <div className="lp-meta-strip">
+          {/* Score */}
+          <div className="lp-meta-cell">
+            <span className="lp-meta-cell__eyebrow">Score</span>
+            <span className="lp-meta-cell__value">
+              <span className="lp-meta-cell__dot" style={{ background: tc.color }} />
+              {sc.score} {"·"} {tc.label}
+            </span>
+          </div>
+          {/* Projected value */}
+          <div className="lp-meta-cell">
+            <span className="lp-meta-cell__eyebrow">Projected value</span>
+            {projectedValue ? (
+              <span className="lp-meta-cell__value">{projectedValue}</span>
+            ) : (
+              <span className="lp-meta-cell__value lp-meta-cell__value--muted">Not yet estimated</span>
+            )}
+          </div>
+          {/* Lead source */}
+          <div className="lp-meta-cell">
+            <span className="lp-meta-cell__eyebrow">Lead source</span>
+            <span className="lp-meta-cell__value">
+              <span className="lp-meta-cell__dot" style={{ background: src.color }} />
+              {src.label}
+            </span>
+          </div>
+          {/* Last visit (v2 will replace with last_touched_by) */}
+          <div className="lp-meta-cell">
+            <span className="lp-meta-cell__eyebrow">Last visit</span>
+            {lastVisitText ? (
+              <span className="lp-meta-cell__value">{lastVisitText.replace("Last visit ", "")}</span>
+            ) : (
+              <span className="lp-meta-cell__value lp-meta-cell__value--muted">No activity</span>
+            )}
           </div>
         </div>
 
-        {/* Action buttons + deal value */}
-        <ActionButtons lead={lead} funnel={funnel} activeLeadType={activeLeadType} onStatusChange={onStatusChange} />
-        <DealValueBadge lead={lead} />
+        {/* ── Band 3: Funnel hero ── */}
+        <div className="lp-funnel-hero">
+          <FunnelTrack funnel={funnel} tc={tc} />
 
-        {/* Two-column: left = details, right = score */}
-        <div className="lp-cols">
-          <div className="lp-col">
-            {/* Contact details */}
-            <div className="lp-section">
-              <h3 className="lp-section__title">Contact</h3>
-              <div className="lp-detail-grid">
-                <div className="lp-detail">
-                  <span className="lp-detail__label">Email</span>
-                  <a href={`mailto:${lead.email}`} className="lp-detail__value lp-detail__link">{lead.email}</a>
-                </div>
-                <div className="lp-detail">
-                  <span className="lp-detail__label">Phone</span>
-                  {lead.phone ? <a href={`tel:${lead.phone}`} className="lp-detail__value lp-detail__link">{lead.phone}</a> : <span className="lp-detail__value lp-detail__muted">Not provided</span>}
-                </div>
-                {lead.company && (
-                  <div className="lp-detail">
-                    <span className="lp-detail__label">Company</span>
-                    <span className="lp-detail__value">{lead.company}</span>
-                  </div>
+          <div className="stage-callout">
+            <div className="stage-callout__head">
+              <p className="stage-callout__eyebrow">Current stage</p>
+              <div className="stage-callout__row">
+                <h3 className="lp-stage-name" style={
+                  funnel.currentStage === "lost" ? { color: "#8C472E" } :
+                  funnel.currentStage === "won" ? { color: "#2E4009" } : {}
+                }>
+                  {FUNNEL_LABELS[funnel.currentStage] || funnel.currentStage}
+                </h3>
+                {stuckThresholds && hc && (
+                  <span className="lp-stage-stuck">
+                    <span className="lp-stage-stuck__dot" style={{ background: hc.color }} />
+                    {hc.label} {"·"} {funnel.daysInStage}d in stage
+                  </span>
                 )}
-                <div className="lp-detail">
-                  <span className="lp-detail__label">Location</span>
-                  <span className="lp-detail__value">{[lead.ip_city, lead.ip_country].filter(Boolean).join(", ") || "Unknown"}</span>
-                </div>
               </div>
-            </div>
-
-            {/* Event / form details */}
-            <div className="lp-section">
-              <h3 className="lp-section__title">Event details</h3>
-              <div className="lp-detail-grid">
-                <div className="lp-detail"><span className="lp-detail__label">Event date</span><span className={`lp-detail__value${!lead.event_date && !lead.wedding_year ? " lp-detail__value--empty" : ""}`}>{lead.event_date || lead.wedding_year || "Not provided"}</span></div>
-                {lead.event_type_label && <div className="lp-detail"><span className="lp-detail__label">Event type</span><span className="lp-detail__value">{lead.event_type_label}</span></div>}
-                <div className="lp-detail"><span className="lp-detail__label">Guests</span><span className={`lp-detail__value${!lead.guest_count ? " lp-detail__value--empty" : ""}`}>{lead.guest_count || "Not provided"}</span></div>
-                <div className="lp-detail"><span className="lp-detail__label">Urgency</span><span className={`lp-detail__value${!lead.urgency_label ? " lp-detail__value--empty" : ""}`}>{lead.urgency_label || "Not provided"}</span></div>
-                <div className="lp-detail"><span className="lp-detail__label">Budget</span><span className={`lp-detail__value${!lead.budget_label ? " lp-detail__value--empty" : ""}`}>{lead.budget_label || "Not provided"}</span></div>
-              </div>
-            </div>
-
-            {/* Cross-sell */}
-            {lead.cross_sell_labels?.length > 0 && (
-              <div className="lp-section">
-                <h3 className="lp-section__title">Also interested in</h3>
-                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                  {lead.cross_sell_labels.map(label => (
-                    <span key={label} className="rep-cross-sell__badge">{label}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <ScoreBreakdown sc={sc} tc={tc} lead={lead} />
-        </div>
-
-        {/* Dates checked - hidden entirely when the lead has not used the calendar */}
-        {datesChecked.length > 0 && (
-          <div className="lp-section lp-dates">
-            <h3 className="lp-section__title">
-              Dates checked
-              <span className="lp-dates__count">{datesChecked.length}</span>
-            </h3>
-            <div className="lp-dates__list">
-              {datesChecked.slice(0, DATES_VISIBLE).map(d => (
-                <span key={d} className="lp-dates__tag">{formatCheckedDate(d)}</span>
-              ))}
-              {datesChecked.length > DATES_VISIBLE && (
-                <span className="lp-dates__more">+{datesChecked.length - DATES_VISIBLE} more</span>
+              {(stageDef || funnel.stageEnteredAt) && (
+                <p className="stage-callout__def">
+                  {stageDef}
+                  {stageDef && funnel.stageEnteredAt && <span className="stage-callout__def-sep">{"·"}</span>}
+                  {funnel.stageEnteredAt && (
+                    <>last touch {formatRelativeTime(funnel.stageEnteredAt instanceof Date ? funnel.stageEnteredAt.toISOString() : funnel.stageEnteredAt)}</>
+                  )}
+                </p>
               )}
             </div>
+            <StageActions lead={lead} funnel={funnel} activeLeadType={activeLeadType} onStatusChange={onStatusChange} />
+          </div>
+        </div>
+
+        {/* ── Band 4: 3-column body ── */}
+        <div className="lp-body">
+          <EventDetailsColumn lead={lead} />
+          <ScoreBreakdownColumn sc={sc} lead={lead} />
+          <ActivitySummaryColumn
+            journey={journey}
+            journeyLoading={journeyLoading}
+            showFullJourney={showFullJourney}
+            setShowFullJourney={setShowFullJourney}
+          />
+        </div>
+
+        {/* Full timeline drill-in - kept inside the card under the 3-col body
+            and only renders when toggled. Replaces the old always-on Journey
+            section so the page stays compact by default. */}
+        {showFullJourney && (
+          <div className="lp-section">
+            <h3 className="lp-section__title">Full timeline</h3>
+            <JourneySummary journey={journey} showFullJourney={showFullJourney} setShowFullJourney={setShowFullJourney} />
           </div>
         )}
-
-        {/* Journey */}
-        <div className="lp-section">
-          <h3 className="lp-section__title">Journey</h3>
-          {journeyLoading && <p className="lp-detail__muted">Loading journey...</p>}
-          {!journeyLoading && !journey && <p className="lp-detail__muted">No journey data available.</p>}
-          {!journeyLoading && journey && journey.sessions.length === 0 && <p className="lp-detail__muted">No sessions recorded for this visitor.</p>}
-          {!journeyLoading && journey && journey.sessions.length > 0 && (
-            <JourneySummary journey={journey} showFullJourney={showFullJourney} setShowFullJourney={setShowFullJourney} />
-          )}
-        </div>
       </div>{/* end lp-card */}
     </div>
   );

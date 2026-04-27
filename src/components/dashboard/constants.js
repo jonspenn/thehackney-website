@@ -222,3 +222,19 @@ export const LEAD_TABS = [
   { type: "private-events", label: "Private Events" },
   { type: "cafe-bar", label: "Cafe-Bar" },
 ];
+
+/* ── Stage-aware primary action mapping ──
+   Drives the Mid Olive primary action button on the lead profile so Hugo
+   always sees the next-most-likely step front and centre. Per
+   prd-sys-lead-profile.md (Technical Approach > Stage-aware action
+   prioritisation table). Stages not listed (won, lost) have no primary -
+   only the ghost Revert / Re-open buttons appear.
+   Each entry: { action: <ActionButtons handleAction key>, label: <button label> } */
+export const STAGE_PRIMARY_ACTION = {
+  lead:      { action: "call",     label: "Had call" },
+  qualified: { action: "call",     label: "Had call" },
+  engaged:   { action: "call",     label: "Had call" },
+  call:      { action: "tour",     label: "Had tour" },
+  tour:      { action: "proposal", label: "Sent proposal" },
+  proposal:  { action: "won",      label: "Won" },
+};
