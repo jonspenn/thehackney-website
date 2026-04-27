@@ -49,10 +49,10 @@ function saveStoredSort(type, sort) {
   }
 }
 
-export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelectLead, onLeadTypeChange, onDelete, onRestore, showRecycleBin, onToggleRecycleBin, mode = "active" }) {
+export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelectLead, onLeadTypeChange, onDelete, onRestore, showRecycleBin, onToggleRecycleBin, mode = "active", initialType }) {
   const isLostMode = mode === "lost";
-  const [activeLeadType, setActiveLeadType] = useState("wedding");
-  const [leadSort, setLeadSort] = useState(() => loadStoredSort("wedding"));
+  const [activeLeadType, setActiveLeadType] = useState(initialType || "wedding");
+  const [leadSort, setLeadSort] = useState(() => loadStoredSort(initialType || "wedding"));
   const [heatFilter, setHeatFilter] = useState("all");
   const [breakdownFilter, setBreakdownFilter] = useState(null);
   const [leadSearch, setLeadSearch] = useState("");

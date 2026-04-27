@@ -34,8 +34,8 @@ const TREND_METRICS = [
   { key: "lost",      label: "Lost",       color: "rgba(44,24,16,0.25)" },
 ];
 
-export default function PipelineView({ leads, onSelectLead }) {
-  const [activeType, setActiveType] = useState("wedding");
+export default function PipelineView({ leads, onSelectLead, initialType, onTypeChange }) {
+  const [activeType, setActiveType] = useState(initialType || "wedding");
   const [selectedStage, setSelectedStage] = useState(null);
   const [funnelOpen, setFunnelOpen] = useState(true);
   const [trendsOpen, setTrendsOpen] = useState(true);
@@ -183,7 +183,7 @@ export default function PipelineView({ leads, onSelectLead }) {
             <button
               key={lt.type}
               className={`adm-subtab${activeType === lt.type ? " adm-subtab--active" : ""}`}
-              onClick={() => { setActiveType(lt.type); setSelectedStage(null); }}
+              onClick={() => { setActiveType(lt.type); setSelectedStage(null); if (onTypeChange) onTypeChange(lt.type); }}
               type="button"
             >
               {lt.label}

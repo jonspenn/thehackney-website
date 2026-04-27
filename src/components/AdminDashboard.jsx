@@ -28,6 +28,10 @@ import BookingsView from "./dashboard/BookingsView.jsx";
 import CustomersView from "./dashboard/CustomersView.jsx";
 import PricingView from "./dashboard/PricingView.jsx";
 
+/* ───────── URL persistence ───────── */
+const VALID_TABS = ["overview", "leads", "pipeline", "bookings", "customers", "lost", "analytics", "pricing"];
+const VALID_TYPES = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
+
 /* ───────── main component ───────── */
 
 export default function AdminDashboard({ pricing }) {
@@ -38,8 +42,26 @@ export default function AdminDashboard({ pricing }) {
   const [lostLeads, setLostLeads] = useState({}); // keyed by lead type - funnel_stage='lost' only
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [activeLeadType, setActiveLeadType] = useState("wedding");
+  // ── URL state hydration ──
+  // Read tab / type / lead from window.location.search so a page refresh preserves
+  // the view. Lead is stored as contact_id; the lead object is resolved once the
+  // leads/customers data loads (see useEffect below).
+  const initialUrlState = (() => {
+    if (typeof window === "undefined") return { tab: "overview", type: "wedding", leadId: null };
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    const type = params.get("type");
+    const leadId = params.get("lead");
+    return {
+      tab: VALID_TABS.includes(tab) ? tab : "overview",
+      type: VALID_TYPES.includes(type) ? type : "wedding",
+      leadId: leadId || null,
+    };
+  })();
+
+  const [activeTab, setActiveTab] = useState(initialUrlState.tab);
+  const [activeLeadType, setActiveLeadType] = useState(initialUrlState.type);
+  const [pendingLeadId, setPendingLeadId] = useState(initialUrlState.leadId); // resolved to selectedLead once data arrives
   const [analyticsFilter, setAnalyticsFilter] = useState(null); // { type, value, label } or null
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
   const [journey, setJourney] = useState(null); // journey data for selected lead
@@ -50,10 +72,12 @@ export default function AdminDashboard({ pricing }) {
 
   function selectLead(lead, leadType) {
     setSelectedLead(lead);
+    const nextType = leadType || activeLeadType;
     if (leadType) setActiveLeadType(leadType);
     setJourney(null);
     setShowFullJourney(false);
     if (lead?.contact_id) {
+      syncUrl({ tab: activeTab, type: nextType, leadId: lead.contact_id });
       setJourneyLoading(true);
       fetch(`/api/lead-journey?contact_id=${encodeURIComponent(lead.contact_id)}`, { cache: "no-store" })
         .then(r => r.json())
@@ -177,6 +201,82 @@ export default function AdminDashboard({ pricing }) {
     return () => clearInterval(timer);
   }, []);
 
+  /* ── URL <-> state sync ── */
+  function syncUrl({ tab, type, leadId }, { replace = false } = {}) {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams();
+    if (tab && tab !== "overview") params.set("tab", tab);
+    if (type && type !== "wedding") params.set("type", type);
+    if (leadId) params.set("lead", leadId);
+    const search = params.toString();
+    const hash = window.location.hash || "";
+    const newUrl = (search ? `${window.location.pathname}?${search}` : window.location.pathname) + hash;
+    if (replace) window.history.replaceState({}, "", newUrl);
+    else window.history.pushState({}, "", newUrl);
+  }
+
+  // popstate (browser back/forward) - re-hydrate state from URL.
+  useEffect(() => {
+    function onPop() {
+      if (typeof window === "undefined") return;
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("tab");
+      const ty = params.get("type");
+      const leadId = params.get("lead");
+      setActiveTab(VALID_TABS.includes(t) ? t : "overview");
+      setActiveLeadType(VALID_TYPES.includes(ty) ? ty : "wedding");
+      if (leadId) {
+        setPendingLeadId(leadId);
+        // selectedLead will be resolved by the resolver effect below
+      } else {
+        setSelectedLead(null);
+        setPendingLeadId(null);
+      }
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  // Resolve pendingLeadId -> selectedLead once leads/customers data is available.
+  useEffect(() => {
+    if (!pendingLeadId) return;
+    // Search across active leads, lost leads.
+    const allBuckets = [leads, lostLeads];
+    let found = null;
+    for (const bucket of allBuckets) {
+      if (!bucket) continue;
+      for (const k of Object.keys(bucket)) {
+        const arr = bucket[k]?.leads;
+        if (!arr) continue;
+        const hit = arr.find(l => l.contact_id === pendingLeadId);
+        if (hit) { found = { lead: hit, type: k }; break; }
+      }
+      if (found) break;
+    }
+    if (found) {
+      setSelectedLead(found.lead);
+      setActiveLeadType(found.type);
+      setJourney(null);
+      setShowFullJourney(false);
+      setJourneyLoading(true);
+      fetch(`/api/lead-journey?contact_id=${encodeURIComponent(found.lead.contact_id)}`, { cache: "no-store" })
+        .then(r => r.json())
+        .then(data => { if (data.ok) setJourney(data); })
+        .catch(() => {})
+        .finally(() => setJourneyLoading(false));
+      setPendingLeadId(null);
+    } else if (!loading) {
+      // Not found in lead/lost data. If we're on the customers tab, CustomersView
+      // will resolve it via onSelectCustomer when its own fetch completes; we
+      // leave pendingLeadId set so a child can claim it. For other tabs, drop it.
+      if (activeTab !== "customers") {
+        setPendingLeadId(null);
+        // strip the orphan lead param from URL silently
+        syncUrl({ tab: activeTab, type: activeLeadType, leadId: null }, { replace: true });
+      }
+    }
+  }, [pendingLeadId, leads, lostLeads, loading, activeTab, activeLeadType]);
+
   /* ── derived data ── */
   const topPageMax = useMemo(() => tracking?.topPages?.[0]?.view_count || 1, [tracking]);
   const topCTAMax = useMemo(() => tracking?.topCTAs?.[0]?.click_count || 1, [tracking]);
@@ -205,7 +305,12 @@ export default function AdminDashboard({ pricing }) {
       setAnalyticsFilter(null);
     } else {
       setAnalyticsFilter({ type, value, label });
-      if (activeTab !== "analytics") setActiveTab("analytics");
+      if (activeTab !== "analytics") {
+        setActiveTab("analytics");
+        setSelectedLead(null);
+        setPendingLeadId(null);
+        syncUrl({ tab: "analytics", type: activeLeadType, leadId: null });
+      }
     }
   }
 
@@ -287,7 +392,12 @@ export default function AdminDashboard({ pricing }) {
             <button
               key={tab.id}
               className={`adm-tab${activeTab === tab.id ? " adm-tab--active" : ""}`}
-              onClick={() => { setActiveTab(tab.id); setSelectedLead(null); }}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setSelectedLead(null);
+                setPendingLeadId(null);
+                syncUrl({ tab: tab.id, type: activeLeadType, leadId: null });
+              }}
               type="button"
             >
               {tab.label}
@@ -586,7 +696,8 @@ export default function AdminDashboard({ pricing }) {
           deletedLeads={deletedLeads}
           selectedLeadId={selectedLead?.contact_id}
           onSelectLead={selectLead}
-          onLeadTypeChange={setActiveLeadType}
+          initialType={activeLeadType}
+          onLeadTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
           onDelete={handleDeleteOrRestore}
           onRestore={handleDeleteOrRestore}
           showRecycleBin={showRecycleBin}
@@ -603,6 +714,8 @@ export default function AdminDashboard({ pricing }) {
         <PipelineView
           leads={leads}
           onSelectLead={selectLead}
+          initialType={activeLeadType}
+          onTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
         />
       )}
 
@@ -615,6 +728,10 @@ export default function AdminDashboard({ pricing }) {
       {activeTab === "customers" && !selectedLead && (
         <CustomersView
           onSelectCustomer={selectLead}
+          initialType={activeLeadType}
+          onTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
+          pendingCustomerId={pendingLeadId}
+          onPendingResolved={() => setPendingLeadId(null)}
         />
       )}
 
@@ -624,7 +741,8 @@ export default function AdminDashboard({ pricing }) {
           leads={lostLeads}
           selectedLeadId={selectedLead?.contact_id}
           onSelectLead={selectLead}
-          onLeadTypeChange={setActiveLeadType}
+          initialType={activeLeadType}
+          onLeadTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
           mode="lost"
         />
       )}
@@ -857,7 +975,11 @@ export default function AdminDashboard({ pricing }) {
           journeyLoading={journeyLoading}
           showFullJourney={showFullJourney}
           setShowFullJourney={setShowFullJourney}
-          onBack={() => setSelectedLead(null)}
+          onBack={() => {
+            setSelectedLead(null);
+            setPendingLeadId(null);
+            syncUrl({ tab: activeTab, type: activeLeadType, leadId: null });
+          }}
           onStatusChange={handleStatusChange}
         />
       )}

@@ -56,8 +56,8 @@ function formatDate(iso) {
   } catch { return iso; }
 }
 
-export default function CustomersView({ onSelectCustomer }) {
-  const [activeType, setActiveType] = useState("wedding");
+export default function CustomersView({ onSelectCustomer, initialType, onTypeChange, pendingCustomerId, onPendingResolved }) {
+  const [activeType, setActiveType] = useState(initialType || "wedding");
   const [data, setData] = useState({}); // keyed by type
   const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState({ field: "won_at", dir: "desc" });
@@ -87,6 +87,24 @@ export default function CustomersView({ onSelectCustomer }) {
     const timer = setInterval(fetchAll, 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // If parent passed a pendingCustomerId (from URL), find it across all types
+  // once data has loaded and call onSelectCustomer to open the profile.
+  useEffect(() => {
+    if (!pendingCustomerId || loading) return;
+    for (const t of LEAD_TABS.map(x => x.type)) {
+      const arr = data[t]?.customers;
+      if (!arr) continue;
+      const hit = arr.find(c => c.contact_id === pendingCustomerId);
+      if (hit) {
+        if (onSelectCustomer) onSelectCustomer(hit, t);
+        if (onPendingResolved) onPendingResolved();
+        return;
+      }
+    }
+    // Not found - clear it so the URL gets cleaned up
+    if (onPendingResolved) onPendingResolved();
+  }, [pendingCustomerId, data, loading]);
 
   const currentData = data[activeType];
   const customers = currentData?.customers || [];
@@ -121,6 +139,7 @@ export default function CustomersView({ onSelectCustomer }) {
     setSortConfig({ field: "won_at", dir: "desc" });
     setSearch("");
     setSearchDraft("");
+    if (onTypeChange) onTypeChange(type);
   }
 
   function toggleSort(field) {
