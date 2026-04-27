@@ -1,12 +1,15 @@
 /**
- * LeadProfile - 5-band lead profile.
+ * LeadProfile - 5-card lead profile (2026-04-27 redesign).
  *
- * Bands (top to bottom):
- *   1. .lp-id-strip       - one quiet row, avatar + name + meta
- *   2. .lp-meta-strip     - 4 cells: Score / Projected value / Lead source / Last visit
- *   3. .lp-funnel-hero    - funnel track + stage callout + stage-aware actions
- *   4. .lp-body           - 3 cols: Event details / Score breakdown / Activity summary
- *   5. Dialogs            - Won / Lost / confirmation (unchanged)
+ * Stack (top to bottom):
+ *   Card 1: .lp-card--header   - .lp-id-strip + .lp-meta-strip
+ *                                meta cell 1 = ScoreRing (size=sm 64px)
+ *   Card 2: .lp-card--funnel   - funnel track + stage callout + actions
+ *   Body row (.lp-body-row, 3 sibling cards w/ 16px gaps):
+ *     Card 3: .lp-card--event     - Event details (k:v rows incl. email/phone)
+ *     Card 4: .lp-card--score     - Score breakdown bars (no ring - moved up)
+ *     Card 5: .lp-card--activity  - Activity timeline (Cormorant + tabs)
+ *   Dialogs            - Won / Lost / confirmation (unchanged)
  *
  * See sales & marketing/website/pages/dashboard/prd-sys-lead-profile.md.
  *
@@ -649,20 +652,27 @@ function StageActions({ lead, funnel, activeLeadType, onStatusChange }) {
 
 /* ── Score breakdown (ring headline + compact bars below - PRD Option B) ── */
 
-function ScoreRing({ score, tierLabel, tierColor }) {
-  const radius = 42;
+function ScoreRing({ score, tierLabel, tierColor, size = "lg" }) {
+  // size === "lg" -> 96px ring, used legacy in the score column (no longer rendered there)
+  // size === "sm" -> 64px ring, used in the metadata strip cell 1
+  const isSm = size === "sm";
+  const dim = isSm ? 64 : 96;
+  const center = dim / 2;
+  const stroke = isSm ? 5 : 6;
+  const radius = isSm ? 27 : 42;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - Math.max(0, Math.min(100, score)) / 100);
+  const cls = isSm ? "lp-score-ring lp-score-ring--sm" : "lp-score-ring";
   return (
-    <div className="lp-score-ring">
-      <svg width="96" height="96" viewBox="0 0 96 96">
-        <circle cx="48" cy="48" r={radius} fill="none" stroke="rgba(64,22,12,0.12)" strokeWidth="6" />
+    <div className={cls}>
+      <svg width={dim} height={dim} viewBox={`0 0 ${dim} ${dim}`}>
+        <circle cx={center} cy={center} r={radius} fill="none" stroke="rgba(64,22,12,0.12)" strokeWidth={stroke} />
         <circle
-          cx="48" cy="48" r={radius} fill="none"
-          stroke="#2E4009" strokeWidth="6"
+          cx={center} cy={center} r={radius} fill="none"
+          stroke="#2E4009" strokeWidth={stroke}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          transform="rotate(-90 48 48)"
+          transform={`rotate(-90 ${center} ${center})`}
           strokeLinecap="round"
         />
       </svg>
@@ -674,6 +684,32 @@ function ScoreRing({ score, tierLabel, tierColor }) {
   );
 }
 
+/* Resolve ring score/tier - shared by metadata strip + (legacy) score column.
+ * Returns { score, tierLabel, tierColor } applying Won/Lost short-circuits. */
+function resolveRingDisplay(sc, lead, funnel) {
+  const TIER_RING_COLORS = {
+    hot:  "#8C472E",            // Fired Brick
+    warm: "#BF7256",            // Dusty Coral
+    cool: "#2E4009",            // Forest Olive
+    cold: "rgba(44,24,16,0.5)", // Brewery Dark @ 50%
+  };
+  let ringScore = sc.score;
+  let ringTierLabel = (TIER_CONFIG[sc.tier] && TIER_CONFIG[sc.tier].label) || "Cool";
+  let ringTierColor = TIER_RING_COLORS[sc.tier] || TIER_RING_COLORS.cool;
+
+  const isWon = lead.contact_type === "customer" || (funnel && funnel.currentStage === "won");
+  const isLost = funnel && funnel.currentStage === "lost";
+  if (isWon) {
+    ringScore = 100;
+    ringTierLabel = "Won";
+    ringTierColor = "#2E4009";
+  } else if (isLost) {
+    ringTierLabel = "Lost";
+    ringTierColor = "rgba(64,22,12,0.6)";
+  }
+  return { score: ringScore, tierLabel: ringTierLabel, tierColor: ringTierColor };
+}
+
 function ScoreBreakdownColumn({ sc, lead, funnel }) {
   const rows = [
     { label: "Stage", val: sc.breakdown.stage, max: 30 },
@@ -683,39 +719,13 @@ function ScoreBreakdownColumn({ sc, lead, funnel }) {
     { label: "Date", val: sc.breakdown.dateProximity, max: 10 },
     { label: "Revenue", val: sc.breakdown.revenue, max: 10 },
   ];
-
-  // Tier colours match the brand palette + tier thresholds in computeLeadScore.
-  const TIER_RING_COLORS = {
-    hot:  "#8C472E",            // Fired Brick
-    warm: "#BF7256",            // Dusty Coral
-    cool: "#2E4009",            // Forest Olive
-    cold: "rgba(44,24,16,0.5)", // Brewery Dark @ 50%
-  };
-
-  // Won / Lost short-circuit (mirrors computeLeadScore: Won = 100/hot already).
-  let ringScore = sc.score;
-  let ringTierLabel = (TIER_CONFIG[sc.tier] && TIER_CONFIG[sc.tier].label) || "Cool";
-  let ringTierColor = TIER_RING_COLORS[sc.tier] || TIER_RING_COLORS.cool;
-
-  const isWon = lead.contact_type === "customer" || (funnel && funnel.currentStage === "won");
-  const isLost = funnel && funnel.currentStage === "lost";
-
-  if (isWon) {
-    ringScore = 100;
-    ringTierLabel = "Won";
-    ringTierColor = "#2E4009"; // Forest Olive
-  } else if (isLost) {
-    ringTierLabel = "Lost";
-    ringTierColor = "rgba(64,22,12,0.6)"; // Mahogany @ 60%
-  }
-
+  // Ring lives in metadata strip cell 1 now - this column shows bars only.
   return (
     <div className="lp-body-col">
       <h3 className="lp-body-col__title">
         <span>Score breakdown</span>
         <span className="lp-body-col__title-meta">Total {sc.score}</span>
       </h3>
-      <ScoreRing score={ringScore} tierLabel={ringTierLabel} tierColor={ringTierColor} />
       {rows.map(row => (
         <div key={row.label} className="lp-sb-row">
           <span className="lp-sb-row__label">{row.label}</span>
@@ -1244,13 +1254,13 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
 
         {/* ── Band 2: Metadata strip ── */}
         <div className="lp-meta-strip">
-          {/* Score */}
-          <div className="lp-meta-cell">
+          {/* Score - circular ring (size sm = 64px) replaces the old text pill */}
+          <div className="lp-meta-cell lp-meta-cell--ring">
             <span className="lp-meta-cell__eyebrow">Score</span>
-            <span className="lp-meta-cell__value">
-              <span className="lp-meta-cell__dot" style={{ background: tc.color }} />
-              {sc.score} {"·"} {tc.label}
-            </span>
+            {(() => {
+              const ring = resolveRingDisplay(sc, lead, funnel);
+              return <ScoreRing size="sm" score={ring.score} tierLabel={ring.tierLabel} tierColor={ring.tierColor} />;
+            })()}
           </div>
           {/* Projected value */}
           <div className="lp-meta-cell">
@@ -1319,31 +1329,35 @@ export default function LeadProfile({ lead, activeLeadType, journey, journeyLoad
         </div>
         </div>{/* end lp-card--funnel */}
 
-        {/* ── Card 3: 3-column body + timeline drill-in ── */}
-        <div className="lp-card lp-card--body">
-        {/* ── Band 4: 3-column body ── */}
-        <div className="lp-body">
-          <EventDetailsColumn lead={lead} />
-          <ScoreBreakdownColumn sc={sc} lead={lead} funnel={funnel} />
-          <ActivitySummaryColumn
-            lead={lead}
-            journey={journey}
-            journeyLoading={journeyLoading}
-            showFullJourney={showFullJourney}
-            setShowFullJourney={setShowFullJourney}
-          />
+        {/* ── Cards 3-5: Body row of three separate cards ── */}
+        <div className="lp-body-row">
+          <div className="lp-card lp-card--event">
+            <EventDetailsColumn lead={lead} />
+          </div>
+          <div className="lp-card lp-card--score">
+            <ScoreBreakdownColumn sc={sc} lead={lead} funnel={funnel} />
+          </div>
+          <div className="lp-card lp-card--activity">
+            <ActivitySummaryColumn
+              lead={lead}
+              journey={journey}
+              journeyLoading={journeyLoading}
+              showFullJourney={showFullJourney}
+              setShowFullJourney={setShowFullJourney}
+            />
+          </div>
         </div>
 
-        {/* Full timeline drill-in - kept inside the card under the 3-col body
-            and only renders when toggled. Replaces the old always-on Journey
-            section so the page stays compact by default. */}
+        {/* Full timeline drill-in - sits below the body row, full width.
+            Only renders when toggled. */}
         {showFullJourney && (
-          <div className="lp-section">
-            <h3 className="lp-section__title">Full timeline</h3>
-            <JourneySummary journey={journey} showFullJourney={showFullJourney} setShowFullJourney={setShowFullJourney} />
+          <div className="lp-card lp-card--timeline">
+            <div className="lp-section">
+              <h3 className="lp-section__title">Full timeline</h3>
+              <JourneySummary journey={journey} showFullJourney={showFullJourney} setShowFullJourney={setShowFullJourney} />
+            </div>
           </div>
         )}
-        </div>{/* end lp-card--body */}
       </div>{/* end lp-card-stack */}
     </div>
   );

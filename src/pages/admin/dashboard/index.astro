@@ -1292,12 +1292,22 @@ import pricing from '../../../data/wedding-pricing.json';
          border closes it instead. */
       .lp-meta-strip {
         display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
-        padding: 24px 32px;
+        padding: 20px 32px;
         background: rgba(255,255,255,0.5);
+        align-items: center;
+        min-height: 96px;
       }
       .lp-meta-cell {
         display: flex; flex-direction: column; gap: 10px;
         padding: 0; min-width: 0;
+        justify-content: center;
+      }
+      /* Cell 1 holds the score ring - centre the ring and tighten the gap. */
+      .lp-meta-cell--ring {
+        gap: 8px; align-items: flex-start;
+      }
+      .lp-meta-cell--ring .lp-score-ring {
+        margin: 0;
       }
       .lp-meta-cell:first-child { padding-left: 0; }
       .lp-meta-cell:last-child { padding-right: 0; }
@@ -1396,15 +1406,25 @@ import pricing from '../../../data/wedding-pricing.json';
         color: #2C1810;
       }
 
-      /* Band 4: Three-column body */
+      /* Body row - three separate cards (event / score / activity) sitting
+         beneath the funnel hero with 16px gaps between them. Each card uses
+         the standard .lp-card chrome (rgba bg + Mahogany 14% border + 2px). */
+      .lp-body-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+      /* Inside each body card, the column wrapper now provides padding.
+         Border-right dividers from the old single-card layout are gone -
+         the card borders + the row gap replace them. */
+      .lp-body-col {
+        padding: 28px 28px; min-width: 0;
+      }
+      /* Legacy .lp-body grid kept defined in case any helper renders it,
+         but the active layout uses .lp-body-row with sibling cards. */
       .lp-body {
         display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
       }
-      .lp-body-col {
-        padding: 28px 28px; min-width: 0;
-        border-right: 1px solid rgba(64,22,12,0.1);
-      }
-      .lp-body-col:last-child { border-right: none; }
       .lp-body-col__title {
         font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
         text-transform: uppercase; letter-spacing: 0.14em; color: #BF7256;
@@ -1564,10 +1584,16 @@ import pricing from '../../../data/wedding-pricing.json';
         color: rgba(44,24,16,0.4); font-style: italic; font-weight: 400;
       }
 
-      /* Score ring (PRD Option B headline visual, sits above .lp-sb-row bars) */
+      /* Score ring - large variant (legacy, no longer rendered in body but
+         retained for any future use). Small variant lives in metadata strip
+         cell 1 and is the active visual for the score now. */
       .lp-score-ring {
         position: relative; width: 96px; height: 96px;
         margin: 0 auto 16px;
+      }
+      .lp-score-ring--sm {
+        width: 64px; height: 64px;
+        margin: 0;
       }
       .lp-score-ring__inner {
         position: absolute; inset: 0;
@@ -1579,10 +1605,16 @@ import pricing from '../../../data/wedding-pricing.json';
         font-weight: 500; font-size: 32px; line-height: 1;
         color: #2C1810; letter-spacing: -0.01em;
       }
+      .lp-score-ring--sm .lp-score-ring__num {
+        font-size: 22px;
+      }
       .lp-score-ring__tier {
         font-family: 'DM Sans', system-ui, sans-serif;
         font-weight: 500; font-size: 10px;
         text-transform: uppercase; letter-spacing: 0.13em;
+      }
+      .lp-score-ring--sm .lp-score-ring__tier {
+        font-size: 9px; letter-spacing: 0.13em;
       }
 
       /* Score-bar rows for column 2 of body */
@@ -2026,9 +2058,10 @@ import pricing from '../../../data/wedding-pricing.json';
         .stage-callout { flex-direction: column; gap: 18px; margin-top: 20px; }
         .lp-stage-actions { width: 100%; }
         .lp-stage-actions__btn { flex: 1; justify-content: center; }
+        .lp-body-row { grid-template-columns: 1fr; gap: 16px; }
         .lp-body { grid-template-columns: 1fr; }
-        .lp-body-col { padding: 20px 18px; border-right: none; border-bottom: 1px solid rgba(64,22,12,0.1); }
-        .lp-body-col:last-child { border-bottom: none; }
+        .lp-body-col { padding: 20px 18px; }
+        .lp-meta-strip { min-height: 0; }
       }
 
       /* ═══════ Pricing tab (PricingView.jsx) ═══════ */
