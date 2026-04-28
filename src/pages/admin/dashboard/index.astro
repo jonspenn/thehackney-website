@@ -546,65 +546,30 @@ import pricing from '../../../data/wedding-pricing.json';
       }
 
       /* ── Pipeline view ── */
+      /* Pipeline panel - matches dashboard card chrome (8px, Mahogany 10%, soft white tint) */
       .pipe-panel {
-        background: var(--color-warm-white); border: 1px solid var(--border-warm);
-        border-radius: 6px; overflow: hidden;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(64, 22, 12, 0.10);
+        border-radius: 8px; overflow: hidden;
       }
       .pipe-panel__tabs {
-        display: flex; gap: 4px; padding: 8px 12px; flex-wrap: wrap;
+        display: flex; gap: 4px; padding: 10px 14px; flex-wrap: wrap;
         border-bottom: 1px solid var(--border-subtle);
       }
       .pipe-funnel {
-        display: flex; align-items: flex-end; gap: 0; padding: 32px 24px 24px;
+        padding: 28px 28px 16px;
         overflow-x: auto;
       }
-      .pipe-stage-col {
-        flex: 1; display: flex; flex-direction: column; align-items: center;
-        min-width: 80px; position: relative;
-      }
-      .pipe-conv-arrow {
-        position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-        font-size: 11px; color: rgba(44,24,16,0.35); white-space: nowrap;
-      }
-      .pipe-conv-arrow__pct { font-weight: 600; }
-      .pipe-stage {
-        width: 100%; padding: 16px 8px 12px; border: 2px solid transparent;
-        border-radius: 6px; background: none; cursor: pointer;
-        display: flex; flex-direction: column; align-items: center; gap: 6px;
-        transition: border-color 0.15s, background 0.15s;
-      }
-      .pipe-stage:hover { background: rgba(46,64,9,0.04); }
-      .pipe-stage--selected {
-        border-color: var(--color-forest-olive);
-        background: rgba(46,64,9,0.06);
-      }
-      .pipe-stage--empty { opacity: 0.45; }
-      .pipe-stage__bar {
-        height: 8px; border-radius: 4px; background: var(--color-forest-olive);
-        min-width: 8px; transition: width 0.3s;
-      }
-      .pipe-stage__count {
-        font-size: 28px; font-weight: 700; color: var(--color-brewery-dark);
-        line-height: 1;
-      }
-      .pipe-stage--empty .pipe-stage__count { color: rgba(44,24,16,0.25); }
-      .pipe-stage__label {
-        font-size: 12px; font-weight: 600; color: rgba(44,24,16,0.55);
-        text-transform: uppercase; letter-spacing: 0.04em;
-      }
-      .pipe-stage--selected .pipe-stage__label { color: var(--color-forest-olive); }
       .pipe-terminal {
-        display: flex; gap: 8px; padding: 0 24px 16px; flex-wrap: wrap;
+        display: flex; gap: 8px; padding: 4px 28px 18px; flex-wrap: wrap;
       }
+      /* Wrapper button is a click target; the SoftPill inside drives the visual */
       .pipe-terminal__btn {
-        padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;
-        border: 1px solid rgba(140,71,46,0.2); background: rgba(140,71,46,0.06);
-        color: #8C472E; cursor: pointer; transition: all 0.15s;
+        background: none; border: none; padding: 0; cursor: pointer;
+        font: inherit; color: inherit;
       }
-      .pipe-terminal__btn:hover { background: rgba(140,71,46,0.12); }
-      .pipe-terminal__btn--selected {
-        border-color: #8C472E; background: rgba(140,71,46,0.15);
-        font-weight: 700;
+      .pipe-terminal__btn--selected .lp-soft-pill {
+        outline: 1px solid currentColor; outline-offset: 1px;
       }
       .pipe-panel__status {
         padding: 8px 16px 10px; font-size: 12px; color: var(--color-dusty-coral);
@@ -1120,6 +1085,64 @@ import pricing from '../../../data/wedding-pricing.json';
       .lp-funnel-engagement__fill {
         height: 100%; background: var(--color-forest-olive); border-radius: 2px;
         transition: width 0.3s ease;
+      }
+
+      /* === FunnelTrack cohort mode (Pipeline tab) === */
+      /* Same dot/line/label visual language as the lead-profile FunnelTrack,
+         but with Cormorant counts under each dot and an optional conversion-rate
+         eyebrow above. Dots are bigger to read as the page hero. */
+      .lp-funnel--cohort {
+        gap: 4px; padding: 16px 4px 8px;
+      }
+      .lp-funnel--cohort .lp-funnel__step {
+        gap: 8px; min-width: 88px; padding: 8px 4px;
+        background: none; border: 1px solid transparent; border-radius: 4px;
+        color: inherit; text-align: center; font: inherit;
+      }
+      .lp-funnel--cohort .lp-funnel__step--clickable {
+        cursor: pointer; transition: background 0.15s, border-color 0.15s;
+      }
+      .lp-funnel--cohort .lp-funnel__step--clickable:hover {
+        background: rgba(46,64,9,0.05);
+      }
+      .lp-funnel--cohort .lp-funnel__step--selected {
+        background: rgba(46,64,9,0.08);
+        border-color: rgba(46,64,9,0.3);
+      }
+      .lp-funnel--cohort .lp-funnel__step--empty .lp-funnel__count,
+      .lp-funnel--cohort .lp-funnel__step--empty .lp-funnel__label {
+        opacity: 0.45;
+      }
+      .lp-funnel--cohort .lp-funnel__dot {
+        width: 14px; height: 14px; border-width: 3px;
+        border-color: var(--color-warm-canvas, #F5F0E8);
+      }
+      .lp-funnel--cohort .lp-funnel__line {
+        top: 30px; height: 2px; background: rgba(46,64,9,0.18);
+      }
+      .lp-funnel__conv {
+        position: absolute; top: -2px; left: -50%; right: 50%;
+        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
+        text-transform: uppercase; letter-spacing: 0.13em;
+        color: var(--color-dusty-coral); text-align: center;
+        white-space: nowrap;
+      }
+      .lp-funnel__count {
+        font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500;
+        line-height: 1; color: var(--color-brewery-dark);
+        font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+      }
+      .lp-funnel--cohort .lp-funnel__label {
+        font-size: 11px; letter-spacing: 0.06em;
+      }
+      @media (max-width: 900px) {
+        .lp-funnel--cohort {
+          overflow-x: auto; padding-bottom: 14px;
+        }
+        .lp-funnel--cohort .lp-funnel__step {
+          min-width: 72px;
+        }
+        .lp-funnel__count { font-size: 22px; }
       }
 
       /* Stage definition line */

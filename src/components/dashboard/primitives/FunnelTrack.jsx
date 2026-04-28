@@ -1,27 +1,45 @@
 /**
- * FunnelTrack - horizontal funnel-stage progression with completed / current / future dots.
+ * FunnelTrack - horizontal funnel-stage progression.
  *
- * Renders the "lead's path through the funnel" as a row of stage dots connected by lines.
- * Used on the lead profile (per-lead view) and the Pipeline tab (cohort view).
+ * Two modes, same visual language (dots + connector lines + stage labels):
  *
- * Props:
+ *   PROFILE MODE — one lead's path. Dot per stage with completed / current / future
+ *   states, optional date / health pulse on the current stage. Pass `funnel`
+ *   (computeFunnelStage output).
+ *
+ *   COHORT MODE — counts per stage (used by the Pipeline tab). Dot per stage with
+ *   a Cormorant count under each, optional "selected" highlight, optional
+ *   click-to-select-stage affordance. Pass `cohort` (an object).
+ *
+ * Profile mode props:
  *   funnel    : computeFunnelStage() output - { stages, currentStage, completed,
  *               health, daysInStage, lostReason }
- *   tierColor : tier accent colour for done dots (typically TIER_CONFIG[tier].color
- *               on a per-lead view; defaults to Forest Olive for cohort views).
+ *   tierColor : tier accent colour for completed dots (default Forest Olive).
  *
- * CSS lives in src/pages/admin/dashboard/index.astro under .lp-funnel*. Class names
- * preserved so the cascade resolves identically after the extraction.
+ * Cohort mode props:
+ *   cohort.stages         : ordered array of stage keys, e.g. FUNNEL_STAGES[type]
+ *   cohort.counts         : map of stage key -> count
+ *   cohort.conversionRates: map of stage key -> percent string (rendered above pairs)
+ *   cohort.selectedStage  : optional key of the currently-selected stage
+ *   cohort.onSelectStage  : optional click handler (stage) => void; when provided,
+ *                           dots become buttons.
  *
- * Extracted from LeadProfile.jsx 2026-04-28 to enable reuse on PipelineView.jsx.
+ * CSS lives in src/pages/admin/dashboard/index.astro under .lp-funnel*.
  */
 
 import { FUNNEL_LABELS, HEALTH_COLORS } from "../constants.js";
 
 const DEFAULT_TIER_COLOR = "#2E4009"; // Forest Olive
 
-export default function FunnelTrack({ funnel, tierColor }) {
-  const tc = { color: tierColor || DEFAULT_TIER_COLOR };
+export default function FunnelTrack({ funnel, tierColor, cohort }) {
+  if (cohort) return <CohortTrack cohort={cohort} tierColor={tierColor || DEFAULT_TIER_COLOR} />;
+  return <ProfileTrack funnel={funnel} tierColor={tierColor || DEFAULT_TIER_COLOR} />;
+}
+
+/* ── Profile mode ── (extracted verbatim from LeadProfile.jsx 2026-04-28) ── */
+
+function ProfileTrack({ funnel, tierColor }) {
+  const tc = { color: tierColor };
   return (
     <div className="lp-funnel">
       {funnel.stages.map((stageKey, i) => {
@@ -87,6 +105,62 @@ export default function FunnelTrack({ funnel, tierColor }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Cohort mode ── (used by PipelineView for stage-count overview) ── */
+
+function CohortTrack({ cohort, tierColor }) {
+  const { stages, counts, conversionRates = {}, selectedStage, onSelectStage } = cohort;
+
+  return (
+    <div className="lp-funnel lp-funnel--cohort">
+      {stages.map((stageKey, i) => {
+        const count = counts[stageKey] || 0;
+        const isSelected = selectedStage === stageKey;
+        const isClickable = !!onSelectStage;
+        const isEmpty = count === 0;
+        const conv = i > 0 ? conversionRates[stageKey] : null;
+
+        const dotStyle = isEmpty
+          ? { background: "rgba(64,22,12,0.14)", borderColor: "rgba(64,22,12,0.14)" }
+          : { background: tierColor, borderColor: tierColor };
+
+        const stepClass = [
+          "lp-funnel__step",
+          "lp-funnel__step--cohort",
+          isSelected ? "lp-funnel__step--selected" : "",
+          isEmpty ? "lp-funnel__step--empty" : "",
+          isClickable ? "lp-funnel__step--clickable" : "",
+        ].filter(Boolean).join(" ");
+
+        const inner = (
+          <>
+            {i > 0 && <div className="lp-funnel__line" style={{ background: tierColor, opacity: 0.45 }} />}
+            {conv != null && (
+              <span className="lp-funnel__conv">{conv}%</span>
+            )}
+            <div className="lp-funnel__dot" style={dotStyle} />
+            <span className="lp-funnel__count">{count}</span>
+            <span className="lp-funnel__label">{FUNNEL_LABELS[stageKey]}</span>
+          </>
+        );
+
+        if (isClickable) {
+          return (
+            <button
+              key={stageKey}
+              type="button"
+              className={stepClass}
+              onClick={() => onSelectStage(isSelected ? null : stageKey)}
+            >
+              {inner}
+            </button>
+          );
+        }
+        return <div key={stageKey} className={stepClass}>{inner}</div>;
+      })}
     </div>
   );
 }

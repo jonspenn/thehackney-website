@@ -18,6 +18,8 @@ import {
   computeLeadScore, computeFunnelStage, resolveSource, parseTimestamp,
 } from "./utils.js";
 
+import { CardSurface, FunnelTrack, SoftPill } from "./primitives/index.js";
+
 /* Non-terminal stages that appear on the main track */
 const TERMINAL_STAGES = new Set(["lost", "cancelled", "noshow"]);
 
@@ -75,16 +77,25 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
   }, [leads, activeType]);
 
   const stages = FUNNEL_STAGES[activeType] || FUNNEL_STAGES.wedding;
-  const maxCount = Math.max(1, ...Object.values(stageCounts));
 
-  /* Conversion rates between consecutive stages */
+  /* Conversion rate between consecutive stages.
+   *
+   * Bounded read: of leads at-or-past the prior stage, what % made it to
+   * at-or-past this stage. Always 0-100. Replaces the previous unbounded
+   * (cumulative / prior_only) calculation that could exceed 100% because
+   * leads currently sit at later stages while only a snapshot remains at
+   * the prior stage.
+   */
   const conversionRates = useMemo(() => {
     const rates = {};
+    let cumulativePrev = 0;
+    for (let j = 0; j < stages.length; j++) cumulativePrev += (stageCounts[stages[j]] || 0);
     for (let i = 1; i < stages.length; i++) {
-      const prev = stageCounts[stages[i - 1]] || 0;
-      let cumulative = 0;
-      for (let j = i; j < stages.length; j++) cumulative += (stageCounts[stages[j]] || 0);
-      rates[stages[i]] = prev > 0 ? Math.round((cumulative / prev) * 100) : null;
+      cumulativePrev -= (stageCounts[stages[i - 1]] || 0);
+      let cumulativeThis = 0;
+      for (let j = i; j < stages.length; j++) cumulativeThis += (stageCounts[stages[j]] || 0);
+      const denom = cumulativeThis + (stageCounts[stages[i - 1]] || 0); // at-or-past prior
+      rates[stages[i]] = denom > 0 ? Math.round((cumulativeThis / denom) * 100) : null;
     }
     return rates;
   }, [stageCounts, stages]);
@@ -207,30 +218,15 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
         {funnelOpen && (
           <>
             <div className="pipe-funnel">
-              {stages.map((stageKey, i) => {
-                const count = stageCounts[stageKey] || 0;
-                const isSelected = selectedStage === stageKey;
-                const barWidth = maxCount > 0 ? Math.max(8, (count / maxCount) * 100) : 8;
-
-                return (
-                  <div key={stageKey} className="pipe-stage-col">
-                    {i > 0 && conversionRates[stageKey] != null && (
-                      <div className="pipe-conv-arrow">
-                        <span className="pipe-conv-arrow__pct">{conversionRates[stageKey]}%</span>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      className={`pipe-stage${isSelected ? " pipe-stage--selected" : ""}${count === 0 ? " pipe-stage--empty" : ""}`}
-                      onClick={() => setSelectedStage(isSelected ? null : stageKey)}
-                    >
-                      <div className="pipe-stage__bar" style={{ width: `${barWidth}%` }} />
-                      <div className="pipe-stage__count">{count}</div>
-                      <div className="pipe-stage__label">{FUNNEL_LABELS[stageKey]}</div>
-                    </button>
-                  </div>
-                );
-              })}
+              <FunnelTrack
+                cohort={{
+                  stages,
+                  counts: stageCounts,
+                  conversionRates,
+                  selectedStage,
+                  onSelectStage: (next) => setSelectedStage(next),
+                }}
+              />
             </div>
 
             {totalTerminal > 0 && (
@@ -238,6 +234,7 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                 {["lost", "cancelled", "noshow"].map(key => {
                   if (!terminalCounts[key]) return null;
                   const isSelected = selectedStage === key;
+                  const variant = key === "lost" ? "muted" : "warning";
                   return (
                     <button
                       key={key}
@@ -245,7 +242,9 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                       className={`pipe-terminal__btn${isSelected ? " pipe-terminal__btn--selected" : ""}`}
                       onClick={() => setSelectedStage(isSelected ? null : key)}
                     >
-                      {FUNNEL_LABELS[key]}: {terminalCounts[key]}
+                      <SoftPill variant={variant} dot>
+                        {FUNNEL_LABELS[key]}: {terminalCounts[key]}
+                      </SoftPill>
                     </button>
                   );
                 })}
