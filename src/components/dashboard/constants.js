@@ -218,8 +218,8 @@ export const DAY_TYPE_LABELS = {
 export const LEAD_TABS = [
   { type: "wedding", label: "Wedding" },
   { type: "corporate", label: "Corporate" },
-  { type: "supperclub", label: "Supper Club" },
   { type: "private-events", label: "Private Events" },
+  { type: "supperclub", label: "Supper Club" },
   { type: "cafe-bar", label: "Cafe-Bar" },
 ];
 
