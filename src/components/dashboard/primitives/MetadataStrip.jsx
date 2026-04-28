@@ -12,9 +12,12 @@
  *   variant  "default" | "ring"  applies .lp-meta-cell--ring for the score
  *                                 ring cell (tighter gap, flex-start align).
  *
- * Visual: 4-col grid, 32px gap, 20px/32px padding, 96px min-height.
- * Eyebrow: DM Sans 11px 500 uppercase tracking 0.14em Dusty Coral.
- * Value: DM Sans 16px 500 Brewery Dark.
+ * Visual: 4-col grid, 2 explicit rows (eyebrow row + 64px content row),
+ * 24px/32px padding. Cells use display:contents so eyebrow + value become
+ * direct grid children of the strip - this is what aligns all 4 eyebrows
+ * to a shared top baseline regardless of the score ring's height.
+ * Eyebrow: DM Sans 10px 500 uppercase tracking 0.13em Dusty Coral.
+ * Value: DM Sans 16px 500 Brewery Dark, vertically centred against the ring.
  */
 
 export function MetadataStrip({ children }) {

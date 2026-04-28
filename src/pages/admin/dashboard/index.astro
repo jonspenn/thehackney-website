@@ -1322,36 +1322,38 @@ import pricing from '../../../data/wedding-pricing.json';
       }
       .lp-attr-row__link:hover { text-decoration: underline; }
 
-      /* Band 2: Metadata strip - 4 cells, generous vertical padding.
-         No border-bottom: this is now the bottom band of Card 1, the card
+      /* Band 2: Metadata strip - 4 cells aligned to a shared 2-row grid.
+         Row 1 = eyebrows (top-baseline). Row 2 = content (ring or value).
+         Cells use display:contents so eyebrow + value become direct grid
+         children of the strip - this locks the eyebrows to a single shared
+         baseline regardless of the ring's height in cell 1.
+         No border-bottom: this is the bottom band of Card 1, the card
          border closes it instead. */
       .lp-meta-strip {
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
-        padding: 20px 32px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto 64px; /* row 2 floor = ring height */
+        column-gap: 32px;
+        row-gap: 10px;
+        padding: 24px 32px;
         background: rgba(255,255,255,0.5);
-        align-items: center;
-        min-height: 96px;
+        align-items: start;
       }
+      /* Cell wrapper is invisible to the grid - its children promote up. */
       .lp-meta-cell {
-        display: flex; flex-direction: column; gap: 10px;
-        padding: 0; min-width: 0;
-        justify-content: center;
+        display: contents;
       }
-      /* Cell 1 holds the score ring - centre the ring and tighten the gap. */
-      .lp-meta-cell--ring {
-        gap: 8px; align-items: flex-start;
-      }
-      .lp-meta-cell--ring .lp-score-ring {
-        margin: 0;
-      }
-      .lp-meta-cell:first-child { padding-left: 0; }
-      .lp-meta-cell:last-child { padding-right: 0; }
       .lp-meta-cell__eyebrow {
-        font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
-        text-transform: uppercase; letter-spacing: 0.14em; color: #BF7256;
+        grid-row: 1;
+        align-self: start;
+        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
+        text-transform: uppercase; letter-spacing: 0.13em; color: #BF7256;
         line-height: 1;
+        min-width: 0;
       }
       .lp-meta-cell__value {
+        grid-row: 2;
+        align-self: center; /* vertically centre against the ring's centre */
         display: inline-flex; align-items: center; gap: 8px;
         font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500;
         color: #2C1810; line-height: 1.3; min-width: 0;
@@ -1361,6 +1363,13 @@ import pricing from '../../../data/wedding-pricing.json';
       }
       .lp-meta-cell__dot {
         width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+      }
+      /* Score ring sits at the top of row 2 and is the row-height anchor. */
+      .lp-meta-cell--ring .lp-score-ring {
+        grid-row: 2;
+        align-self: start;
+        justify-self: start;
+        margin: 0;
       }
 
       /* Band 3: Funnel hero - now its own card (Card 2). No border-bottom. */
@@ -2087,7 +2096,25 @@ import pricing from '../../../data/wedding-pricing.json';
           flex-wrap: wrap; width: 100%;
         }
         .lp-id-actions__btn { flex: 1; justify-content: center; }
-        .lp-meta-strip { grid-template-columns: 1fr 1fr; gap: 20px 16px; padding: 18px 18px; }
+        /* Mobile: revert to per-cell flex column - the 2-row alignment trick
+           doesn't apply once we wrap to 2x2. Each cell stacks its own
+           eyebrow + value vertically. */
+        .lp-meta-strip {
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: auto;
+          grid-auto-rows: auto;
+          gap: 20px 16px;
+          padding: 18px 18px;
+        }
+        .lp-meta-cell {
+          display: flex; flex-direction: column; gap: 8px;
+          min-width: 0;
+        }
+        .lp-meta-cell__eyebrow,
+        .lp-meta-cell__value,
+        .lp-meta-cell--ring .lp-score-ring {
+          grid-row: auto; align-self: auto; justify-self: auto;
+        }
         .lp-meta-cell__value { font-size: 14px; }
         .lp-funnel-hero { padding: 20px 18px; }
         .stage-callout { flex-direction: column; gap: 18px; margin-top: 20px; }
