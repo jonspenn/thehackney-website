@@ -92,9 +92,14 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
     for (let j = 0; j < stages.length; j++) cumulativePrev += (stageCounts[stages[j]] || 0);
     for (let i = 1; i < stages.length; i++) {
       cumulativePrev -= (stageCounts[stages[i - 1]] || 0);
+      const priorSnapshot = stageCounts[stages[i - 1]] || 0;
+      // Suppress when the prior stage has no live cohort. A 100% rate from an
+      // empty stage is mathematically true but operationally misleading -
+      // there's no actual cohort sitting at the prior stage to convert from.
+      if (priorSnapshot === 0) { rates[stages[i]] = null; continue; }
       let cumulativeThis = 0;
       for (let j = i; j < stages.length; j++) cumulativeThis += (stageCounts[stages[j]] || 0);
-      const denom = cumulativeThis + (stageCounts[stages[i - 1]] || 0); // at-or-past prior
+      const denom = cumulativeThis + priorSnapshot; // at-or-past prior
       rates[stages[i]] = denom > 0 ? Math.round((cumulativeThis / denom) * 100) : null;
     }
     return rates;
@@ -268,7 +273,90 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
         </div>
       </div>
 
-      {/* ── Collapsible monthly trends (above the drill-in table) ── */}
+      {/* ── Drill-in table for the selected stage (sits directly below the funnel) ── */}
+      {selectedStage && sortedSelectedLeads.length > 0 && (
+        <div style={{ marginTop: "4px" }}>
+          <div className="rep-table-wrap">
+            <table className="rep-table rep-table--sortable">
+              <thead>
+                <tr>
+                  <th style={{ width: "52px" }}>Score</th>
+                  <th>Health</th>
+                  <th>When</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  {activeType === "corporate" && <th>Company</th>}
+                  {activeType === "wedding" && <th>Wedding date</th>}
+                  {activeType === "corporate" && <th>Event type</th>}
+                  <th>Source</th>
+                  <th>Engagement</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedSelectedLeads.map((lead) => {
+                  const sc = lead._score;
+                  const tc = TIER_CONFIG[sc.tier];
+                  const funnel = lead._funnel;
+                  const hc = funnel.health ? HEALTH_COLORS[funnel.health] : null;
+                  const src = resolveSource(lead.source_channel);
+
+                  return (
+                    <tr
+                      key={lead.contact_id}
+                      className={`lead-row lead-row--${sc.tier}${sc.isDead ? " lead-row--dead" : ""}`}
+                      style={{ borderLeft: `4px solid ${tc.border}`, background: tc.bg, cursor: "pointer" }}
+                      onClick={() => onSelectLead(lead, activeType)}
+                    >
+                      <td>
+                        <span
+                          className="lead-score-badge"
+                          style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff" }}
+                        >
+                          {sc.score}
+                        </span>
+                      </td>
+                      <td>
+                        {hc && funnel.health !== "green" ? (
+                          <span className="lead-health-badge" style={{ color: hc.color, background: hc.bg }}>
+                            {hc.label} ({funnel.daysInStage}d)
+                          </span>
+                        ) : funnel.health === "green" ? (
+                          <span style={{ color: "#2E4009", fontSize: "12px" }}>On track</span>
+                        ) : (
+                          <span style={{ color: "rgba(44,24,16,0.3)", fontSize: "12px" }}>{"\u2014"}</span>
+                        )}
+                      </td>
+                      <td>
+                        <span>{formatRelativeTime(lead.created_at)}</span>
+                        {sc.daysSinceActivity > 7 && (
+                          <span className="lead-last-seen">seen {sc.daysSinceActivity}d ago</span>
+                        )}
+                      </td>
+                      <td>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
+                      <td>{lead.email}</td>
+                      <td>{lead.phone || "\u2014"}</td>
+                      {activeType === "corporate" && <td>{lead.company || "\u2014"}</td>}
+                      {activeType === "wedding" && <td>{lead.event_date || "\u2014"}</td>}
+                      {activeType === "corporate" && <td>{lead.event_type_label || "\u2014"}</td>}
+                      <td>
+                        <span className="lead-source-badge" style={{ color: src.color, background: src.bg }}>{src.label}</span>
+                      </td>
+                      <td>{lead.sessions_before_conversion != null ? `${lead.sessions_before_conversion}s / ${lead.total_page_views || 0}p` : "\u2014"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {selectedStage && sortedSelectedLeads.length === 0 && (
+        <p className="rep-empty-small" style={{ marginTop: "12px" }}>No leads at this stage.</p>
+      )}
+
+      {/* ── Monthly trends (independent reference, lives below the drill-in) ── */}
       {monthlyData.months.length > 0 && (
         <div className="pipe-trends">
           <button
@@ -397,88 +485,6 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
         </div>
       )}
 
-      {/* ── Leads in selected stage (now below both collapsible sections) ── */}
-      {selectedStage && sortedSelectedLeads.length > 0 && (
-        <div style={{ marginTop: "4px" }}>
-          <div className="rep-table-wrap">
-            <table className="rep-table rep-table--sortable">
-              <thead>
-                <tr>
-                  <th style={{ width: "52px" }}>Score</th>
-                  <th>Health</th>
-                  <th>When</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  {activeType === "corporate" && <th>Company</th>}
-                  {activeType === "wedding" && <th>Wedding date</th>}
-                  {activeType === "corporate" && <th>Event type</th>}
-                  <th>Source</th>
-                  <th>Engagement</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedSelectedLeads.map((lead) => {
-                  const sc = lead._score;
-                  const tc = TIER_CONFIG[sc.tier];
-                  const funnel = lead._funnel;
-                  const hc = funnel.health ? HEALTH_COLORS[funnel.health] : null;
-                  const src = resolveSource(lead.source_channel);
-
-                  return (
-                    <tr
-                      key={lead.contact_id}
-                      className={`lead-row lead-row--${sc.tier}${sc.isDead ? " lead-row--dead" : ""}`}
-                      style={{ borderLeft: `4px solid ${tc.border}`, background: tc.bg, cursor: "pointer" }}
-                      onClick={() => onSelectLead(lead, activeType)}
-                    >
-                      <td>
-                        <span
-                          className="lead-score-badge"
-                          style={{ background: sc.tier === "cold" ? "rgba(44,24,16,0.08)" : tc.color, color: sc.tier === "cold" ? "rgba(44,24,16,0.35)" : "#fff" }}
-                        >
-                          {sc.score}
-                        </span>
-                      </td>
-                      <td>
-                        {hc && funnel.health !== "green" ? (
-                          <span className="lead-health-badge" style={{ color: hc.color, background: hc.bg }}>
-                            {hc.label} ({funnel.daysInStage}d)
-                          </span>
-                        ) : funnel.health === "green" ? (
-                          <span style={{ color: "#2E4009", fontSize: "12px" }}>On track</span>
-                        ) : (
-                          <span style={{ color: "rgba(44,24,16,0.3)", fontSize: "12px" }}>{"\u2014"}</span>
-                        )}
-                      </td>
-                      <td>
-                        <span>{formatRelativeTime(lead.created_at)}</span>
-                        {sc.daysSinceActivity > 7 && (
-                          <span className="lead-last-seen">seen {sc.daysSinceActivity}d ago</span>
-                        )}
-                      </td>
-                      <td>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || "\u2014"}</td>
-                      <td>{lead.email}</td>
-                      <td>{lead.phone || "\u2014"}</td>
-                      {activeType === "corporate" && <td>{lead.company || "\u2014"}</td>}
-                      {activeType === "wedding" && <td>{lead.event_date || "\u2014"}</td>}
-                      {activeType === "corporate" && <td>{lead.event_type_label || "\u2014"}</td>}
-                      <td>
-                        <span className="lead-source-badge" style={{ color: src.color, background: src.bg }}>{src.label}</span>
-                      </td>
-                      <td>{lead.sessions_before_conversion != null ? `${lead.sessions_before_conversion}s / ${lead.total_page_views || 0}p` : "\u2014"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {selectedStage && sortedSelectedLeads.length === 0 && (
-        <p className="rep-empty-small" style={{ marginTop: "12px" }}>No leads at this stage.</p>
-      )}
     </>
   );
 }

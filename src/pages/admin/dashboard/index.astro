@@ -1106,8 +1106,11 @@ import pricing from '../../../data/wedding-pricing.json';
         background: rgba(46,64,9,0.05);
       }
       .lp-funnel--cohort .lp-funnel__step--selected {
-        background: rgba(46,64,9,0.08);
-        border-color: rgba(46,64,9,0.3);
+        background: rgba(46,64,9,0.04);
+        border-color: rgba(46,64,9,0.18);
+      }
+      .lp-funnel--cohort .lp-funnel__step--selected .lp-funnel__count {
+        color: var(--color-forest-olive);
       }
       .lp-funnel--cohort .lp-funnel__step--empty .lp-funnel__count,
       .lp-funnel--cohort .lp-funnel__step--empty .lp-funnel__label {
@@ -1121,11 +1124,12 @@ import pricing from '../../../data/wedding-pricing.json';
         top: 30px; height: 2px; background: rgba(46,64,9,0.18);
       }
       .lp-funnel__conv {
-        position: absolute; top: -2px; left: -50%; right: 50%;
-        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
-        text-transform: uppercase; letter-spacing: 0.13em;
-        color: var(--color-dusty-coral); text-align: center;
+        position: absolute; top: 14px; left: -50%; right: 50%;
+        font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 400;
+        letter-spacing: 0.04em;
+        color: rgba(44,24,16,0.45); text-align: center;
         white-space: nowrap;
+        font-variant-numeric: tabular-nums;
       }
       .lp-funnel__count {
         font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500;
