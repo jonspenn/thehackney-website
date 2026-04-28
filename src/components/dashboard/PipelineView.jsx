@@ -18,7 +18,7 @@ import {
   computeLeadScore, computeFunnelStage, resolveSource, parseTimestamp,
 } from "./utils.js";
 
-import { CardSurface, FunnelTrack, SoftPill } from "./primitives/index.js";
+import { CardSurface, FunnelTrack, SoftPill, MetadataStrip, MetadataCell } from "./primitives/index.js";
 
 /* Non-terminal stages that appear on the main track */
 const TERMINAL_STAGES = new Set(["lost", "cancelled", "noshow"]);
@@ -104,6 +104,68 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
     }
     return rates;
   }, [stageCounts, stages]);
+
+  /* ── Pipeline-level metrics for the metadata strip header ── */
+  const pipelineMetrics = useMemo(() => {
+    const currentLeads = leads[activeType]?.leads || [];
+    const stages = FUNNEL_STAGES[activeType] || FUNNEL_STAGES.wedding;
+    const tourIdx = stages.indexOf("tour");
+
+    const activeNonTerminal = currentLeads.filter(l => {
+      const f = computeFunnelStage(l, activeType);
+      return !TERMINAL_STAGES.has(f.currentStage);
+    });
+
+    /* Tour rate: of active leads, how many have reached at-or-past Tour. */
+    let atOrPastTour = 0;
+    if (tourIdx >= 0) {
+      for (const l of activeNonTerminal) {
+        const f = computeFunnelStage(l, activeType);
+        const idx = stages.indexOf(f.currentStage);
+        if (idx >= tourIdx) atOrPastTour++;
+      }
+    }
+    const tourRate = activeNonTerminal.length > 0
+      ? Math.round((atOrPastTour / activeNonTerminal.length) * 100)
+      : null;
+
+    /* Avg days a lead has been in the pipeline (live, not closed). */
+    let totalAgeDays = 0; let aged = 0;
+    const now = Date.now();
+    for (const l of activeNonTerminal) {
+      const created = parseTimestamp(l.created_at);
+      if (created) { totalAgeDays += (now - created.getTime()) / (1000 * 60 * 60 * 24); aged++; }
+    }
+    const avgAgeDays = aged > 0 ? Math.round(totalAgeDays / aged) : null;
+
+    /* Pipeline value £ - sum of event-budget enum mid-points across active leads.
+       Leads without a budget aren't counted. Mid-points: under-5k=2.5k, 5-10k=7.5k,
+       10-20k=15k, 20k-plus=25k. */
+    const BUDGET_MIDPOINT = {
+      "under-5k": 2500,
+      "5k-10k": 7500,
+      "10k-20k": 15000,
+      "20k-plus": 25000,
+    };
+    let pipelineValue = 0;
+    for (const l of activeNonTerminal) {
+      const v = BUDGET_MIDPOINT[l.event_budget];
+      if (v) pipelineValue += v;
+    }
+
+    return {
+      activeCount: activeNonTerminal.length,
+      tourRate,
+      avgAgeDays,
+      pipelineValue,
+    };
+  }, [leads, activeType]);
+
+  function formatPipelineValue(v) {
+    if (!v) return "\u2014";
+    if (v >= 1000) return "\u00A3" + (v / 1000).toFixed(v >= 10000 ? 0 : 1) + "k";
+    return "\u00A3" + v;
+  }
 
   const selectedLeads = selectedStage ? (stageLeads[selectedStage] || []) : [];
   const sortedSelectedLeads = useMemo(() => {
@@ -208,6 +270,24 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
               )}
             </button>
           ))}
+        </div>
+
+        {/* ── Pipeline-level metrics strip ── */}
+        <div className="pipe-meta-wrap">
+          <MetadataStrip>
+            <MetadataCell eyebrow="Tour rate">
+              <span className="pipe-metric">{pipelineMetrics.tourRate != null ? pipelineMetrics.tourRate + "%" : "\u2014"}</span>
+            </MetadataCell>
+            <MetadataCell eyebrow="Avg days in pipeline">
+              <span className="pipe-metric">{pipelineMetrics.avgAgeDays != null ? pipelineMetrics.avgAgeDays : "\u2014"}<span className="pipe-metric__unit">d</span></span>
+            </MetadataCell>
+            <MetadataCell eyebrow="Active leads">
+              <span className="pipe-metric">{pipelineMetrics.activeCount}</span>
+            </MetadataCell>
+            <MetadataCell eyebrow="Pipeline value">
+              <span className="pipe-metric">{formatPipelineValue(pipelineMetrics.pipelineValue)}</span>
+            </MetadataCell>
+          </MetadataStrip>
         </div>
 
         {/* ── Collapsible funnel ── */}

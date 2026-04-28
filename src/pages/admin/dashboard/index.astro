@@ -556,6 +556,36 @@ import pricing from '../../../data/wedding-pricing.json';
         display: flex; gap: 4px; padding: 10px 14px; flex-wrap: wrap;
         border-bottom: 1px solid var(--border-subtle);
       }
+      /* Pipeline metric strip header (between sub-tabs and funnel card) */
+      .pipe-meta-wrap {
+        padding: 4px 8px 0;
+      }
+      .pipe-meta-wrap .lp-meta-strip {
+        background: transparent;
+        border: none;
+        padding: 18px 20px;
+        gap: 16px 56px;
+      }
+      .pipe-meta-wrap .lp-meta-cell__content {
+        min-height: auto;
+      }
+      .pipe-metric {
+        font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 500;
+        line-height: 1; color: var(--color-brewery-dark);
+        font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+      .pipe-metric__unit {
+        font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 400;
+        color: rgba(44,24,16,0.5); margin-left: 4px;
+      }
+      @media (max-width: 900px) {
+        .pipe-meta-wrap .lp-meta-strip {
+          padding: 12px 14px; gap: 12px 28px;
+        }
+        .pipe-metric { font-size: 26px; }
+      }
+
       .pipe-funnel {
         padding: 28px 28px 16px;
         overflow-x: auto;
