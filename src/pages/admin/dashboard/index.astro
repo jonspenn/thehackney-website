@@ -1345,7 +1345,7 @@ import pricing from '../../../data/wedding-pricing.json';
         display: flex;
         flex-direction: column;
         gap: 10px;
-        min-width: 140px;
+        width: max-content;
       }
       .lp-meta-cell__eyebrow {
         flex: 0 0 auto;
@@ -1365,6 +1365,7 @@ import pricing from '../../../data/wedding-pricing.json';
         display: inline-flex; align-items: center; gap: 8px;
         font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500;
         color: #2C1810; line-height: 1.3; min-width: 0;
+        white-space: nowrap;
       }
       .lp-meta-cell__value--muted {
         color: rgba(44,24,16,0.5); font-style: italic;
