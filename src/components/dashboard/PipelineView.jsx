@@ -500,7 +500,7 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                 const currentMonth = new Date().getUTCMonth(); // 0-based
 
                 /* SVG dimensions */
-                const W = 800, H = 180, PAD_T = 18, PAD_B = 28, PAD_L = 12, PAD_R = 12;
+                const W = 800, H = 180, PAD_T = 18, PAD_B = 28, PAD_L = 24, PAD_R = 12;
                 const plotW = W - PAD_L - PAD_R;
                 const plotH = H - PAD_T - PAD_B;
 
@@ -516,9 +516,12 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                 return (
                   <div className="pipe-line-chart">
                     <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", height: "auto", maxHeight: "220px" }}>
-                      {/* Light gridlines, no numeric Y-axis labels (cleaner read). */}
+                      {/* Light gridlines with subtle Y-axis numeric labels. */}
                       {gridLines.map(g => (
-                        <line key={g.val} x1={PAD_L} y1={g.y} x2={W - PAD_R} y2={g.y} stroke="rgba(44,24,16,0.05)" strokeWidth="1" />
+                        <g key={g.val}>
+                          <line x1={PAD_L} y1={g.y} x2={W - PAD_R} y2={g.y} stroke="rgba(44,24,16,0.05)" strokeWidth="1" />
+                          <text x={PAD_L - 4} y={g.y + 3} textAnchor="end" fontSize="9" fill="rgba(44,24,16,0.35)" fontVariantNumeric="tabular-nums">{g.val}</text>
+                        </g>
                       ))}
 
                       {/* Future month shading */}
