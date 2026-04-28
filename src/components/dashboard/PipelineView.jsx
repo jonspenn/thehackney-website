@@ -27,19 +27,19 @@ const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "S
 
 /* Colours for each metric bar in the monthly chart */
 const TREND_METRICS = [
-  { key: "new",       label: "New leads",  color: "#2C1810" },
-  { key: "qualified", label: "Qualified",  color: "#49590E" },
+  { key: "new",       label: "New leads",  color: "#2C1810", weight: 2.5 },
+  { key: "qualified", label: "Qualified",  color: "#49590E", dash: "6 4" },
   { key: "engaged",   label: "Engaged",    color: "#2E4009" },
   { key: "call",      label: "Calls",      color: "#BF7256" },
-  { key: "tour",      label: "Tours",      color: "#40160C" },
-  { key: "won",       label: "Won",        color: "#8C472E" },
-  { key: "lost",      label: "Lost",       color: "#BF7256", dashed: true },
+  { key: "tour",      label: "Tours",      color: "#40160C", dash: "6 4" },
+  { key: "won",       label: "Won",        color: "#8C472E", weight: 2.5 },
+  { key: "lost",      label: "Lost",       color: "#BF7256", dash: "2 3" },
 ];
 
 /* Catmull-Rom spline -> cubic Bezier path. Produces a smooth curve through
    each point, no straight segments. tension=1 is the standard uniform curve
    that the reference design uses. */
-function smoothPath(points, tension = 1) {
+function smoothPath(points, tension = 0.7) {
   if (points.length === 0) return "";
   if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
   if (points.length === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
@@ -487,7 +487,7 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                     })}
                     title={hiddenMetrics.has(m.key) ? `Show ${m.label}` : `Hide ${m.label}`}
                   >
-                    <span className="pipe-legend__swatch" style={{ background: hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : (m.dashed ? "transparent" : m.color), border: m.dashed ? `1px dashed ${hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : m.color}` : "none" }} />
+                    <span className="pipe-legend__swatch" style={{ background: hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : (m.dash ? "transparent" : m.color), border: m.dash ? `1px dashed ${hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : m.color}` : "none" }} />
                     {m.label}
                   </button>
                 ))}
@@ -569,17 +569,17 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                               d={pathD}
                               fill="none"
                               stroke={metric.color}
-                              strokeWidth={metric.dashed ? "1.5" : "2"}
+                              strokeWidth={metric.weight ?? (metric.dash ? 1.5 : 2)}
                               strokeLinejoin="round"
                               strokeLinecap="round"
-                              strokeDasharray={metric.dashed ? "3 4" : undefined}
+                              strokeDasharray={metric.dash}
                             />
                             {/* Single end-of-line dot to mark the latest data point */}
                             {endPoint.val > 0 && (
                               <circle
                                 cx={endPoint.x}
                                 cy={endPoint.y}
-                                r={3.5}
+                                r={4}
                                 fill={metric.color}
                                 stroke="#F5F0E8"
                                 strokeWidth="2"
