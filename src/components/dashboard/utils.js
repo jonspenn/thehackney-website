@@ -197,28 +197,59 @@ export function computeLeadScore(lead, leadType) {
   }
 
   let stage = 8, stageLabel = "Brochure";
-  /* Score reflects funnel progression: Tour > Call > Quiz > Brochure */
-  if (lead.tour_at || lead.clicked_venue_tour_at)       { stage = 30; stageLabel = "Tour"; }
-  else if (lead.call_at || lead.clicked_discovery_call_at) { stage = 26; stageLabel = "Call"; }
+  /* Score reflects funnel progression. Mirrors computeFunnelStage so that
+     manually-recorded actions (Hugo logging a tour via the dashboard, which
+     writes meeting_at not a per-action column) lift the score the same as a
+     website-driven booking. Order matters: proposal > tour > call > quiz. */
+  const _hasTourSignal = !!(lead.tour_at || lead.clicked_venue_tour_at);
+  const _hasCallSignal = !!(lead.call_at || lead.clicked_discovery_call_at);
+  const _hasMeeting    = !!lead.meeting_at;
+  const _hasProposal   = !!lead.proposal_at;
+  /* If meeting_at is set but no intent signal, default to tour (most common
+     meeting type) - matches fallbackTourAt logic in computeFunnelStage. */
+  const _meetingIsTour = _hasMeeting && (_hasTourSignal || !_hasCallSignal);
+  const _meetingIsCall = _hasMeeting && _hasCallSignal && !_hasTourSignal;
+
+  if (_hasProposal)                                    { stage = 30; stageLabel = "Proposal"; }
+  else if (_hasTourSignal || _meetingIsTour)           { stage = 30; stageLabel = "Tour"; }
+  else if (_hasCallSignal || _meetingIsCall)           { stage = 26; stageLabel = "Call"; }
   else if (lead.form_types?.some(ft => ft.includes("quiz"))) { stage = 18; stageLabel = "Quiz"; }
 
   const INTENT_SCORE = { asap: 10, ready: 8, comparing: 5, browsing: 2 };
   const intent = INTENT_SCORE[lead.urgency] || 0;
 
   let recency = 0, daysSinceActivity = 999;
-  const lastAct = lead.last_seen_at || lead.created_at;
-  if (lastAct) {
-    const safe = lastAct.includes("T") ? lastAct : lastAct.replace(" ", "T") + "Z";
-    const d = new Date(safe);
-    if (!Number.isNaN(d.getTime())) {
-      daysSinceActivity = Math.max(0, Math.floor((now - d.getTime()) / 86400000));
-      if (daysSinceActivity <= 1) recency = 25;
-      else if (daysSinceActivity <= 3) recency = 20;
-      else if (daysSinceActivity <= 7) recency = 15;
-      else if (daysSinceActivity <= 14) recency = 10;
-      else if (daysSinceActivity <= 21) recency = 5;
-      else if (daysSinceActivity <= 30) recency = 2;
-    }
+  /* "Effective last touch" - take the MAX of website activity (last_seen_at)
+     and any manual action timestamp Hugo recorded (call/tour/proposal/etc).
+     Without this, a lead who came in for a tour 3 days ago but hasn't
+     visited the site since enquiry looks stale to the recency calc. */
+  const _touchCandidates = [
+    lead.last_seen_at,
+    lead.meeting_at,
+    lead.proposal_at,
+    lead.lost_at,
+    lead.cancelled_at,
+    lead.noshow_at,
+    lead.re_engaged_at,
+    lead.clicked_discovery_call_at,
+    lead.clicked_venue_tour_at,
+    lead.created_at,
+  ];
+  let lastActMs = 0;
+  for (const ts of _touchCandidates) {
+    if (!ts) continue;
+    const safe = ts.includes("T") ? ts : ts.replace(" ", "T") + "Z";
+    const t = new Date(safe).getTime();
+    if (!Number.isNaN(t) && t > lastActMs) lastActMs = t;
+  }
+  if (lastActMs > 0) {
+    daysSinceActivity = Math.max(0, Math.floor((now - lastActMs) / 86400000));
+    if (daysSinceActivity <= 1) recency = 25;
+    else if (daysSinceActivity <= 3) recency = 20;
+    else if (daysSinceActivity <= 7) recency = 15;
+    else if (daysSinceActivity <= 14) recency = 10;
+    else if (daysSinceActivity <= 21) recency = 5;
+    else if (daysSinceActivity <= 30) recency = 2;
   }
 
   const sessions = lead.sessions_before_conversion || 0;
