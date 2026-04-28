@@ -28,3 +28,4 @@ export { default as SoftPill } from "./SoftPill.jsx";
 export { default as ActivityTimelineRow } from "./ActivityTimelineRow.jsx";
 export { MILESTONE_ICONS, MilestoneIcon } from "./activity-icons.jsx";
 export { default as CardSurface } from "./CardSurface.jsx";
+export { default as FunnelTrack } from "./FunnelTrack.jsx";
