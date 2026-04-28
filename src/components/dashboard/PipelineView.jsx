@@ -33,8 +33,30 @@ const TREND_METRICS = [
   { key: "call",      label: "Calls",      color: "#BF7256" },
   { key: "tour",      label: "Tours",      color: "#40160C" },
   { key: "won",       label: "Won",        color: "#8C472E" },
-  { key: "lost",      label: "Lost",       color: "rgba(44,24,16,0.25)" },
+  { key: "lost",      label: "Lost",       color: "#BF7256", dashed: true },
 ];
+
+/* Catmull-Rom spline -> cubic Bezier path. Produces a smooth curve through
+   each point, no straight segments. tension=1 is the standard uniform curve
+   that the reference design uses. */
+function smoothPath(points, tension = 1) {
+  if (points.length === 0) return "";
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+  if (points.length === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] || points[i];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] || points[i + 1];
+    const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
+    const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
+    const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
+    const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
+    d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+  return d;
+}
 
 export default function PipelineView({ leads, onSelectLead, initialType, onTypeChange }) {
   const [activeType, setActiveType] = useState(initialType || "wedding");
@@ -465,7 +487,7 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                     })}
                     title={hiddenMetrics.has(m.key) ? `Show ${m.label}` : `Hide ${m.label}`}
                   >
-                    <span className="pipe-legend__swatch" style={{ background: hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : m.color }} />
+                    <span className="pipe-legend__swatch" style={{ background: hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : (m.dashed ? "transparent" : m.color), border: m.dashed ? `1px dashed ${hiddenMetrics.has(m.key) ? "rgba(44,24,16,0.15)" : m.color}` : "none" }} />
                     {m.label}
                   </button>
                 ))}
@@ -478,7 +500,7 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                 const currentMonth = new Date().getUTCMonth(); // 0-based
 
                 /* SVG dimensions */
-                const W = 800, H = 180, PAD_T = 24, PAD_B = 28, PAD_L = 28, PAD_R = 12;
+                const W = 800, H = 180, PAD_T = 18, PAD_B = 28, PAD_L = 12, PAD_R = 12;
                 const plotW = W - PAD_L - PAD_R;
                 const plotH = H - PAD_T - PAD_B;
 
@@ -494,12 +516,9 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                 return (
                   <div className="pipe-line-chart">
                     <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ width: "100%", height: "auto", maxHeight: "220px" }}>
-                      {/* Grid lines */}
+                      {/* Light gridlines, no numeric Y-axis labels (cleaner read). */}
                       {gridLines.map(g => (
-                        <g key={g.val}>
-                          <line x1={PAD_L} y1={g.y} x2={W - PAD_R} y2={g.y} stroke="rgba(44,24,16,0.08)" strokeWidth="1" />
-                          <text x={PAD_L - 6} y={g.y + 3} textAnchor="end" fontSize="9" fill="rgba(44,24,16,0.35)">{g.val}</text>
-                        </g>
+                        <line key={g.val} x1={PAD_L} y1={g.y} x2={W - PAD_R} y2={g.y} stroke="rgba(44,24,16,0.05)" strokeWidth="1" />
                       ))}
 
                       {/* Future month shading */}
@@ -528,31 +547,44 @@ export default function PipelineView({ leads, onSelectLead, initialType, onTypeC
                         );
                       })}
 
-                      {/* Lines + dots for each metric */}
+                      {/* Smooth lines with end-of-line marker only.
+                          Quieter than the previous straight-segment + per-point
+                          labels treatment. */}
                       {metrics.filter(metric => !hiddenMetrics.has(metric.key)).map(metric => {
-                        const points = months
-                          .filter(m => !m.isFuture)
-                          .map((m, i) => ({
-                            x: PAD_L + (plotW * (i / 11)),
-                            y: PAD_T + plotH - (plotH * ((m[metric.key] || 0) / maxVal)),
-                            val: m[metric.key] || 0,
-                          }));
+                        const visibleMonths = months.filter(m => !m.isFuture);
+                        const points = visibleMonths.map((m, i) => ({
+                          x: PAD_L + (plotW * (months.indexOf(m) / 11)),
+                          y: PAD_T + plotH - (plotH * ((m[metric.key] || 0) / maxVal)),
+                          val: m[metric.key] || 0,
+                        }));
 
                         if (points.length === 0) return null;
 
-                        const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+                        const pathD = smoothPath(points);
+                        const endPoint = points[points.length - 1];
 
                         return (
                           <g key={metric.key}>
-                            <path d={pathD} fill="none" stroke={metric.color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-                            {points.map((p, i) => (
-                              <g key={i}>
-                                <circle cx={p.x} cy={p.y} r={p.val > 0 ? 3.5 : 2} fill={p.val > 0 ? metric.color : "rgba(44,24,16,0.1)"} stroke="#F5F0E8" strokeWidth="1.5" />
-                                {p.val > 0 && (
-                                  <text x={p.x} y={p.y - 8} textAnchor="middle" fontSize="9" fontWeight="600" fill={metric.color}>{p.val}</text>
-                                )}
-                              </g>
-                            ))}
+                            <path
+                              d={pathD}
+                              fill="none"
+                              stroke={metric.color}
+                              strokeWidth={metric.dashed ? "1.5" : "2"}
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                              strokeDasharray={metric.dashed ? "3 4" : undefined}
+                            />
+                            {/* Single end-of-line dot to mark the latest data point */}
+                            {endPoint.val > 0 && (
+                              <circle
+                                cx={endPoint.x}
+                                cy={endPoint.y}
+                                r={3.5}
+                                fill={metric.color}
+                                stroke="#F5F0E8"
+                                strokeWidth="2"
+                              />
+                            )}
                           </g>
                         );
                       })}
