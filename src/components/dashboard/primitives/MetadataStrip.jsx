@@ -1,23 +1,26 @@
 /**
- * MetadataStrip + MetadataCell - 4-column metadata band beneath an identity
- * strip. Renders eyebrow above value with tight vertical rhythm.
+ * MetadataStrip + MetadataCell - metadata band beneath an identity strip.
+ * Renders eyebrow above value with tight vertical rhythm.
  *
  * MetadataStrip props:
- *   children  ReactNode  4 MetadataCell children (the .lp-meta-strip grid)
+ *   children  ReactNode  MetadataCell children (the .lp-meta-strip flex row)
  *
  * MetadataCell props:
  *   eyebrow  string     small uppercased coral label
  *   children ReactNode  cell value content (string, ScoreRing, etc.)
- *   align    "start" | "center"  reserved (currently centre via parent grid)
+ *   align    "start" | "center"  reserved (currently centre via content area)
  *   variant  "default" | "ring"  applies .lp-meta-cell--ring for the score
- *                                 ring cell (tighter gap, flex-start align).
+ *                                 ring cell (top-aligns the ring inside the
+ *                                 content area).
  *
- * Visual: 4-col grid, 2 explicit rows (eyebrow row + 64px content row),
- * 24px/32px padding. Cells use display:contents so eyebrow + value become
- * direct grid children of the strip - this is what aligns all 4 eyebrows
- * to a shared top baseline regardless of the score ring's height.
+ * Visual: flex row, left-packed. Cells size to content with a 140px min-width
+ * floor and 40px gap; the right side stays open so future cells (engagement %,
+ * owner, days-in-system, etc.) can be appended without restructuring.
+ * Each cell is itself a flex column: eyebrow on top, then a content area
+ * with min-height 64px (matches the score ring) so values vertically centre
+ * against the ring across all cells.
  * Eyebrow: DM Sans 10px 500 uppercase tracking 0.13em Dusty Coral.
- * Value: DM Sans 16px 500 Brewery Dark, vertically centred against the ring.
+ * Value: DM Sans 16px 500 Brewery Dark, vertically centred in the content area.
  */
 
 export function MetadataStrip({ children }) {
@@ -32,7 +35,7 @@ export function MetadataCell({ eyebrow, children, align = "start", variant = "de
   return (
     <div className={cls}>
       <span className="lp-meta-cell__eyebrow">{eyebrow}</span>
-      {children}
+      <div className="lp-meta-cell__content">{children}</div>
     </div>
   );
 }
