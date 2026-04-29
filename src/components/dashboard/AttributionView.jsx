@@ -29,7 +29,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { MetadataStrip, MetadataCell, SoftPill } from "./primitives/index.js";
-import { shortenUrl } from "./utils.js";
+import { shortenUrl, formatCount, formatPounds } from "./utils.js";
 
 const WINDOW_MODES = [
   { id: "all", label: "All time" },
@@ -82,23 +82,6 @@ export default function AttributionView() {
 
   /* Number formatter mirrored from WebsiteView so the strip reads
      consistently across the dashboard. */
-  const formatCount = (n) => {
-    if (n == null) return "0";
-    if (n >= 1000) return `${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
-    return String(n);
-  };
-
-  /* £ formatter for spend and CPA cells. Mirrors the Bookings tab £k
-     compaction pattern. Values under £1k render with no decimals;
-     values >= £1k compact to £Xk. Returns the em-dash placeholder when
-     value is null/0/falsy. */
-  const formatPounds = (n) => {
-    if (n == null || n === 0) return "—";
-    if (n >= 1000) return `£${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
-    if (n >= 100) return `£${Math.round(n)}`;
-    return `£${n.toFixed(2)}`;
-  };
-
   /* SoftPill variant for the platform column. Mirrors the WebsiteView
      sourceVariant logic so Google = olive, Meta = coral etc. across the
      dashboard. Direct + Organic + Other paid = muted (low-signal buckets). */

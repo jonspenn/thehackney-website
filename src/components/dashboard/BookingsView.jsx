@@ -12,6 +12,7 @@ import {
 } from "./bookings-data.js";
 import { DEALS_BY_MONTH } from "./bookings-deals.js";
 import { MetadataStrip, MetadataCell } from "./primitives/index.js";
+import { formatPoundsRounded, formatPoundsExact } from "./utils.js";
 
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -41,23 +42,6 @@ const BEST_EVER_COLOR = "#40160C"; /* Mahogany */
 const BEST_EVER_DASH = "5 3";
 const BEST_EVER_WIDTH = 1.5;
 const BEST_EVER_OPACITY = 0.42;
-
-function formatRevenue(val) {
-  if (val >= 1000) return `£${Math.round(val / 1000)}k`;
-  return `£${val}`;
-}
-
-/* Strip-cell short form: same as formatRevenue but always £k for >=1000.
-   Returned to the metric strip for the YTD total + best-month sub-unit. */
-function formatRevenueShort(val) {
-  if (val == null) return "—";
-  if (val >= 1000) return `£${Math.round(val / 1000)}k`;
-  return `£${val}`;
-}
-
-function formatRevenueExact(val) {
-  return `£${val.toLocaleString("en-GB")}`;
-}
 
 function formatEventDate(d) {
   if (!d) return "-";
@@ -220,7 +204,7 @@ export default function BookingsView() {
         <MetadataStrip>
           <MetadataCell eyebrow="YTD total">
             <span className="pipe-metric">
-              {formatRevenueShort(strip.ytdTotal)}
+              {formatPoundsRounded(strip.ytdTotal)}
               <span className="pipe-metric__unit">by {SHORT_MONTHS[CURRENT_DATA_MONTH - 1]}</span>
             </span>
           </MetadataCell>
@@ -245,7 +229,7 @@ export default function BookingsView() {
           <MetadataCell eyebrow="Best month YTD">
             <span className="pipe-metric">
               {strip.bestMonthLabel}
-              {strip.bestMonthValue > 0 && <span className="pipe-metric__unit">{formatRevenueShort(strip.bestMonthValue)}</span>}
+              {strip.bestMonthValue > 0 && <span className="pipe-metric__unit">{formatPoundsRounded(strip.bestMonthValue)}</span>}
             </span>
           </MetadataCell>
           <MetadataCell eyebrow="Deals closed YTD">
@@ -341,7 +325,7 @@ export default function BookingsView() {
             <g key={g.val}>
               <line x1={PAD_L} y1={g.y} x2={W - PAD_R} y2={g.y} stroke="rgba(44,24,16,0.06)" strokeWidth="1" />
               <text x={PAD_L - 8} y={g.y + 3} textAnchor="end" fontSize="10" fill="rgba(44,24,16,0.4)">
-                {formatRevenue(g.val)}
+                {formatPoundsRounded(g.val)}
               </text>
             </g>
           ))}
@@ -569,7 +553,7 @@ export default function BookingsView() {
                         fill={YEAR_COLORS[year]}
                         fontVariantNumeric="tabular-nums"
                       >
-                        {formatRevenue(REVENUE_BY_YEAR[year][hoveredMonth])}
+                        {formatPoundsRounded(REVENUE_BY_YEAR[year][hoveredMonth])}
                       </text>
                     </g>
                   );
@@ -619,7 +603,7 @@ export default function BookingsView() {
                         fillOpacity={0.7}
                         fontVariantNumeric="tabular-nums"
                       >
-                        {formatRevenue(bestVal)}
+                        {formatPoundsRounded(bestVal)}
                       </text>
                     </g>
                   );
@@ -639,7 +623,7 @@ export default function BookingsView() {
             <div className="bookings-drill-card__title-wrap">
               <span className="lp-meta-cell__eyebrow">Drill-in · {FULL_MONTHS[drillDown.month]} {drillDown.year}</span>
               <h3 className="bookings-drill-card__title">
-                {formatRevenueExact(REVENUE_BY_YEAR[drillDown.year][drillDown.month])}
+                {formatPoundsExact(REVENUE_BY_YEAR[drillDown.year][drillDown.month])}
                 <span className="bookings-drill-card__sub">from {drillDeals.length} deal{drillDeals.length !== 1 ? "s" : ""}</span>
               </h3>
             </div>
@@ -668,7 +652,7 @@ export default function BookingsView() {
                       <td style={{ textAlign: "left", fontWeight: 500 }}>{deal.n}</td>
                       <td style={{ textAlign: "left", color: "rgba(44,24,16,0.6)" }}>{deal.t}</td>
                       <td style={{ textAlign: "left", color: "rgba(44,24,16,0.6)" }}>{formatEventDate(deal.d)}</td>
-                      <td style={{ textAlign: "right", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{formatRevenueExact(deal.a)}</td>
+                      <td style={{ textAlign: "right", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{formatPoundsExact(deal.a)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -731,7 +715,7 @@ export default function BookingsView() {
                           onClick={() => handleCellClick(y, i)}
                           title={val > 0 ? `Click to see ${FULL_MONTHS[i]} ${y} deals` : ""}
                         >
-                          {val > 0 ? formatRevenueExact(val) : "—"}
+                          {val > 0 ? formatPoundsExact(val) : "—"}
                         </td>
                       );
                     })}
@@ -746,8 +730,8 @@ export default function BookingsView() {
                 {YEARS.map(y => (
                   <td key={y} style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
                     {y === CURRENT_YEAR
-                      ? formatRevenueExact(REVENUE_BY_YEAR[y].slice(0, CURRENT_DATA_MONTH).reduce((a, b) => a + b, 0))
-                      : formatRevenueExact(YEAR_TOTALS[y])
+                      ? formatPoundsExact(REVENUE_BY_YEAR[y].slice(0, CURRENT_DATA_MONTH).reduce((a, b) => a + b, 0))
+                      : formatPoundsExact(YEAR_TOTALS[y])
                     }
                   </td>
                 ))}

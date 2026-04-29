@@ -54,6 +54,78 @@ export function formatLongDate(dateStr) {
   return `${DAY_LABELS_FULL[d.getUTCDay()]}, ${d.getUTCDate()} ${MONTH_LABELS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
+
+/**
+ * Compact pound formatter with 1-decimal precision (default - matches Attribution).
+ *   £15,624 -> "£15.6k"
+ *   £703    -> "£703"
+ *   £58.50  -> "£58.50"
+ *   null/0  -> "—"
+ *
+ * Use this on every spend / CPA / ad-cost cell. For Bookings YoY revenue
+ * (where rounded-to-nearest-k is preferred for chart legibility), use
+ * formatPoundsRounded instead.
+ */
+export function formatPounds(n) {
+  if (n == null || n === 0) return "\u2014";
+  if (n >= 1000) return `\u00A3${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
+  if (n >= 100) return `\u00A3${Math.round(n)}`;
+  return `\u00A3${n.toFixed(2)}`;
+}
+
+/**
+ * Pound formatter with rounded-to-nearest-k precision (Bookings YoY style).
+ *   £15,624 -> "£16k"
+ *   £703    -> "£703"
+ *   null    -> "—"
+ *
+ * Use this on revenue charts and YoY metric strips where a decimal would
+ * clutter the read.
+ */
+export function formatPoundsRounded(n) {
+  if (n == null) return "\u2014";
+  if (n >= 1000) return `\u00A3${Math.round(n / 1000)}k`;
+  return `\u00A3${n}`;
+}
+
+/**
+ * Locale-formatted exact pounds.
+ *   £15,624 -> "£15,624"
+ *   null    -> "—"
+ *
+ * Use this for individual deal amounts, drill-in cells, and table totals
+ * where every pound matters.
+ */
+export function formatPoundsExact(n) {
+  if (n == null) return "\u2014";
+  return `\u00A3${n.toLocaleString("en-GB")}`;
+}
+
+/**
+ * Compact count formatter.
+ *   58,550 -> "58.6k"
+ *   550    -> "550"
+ *   null   -> "0"
+ *
+ * Use this on visitor / session / submission / click counts.
+ */
+export function formatCount(n) {
+  if (n == null) return "0";
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
+  return String(n);
+}
+
+/**
+ * Percent formatter with em-dash for null.
+ *   1.234   -> "1.2%"
+ *   0       -> "0.0%"
+ *   null    -> "—"
+ */
+export function formatPercent(n, decimals = 1) {
+  if (n == null) return "\u2014";
+  return `${n.toFixed(decimals)}%`;
+}
+
 /* ───────── parsing ───────── */
 
 export function shortenUrl(url) {

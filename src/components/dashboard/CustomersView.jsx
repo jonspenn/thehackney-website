@@ -9,7 +9,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { LEAD_TABS } from "./constants.js";
-import { formatRelativeTime, resolveSource } from "./utils.js";
+import { formatRelativeTime, resolveSource, formatPoundsExact } from "./utils.js";
 
 /* Event type labels for the Customers view - MUST stay in sync with
    EVENT_TYPE_OPTIONS in src/components/CorporateQuiz.jsx. When the quiz changes,
@@ -35,11 +35,6 @@ const EVENT_TYPE_LABEL = {
   corporate: "Corporate",
   "private-events": "Private Event",
 };
-
-function formatCurrency(n) {
-  if (n == null) return "\u2014";
-  return "\u00A3" + n.toLocaleString("en-GB");
-}
 
 const HUBSPOT_PORTAL = "25870094";
 
@@ -171,11 +166,11 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
           <div className="cust-kpi__label">{currentData?.lead_type_label || "Wedding"} customers</div>
         </div>
         <div className="cust-kpi">
-          <div className="cust-kpi__value">{formatCurrency(summary.total_deal_value)}</div>
+          <div className="cust-kpi__value">{formatPoundsExact(summary.total_deal_value)}</div>
           <div className="cust-kpi__label">Total deal value</div>
         </div>
         <div className="cust-kpi">
-          <div className="cust-kpi__value">{formatCurrency(summary.avg_deal_value)}</div>
+          <div className="cust-kpi__value">{formatPoundsExact(summary.avg_deal_value)}</div>
           <div className="cust-kpi__label">Avg deal value</div>
         </div>
       </div>
@@ -275,7 +270,7 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
                       {activeType === "corporate" && <td>{EVENT_TYPE_LABEL[c.event_type] || c.event_type || "\u2014"}</td>}
                       {activeType === "corporate" && <td>{c.event_date || "\u2014"}</td>}
                       {(activeType === "private-events" || activeType === "supperclub" || activeType === "cafe-bar") && <td>{c.event_date || "\u2014"}</td>}
-                      <td style={{ fontWeight: 600 }}>{formatCurrency(c.deal_value)}</td>
+                      <td style={{ fontWeight: 600 }}>{formatPoundsExact(c.deal_value)}</td>
                       <td><span className="lead-source-badge" style={{ color: src.color, background: src.bg }}>{src.label}</span></td>
                       <td>{[c.ip_city, c.ip_country].filter(Boolean).join(", ") || "\u2014"}</td>
                       <td onClick={(e) => e.stopPropagation()}>
@@ -306,7 +301,7 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
             {summary.by_source.map((s) => (
               <div key={s.label} className="cust-source-card">
                 <div className="cust-source-card__label">{s.label}</div>
-                <div className="cust-source-card__value">{formatCurrency(s.value)}</div>
+                <div className="cust-source-card__value">{formatPoundsExact(s.value)}</div>
                 <div className="cust-source-card__count">{s.count} customer{s.count !== 1 ? "s" : ""}</div>
               </div>
             ))}

@@ -25,11 +25,9 @@ import {
   EVENT_TYPE_LABELS,
 } from "./constants.js";
 
-import {
-  formatRelativeTime, formatAbsoluteTime, formatLongDate,
+import { formatRelativeTime, formatAbsoluteTime, formatLongDate,
   shortenUrl, parseEventData, eventSummary,
-  buildHeatmapMonths, heatColour, heatTextColour,
-} from "./utils.js";
+  buildHeatmapMonths, heatColour, heatTextColour, formatCount } from "./utils.js";
 
 import { MetadataStrip, MetadataCell, SoftPill } from "./primitives/index.js";
 
@@ -140,13 +138,6 @@ export default function WebsiteView({
     return "muted";
   }
 
-  /* Number formatters for the metric strip */
-  const formatVisitorCount = (n) => {
-    if (n >= 10000) return `${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
-    if (n >= 1000) return `${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
-    return String(n || 0);
-  };
-
   return (
     <>
       {/* ── Metric strip header (4 cells, all-time + 30d cross) ── */}
@@ -154,7 +145,7 @@ export default function WebsiteView({
         <MetadataStrip>
           <MetadataCell eyebrow="Total visitors">
             <span className="pipe-metric">
-              {formatVisitorCount(t.totalVisitors)}
+              {formatCount(t.totalVisitors)}
               {t.returningPct != null && (
                 <span className="pipe-metric__unit">{t.returningPct}% returning</span>
               )}
@@ -162,7 +153,7 @@ export default function WebsiteView({
           </MetadataCell>
           <MetadataCell eyebrow="Sessions">
             <span className="pipe-metric">
-              {formatVisitorCount(t.totalSessions)}
+              {formatCount(t.totalSessions)}
               {t.bouncePct != null && (
                 <span className="pipe-metric__unit">{t.bouncePct}% bounced</span>
               )}
@@ -170,7 +161,7 @@ export default function WebsiteView({
           </MetadataCell>
           <MetadataCell eyebrow="CTA clicks">
             <span className="pipe-metric">
-              {formatVisitorCount((tracking?.topCTAs || []).reduce((sum, r) => sum + (r.click_count || 0), 0))}
+              {formatCount((tracking?.topCTAs || []).reduce((sum, r) => sum + (r.click_count || 0), 0))}
               <span className="pipe-metric__unit">all-time</span>
             </span>
           </MetadataCell>
@@ -182,7 +173,7 @@ export default function WebsiteView({
             >
               {t.conv30dPct == null ? "—" : `${t.conv30dPct}%`}
               {t.conv30dPct != null && (
-                <span className="pipe-metric__unit">{t.submissions30d || 0} of {formatVisitorCount(t.visitors30d || 0)}</span>
+                <span className="pipe-metric__unit">{t.submissions30d || 0} of {formatCount(t.visitors30d || 0)}</span>
               )}
             </span>
           </MetadataCell>
