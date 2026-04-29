@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { LEAD_TABS } from "./constants.js";
 import { formatRelativeTime, resolveSource, formatPoundsExact } from "./utils.js";
+import { SubModeToggle } from "./primitives/index.js";
 
 /* Event type labels for the Customers view - MUST stay in sync with
    EVENT_TYPE_OPTIONS in src/components/CorporateQuiz.jsx. When the quiz changes,
@@ -58,6 +59,15 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
   const [sortConfig, setSortConfig] = useState({ field: "won_at", dir: "desc" });
   const [searchDraft, setSearchDraft] = useState("");
   const [search, setSearch] = useState("");
+  /* Year filter - default to current calendar year so the table opens
+     short and recent. URL persistence via ?year= so the filter survives
+     reload. "all" = no year filter (full history). */
+  const [yearFilter, setYearFilter] = useState(() => {
+    if (typeof window === "undefined") return String(new Date().getFullYear());
+    const url = new URLSearchParams(window.location.search);
+    const y = url.get("year");
+    return y || String(new Date().getFullYear());
+  });
 
   // Fetch customers for all types on mount
   useEffect(() => {
@@ -105,9 +115,38 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
   const customers = currentData?.customers || [];
   const summary = currentData?.summary || {};
 
+  /* Available years from the customers dataset, descending. Used to
+     populate the year filter SubModeToggle. */
+  const availableYears = useMemo(() => {
+    const years = new Set();
+    for (const c of customers) {
+      if (c.won_at) {
+        const y = new Date(c.won_at).getFullYear();
+        if (Number.isFinite(y)) years.add(y);
+      }
+    }
+    return [...years].sort((a, b) => b - a);
+  }, [customers]);
+
+  /* Modes for the year SubModeToggle: each year that has data, plus "All time". */
+  const yearModes = useMemo(() => {
+    const modes = availableYears.map(y => ({ id: String(y), label: String(y) }));
+    modes.push({ id: "all", label: "All time" });
+    return modes;
+  }, [availableYears]);
+
   // Filter + sort
   const filtered = useMemo(() => {
     let arr = [...customers];
+    /* Year filter first so search + sort work over the year-scoped subset. */
+    if (yearFilter !== "all") {
+      const target = parseInt(yearFilter, 10);
+      arr = arr.filter(c => {
+        if (!c.won_at) return false;
+        const y = new Date(c.won_at).getFullYear();
+        return y === target;
+      });
+    }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       arr = arr.filter(c => {
@@ -127,7 +166,7 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
       return 0;
     });
     return arr;
-  }, [customers, search, sortConfig]);
+  }, [customers, search, sortConfig, yearFilter]);
 
   function changeType(type) {
     setActiveType(type);
@@ -135,6 +174,19 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
     setSearch("");
     setSearchDraft("");
     if (onTypeChange) onTypeChange(type);
+  }
+
+  function selectYear(id) {
+    setYearFilter(id);
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (id === String(new Date().getFullYear())) {
+      params.delete("year"); /* default - keep URL clean */
+    } else {
+      params.set("year", id);
+    }
+    const qs = params.toString();
+    window.history.replaceState({}, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
   }
 
   function toggleSort(field) {
@@ -150,8 +202,43 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
     return sortConfig.dir === "asc" ? " \u25B2" : " \u25BC";
   }
 
-  // Total customers across all types for the summary
-  const totalCustomers = LEAD_TABS.reduce((sum, lt) => sum + (data[lt.type]?.total || 0), 0);
+  /* Filtered KPIs - reflect the year-scoped + searched subset.
+     totalDealValue + avgDealValue computed from filtered array because
+     the API summary is all-time. typeCount = filtered length for the
+     active type. totalCustomers stays all-time across all types as the
+     stable headline (year-aware via filteredAcrossTypes). */
+  const filteredAcrossTypes = useMemo(() => {
+    let n = 0;
+    for (const lt of LEAD_TABS) {
+      const arr = data[lt.type]?.customers || [];
+      for (const c of arr) {
+        if (yearFilter !== "all") {
+          if (!c.won_at) continue;
+          if (new Date(c.won_at).getFullYear() !== parseInt(yearFilter, 10)) continue;
+        }
+        n++;
+      }
+    }
+    return n;
+  }, [data, yearFilter]);
+
+  const filteredSummary = useMemo(() => {
+    let total = 0;
+    let count = 0;
+    for (const c of filtered) {
+      if (c.deal_value != null) {
+        total += Number(c.deal_value) || 0;
+        count++;
+      }
+    }
+    return {
+      total_deal_value: count > 0 ? total : null,
+      avg_deal_value:   count > 0 ? Math.round(total / count) : null,
+      type_count: filtered.length,
+    };
+  }, [filtered]);
+
+  const totalCustomers = filteredAcrossTypes;
 
   return (
     <>
@@ -159,19 +246,19 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
       <div className="cust-kpis">
         <div className="cust-kpi">
           <div className="cust-kpi__value">{totalCustomers}</div>
-          <div className="cust-kpi__label">Total customers</div>
+          <div className="cust-kpi__label">{yearFilter === "all" ? "Total customers" : `Customers (${yearFilter})`}</div>
         </div>
         <div className="cust-kpi">
-          <div className="cust-kpi__value">{currentData?.total || 0}</div>
-          <div className="cust-kpi__label">{currentData?.lead_type_label || "Wedding"} customers</div>
+          <div className="cust-kpi__value">{filteredSummary.type_count}</div>
+          <div className="cust-kpi__label">{currentData?.lead_type_label || "Wedding"} customers{yearFilter === "all" ? "" : ` (${yearFilter})`}</div>
         </div>
         <div className="cust-kpi">
-          <div className="cust-kpi__value">{formatPoundsExact(summary.total_deal_value)}</div>
-          <div className="cust-kpi__label">Total deal value</div>
+          <div className="cust-kpi__value">{formatPoundsExact(filteredSummary.total_deal_value)}</div>
+          <div className="cust-kpi__label">Total deal value{yearFilter === "all" ? "" : ` (${yearFilter})`}</div>
         </div>
         <div className="cust-kpi">
-          <div className="cust-kpi__value">{formatPoundsExact(summary.avg_deal_value)}</div>
-          <div className="cust-kpi__label">Avg deal value</div>
+          <div className="cust-kpi__value">{formatPoundsExact(filteredSummary.avg_deal_value)}</div>
+          <div className="cust-kpi__label">Avg deal value{yearFilter === "all" ? "" : ` (${yearFilter})`}</div>
         </div>
       </div>
 
@@ -197,6 +284,16 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
         <div className="lead-panel__divider" />
 
         {/* Search */}
+        {/* Year filter - shrinks 261-row history to a single year for legibility.
+            Defaults to current year. "All time" option for full history. */}
+        {yearModes.length > 1 && (
+          <SubModeToggle
+            modes={yearModes}
+            active={yearFilter}
+            onChange={selectYear}
+          />
+        )}
+
         <div className="lead-panel__filters">
           <form className="lead-toolbar__search" onSubmit={(e) => { e.preventDefault(); setSearch(searchDraft.trim()); }}>
             <input
@@ -221,7 +318,7 @@ export default function CustomersView({ onSelectCustomer, initialType, onTypeCha
         )}
 
         <div className="lead-panel__status">
-          <span>Showing {filtered.length} of {customers.length} customers.{onSelectCustomer ? " Click a row to view full profile." : ""}</span>
+          <span>Showing {filtered.length} of {customers.length} customers{yearFilter === "all" ? "" : ` (${yearFilter})`}.{onSelectCustomer ? " Click a row to view full profile." : ""}</span>
         </div>
       </div>
 
