@@ -139,17 +139,6 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
 
   return (
     <>
-      {/* Page header (no local Refresh - the global Refresh in the tab nav
-           handles reload; /api/dates uses cache: no-store on every fetch). */}
-      <header className="dt-page-head">
-        <div>
-          <h2 className="rep-h2" style={{ marginBottom: "6px" }}>Dates</h2>
-          <p className="rep-sub" style={{ marginTop: 0, maxWidth: "640px" }}>
-            The venue's 365 SKUs per year. Cell intensity shows demand; corner badge marks booked dates. Click any date for the click breakdown, recent leads, and pricing controls.
-          </p>
-        </div>
-      </header>
-
       {/* ── Calendar panel: sub-tabs + metric strip + heat map ── */}
       <div className="pipe-panel">
         <div className="pipe-panel__tabs">
