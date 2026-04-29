@@ -802,9 +802,27 @@ import pricing from '../../../data/wedding-pricing.json';
         margin: 14px 20px 18px; font-size: 12px; font-style: italic;
         color: rgba(44,24,16,0.45);
       }
+      /* ── Bookings tab mobile breakpoint ── */
       @media (max-width: 900px) {
-        .bookings-drill-card__header { padding: 14px 14px 10px; }
+        .bookings-view { padding: 0; }
+        .bookings-chart-panel,
+        .bookings-table-panel,
+        .bookings-drill-card { margin-bottom: 12px; }
+        .bookings-chart-body { padding: 4px 12px 14px; }
+        .bookings-legend { gap: 6px 10px !important; margin-bottom: 6px !important; }
+        .bookings-legend__item { font-size: 11px; padding: 2px 4px; }
+        .bookings-table-panel .rep-table { min-width: 480px; }
+        .bookings-rep-table { font-size: 12px; }
+        .bookings-rep-table th,
+        .bookings-rep-table td { padding: 8px 10px; }
+        .bookings-drill-card__header {
+          padding: 14px 14px 10px;
+          flex-direction: row; align-items: flex-start; gap: 10px;
+        }
         .bookings-drill-card__title { font-size: 20px; }
+        .bookings-drill-card__sub { display: block; margin-left: 0; margin-top: 2px; }
+        .bookings-drill-card__table { min-width: 380px; }
+        .bookings-footnote { font-size: 10.5px; line-height: 1.5; }
       }
       .bookings-kpis {
         display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
