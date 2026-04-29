@@ -502,6 +502,49 @@ import pricing from '../../../data/wedding-pricing.json';
       }
       .lead-toolbar__recycle-btn:hover { border-color: rgba(44,24,16,0.3); color: rgba(44,24,16,0.7); }
       .lead-toolbar__recycle-btn--active { background: rgba(44,24,16,0.06); color: #2C1810; border-color: rgba(44,24,16,0.2); }
+      /* ── Leads tab Active/Lost mode toggle (29 Apr 2026 Lost demotion) ── */
+      .adm-leads-mode {
+        display: inline-flex;
+        gap: 4px;
+        padding: 4px;
+        background: rgba(64, 22, 12, 0.04);
+        border-radius: 6px;
+        margin-bottom: 14px;
+      }
+      .adm-leads-mode__btn {
+        background: transparent;
+        border: none;
+        padding: 7px 14px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(44, 24, 16, 0.55);
+        cursor: pointer;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.12s ease, color 0.12s ease;
+      }
+      .adm-leads-mode__btn:hover { color: rgba(44, 24, 16, 0.85); }
+      .adm-leads-mode__btn--active {
+        background: rgba(255, 255, 255, 0.85);
+        color: var(--color-brewery-dark);
+        box-shadow: 0 1px 2px rgba(64, 22, 12, 0.06);
+      }
+      .adm-leads-mode__count {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 16px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        color: rgba(44, 24, 16, 0.5);
+        line-height: 1;
+        letter-spacing: -0.01em;
+      }
+      .adm-leads-mode__btn--active .adm-leads-mode__count {
+        color: var(--color-forest-olive, #2E4009);
+      }
+
 
       /* Selection action bar */
       .lead-panel__actions {

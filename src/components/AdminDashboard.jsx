@@ -60,8 +60,18 @@ export default function AdminDashboard({ pricing }) {
     };
   })();
 
-  const [activeTab, setActiveTab] = useState(initialUrlState.tab);
+  const [activeTab, setActiveTab] = useState(initialUrlState.tab === "lost" ? "leads" : initialUrlState.tab);
   const [activeLeadType, setActiveLeadType] = useState(initialUrlState.type);
+  // Lost tab demotion (29 Apr 2026): Lost is now an inline toggle on the Leads
+  // tab. Reading ?tab=lost on URL hydration auto-redirects to ?tab=leads&lost=1.
+  // Reading ?tab=leads&lost=1 boots into Lost mode directly.
+  const initialLostMode = (() => {
+    if (typeof window === "undefined") return false;
+    if (initialUrlState.tab === "lost") return true;
+    const params = new URLSearchParams(window.location.search);
+    return params.get("lost") === "1";
+  })();
+  const [showLost, setShowLost] = useState(initialLostMode);
   const [pendingLeadId, setPendingLeadId] = useState(initialUrlState.leadId); // resolved to selectedLead once data arrives
   const [analyticsFilter, setAnalyticsFilter] = useState(null); // { type, value, label } or null
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
@@ -365,13 +375,16 @@ export default function AdminDashboard({ pricing }) {
   const totalLeadsCount = LEAD_TABS.reduce((sum, lt) => sum + (leads[lt.type]?.total || 0), 0);
   const totalLostCount = LEAD_TABS.reduce((sum, lt) => sum + (lostLeads[lt.type]?.total || 0), 0);
 
-  // ── Visible tab order (29 Apr 2026 IA restructure Phase 1) ──
+  // ── Visible tab order (29 Apr 2026 IA restructure) ──
   // Operational tabs first (Pipeline / Leads / Dates), retrospective in
-  // the middle (Customers / Bookings), legacy Overview/Analytics/Lost at
-  // the end pending Phase 2-3 post-launch (merge Overview+Analytics into
-  // Website, demote Lost to a filter). Pricing is no longer a top-level
-  // tab - PricingView remains reachable via URL ?tab=pricing for James's
-  // year-over-year review until the rate-card drawer absorbs it.
+  // the middle (Customers / Bookings), Overview / Analytics at the end.
+  // Pricing and Lost are no longer top-level tabs:
+  //   - Pricing absorbed into Dates (PricingView reachable via ?tab=pricing
+  //     until the rate-card drawer fully absorbs it).
+  //   - Lost demoted to an inline mode toggle on the Leads tab (Active /
+  //     Lost). The lost route ?tab=lost is auto-redirected to
+  //     ?tab=leads&lost=1 on hydration. Pipeline already shows Lost as a
+  //     terminal stage with click-to-drill-in - that pattern stays.
   const tabs = [
     { id: "pipeline", label: "Pipeline" },
     { id: "leads", label: `Leads (${totalLeadsCount})` },
@@ -380,7 +393,6 @@ export default function AdminDashboard({ pricing }) {
     { id: "bookings", label: "Bookings" },
     { id: "overview", label: "Overview" },
     { id: "analytics", label: "Analytics" },
-    { id: "lost", label: `Lost${totalLostCount > 0 ? ` (${totalLostCount})` : ""}` },
   ];
 
   return (
@@ -697,24 +709,70 @@ export default function AdminDashboard({ pricing }) {
         </>
       )}
 
-      {/* ═══════ LEADS TAB ═══════ */}
+      {/* ═══════ LEADS TAB ═══════
+           Lost is an inline mode toggle here (29 Apr 2026 demotion - was its
+           own top-level tab). Active = open pipeline, Lost = funnel_stage="lost"
+           leads from /api/leads?stage=lost. Both views share the same LeadTable
+           render path; only the data source and `mode` prop change. */}
       {activeTab === "leads" && !selectedLead && (
-        <LeadTable
-          leads={leads}
-          deletedLeads={deletedLeads}
-          selectedLeadId={selectedLead?.contact_id}
-          onSelectLead={selectLead}
-          initialType={activeLeadType}
-          onLeadTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
-          onDelete={handleDeleteOrRestore}
-          onRestore={handleDeleteOrRestore}
-          showRecycleBin={showRecycleBin}
-          onToggleRecycleBin={() => {
-            const next = !showRecycleBin;
-            setShowRecycleBin(next);
-            if (next) fetchDeletedLeads();
-          }}
-        />
+        <>
+          <div className="adm-leads-mode">
+            <button
+              type="button"
+              className={`adm-leads-mode__btn${!showLost ? " adm-leads-mode__btn--active" : ""}`}
+              onClick={() => {
+                setShowLost(false);
+                syncUrl({ tab: "leads", type: activeLeadType, leadId: null }, { replace: true });
+              }}
+            >
+              Active leads
+              <span className="adm-leads-mode__count">{totalLeadsCount}</span>
+            </button>
+            <button
+              type="button"
+              className={`adm-leads-mode__btn${showLost ? " adm-leads-mode__btn--active" : ""}`}
+              onClick={() => {
+                setShowLost(true);
+                const params = new URLSearchParams(window.location.search);
+                params.set("tab", "leads");
+                params.set("type", activeLeadType);
+                params.set("lost", "1");
+                params.delete("lead");
+                window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+              }}
+            >
+              Lost
+              <span className="adm-leads-mode__count">{totalLostCount}</span>
+            </button>
+          </div>
+          {showLost ? (
+            <LeadTable
+              leads={lostLeads}
+              selectedLeadId={selectedLead?.contact_id}
+              onSelectLead={selectLead}
+              initialType={activeLeadType}
+              onLeadTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
+              mode="lost"
+            />
+          ) : (
+            <LeadTable
+              leads={leads}
+              deletedLeads={deletedLeads}
+              selectedLeadId={selectedLead?.contact_id}
+              onSelectLead={selectLead}
+              initialType={activeLeadType}
+              onLeadTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
+              onDelete={handleDeleteOrRestore}
+              onRestore={handleDeleteOrRestore}
+              showRecycleBin={showRecycleBin}
+              onToggleRecycleBin={() => {
+                const next = !showRecycleBin;
+                setShowRecycleBin(next);
+                if (next) fetchDeletedLeads();
+              }}
+            />
+          )}
+        </>
       )}
 
       {/* ═══════ PIPELINE TAB ═══════ */}
@@ -740,18 +798,6 @@ export default function AdminDashboard({ pricing }) {
           onTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
           pendingCustomerId={pendingLeadId}
           onPendingResolved={() => setPendingLeadId(null)}
-        />
-      )}
-
-      {/* ═══════ LOST TAB ═══════ */}
-      {activeTab === "lost" && !selectedLead && (
-        <LeadTable
-          leads={lostLeads}
-          selectedLeadId={selectedLead?.contact_id}
-          onSelectLead={selectLead}
-          initialType={activeLeadType}
-          onLeadTypeChange={(t) => { setActiveLeadType(t); syncUrl({ tab: activeTab, type: t, leadId: null }, { replace: true }); }}
-          mode="lost"
         />
       )}
 
