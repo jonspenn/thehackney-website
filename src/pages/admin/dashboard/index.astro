@@ -765,6 +765,47 @@ import pricing from '../../../data/wedding-pricing.json';
       /* Static collapse-toggle - looks like the pipe pattern but doesn't toggle */
       .pipe-collapse-toggle--static { cursor: default; }
       .pipe-collapse-toggle--static:hover { background: transparent; }
+      /* Bookings drill-in card - lp-card chrome with eyebrow + Cormorant value */
+      .bookings-drill-card { margin-bottom: 16px; }
+      .bookings-drill-card__header {
+        display: flex; align-items: flex-start; justify-content: space-between;
+        gap: 14px; padding: 16px 20px 10px;
+        border-bottom: 1px solid rgba(44,24,16,0.06);
+      }
+      .bookings-drill-card__title-wrap {
+        display: flex; flex-direction: column; gap: 4px;
+      }
+      .bookings-drill-card__title {
+        margin: 0;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 22px; font-weight: 500; letter-spacing: -0.01em;
+        color: var(--color-brewery-dark);
+        font-variant-numeric: tabular-nums;
+      }
+      .bookings-drill-card__sub {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+        color: rgba(44,24,16,0.5); margin-left: 8px;
+      }
+      .bookings-drill-card__close {
+        background: none; border: none; cursor: pointer;
+        font-size: 22px; line-height: 1; padding: 4px 8px; margin: -4px -8px 0 0;
+        color: rgba(44,24,16,0.45); border-radius: 2px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .bookings-drill-card__close:hover {
+        color: var(--color-brewery-dark);
+        background: rgba(44,24,16,0.04);
+      }
+      .bookings-drill-card__table-wrap { padding: 8px 0 14px; }
+      .bookings-drill-card__table { border: none; border-radius: 0; min-width: 480px; }
+      .bookings-drill-card__empty {
+        margin: 14px 20px 18px; font-size: 12px; font-style: italic;
+        color: rgba(44,24,16,0.45);
+      }
+      @media (max-width: 900px) {
+        .bookings-drill-card__header { padding: 14px 14px 10px; }
+        .bookings-drill-card__title { font-size: 20px; }
+      }
       .bookings-kpis {
         display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
       }

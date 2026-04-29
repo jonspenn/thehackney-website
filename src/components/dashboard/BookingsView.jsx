@@ -378,39 +378,48 @@ export default function BookingsView() {
 
       {/* ── Drill-down panel ── */}
       {drillDown && drillDeals && (
-        <div className="bookings-drill">
-          <div className="bookings-drill__header">
-            <h3 className="bookings-drill__title">
-              {FULL_MONTHS[drillDown.month]} {drillDown.year}
-              <span className="bookings-drill__total"> - {formatRevenueExact(REVENUE_BY_YEAR[drillDown.year][drillDown.month])} from {drillDeals.length} deal{drillDeals.length !== 1 ? "s" : ""}</span>
-            </h3>
-            <button className="bookings-drill__close" onClick={() => setDrillDown(null)} type="button" title="Close">&times;</button>
+        <div className="lp-card bookings-drill-card">
+          <div className="bookings-drill-card__header">
+            <div className="bookings-drill-card__title-wrap">
+              <span className="lp-meta-cell__eyebrow">Drill-in · {FULL_MONTHS[drillDown.month]} {drillDown.year}</span>
+              <h3 className="bookings-drill-card__title">
+                {formatRevenueExact(REVENUE_BY_YEAR[drillDown.year][drillDown.month])}
+                <span className="bookings-drill-card__sub">from {drillDeals.length} deal{drillDeals.length !== 1 ? "s" : ""}</span>
+              </h3>
+            </div>
+            <button
+              type="button"
+              className="bookings-drill-card__close"
+              onClick={() => setDrillDown(null)}
+              title="Close drill-in"
+              aria-label="Close drill-in"
+            >×</button>
           </div>
           {drillDeals.length > 0 ? (
-            <div className="bookings-drill__table-wrap">
-              <table className="bookings-drill__table">
+            <div className="rep-table-wrap bookings-drill-card__table-wrap">
+              <table className="rep-table bookings-drill-card__table">
                 <thead>
                   <tr>
                     <th style={{ textAlign: "left" }}>Deal</th>
-                    <th>Type</th>
-                    <th>Event date</th>
-                    <th>Amount</th>
+                    <th style={{ textAlign: "left" }}>Type</th>
+                    <th style={{ textAlign: "left" }}>Event date</th>
+                    <th style={{ textAlign: "right" }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
                   {drillDeals.map((deal, idx) => (
                     <tr key={idx}>
                       <td style={{ textAlign: "left", fontWeight: 500 }}>{deal.n}</td>
-                      <td>{deal.t}</td>
-                      <td>{formatEventDate(deal.d)}</td>
-                      <td style={{ fontWeight: 600 }}>{formatRevenueExact(deal.a)}</td>
+                      <td style={{ textAlign: "left", color: "rgba(44,24,16,0.6)" }}>{deal.t}</td>
+                      <td style={{ textAlign: "left", color: "rgba(44,24,16,0.6)" }}>{formatEventDate(deal.d)}</td>
+                      <td style={{ textAlign: "right", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{formatRevenueExact(deal.a)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p style={{ color: "rgba(44,24,16,0.4)", fontStyle: "italic", margin: "8px 0" }}>No deal data available for this month.</p>
+            <p className="bookings-drill-card__empty">No deal data available for this month.</p>
           )}
         </div>
       )}
