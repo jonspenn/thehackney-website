@@ -267,7 +267,7 @@ export async function onRequestGet(context) {
     const paidToursBooked = paidRows.reduce((s, r) => s + (r.tours_booked || 0), 0);
     const paidVisitorsPct = totalVisitors > 0 ? Math.round((paidVisitors / totalVisitors) * 100) : null;
     const paidConvRate = paidVisitors > 0 ? Math.round((paidSubmissions / paidVisitors) * 10000) / 100 : null;
-    const eligibleForBest = paidRows.filter(r => (r.visitors || 0) >= 10 && r.conv_rate != null);
+    const eligibleForBest = paidRows.filter(r => (r.visitors || 0) >= 10 && r.conv_rate != null && r.conv_rate > 0);
     const bestPlatform = eligibleForBest.length > 0
       ? eligibleForBest.reduce((best, r) => (r.conv_rate > (best?.conv_rate ?? -Infinity) ? r : best), null)
       : null;
