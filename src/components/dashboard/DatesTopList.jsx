@@ -1,13 +1,12 @@
 /**
- * DatesTopList - Sortable top dates list for the Dates tab.
+ * DatesTopList - Sortable top-dates table for the Dates tab.
  *
- * Two modes via the direction prop:
- *   "hot"  - most-clicked future dates, hold price candidates
+ * Direction prop:
+ *   "hot"  - most-clicked future dates, hold-price candidates
  *   "cold" - low-click dates within 90 days, discount candidates
  *
- * Click a row to open the DateDetailDrawer (parent handles selection).
- *
- * Class prefix: dt-
+ * Uses the shared .rep-table chrome for visual consistency with other
+ * dashboard tables. Click a row to open the DateDetailDrawer.
  */
 
 import { useEffect, useState } from "react";
@@ -24,7 +23,7 @@ function dayOfWeek(iso) {
   if (dow === 6) return "Sat";
   if (dow === 5) return "Fri";
   if (dow === 0) return "Sun";
-  return ["Mon","Tue","Wed","Thu"][dow - 1] || "?";
+  return ["Mon", "Tue", "Wed", "Thu"][dow - 1] || "?";
 }
 
 function relative(iso) {
@@ -72,13 +71,13 @@ export default function DatesTopList({ year, stream, direction, onSelectDate, se
   }
 
   return (
-    <div className="dt-top-list">
-      <table className="dt-top-table">
+    <div className="rep-table-wrap">
+      <table className="rep-table dt-top-table">
         <thead>
           <tr>
             <th>Date</th>
-            <th className="dt-num">Day</th>
-            <th className="dt-num">Clicks</th>
+            <th>Day</th>
+            <th style={{ textAlign: "right" }}>Clicks</th>
             <th>Last click</th>
           </tr>
         </thead>
@@ -86,12 +85,14 @@ export default function DatesTopList({ year, stream, direction, onSelectDate, se
           {rows.map((r) => (
             <tr
               key={r.clicked_date}
-              className={`dt-top-row ${selectedDate === r.clicked_date ? "dt-top-row--selected" : ""}`}
+              className={`dt-top-row${selectedDate === r.clicked_date ? " dt-top-row--selected" : ""}`}
               onClick={() => onSelectDate && onSelectDate(r.clicked_date)}
             >
               <td>{fmtDate(r.clicked_date)}</td>
-              <td className="dt-num">{dayOfWeek(r.clicked_date)}</td>
-              <td className="dt-num dt-clicks">{r.clicks}</td>
+              <td>{dayOfWeek(r.clicked_date)}</td>
+              <td style={{ textAlign: "right" }}>
+                <span className="dt-clicks">{r.clicks}</span>
+              </td>
               <td className="dt-when">{relative(r.last_click_at)}</td>
             </tr>
           ))}

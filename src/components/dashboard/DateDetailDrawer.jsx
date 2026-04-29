@@ -1,31 +1,24 @@
 /**
  * DateDetailDrawer - Per-date detail panel for the Dates tab.
  *
- * Slides in from the right when a date is clicked in DatesCalendar or
- * DatesTopList. Shows:
- *   - Header: full date, status (Available / Booked / Past), day type
- *   - Click totals + per-stream breakdown bars
- *   - 90d sparkline (weekly buckets)
- *   - Recent leads who clicked this date (links to LeadProfile)
- *   - Pricing block: rate-card price + override input + history
- *   - Save / Clear override buttons
- *
- * All override edits POST to /api/date-pricing - append-only, latest-row-
- * wins on read. History list shows the audit trail.
+ * Slides in from the right. Inner sections use the lp-card chrome to
+ * visually align with lead-profile / pipeline cards. Status pill via
+ * SoftPill, eyebrows via EyebrowLabel, big numbers in Cormorant tabular.
  *
  * Props:
- *   date          ISO date string YYYY-MM-DD
+ *   date          ISO YYYY-MM-DD
  *   bookedDates   Set of booked ISO dates
  *   onClose       () => void
- *   onSelectLead  (lead, leadType) => void  - hand off to AdminDashboard
- *
- * Class prefix: dt- (Dates tab)
+ *   onSelectLead  (lead, leadType) => void
+ *   leads         AdminDashboard's leads state (per stream)
+ *   pricing       wedding-pricing.json content
  */
 
 import { useEffect, useState } from "react";
 import { LEAD_TYPE_LABELS } from "./constants.js";
+import { SoftPill, EyebrowLabel } from "./primitives/index.js";
 
-function fmt(n) { return n == null ? "-" : `£${n.toLocaleString("en-GB")}`; }
+function fmt(n) { return n == null ? "—" : `£${n.toLocaleString("en-GB")}`; }
 
 function fmtDate(iso) {
   if (!iso) return "";
@@ -49,6 +42,12 @@ function daysFromToday(iso) {
   return Math.round((d - today) / 86400000);
 }
 
+function statusVariant(status) {
+  if (status === "Booked") return "brick";
+  if (status === "Past") return "muted";
+  return "olive"; // Available
+}
+
 export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectLead, leads, pricing }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +57,6 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
-  /* Fetch detail when date changes */
   useEffect(() => {
     let cancelled = false;
     if (!date) return;
@@ -82,7 +80,6 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
     return () => { cancelled = true; };
   }, [date]);
 
-  /* ESC closes the drawer */
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose && onClose(); };
     window.addEventListener("keydown", onKey);
@@ -108,7 +105,6 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
       });
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || "save_failed");
-      // Refresh detail to pull new history + override row
       const refresh = await fetch(`/api/dates?mode=detail&date=${encodeURIComponent(date)}`, { cache: "no-store" });
       const rj = await refresh.json();
       if (rj.ok) {
@@ -132,7 +128,7 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
   const month = parseInt(date.slice(5, 7), 10);
   const year = date.slice(0, 4);
 
-  // Look up rate-card baseline for this date (via prop drilling from AdminDashboard)
+  // Rate-card baseline lookup
   let baseline = null;
   if (pricing?.rateCards?.[year]) {
     const card = pricing.rateCards[year];
@@ -152,7 +148,10 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
       <aside className="dt-drawer" role="dialog" aria-label={`Detail for ${date}`}>
         <header className="dt-drawer-head">
           <div>
-            <div className="dt-drawer-eyebrow">{dayTypeLabel} · {status}</div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+              <SoftPill variant={statusVariant(status)} dot uppercase>{status}</SoftPill>
+              <SoftPill variant="muted" uppercase>{dayTypeLabel}</SoftPill>
+            </div>
             <h2 className="dt-drawer-title">{fmtDate(date)}</h2>
             <div className="dt-drawer-sub">
               {daysOut === 0 ? "Today" : daysOut > 0 ? `${daysOut} days from today` : `${Math.abs(daysOut)} days ago`}
@@ -167,28 +166,26 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
 
         {!loading && !error && data && (
           <div className="dt-drawer-body">
-            {/* Click overview */}
-            <section className="dt-section">
-              <div className="dt-stat-row">
-                <div className="dt-stat">
-                  <div className="dt-stat-eyebrow">CLICKS (ALL TIME)</div>
-                  <div className="dt-stat-value">{data.totalClicks}</div>
+            {/* Click overview - card with metadata strip */}
+            <div className="lp-card dt-drawer-card">
+              <div className="dt-drawer-stat-row">
+                <div>
+                  <EyebrowLabel size="sm">Clicks (all time)</EyebrowLabel>
+                  <div className="pipe-metric" style={{ marginTop: 4 }}>{data.totalClicks}</div>
                 </div>
-                <div className="dt-stat">
-                  <div className="dt-stat-eyebrow">KNOWN LEADS</div>
-                  <div className="dt-stat-value">{(data.recentLeads || []).length}{data.recentLeads?.length === 5 ? "+" : ""}</div>
-                </div>
-                <div className="dt-stat">
-                  <div className="dt-stat-eyebrow">STATUS</div>
-                  <div className="dt-stat-value dt-stat-value--small">{status}</div>
+                <div>
+                  <EyebrowLabel size="sm">Known leads</EyebrowLabel>
+                  <div className="pipe-metric" style={{ marginTop: 4 }}>
+                    {(data.recentLeads || []).length}{data.recentLeads?.length === 5 ? "+" : ""}
+                  </div>
                 </div>
               </div>
-            </section>
+            </div>
 
             {/* Per-stream breakdown */}
             {data.breakdown && data.breakdown.length > 0 && (
-              <section className="dt-section">
-                <h3 className="dt-section-h">Per-stream click breakdown</h3>
+              <div className="lp-card dt-drawer-card">
+                <h3 className="dt-drawer-h">Per-stream click breakdown</h3>
                 <div className="dt-breakdown">
                   {data.breakdown.map((b) => {
                     const max = Math.max(...data.breakdown.map((x) => x.clicks));
@@ -205,13 +202,13 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
                     );
                   })}
                 </div>
-              </section>
+              </div>
             )}
 
             {/* Recent leads */}
             {data.recentLeads && data.recentLeads.length > 0 && (
-              <section className="dt-section">
-                <h3 className="dt-section-h">Recent leads who clicked this date</h3>
+              <div className="lp-card dt-drawer-card">
+                <h3 className="dt-drawer-h">Recent leads who clicked this date</h3>
                 <ul className="dt-leads">
                   {data.recentLeads.map((l) => {
                     const fullLead = leads?.[l.lead_type]?.leads?.find((x) => x.contact_id === l.contact_id);
@@ -225,28 +222,32 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
                           title={!fullLead ? "Lead not found in current view" : ""}
                         >
                           <span className="dt-leads-name">{l.first_name || "(no name)"}</span>
-                          <span className="dt-leads-stream">{LEAD_TYPE_LABELS[l.lead_type] || l.lead_type}</span>
+                          <SoftPill variant="muted">{LEAD_TYPE_LABELS[l.lead_type] || l.lead_type}</SoftPill>
                           <span className="dt-leads-when">{l.last_click_at?.slice(0, 10)}</span>
                         </button>
                       </li>
                     );
                   })}
                 </ul>
-              </section>
+              </div>
             )}
 
-            {/* Pricing block */}
-            <section className="dt-section dt-pricing">
-              <h3 className="dt-section-h">Pricing</h3>
+            {/* Pricing - lp-card */}
+            <div className="lp-card dt-drawer-card">
+              <h3 className="dt-drawer-h">Pricing</h3>
               <div className="dt-pricing-summary">
                 <div>
-                  <div className="dt-stat-eyebrow">Effective hire fee</div>
-                  <div className="dt-stat-value">{fmt(effectiveFee)}</div>
-                  {data.override?.fee != null && <div className="dt-pricing-tag">Override active</div>}
+                  <EyebrowLabel size="sm">Effective hire fee</EyebrowLabel>
+                  <div className="pipe-metric" style={{ marginTop: 4 }}>{fmt(effectiveFee)}</div>
+                  {data.override?.fee != null && (
+                    <div style={{ marginTop: 6 }}>
+                      <SoftPill variant="brick" uppercase>Override active</SoftPill>
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <div className="dt-stat-eyebrow">Effective min spend</div>
-                  <div className="dt-stat-value">{fmt(effectiveMin)}</div>
+                  <EyebrowLabel size="sm">Effective min spend</EyebrowLabel>
+                  <div className="pipe-metric" style={{ marginTop: 4 }}>{fmt(effectiveMin)}</div>
                 </div>
               </div>
               {baseline && (
@@ -305,12 +306,15 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
                   )}
                 </div>
               </div>
-            </section>
+            </div>
 
-            {/* Override history */}
+            {/* Audit history */}
             {data.history && data.history.length > 0 && (
-              <section className="dt-section">
-                <h3 className="dt-section-h">Override history (append-only)</h3>
+              <div className="lp-card dt-drawer-card">
+                <h3 className="dt-drawer-h">Override history</h3>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(44,24,16,0.5)", margin: "0 0 8px" }}>
+                  Append-only audit log. Latest row wins on read.
+                </p>
                 <ul className="dt-history">
                   {data.history.map((h, i) => (
                     <li key={i} className="dt-history-row">
@@ -325,7 +329,7 @@ export default function DateDetailDrawer({ date, bookedDates, onClose, onSelectL
                     </li>
                   ))}
                 </ul>
-              </section>
+              </div>
             )}
           </div>
         )}

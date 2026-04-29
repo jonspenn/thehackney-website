@@ -2,29 +2,31 @@
  * DatesView - Top-level container for the Dates tab.
  *
  * Treats the venue's calendar as 365 perishable SKUs of inventory per
- * year. Renders three views in one tab:
- *   1. Stream + year + direction filter toolbar
- *   2. Calendar heat map (12 months, click-to-select)
- *   3. Top dates list (hot dates by default; toggle to cold)
- *   4. Date detail drawer (slides in on cell or row click)
+ * year. Built to feel like Pipeline / Leads (sub-tabs + metric strip +
+ * funnel-style panel) rather than a bespoke layout.
+ *
+ * Layout:
+ *   1. pipe-panel   sub-tabs (stream filter) + year selector + metric
+ *                   strip + heat-map calendar + legend
+ *   2. pipe-panel   collapse-toggle (Hot/Cold heading) + direction tabs +
+ *                   top-dates table
+ *   3. drawer       slides in on cell or row click
  *
  * Per-stream calibration is applied at the API level - thresholds in the
- * heat map come from the stream's own click distribution, not a global
- * scale (per prd-sys-dates-tab.md Data Principles).
+ * heat map come from the stream's own click distribution.
  *
  * Pricing prop is the wedding-pricing.json content - drilled to the
  * detail drawer for rate-card baseline lookup.
- *
- * Class prefix: dt-
  */
 
 import { useEffect, useMemo, useState } from "react";
 import DatesCalendar from "./DatesCalendar.jsx";
 import DateDetailDrawer from "./DateDetailDrawer.jsx";
 import DatesTopList from "./DatesTopList.jsx";
+import { MetadataStrip, MetadataCell } from "./primitives/index.js";
 
 const STREAM_OPTIONS = [
-  { value: "all", label: "All streams" },
+  { value: "all", label: "All" },
   { value: "wedding", label: "Wedding" },
   { value: "corporate", label: "Corporate" },
   { value: "private-events", label: "Private Events" },
@@ -34,6 +36,14 @@ const STREAM_OPTIONS = [
 
 const TODAY = new Date();
 const YEAR_OPTIONS = [TODAY.getFullYear(), TODAY.getFullYear() + 1, TODAY.getFullYear() + 2];
+
+function formatPeak(peak) {
+  if (!peak) return "—";
+  const d = new Date(peak.clicked_date);
+  const m = d.toLocaleDateString("en-GB", { month: "short" });
+  const day = d.getDate();
+  return `${day} ${m}`;
+}
 
 export default function DatesView({ pricing, leads, onSelectLead }) {
   const [year, setYear] = useState(TODAY.getFullYear());
@@ -93,19 +103,19 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
       activeDates: data.activeDates || 0,
       totalClicks: data.totalClicks || 0,
       peakDate: (data.heat || []).find((r) => r.clicks === max),
+      peakCount: max,
       overrideCount: Object.keys(data.overrides || {}).length,
     };
   }, [data]);
 
   return (
-    <section className="dt-view">
-      <header className="dt-view-head">
+    <>
+      {/* Page header */}
+      <header className="dt-page-head">
         <div>
           <h2 className="rep-h2" style={{ marginBottom: "6px" }}>Dates</h2>
           <p className="rep-sub" style={{ marginTop: 0, maxWidth: "640px" }}>
-            The venue's 365 SKUs per year. Cell intensity shows demand;
-            corner badge marks booked dates. Click any date for the
-            click breakdown, recent leads, and pricing override controls.
+            The venue's 365 SKUs per year. Cell intensity shows demand; corner badge marks booked dates. Click any date for the click breakdown, recent leads, and pricing controls.
           </p>
         </div>
         <button
@@ -118,85 +128,110 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
         </button>
       </header>
 
-      {/* Filter toolbar */}
-      <div className="dt-toolbar">
-        <label className="dt-toolbar-field">
-          <span>Stream</span>
-          <select value={stream} onChange={(e) => setStream(e.target.value)}>
-            {STREAM_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </label>
-        <label className="dt-toolbar-field">
-          <span>Year</span>
-          <select value={year} onChange={(e) => setYear(parseInt(e.target.value, 10))}>
-            {YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
-          </select>
-        </label>
-        {summary && (
-          <div className="dt-toolbar-summary">
-            <span><strong>{summary.activeDates}</strong> dates with clicks</span>
-            <span><strong>{summary.totalClicks}</strong> clicks total</span>
-            {summary.peakDate && <span>Peak: <strong>{summary.peakDate.clicked_date}</strong> ({summary.peakDate.clicks})</span>}
-            {summary.overrideCount > 0 && <span><strong>{summary.overrideCount}</strong> manual override{summary.overrideCount !== 1 ? "s" : ""}</span>}
-          </div>
-        )}
-      </div>
-
-      {/* Heat map calendar */}
-      <div className="dt-card">
-        {loading && <p className="rep-empty-small">Loading heat map…</p>}
-        {error && <p className="rep-empty-small">Error: {error}</p>}
-        {!loading && !error && data && (
-          <>
-            <DatesCalendar
-              year={year}
-              data={data}
-              bookedDates={bookedDates}
-              onSelectDate={setSelectedDate}
-              selectedDate={selectedDate}
-            />
-            {data.thresholds && (
-              <div className="dt-legend">
-                <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--zero" />0</span>
-                <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--low" />1 - {data.thresholds.mid - 1}</span>
-                <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--mid" />{data.thresholds.mid} - {data.thresholds.high - 1}</span>
-                <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--high" />{data.thresholds.high}+</span>
-                <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--booked-mini" />Booked</span>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Top dates list */}
-      <div className="dt-card">
-        <div className="dt-card-head">
-          <h3 className="rep-h2" style={{ fontSize: "20px", marginBottom: 0 }}>
-            {direction === "hot" ? "Hot dates" : "Cold dates (within 90 days)"}
-          </h3>
-          <div className="dt-toggle">
+      {/* ── Calendar panel: sub-tabs + metric strip + heat map ── */}
+      <div className="pipe-panel">
+        <div className="pipe-panel__tabs">
+          {STREAM_OPTIONS.map((o) => (
             <button
+              key={o.value}
+              className={`adm-subtab${stream === o.value ? " adm-subtab--active" : ""}`}
+              onClick={() => setStream(o.value)}
               type="button"
-              className={direction === "hot" ? "dt-toggle--active" : ""}
-              onClick={() => setDirection("hot")}
-            >Hot</button>
-            <button
-              type="button"
-              className={direction === "cold" ? "dt-toggle--active" : ""}
-              onClick={() => setDirection("cold")}
-            >Cold</button>
+            >
+              {o.label}
+            </button>
+          ))}
+          <div className="dt-year-wrap">
+            <label className="dt-year-label">Year</label>
+            <select
+              className="dt-year-select"
+              value={year}
+              onChange={(e) => setYear(parseInt(e.target.value, 10))}
+            >
+              {YEAR_OPTIONS.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
           </div>
         </div>
-        <DatesTopList
-          year={year}
-          stream={stream}
-          direction={direction}
-          onSelectDate={setSelectedDate}
-          selectedDate={selectedDate}
-          refreshKey={refreshKey}
-        />
+
+        {/* Metric strip - matches Pipeline pattern */}
+        <div className="pipe-meta-wrap">
+          <MetadataStrip>
+            <MetadataCell eyebrow="Active dates">
+              <span className="pipe-metric">{summary?.activeDates ?? "—"}</span>
+            </MetadataCell>
+            <MetadataCell eyebrow="Total clicks">
+              <span className="pipe-metric">{summary?.totalClicks ?? "—"}</span>
+            </MetadataCell>
+            <MetadataCell eyebrow="Peak date">
+              <span className="pipe-metric">
+                {formatPeak(summary?.peakDate)}
+                {summary?.peakCount > 0 && <span className="pipe-metric__unit">{summary.peakCount} clicks</span>}
+              </span>
+            </MetadataCell>
+            <MetadataCell eyebrow="Manual overrides">
+              <span className="pipe-metric">{summary?.overrideCount ?? 0}</span>
+            </MetadataCell>
+          </MetadataStrip>
+        </div>
+
+        {/* Heat map */}
+        <div className="dt-cal-wrap">
+          {loading && <p className="rep-empty-small" style={{ padding: "0 28px 16px" }}>Loading heat map…</p>}
+          {error && <p className="rep-empty-small" style={{ padding: "0 28px 16px" }}>Error: {error}</p>}
+          {!loading && !error && data && (
+            <>
+              <DatesCalendar
+                year={year}
+                data={data}
+                bookedDates={bookedDates}
+                onSelectDate={setSelectedDate}
+                selectedDate={selectedDate}
+              />
+              {data.thresholds && (
+                <div className="dt-legend">
+                  <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--zero" />0</span>
+                  <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--low" />1 - {data.thresholds.mid - 1}</span>
+                  <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--mid" />{data.thresholds.mid} - {data.thresholds.high - 1}</span>
+                  <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--high" />{data.thresholds.high}+</span>
+                  <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--booked-mini" />Booked</span>
+                  <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--override-mini" />Manual override</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ── Top dates panel: collapse-toggle heading + direction tabs + table ── */}
+      <div className="pipe-panel" style={{ marginTop: "16px" }}>
+        <div className="pipe-collapse-toggle" style={{ cursor: "default" }}>
+          <span>{direction === "hot" ? "Hot dates" : "Cold dates"}</span>
+          <span className="pipe-collapse-toggle__summary">
+            {direction === "hot" ? "most-clicked future dates" : "low click count, within 90 days, candidates for discount"}
+          </span>
+        </div>
+        <div className="pipe-panel__tabs" style={{ paddingTop: 0 }}>
+          <button
+            className={`adm-subtab${direction === "hot" ? " adm-subtab--active" : ""}`}
+            onClick={() => setDirection("hot")}
+            type="button"
+          >Hot</button>
+          <button
+            className={`adm-subtab${direction === "cold" ? " adm-subtab--active" : ""}`}
+            onClick={() => setDirection("cold")}
+            type="button"
+          >Cold</button>
+        </div>
+        <div style={{ padding: "8px 16px 18px" }}>
+          <DatesTopList
+            year={year}
+            stream={stream}
+            direction={direction}
+            onSelectDate={setSelectedDate}
+            selectedDate={selectedDate}
+            refreshKey={refreshKey}
+          />
+        </div>
       </div>
 
       {/* Detail drawer */}
@@ -210,6 +245,6 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
           pricing={pricing}
         />
       )}
-    </section>
+    </>
   );
 }
