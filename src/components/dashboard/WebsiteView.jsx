@@ -210,7 +210,7 @@ export default function WebsiteView({
       {/* Performance sub-tab */}
       {websiteSub === "performance" && (
         <>
-          <div className="rep-totals" style={{ marginBottom: "12px" }}>
+          <div className="rep-totals">
             <div className="rep-stat">
               <div className="rep-stat__num">{t.totalVisitors || 0}</div>
               <div className="rep-stat__label">Total visitors</div>
@@ -249,7 +249,7 @@ export default function WebsiteView({
           </div>
 
           <div className="rep-two-col">
-            <section className="rep-section" style={{ marginTop: "24px" }}>
+            <section className="rep-section">
               <h2 className="rep-h2">Top pages</h2>
               <p className="rep-sub">Most viewed pages.</p>
               {(tracking?.topPages || []).length === 0 ? <p className="rep-empty-small">No page views yet.</p> : (
@@ -270,7 +270,7 @@ export default function WebsiteView({
                 </ol>
               )}
             </section>
-            <section className="rep-section" style={{ marginTop: "24px" }}>
+            <section className="rep-section">
               <h2 className="rep-h2">Traffic sources</h2>
               <p className="rep-sub">First-touch UTM source.</p>
               {(tracking?.sources || []).length === 0 ? <p className="rep-empty-small">No source data yet.</p> : (
@@ -659,7 +659,7 @@ export default function WebsiteView({
           <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
           <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Events</h2>
 
-          <section className="rep-section" style={{ marginTop: "12px" }}>
+          <section className="rep-section">
             <h2 className="rep-h2">Events by type</h2>
             <p className="rep-sub">Total count for each event type tracked.</p>
             {(tracking?.eventTypes || []).length === 0 ? <p className="rep-empty-small">No events yet.</p> : (

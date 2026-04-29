@@ -209,7 +209,13 @@ import pricing from '../../../data/wedding-pricing.json';
         gap: 12px;
         margin-bottom: 12px;
       }
-      .rep-totals--today { margin-bottom: 32px; }
+      /* .rep-totals--today margin-bottom kept at 0 - the CSS rules above
+         drive the consistent 16px rhythm between the today strip and the
+         first card row beneath. */
+      .rep-totals--today { margin-bottom: 0; }
+      .rep-totals { margin-bottom: 0; }
+      .rep-totals + .rep-totals { margin-top: 12px; }
+      .rep-totals + .rep-section { margin-top: 16px; }
       @media (max-width: 720px) { .rep-totals { grid-template-columns: repeat(2, 1fr); } }
       .rep-stat {
         background: var(--color-warm-white);
@@ -335,7 +341,10 @@ import pricing from '../../../data/wedding-pricing.json';
       }
 
       /* ── Two-column layout ── */
-      .rep-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+      .rep-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+      .rep-two-col + .rep-two-col { margin-top: 16px; }
+      .rep-totals + .rep-two-col,
+      .rep-totals--today + .rep-two-col { margin-top: 16px; }
       @media (max-width: 720px) { .rep-two-col { grid-template-columns: 1fr; } }
 
       /* ── Device cards ── */
