@@ -342,7 +342,22 @@ import pricing from '../../../data/wedding-pricing.json';
       .rep-toprow:last-child { border-bottom: none; }
       .rep-toprow--compact { grid-template-columns: 32px minmax(140px, 1.2fr) 3fr 48px; padding: 10px 20px; }
       .rep-toprank { font-family: var(--serif); font-size: 18px; color: var(--color-dusty-coral); font-weight: 500; }
-      .rep-topdate { font-size: 14px; color: var(--color-brewery-dark); }
+      .rep-topdate {
+        font-size: 14px;
+        color: var(--color-brewery-dark);
+        /* Cap to 2 lines max with ellipsis. Long URLs (e.g. journal
+           slugs) were wrapping across 5 lines and throwing off
+           .rep-two-col panel heights. The 2-line cap preserves the
+           intentional <strong>cta_id</strong><br/><span>page</span>
+           layout used in Top CTA clicks while truncating anything
+           longer. min-width: 0 lets it truncate inside the grid cell. */
+        min-width: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+      }
       .rep-topbar { background: rgba(44, 24, 16, 0.06); height: 8px; border-radius: 2px; overflow: hidden; }
       .rep-topbar__fill { display: block; height: 100%; background: var(--color-mid-olive); }
       .rep-topcount { font-family: var(--serif); font-size: 18px; text-align: right; color: var(--color-brewery-dark); font-weight: 500; }
