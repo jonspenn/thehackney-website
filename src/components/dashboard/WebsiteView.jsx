@@ -480,8 +480,8 @@ export default function WebsiteView({
                           <td>{row.device_type ? <SoftPill variant={resolveDeviceVariant(row.device_type)} dot>{row.device_type}</SoftPill> : "—"}</td>
                           <td className="rep-table__ref">{shortenUrl(row.first_landing_page)}</td>
                           <td><SoftPill variant={resolveSourceVariant(src)} dot>{src}{row.first_utm_medium ? ` / ${row.first_utm_medium}` : ""}</SoftPill></td>
-                          <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{row.total_sessions}</td>
-                          <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{row.total_page_views}</td>
+                          <td className="rep-table__num">{row.total_sessions}</td>
+                          <td className="rep-table__num">{row.total_page_views}</td>
                         </tr>
                       );
                     })}

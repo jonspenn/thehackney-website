@@ -171,17 +171,17 @@ export default function AttributionView() {
             <thead>
               <tr>
                 <th>Platform</th>
-                <th style={{ textAlign: "right" }}>Visitors</th>
-                <th style={{ textAlign: "right" }}>Sessions</th>
-                <th style={{ textAlign: "right" }}>Submissions</th>
-                <th style={{ textAlign: "right" }}>Tour clicks</th>
-                <th style={{ textAlign: "right" }}>Tours</th>
-                <th style={{ textAlign: "right" }}>Won</th>
-                <th style={{ textAlign: "right" }}>Conv rate</th>
-                <th style={{ textAlign: "right" }}>Avg days</th>
-                <th style={{ textAlign: "right" }}>Spend</th>
-                <th style={{ textAlign: "right" }}>CPA</th>
-                <th style={{ textAlign: "right" }}>ROAS</th>
+                <th className="rep-table__num">Visitors</th>
+                <th className="rep-table__num">Sessions</th>
+                <th className="rep-table__num">Submissions</th>
+                <th className="rep-table__num">Tour clicks</th>
+                <th className="rep-table__num">Tours</th>
+                <th className="rep-table__num">Won</th>
+                <th className="rep-table__num">Conv rate</th>
+                <th className="rep-table__num">Avg days</th>
+                <th className="rep-table__num">Spend</th>
+                <th className="rep-table__num">CPA</th>
+                <th className="rep-table__num">ROAS</th>
               </tr>
             </thead>
             <tbody>
@@ -198,25 +198,25 @@ export default function AttributionView() {
                   className={drillIn?.platform === row.platform ? "rep-table__row--active" : ""}
                 >
                   <td><SoftPill variant={resolveSourceVariant(row.platform)} dot>{row.platform}</SoftPill></td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.visitors)}</td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.sessions)}</td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.submissions)}</td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.tour_clicks)}</td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.tours_booked)}</td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.won_deals)}</td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right", color: resolveTierColour(row.conv_rate) }}>
+                  <td className="rep-table__num">{formatCount(row.visitors)}</td>
+                  <td className="rep-table__num">{formatCount(row.sessions)}</td>
+                  <td className="rep-table__num">{formatCount(row.submissions)}</td>
+                  <td className="rep-table__num">{formatCount(row.tour_clicks)}</td>
+                  <td className="rep-table__num">{formatCount(row.tours_booked)}</td>
+                  <td className="rep-table__num">{formatCount(row.won_deals)}</td>
+                  <td className="rep-table__num" style={{ color: resolveTierColour(row.conv_rate) }}>
                     {row.conv_rate == null ? "—" : `${row.conv_rate}%`}
                   </td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+                  <td className="rep-table__num">
                     {row.avg_days_to_convert == null ? "—" : `${row.avg_days_to_convert}d`}
                   </td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+                  <td className="rep-table__num">
                     {formatPounds(row.spend_pounds)}
                   </td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+                  <td className="rep-table__num">
                     {formatPounds(row.cpa_pounds)}
                   </td>
-                  <td style={{ textAlign: "right", color: "#8C472E" }} title="ROAS lights up once deal value is captured at won_at">—</td>
+                  <td className="rep-table__num" style={{ color: "#8C472E" }} title="ROAS lights up once deal value is captured at won_at">—</td>
                 </tr>
               ))}
             </tbody>
@@ -240,9 +240,9 @@ export default function AttributionView() {
                 <thead>
                   <tr>
                     <th>Campaign</th>
-                    <th style={{ textAlign: "right" }}>Visitors</th>
-                    <th style={{ textAlign: "right" }}>Submissions</th>
-                    <th style={{ textAlign: "right" }}>Conv rate</th>
+                    <th className="rep-table__num">Visitors</th>
+                    <th className="rep-table__num">Submissions</th>
+                    <th className="rep-table__num">Conv rate</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -251,9 +251,9 @@ export default function AttributionView() {
                     return (
                       <tr key={c.campaign}>
                         <td>{c.campaign}</td>
-                        <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.visitors)}</td>
-                        <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.submissions)}</td>
-                        <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right", color: resolveTierColour(rate) }}>
+                        <td className="rep-table__num">{formatCount(c.visitors)}</td>
+                        <td className="rep-table__num">{formatCount(c.submissions)}</td>
+                        <td className="rep-table__num" style={{ color: resolveTierColour(rate) }}>
                           {rate == null ? "—" : `${rate}%`}
                         </td>
                       </tr>
@@ -279,8 +279,8 @@ export default function AttributionView() {
                   <tr>
                     <th>Campaign</th>
                     <th>Platform</th>
-                    <th style={{ textAlign: "right" }}>Visitors</th>
-                    <th style={{ textAlign: "right" }}>Subs</th>
+                    <th className="rep-table__num">Visitors</th>
+                    <th className="rep-table__num">Subs</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -288,8 +288,8 @@ export default function AttributionView() {
                     <tr key={`${c.platform}::${c.campaign}`}>
                       <td>{c.campaign}</td>
                       <td><SoftPill variant={resolveSourceVariant(c.platform)} dot>{c.platform}</SoftPill></td>
-                      <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.visitors)}</td>
-                      <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.submissions)}</td>
+                      <td className="rep-table__num">{formatCount(c.visitors)}</td>
+                      <td className="rep-table__num">{formatCount(c.submissions)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -308,8 +308,8 @@ export default function AttributionView() {
                   <tr>
                     <th>Landing page</th>
                     <th>Platform</th>
-                    <th style={{ textAlign: "right" }}>Visitors</th>
-                    <th style={{ textAlign: "right" }}>Subs</th>
+                    <th className="rep-table__num">Visitors</th>
+                    <th className="rep-table__num">Subs</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -317,8 +317,8 @@ export default function AttributionView() {
                     <tr key={`${lp.platform}::${lp.landing_page}`}>
                       <td className="rep-table__ref">{shortenUrl(lp.landing_page)}</td>
                       <td><SoftPill variant={resolveSourceVariant(lp.platform)} dot>{lp.platform}</SoftPill></td>
-                      <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(lp.visitors)}</td>
-                      <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(lp.submissions)}</td>
+                      <td className="rep-table__num">{formatCount(lp.visitors)}</td>
+                      <td className="rep-table__num">{formatCount(lp.submissions)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -328,7 +328,7 @@ export default function AttributionView() {
         </section>
       </div>
 
-      <p style={{ marginTop: 16, fontSize: 11, color: "#8C472E", letterSpacing: "0.04em" }}>
+      <p className="rep-footnote">
         Data window: {data.window === "all" ? "all time" : `last ${data.window === "30d" ? "30" : "90"} days`}.
         {totals.last_spend_import
           ? ` Ad spend last imported ${new Date(totals.last_spend_import).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}.`

@@ -433,6 +433,22 @@ import pricing from '../../../data/wedding-pricing.json';
       }
 
       /* ── Wedding leads table ── */
+      /* Numeric table cell utility - tabular-nums + right-align. Replaces
+         dozens of inline style={{ fontVariantNumeric: "tabular-nums",
+         textAlign: "right" }} pairs across AttributionView / WebsiteView /
+         BookingsView. Works on both <th> and <td>. */
+      .rep-table__num { font-variant-numeric: tabular-nums; text-align: right; }
+
+      /* Footnote line - DM Sans 11px brick colour, 0.04em letter-spaced.
+         Replaces the inline footnote style on AttributionView. */
+      .rep-footnote {
+        margin-top: 16px;
+        font-family: var(--sans);
+        font-size: 11px;
+        color: var(--color-fired-brick);
+        letter-spacing: 0.04em;
+      }
+
       .rep-table--sortable th { cursor: pointer; user-select: none; }
       .rep-table--sortable th:hover { color: var(--color-brewery-dark, #2C1810); }
       .rep-table--sortable { min-width: 1400px; }
