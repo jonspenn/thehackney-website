@@ -390,6 +390,28 @@ import pricing from '../../../data/wedding-pricing.json';
       .rep-month__cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; background: rgba(44, 24, 16, 0.04); color: rgba(44, 24, 16, 0.55); border-radius: 2px; }
       .rep-month__cell--blank { background: transparent; }
 
+      /* ── Website tab mobile breakpoint pass (Phase 5) ── */
+      @media (max-width: 900px) {
+        /* Stat tiles - the .rep-totals row carries the stat__num at 32px which
+           is too large on mobile; shrink to 24px and tighten padding. */
+        .rep-stat { padding: 14px 16px; }
+        .rep-stat__num { font-size: 24px; }
+        .rep-stat__label { font-size: 10px; margin-top: 4px; }
+        /* Top lists - tighter row padding so the table reads less airy. */
+        .rep-toprow,
+        .rep-toprow--compact { padding: 8px 14px; gap: 8px; }
+        .rep-toprank,
+        .rep-topcount { font-size: 16px; }
+        .rep-topdate { font-size: 13px; }
+        /* Day-of-week chart - shrink the bar height + label sizes. */
+        .rep-dow__col { font-size: 10px; }
+        .rep-dow__label { font-size: 10px; }
+        /* Recent tables - keep horizontal scroll but tighten cell padding. */
+        .rep-table { font-size: 12px; }
+        .rep-table th,
+        .rep-table td { padding: 8px 10px; }
+      }
+
       /* ── Tables ── */
       .rep-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(44,24,16,0.2) transparent; }
       .rep-table-wrap::-webkit-scrollbar { height: 8px; }
