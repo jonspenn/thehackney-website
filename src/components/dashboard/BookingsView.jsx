@@ -12,7 +12,7 @@ import {
 } from "./bookings-data.js";
 import { DEALS_BY_MONTH } from "./bookings-deals.js";
 import { MetadataStrip, MetadataCell } from "./primitives/index.js";
-import { formatPoundsRounded, formatPoundsExact } from "./utils.js";
+import { formatPoundsRounded, formatPoundsExact, resolveTierColour } from "./utils.js";
 
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -209,7 +209,7 @@ export default function BookingsView() {
             </span>
           </MetadataCell>
           <MetadataCell eyebrow="vs last year">
-            <span className="pipe-metric" style={{ color: strip.yoyPct == null ? undefined : (strip.yoyPct >= 0 ? "#2E4009" : "#8C472E") }}>
+            <span className="pipe-metric" style={{ color: resolveTierColour(strip.yoyPct, "yoy") }}>
               {strip.yoyPct == null ? "—" : `${strip.yoyPct >= 0 ? "+" : ""}${strip.yoyPct}%`}
               <span className="pipe-metric__unit">vs {CURRENT_YEAR - 1} YTD</span>
             </span>
@@ -217,7 +217,7 @@ export default function BookingsView() {
           <MetadataCell eyebrow="vs best ever">
             <span
               className="pipe-metric"
-              style={{ color: strip.bestEverPct == null ? undefined : (strip.bestEverPct >= 0 ? "#2E4009" : "#8C472E") }}
+              style={{ color: resolveTierColour(strip.bestEverPct, "yoy") }}
               title={strip.bestEverYTD ? `Best-ever YTD = sum of per-month historical maxes across 2023, 2024, 2025 (£${strip.bestEverYTD.toLocaleString("en-GB")} for Jan-${SHORT_MONTHS[CURRENT_DATA_MONTH - 1]})` : ""}
             >
               {strip.bestEverPctDisplay == null

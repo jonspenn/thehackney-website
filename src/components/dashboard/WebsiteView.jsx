@@ -27,7 +27,7 @@ import {
 
 import { formatRelativeTime, formatAbsoluteTime, formatLongDate,
   shortenUrl, parseEventData, eventSummary,
-  buildHeatmapMonths, heatColour, heatTextColour, formatCount } from "./utils.js";
+  buildHeatmapMonths, heatColour, heatTextColour, formatCount, resolveSourceVariant, resolveDeviceVariant, resolveTierColour } from "./utils.js";
 
 import { MetadataStrip, MetadataCell, SoftPill } from "./primitives/index.js";
 
@@ -114,30 +114,6 @@ export default function WebsiteView({
     window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
   }
 
-  /* Map a UTM source string to a SoftPill variant for the recent-visitors
-     table. Mirrors SOURCE_MAP in constants.js (used on the Leads table)
-     but operates on the simpler first_utm_source values surfaced here. */
-  function sourceVariant(src) {
-    if (!src || src === "Direct") return "muted";
-    const v = String(src).toLowerCase();
-    if (v.includes("google")) return "olive";
-    if (v.includes("facebook") || v.includes("instagram") || v.includes("meta") || v.includes("fb")) return "coral";
-    if (v.includes("hitched") || v.includes("bridebook")) return "brick";
-    if (v.includes("pinterest")) return "coral";
-    if (v.includes("tiktok")) return "muted";
-    if (v.includes("bing") || v.includes("microsoft")) return "olive";
-    return "muted";
-  }
-
-  /* Device variants - keep them quiet since this is a secondary signal. */
-  function deviceVariant(d) {
-    const v = String(d || "").toLowerCase();
-    if (v === "desktop") return "olive";
-    if (v === "mobile")  return "coral";
-    if (v === "tablet")  return "brick";
-    return "muted";
-  }
-
   return (
     <>
       {/* ── Metric strip header (4 cells, all-time + 30d cross) ── */}
@@ -168,7 +144,7 @@ export default function WebsiteView({
           <MetadataCell eyebrow="Conv rate (30d)">
             <span
               className="pipe-metric"
-              style={{ color: t.conv30dPct == null ? undefined : (t.conv30dPct >= 1 ? "#2E4009" : (t.conv30dPct >= 0.5 ? "#8C472E" : "#40160C")) }}
+              style={{ color: resolveTierColour(t.conv30dPct) }}
               title={t.conv30dPct == null ? "" : `${t.submissions30d || 0} submissions / ${t.visitors30d || 0} visitors over the last 30 days`}
             >
               {t.conv30dPct == null ? "—" : `${t.conv30dPct}%`}
@@ -508,9 +484,9 @@ export default function WebsiteView({
                       return (
                         <tr key={row.visitor_id}>
                           <td>{formatRelativeTime(row.first_seen_at)}</td>
-                          <td>{row.device_type ? <SoftPill variant={deviceVariant(row.device_type)} dot>{row.device_type}</SoftPill> : "—"}</td>
+                          <td>{row.device_type ? <SoftPill variant={resolveDeviceVariant(row.device_type)} dot>{row.device_type}</SoftPill> : "—"}</td>
                           <td className="rep-table__ref">{shortenUrl(row.first_landing_page)}</td>
-                          <td><SoftPill variant={sourceVariant(src)} dot>{src}{row.first_utm_medium ? ` / ${row.first_utm_medium}` : ""}</SoftPill></td>
+                          <td><SoftPill variant={resolveSourceVariant(src)} dot>{src}{row.first_utm_medium ? ` / ${row.first_utm_medium}` : ""}</SoftPill></td>
                           <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{row.total_sessions}</td>
                           <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{row.total_page_views}</td>
                         </tr>

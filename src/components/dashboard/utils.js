@@ -126,6 +126,66 @@ export function formatPercent(n, decimals = 1) {
   return `${n.toFixed(decimals)}%`;
 }
 
+
+/**
+ * Maps a source / platform string to a SoftPill variant.
+ * Single source of truth for the channel coding used across the dashboard
+ * (recent-visitors source column, attribution platform column, future
+ * channel-aware components). Mirrors the colour semantics from BRAND_GUIDE.md
+ * and prd-sys-dashboard-design-system.md.
+ *
+ * Returns: "olive" | "coral" | "brick" | "muted"
+ */
+export function resolveSourceVariant(raw) {
+  if (!raw || raw === "Direct") return "muted";
+  const v = String(raw).toLowerCase();
+  if (v.includes("google") || v.includes("bing") || v.includes("microsoft")) return "olive";
+  if (v.includes("linkedin")) return "olive";
+  if (v.includes("organic")) return "olive";
+  if (v.includes("meta") || v.includes("facebook") || v.includes("instagram") || v.includes("fb")) return "coral";
+  if (v.includes("pinterest")) return "coral";
+  if (v.includes("hitched") || v.includes("bridebook")) return "brick";
+  if (v.includes("tiktok")) return "brick";
+  return "muted";
+}
+
+/**
+ * Maps a device string ("desktop" | "mobile" | "tablet") to a SoftPill
+ * variant. Quiet variants because device is a secondary signal.
+ */
+export function resolveDeviceVariant(raw) {
+  const v = String(raw || "").toLowerCase();
+  if (v === "desktop") return "olive";
+  if (v === "mobile")  return "coral";
+  if (v === "tablet")  return "brick";
+  return "muted";
+}
+
+/**
+ * Resolves a numeric value to a traffic-light hex colour.
+ *
+ * scale = "conv" (default) - conversion-rate traffic light:
+ *   >= 1.0 -> Forest Olive (#2E4009)
+ *   0.5 - 1.0 -> Fired Brick (#8C472E)
+ *   < 0.5 -> Mahogany (#40160C)
+ *
+ * scale = "yoy" - YoY positive/negative:
+ *   >= 0 -> Forest Olive (#2E4009)
+ *   < 0  -> Fired Brick (#8C472E)
+ *
+ * Returns undefined when value is null so the caller falls back to the
+ * inherited text colour.
+ */
+export function resolveTierColour(value, scale = "conv") {
+  if (value == null) return undefined;
+  if (scale === "yoy") {
+    return value >= 0 ? "#2E4009" : "#8C472E";
+  }
+  if (value >= 1) return "#2E4009";
+  if (value >= 0.5) return "#8C472E";
+  return "#40160C";
+}
+
 /* ───────── parsing ───────── */
 
 export function shortenUrl(url) {

@@ -29,7 +29,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { MetadataStrip, MetadataCell, SoftPill } from "./primitives/index.js";
-import { shortenUrl, formatCount, formatPounds } from "./utils.js";
+import { shortenUrl, formatCount, formatPounds, resolveSourceVariant, resolveTierColour } from "./utils.js";
 
 const WINDOW_MODES = [
   { id: "all", label: "All time" },
@@ -82,21 +82,6 @@ export default function AttributionView() {
 
   /* Number formatter mirrored from WebsiteView so the strip reads
      consistently across the dashboard. */
-  /* SoftPill variant for the platform column. Mirrors the WebsiteView
-     sourceVariant logic so Google = olive, Meta = coral etc. across the
-     dashboard. Direct + Organic + Other paid = muted (low-signal buckets). */
-  function platformVariant(p) {
-    if (!p) return "muted";
-    const v = String(p).toLowerCase();
-    if (v.includes("google")) return "olive";
-    if (v.includes("meta") || v.includes("facebook") || v.includes("instagram") || v.includes("fb")) return "coral";
-    if (v.includes("microsoft") || v.includes("bing")) return "brick";
-    if (v.includes("linkedin")) return "olive";
-    if (v.includes("tiktok")) return "muted";
-    if (v.includes("organic")) return "olive";
-    return "muted";
-  }
-
   const totals = data?.totals || {};
   const funnel = data?.funnel || [];
   const campaigns = data?.campaigns || [];
@@ -108,16 +93,6 @@ export default function AttributionView() {
     if (!drillIn) return [];
     return campaigns.filter(c => c.platform === drillIn.platform);
   }, [drillIn, campaigns]);
-
-  /* Best-platform tier colour for the 4th metric strip cell. Mirrors the
-     traffic-light convention used on Website tab's 30d conv cell:
-     >= 1% conv → Forest Olive, 0.5–1% → Fired Brick, < 0.5% → Mahogany. */
-  function tierColour(rate) {
-    if (rate == null) return undefined;
-    if (rate >= 1) return "#2E4009";
-    if (rate >= 0.5) return "#8C472E";
-    return "#40160C";
-  }
 
   if (loading && !data) {
     return <div className="rep-state">Loading attribution data…</div>;
@@ -161,7 +136,7 @@ export default function AttributionView() {
           <MetadataCell eyebrow="Best converting platform">
             <span
               className="pipe-metric"
-              style={{ color: tierColour(totals.best_platform?.conv_rate), fontSize: "22px" }}
+              style={{ color: resolveTierColour(totals.best_platform?.conv_rate), fontSize: "22px" }}
               title={totals.best_platform ? `${totals.best_platform.conv_rate}% conv${totals.best_platform.cpa_pounds != null ? ` · ${formatPounds(totals.best_platform.cpa_pounds)} CPA` : ""} (paid platforms with ≥10 visitors)` : "Not enough paid traffic to call a winner"}
             >
               {totals.best_platform?.platform || "—"}
@@ -228,14 +203,14 @@ export default function AttributionView() {
                   style={{ cursor: "pointer" }}
                   className={drillIn?.platform === row.platform ? "rep-table__row--active" : ""}
                 >
-                  <td><SoftPill variant={platformVariant(row.platform)} dot>{row.platform}</SoftPill></td>
+                  <td><SoftPill variant={resolveSourceVariant(row.platform)} dot>{row.platform}</SoftPill></td>
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.visitors)}</td>
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.sessions)}</td>
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.submissions)}</td>
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.tour_clicks)}</td>
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.tours_booked)}</td>
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(row.won_deals)}</td>
-                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right", color: tierColour(row.conv_rate) }}>
+                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right", color: resolveTierColour(row.conv_rate) }}>
                     {row.conv_rate == null ? "—" : `${row.conv_rate}%`}
                   </td>
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
@@ -296,7 +271,7 @@ export default function AttributionView() {
                         <td>{c.campaign}</td>
                         <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.visitors)}</td>
                         <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.submissions)}</td>
-                        <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right", color: tierColour(rate) }}>
+                        <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right", color: resolveTierColour(rate) }}>
                           {rate == null ? "—" : `${rate}%`}
                         </td>
                       </tr>
@@ -330,7 +305,7 @@ export default function AttributionView() {
                   {campaigns.slice(0, 10).map(c => (
                     <tr key={`${c.platform}::${c.campaign}`}>
                       <td>{c.campaign}</td>
-                      <td><SoftPill variant={platformVariant(c.platform)} dot>{c.platform}</SoftPill></td>
+                      <td><SoftPill variant={resolveSourceVariant(c.platform)} dot>{c.platform}</SoftPill></td>
                       <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.visitors)}</td>
                       <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(c.submissions)}</td>
                     </tr>
@@ -359,7 +334,7 @@ export default function AttributionView() {
                   {landingPages.slice(0, 10).map(lp => (
                     <tr key={`${lp.platform}::${lp.landing_page}`}>
                       <td className="rep-table__ref">{shortenUrl(lp.landing_page)}</td>
-                      <td><SoftPill variant={platformVariant(lp.platform)} dot>{lp.platform}</SoftPill></td>
+                      <td><SoftPill variant={resolveSourceVariant(lp.platform)} dot>{lp.platform}</SoftPill></td>
                       <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(lp.visitors)}</td>
                       <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatCount(lp.submissions)}</td>
                     </tr>
