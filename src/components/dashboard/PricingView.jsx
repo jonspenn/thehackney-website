@@ -138,17 +138,9 @@ export default function PricingView({ pricing }) {
 
   return (
     <section className="pr-view">
-      {/* Header row: title + lede on the left, Print button on the right */}
-      <div className="pr-view-head">
-        <div>
-          <h2 className="rep-h2" style={{ marginBottom: "6px" }}>Pricing review</h2>
-          <p className="rep-sub" style={{ marginTop: 0, maxWidth: "640px" }}>
-            Side-by-side view of every row in the wedding rate card, pulled
-            directly from the site's pricing data. Green tint = price rose
-            year-over-year, brick tint = price fell, no tint = flat. 2028 is
-            draft and pending James's sign-off.
-          </p>
-        </div>
+      {/* Tab-specific action: Print / Save PDF (R4 - right-aligned action row,
+           not a header bar). Tab title comes from the active tab pill (R1). */}
+      <div className="pr-action-row">
         <button
           className="rep-refresh pr-print-btn"
           onClick={() => window.print()}

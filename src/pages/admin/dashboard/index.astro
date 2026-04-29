@@ -2348,15 +2348,14 @@ import pricing from '../../../data/wedding-pricing.json';
 
       /* ═══════ Pricing tab (PricingView.jsx) ═══════ */
       .pr-view { display: block; }
-      .pr-view-head {
+      /* Tab-specific action row (R4): right-aligned single-button row that
+         replaces the old .pr-view-head bar (which violated R1/R2/R3). */
+      .pr-action-row {
         display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 18px;
+        justify-content: flex-end;
+        margin-bottom: 14px;
       }
-      .pr-view-head .rep-h2 { margin-top: 0; }
-      .pr-print-btn { flex-shrink: 0; align-self: flex-start; }
+      .pr-print-btn { flex-shrink: 0; }
 
       .pr-section-head {
         display: flex;
@@ -2575,7 +2574,7 @@ import pricing from '../../../data/wedding-pricing.json';
         .rep-shell { padding: 0; max-width: none; }
         .rep-header, .rep-eyebrow, .rep-title, .rep-lede, .rep-footer,
         .adm-tabs, .rep-refresh, .pr-print-btn { display: none !important; }
-        .pr-view-head { margin-bottom: 12px; }
+        .pr-action-row { display: none !important; }
         .pr-status-banner { background: #fff; color: #000; border: 2px solid #000; }
         .pr-callouts { page-break-after: always; }
         .pr-table-wrap { overflow: visible; border: none; background: #fff; }
