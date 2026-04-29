@@ -11,6 +11,7 @@ import {
   YEAR_COLORS, YEAR_STYLES,
 } from "./bookings-data.js";
 import { DEALS_BY_MONTH } from "./bookings-deals.js";
+import { MetadataStrip, MetadataCell } from "./primitives/index.js";
 
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -18,6 +19,14 @@ const YEARS = Object.keys(REVENUE_BY_YEAR).map(Number).sort();
 const CURRENT_YEAR = YEARS[YEARS.length - 1];
 
 function formatRevenue(val) {
+  if (val >= 1000) return `£${Math.round(val / 1000)}k`;
+  return `£${val}`;
+}
+
+/* Strip-cell short form: same as formatRevenue but always £k for >=1000.
+   Returned to the metric strip for the YTD total + best-month sub-unit. */
+function formatRevenueShort(val) {
+  if (val == null) return "—";
   if (val >= 1000) return `£${Math.round(val / 1000)}k`;
   return `£${val}`;
 }
@@ -73,6 +82,35 @@ export default function BookingsView() {
     return DEALS_BY_MONTH[key] || [];
   }, [drillDown]);
 
+  /* Metric-strip cells (YTD total / vs Last year % / Best month YTD / Deals closed YTD) */
+  const strip = useMemo(() => {
+    const ytdTotal = ytdByYear[CURRENT_YEAR] || 0;
+    const ytdPrev = ytdByYear[CURRENT_YEAR - 1];
+    const yoyPct = ytdPrev ? Math.round(((ytdTotal - ytdPrev) / ytdPrev) * 100) : null;
+
+    /* Best month YTD: highest month within the current year up to CURRENT_DATA_MONTH */
+    let bestMonthIdx = -1;
+    let bestMonthValue = 0;
+    for (let m = 0; m < CURRENT_DATA_MONTH; m++) {
+      const v = REVENUE_BY_YEAR[CURRENT_YEAR][m];
+      if (v > bestMonthValue) {
+        bestMonthValue = v;
+        bestMonthIdx = m;
+      }
+    }
+    const bestMonthLabel = bestMonthIdx >= 0 ? SHORT_MONTHS[bestMonthIdx] : "—";
+
+    /* Deals closed YTD: count rows in DEALS_BY_MONTH for current year up to CURRENT_DATA_MONTH */
+    let dealsCurrentYTD = 0;
+    let dealsPriorYTD = 0;
+    for (let m = 1; m <= CURRENT_DATA_MONTH; m++) {
+      dealsCurrentYTD += (DEALS_BY_MONTH[`${CURRENT_YEAR}-${m}`] || []).length;
+      dealsPriorYTD += (DEALS_BY_MONTH[`${CURRENT_YEAR - 1}-${m}`] || []).length;
+    }
+
+    return { ytdTotal, yoyPct, bestMonthLabel, bestMonthValue, dealsCurrentYTD, dealsPriorYTD };
+  }, [ytdByYear]);
+
   function handleCellClick(year, monthIdx) {
     const val = REVENUE_BY_YEAR[year][monthIdx];
     if (val <= 0) return;
@@ -103,31 +141,34 @@ export default function BookingsView() {
   return (
     <div className="bookings-view">
 
-      {/* ── KPI cards ── */}
-      <div className="bookings-kpis">
-        {YEARS.map(year => {
-          const total = year === CURRENT_YEAR
-            ? REVENUE_BY_YEAR[year].slice(0, CURRENT_DATA_MONTH).reduce((a, b) => a + b, 0)
-            : YEAR_TOTALS[year];
-          const label = year === CURRENT_YEAR
-            ? `${year} YTD (${SHORT_MONTHS[CURRENT_DATA_MONTH - 1]})`
-            : `${year} Total`;
-          const ytdPrev = year > YEARS[0] ? ytdByYear[year - 1] : null;
-          const ytdCurr = ytdByYear[year];
-          const pctChange = ytdPrev ? Math.round(((ytdCurr - ytdPrev) / ytdPrev) * 100) : null;
-
-          return (
-            <div key={year} className="bookings-kpi" style={{ borderLeftColor: YEAR_COLORS[year] }}>
-              <div className="bookings-kpi__label">{label}</div>
-              <div className="bookings-kpi__value">{formatRevenueExact(total)}</div>
-              {year === CURRENT_YEAR && pctChange !== null && (
-                <div className="bookings-kpi__change" style={{ color: pctChange >= 0 ? "#2E4009" : "#8C472E" }}>
-                  {pctChange >= 0 ? "+" : ""}{pctChange}% vs {year - 1} at same point
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {/* ── Metric strip header ── */}
+      <div className="pipe-meta-wrap">
+        <MetadataStrip>
+          <MetadataCell eyebrow="YTD total">
+            <span className="pipe-metric">
+              {formatRevenueShort(strip.ytdTotal)}
+              <span className="pipe-metric__unit">by {SHORT_MONTHS[CURRENT_DATA_MONTH - 1]}</span>
+            </span>
+          </MetadataCell>
+          <MetadataCell eyebrow="vs last year">
+            <span className="pipe-metric" style={{ color: strip.yoyPct == null ? undefined : (strip.yoyPct >= 0 ? "#2E4009" : "#8C472E") }}>
+              {strip.yoyPct == null ? "—" : `${strip.yoyPct >= 0 ? "+" : ""}${strip.yoyPct}%`}
+              <span className="pipe-metric__unit">vs {CURRENT_YEAR - 1} YTD</span>
+            </span>
+          </MetadataCell>
+          <MetadataCell eyebrow="Best month YTD">
+            <span className="pipe-metric">
+              {strip.bestMonthLabel}
+              {strip.bestMonthValue > 0 && <span className="pipe-metric__unit">{formatRevenueShort(strip.bestMonthValue)}</span>}
+            </span>
+          </MetadataCell>
+          <MetadataCell eyebrow="Deals closed YTD">
+            <span className="pipe-metric">
+              {strip.dealsCurrentYTD}
+              <span className="pipe-metric__unit">vs {strip.dealsPriorYTD} in {CURRENT_YEAR - 1}</span>
+            </span>
+          </MetadataCell>
+        </MetadataStrip>
       </div>
 
       {/* ── Chart ── */}
