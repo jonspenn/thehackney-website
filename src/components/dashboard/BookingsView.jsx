@@ -350,48 +350,111 @@ export default function BookingsView() {
                     strokeWidth={1.5}
                   />
                 )}
-                {/* Per-point hover/active dot + value label. Rendered only when
-                    hovered or the drilled-in cell, so the chart stays clean by default
-                    but surfaces the £k value the moment the user reads a month. Label
-                    sits above the dot with a Warm Canvas stroke halo so it stays
-                    legible over crossing year lines. */}
+                {/* Per-point hover/active dot. Value label moved to the stacked
+                    tooltip rendered once per hover, after the year-line loop. */}
                 {points.map((p) => {
                   const isHovered = hoveredMonth === p.month;
                   const isActive = drillDown && drillDown.year === year && drillDown.month === p.month;
                   if (!isHovered && !isActive) return null;
                   return (
-                    <g key={p.month}>
-                      <circle
-                        cx={p.x} cy={p.y}
-                        r={isActive ? 5 : 4}
-                        fill={p.val > 0 ? YEAR_COLORS[year] : "transparent"}
-                        stroke={isActive ? "#2E4009" : "#F5F0E8"}
-                        strokeWidth={isActive ? 2.5 : 1.5}
-                        style={{ cursor: p.val > 0 ? "pointer" : "default" }}
-                        onClick={() => handleCellClick(year, p.month)}
-                      />
-                      {p.val > 0 && (
-                        <text
-                          x={p.x}
-                          y={p.y - 11}
-                          textAnchor="middle"
-                          fontSize="11"
-                          fontWeight="600"
-                          fill={YEAR_COLORS[year]}
-                          stroke="#F5F0E8"
-                          strokeWidth="3"
-                          paintOrder="stroke"
-                          style={{ pointerEvents: "none" }}
-                        >
-                          {formatRevenue(p.val)}
-                        </text>
-                      )}
-                    </g>
+                    <circle
+                      key={p.month}
+                      cx={p.x} cy={p.y}
+                      r={isActive ? 5 : 4}
+                      fill={p.val > 0 ? YEAR_COLORS[year] : "transparent"}
+                      stroke={isActive ? "#2E4009" : "#F5F0E8"}
+                      strokeWidth={isActive ? 2.5 : 1.5}
+                      style={{ cursor: p.val > 0 ? "pointer" : "default" }}
+                      onClick={() => handleCellClick(year, p.month)}
+                    />
                   );
                 })}
               </g>
             );
           })}
+
+          {/* Stacked hover tooltip - one card listing every visible year's
+              value at the hovered month. Replaces per-dot labels which
+              collided when years stacked close together (e.g. £39k vs £28k
+              within 12px y-distance). */}
+          {hoveredMonth !== null && (() => {
+            const visibleAtMonth = YEARS
+              .filter(y => !hiddenYears.has(y))
+              .filter(y => {
+                const endMonth = y === CURRENT_YEAR ? CURRENT_DATA_MONTH : 12;
+                return hoveredMonth < endMonth && REVENUE_BY_YEAR[y][hoveredMonth] > 0;
+              })
+              .sort((a, b) => b - a);
+            if (visibleAtMonth.length === 0) return null;
+
+            /* Card geometry */
+            const rowH = 16;
+            const padX = 10;
+            const padY = 6;
+            const cardW = 96;
+            const cardH = padY * 2 + rowH * (visibleAtMonth.length + 1) - 2;
+            const tx = monthX(hoveredMonth);
+            /* Pin to right of crosshair when there's room, otherwise flip left. */
+            const cardX = tx + cardW + 14 > W - PAD_R
+              ? tx - cardW - 12
+              : tx + 12;
+            const cardY = PAD_T + 4;
+
+            return (
+              <g style={{ pointerEvents: "none" }}>
+                <rect
+                  x={cardX} y={cardY}
+                  width={cardW} height={cardH}
+                  rx={4} ry={4}
+                  fill="rgba(245,240,232,0.96)"
+                  stroke="rgba(64,22,12,0.14)"
+                  strokeWidth="1"
+                />
+                <text
+                  x={cardX + padX} y={cardY + padY + 11}
+                  fontSize="10" fontWeight="700"
+                  letterSpacing="0.08em"
+                  textTransform="uppercase"
+                  fill="rgba(44,24,16,0.5)"
+                >
+                  {SHORT_MONTHS[hoveredMonth].toUpperCase()}
+                </text>
+                {visibleAtMonth.map((year, i) => {
+                  const rowY = cardY + padY + rowH + 2 + i * rowH;
+                  return (
+                    <g key={year}>
+                      <circle
+                        cx={cardX + padX + 4}
+                        cy={rowY - 4}
+                        r={4}
+                        fill={YEAR_COLORS[year]}
+                      />
+                      <text
+                        x={cardX + padX + 14}
+                        y={rowY}
+                        fontSize="11"
+                        fontWeight={year === CURRENT_YEAR ? "600" : "500"}
+                        fill="rgba(44,24,16,0.7)"
+                      >
+                        {year}
+                      </text>
+                      <text
+                        x={cardX + cardW - padX}
+                        y={rowY}
+                        textAnchor="end"
+                        fontSize="11"
+                        fontWeight="600"
+                        fill={YEAR_COLORS[year]}
+                        fontVariantNumeric="tabular-nums"
+                      >
+                        {formatRevenue(REVENUE_BY_YEAR[year][hoveredMonth])}
+                      </text>
+                    </g>
+                  );
+                })}
+              </g>
+            );
+          })()}
         </svg>
         </div>
         )}
