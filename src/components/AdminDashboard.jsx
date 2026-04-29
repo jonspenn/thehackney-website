@@ -27,9 +27,10 @@ import PipelineView from "./dashboard/PipelineView.jsx";
 import BookingsView from "./dashboard/BookingsView.jsx";
 import CustomersView from "./dashboard/CustomersView.jsx";
 import PricingView from "./dashboard/PricingView.jsx";
+import DatesView from "./dashboard/DatesView.jsx";
 
 /* ───────── URL persistence ───────── */
-const VALID_TABS = ["overview", "leads", "pipeline", "bookings", "customers", "lost", "analytics", "pricing"];
+const VALID_TABS = ["pipeline", "leads", "dates", "customers", "bookings", "overview", "analytics", "lost", "pricing"];
 const VALID_TYPES = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
 
 /* ───────── main component ───────── */
@@ -53,7 +54,7 @@ export default function AdminDashboard({ pricing }) {
     const type = params.get("type");
     const leadId = params.get("lead");
     return {
-      tab: VALID_TABS.includes(tab) ? tab : "overview",
+      tab: VALID_TABS.includes(tab) ? tab : "pipeline",
       type: VALID_TYPES.includes(type) ? type : "wedding",
       leadId: leadId || null,
     };
@@ -223,7 +224,7 @@ export default function AdminDashboard({ pricing }) {
       const t = params.get("tab");
       const ty = params.get("type");
       const leadId = params.get("lead");
-      setActiveTab(VALID_TABS.includes(t) ? t : "overview");
+      setActiveTab(VALID_TABS.includes(t) ? t : "pipeline");
       setActiveLeadType(VALID_TYPES.includes(ty) ? ty : "wedding");
       if (leadId) {
         setPendingLeadId(leadId);
@@ -364,15 +365,22 @@ export default function AdminDashboard({ pricing }) {
   const totalLeadsCount = LEAD_TABS.reduce((sum, lt) => sum + (leads[lt.type]?.total || 0), 0);
   const totalLostCount = LEAD_TABS.reduce((sum, lt) => sum + (lostLeads[lt.type]?.total || 0), 0);
 
+  // ── Visible tab order (29 Apr 2026 IA restructure Phase 1) ──
+  // Operational tabs first (Pipeline / Leads / Dates), retrospective in
+  // the middle (Customers / Bookings), legacy Overview/Analytics/Lost at
+  // the end pending Phase 2-3 post-launch (merge Overview+Analytics into
+  // Website, demote Lost to a filter). Pricing is no longer a top-level
+  // tab - PricingView remains reachable via URL ?tab=pricing for James's
+  // year-over-year review until the rate-card drawer absorbs it.
   const tabs = [
-    { id: "overview", label: "Overview" },
-    { id: "leads", label: `Leads (${totalLeadsCount})` },
     { id: "pipeline", label: "Pipeline" },
-    { id: "bookings", label: "Bookings" },
+    { id: "leads", label: `Leads (${totalLeadsCount})` },
+    { id: "dates", label: "Dates" },
     { id: "customers", label: "Customers" },
-    { id: "lost", label: `Lost${totalLostCount > 0 ? ` (${totalLostCount})` : ""}` },
+    { id: "bookings", label: "Bookings" },
+    { id: "overview", label: "Overview" },
     { id: "analytics", label: "Analytics" },
-    { id: "pricing", label: "Pricing" },
+    { id: "lost", label: `Lost${totalLostCount > 0 ? ` (${totalLostCount})` : ""}` },
   ];
 
   return (
@@ -748,6 +756,14 @@ export default function AdminDashboard({ pricing }) {
       )}
 
       {/* ═══════ PRICING TAB ═══════ */}
+      {activeTab === "dates" && (
+        <DatesView
+          pricing={pricing}
+          leads={leads}
+          onSelectLead={selectLead}
+        />
+      )}
+
       {activeTab === "pricing" && !selectedLead && (
         <PricingView pricing={pricing} />
       )}
