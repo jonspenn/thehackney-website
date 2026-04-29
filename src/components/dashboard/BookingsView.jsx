@@ -47,6 +47,7 @@ export default function BookingsView() {
   const [hiddenYears, setHiddenYears] = useState(() => new Set(YEARS.filter(y => y !== CURRENT_YEAR)));
   const [hoveredMonth, setHoveredMonth] = useState(null);
   const [drillDown, setDrillDown] = useState(null); // { year, month } or null
+  const [chartOpen, setChartOpen] = useState(true);
 
   /* Compute max value across visible years for Y-axis scaling */
   const maxVal = useMemo(() => {
@@ -171,9 +172,21 @@ export default function BookingsView() {
         </MetadataStrip>
       </div>
 
-      {/* ── Chart ── */}
-      <div className="bookings-chart">
-        <h3 className="bookings-chart__title">Monthly revenue booked (close date)</h3>
+      {/* ── Chart panel ── */}
+      <div className="pipe-panel bookings-chart-panel">
+        <button
+          type="button"
+          className="pipe-collapse-toggle"
+          onClick={() => setChartOpen(o => !o)}
+          aria-expanded={chartOpen}
+          aria-controls="bookings-chart-body"
+        >
+          <span className={`pipe-collapse-toggle__arrow${chartOpen ? " pipe-collapse-toggle__arrow--open" : ""}`}>{"\u25B6"}</span>
+          Monthly revenue booked
+          {!chartOpen && <span className="pipe-collapse-toggle__summary">close date · click a year in the legend to toggle</span>}
+        </button>
+        {chartOpen && (
+        <div className="bookings-chart-body" id="bookings-chart-body">
 
         {/* Interactive legend */}
         <div className="bookings-legend">
@@ -323,6 +336,8 @@ export default function BookingsView() {
             );
           })}
         </svg>
+        </div>
+        )}
       </div>
 
       {/* ── Drill-down panel ── */}

@@ -748,6 +748,12 @@ import pricing from '../../../data/wedding-pricing.json';
 
       /* ── Bookings tab ── */
       .bookings-view { padding: 0 4px; }
+      /* Bookings chart panel inner body - sits inside .pipe-panel chrome */
+      .bookings-chart-panel { margin-bottom: 16px; }
+      .bookings-chart-body { padding: 4px 24px 22px; }
+      @media (max-width: 900px) {
+        .bookings-chart-body { padding: 4px 14px 16px; }
+      }
       .bookings-kpis {
         display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
       }
