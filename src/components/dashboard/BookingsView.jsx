@@ -43,6 +43,30 @@ function formatEventDate(d) {
   } catch { return d; }
 }
 
+/* Catmull-Rom spline -> cubic Bezier path. Same helper as PipelineView's
+   monthly trends chart so both charts smooth identically. tension=0.5 keeps
+   peaks sharp for lumpy seasonal revenue data; tension=0.7 (Pipeline default)
+   smooths slightly more. Wedding revenue is structurally lumpy month-to-month,
+   so we under-smooth here to preserve the actual shape. */
+function smoothPath(points, tension = 0.5) {
+  if (points.length === 0) return "";
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+  if (points.length === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] || points[i];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] || points[i + 1];
+    const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
+    const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
+    const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
+    const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
+    d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+  return d;
+}
+
 export default function BookingsView() {
   const [hiddenYears, setHiddenYears] = useState(() => new Set(YEARS.filter(y => y !== CURRENT_YEAR)));
   const [hoveredMonth, setHoveredMonth] = useState(null);
@@ -286,7 +310,12 @@ export default function BookingsView() {
             </text>
           ))}
 
-          {/* Year lines */}
+          {/* Year lines - smoothPath (Catmull-Rom Bezier, tension 0.5) for visual
+              parity with PipelineView's monthly trends. Lines only on the path;
+              hit-target circles per month for click + hover state; end-of-line
+              dot per visible year so the latest data point is always anchored.
+              Per-point value labels removed - hover crosshair + drill-in below
+              carry that data without cluttering the chart. */}
           {YEARS.filter(y => !hiddenYears.has(y)).map(year => {
             const data = REVENUE_BY_YEAR[year];
             const endMonth = year === CURRENT_YEAR ? CURRENT_DATA_MONTH : 12;
@@ -296,7 +325,9 @@ export default function BookingsView() {
             }
             if (points.length === 0) return null;
 
-            const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+            const pathD = smoothPath(points, 0.5);
+            const lastPoint = points[points.length - 1];
+            const isCurrent = year === CURRENT_YEAR;
 
             return (
               <g key={year}>
@@ -309,29 +340,34 @@ export default function BookingsView() {
                   strokeLinejoin="round"
                   strokeLinecap="round"
                 />
-                {points.map((p, i) => (
-                  <g key={i} onClick={() => handleCellClick(year, p.month)} style={{ cursor: p.val > 0 ? "pointer" : "default" }}>
+                {/* End-of-line dot */}
+                {lastPoint.val > 0 && (
+                  <circle
+                    cx={lastPoint.x} cy={lastPoint.y}
+                    r={isCurrent ? 4.5 : 3.5}
+                    fill={YEAR_COLORS[year]}
+                    stroke="#F5F0E8"
+                    strokeWidth={1.5}
+                  />
+                )}
+                {/* Per-point hit targets - kept invisible so hover/click still work */}
+                {points.map((p) => {
+                  const isHovered = hoveredMonth === p.month;
+                  const isActive = drillDown && drillDown.year === year && drillDown.month === p.month;
+                  if (!isHovered && !isActive) return null;
+                  return (
                     <circle
+                      key={p.month}
                       cx={p.x} cy={p.y}
-                      r={hoveredMonth === p.month ? 4.5 : (p.val > 0 ? 3 : 1.5)}
-                      fill={p.val > 0 ? YEAR_COLORS[year] : "rgba(44,24,16,0.08)"}
-                      stroke={drillDown && drillDown.year === year && drillDown.month === p.month ? "#2E4009" : "#F5F0E8"}
-                      strokeWidth={drillDown && drillDown.year === year && drillDown.month === p.month ? 2.5 : 1.5}
+                      r={isActive ? 5 : 4}
+                      fill={p.val > 0 ? YEAR_COLORS[year] : "transparent"}
+                      stroke={isActive ? "#2E4009" : "#F5F0E8"}
+                      strokeWidth={isActive ? 2.5 : 1.5}
+                      style={{ cursor: p.val > 0 ? "pointer" : "default" }}
+                      onClick={() => handleCellClick(year, p.month)}
                     />
-                    {(hoveredMonth === p.month || (year === CURRENT_YEAR && i === points.length - 1)) && p.val > 0 && (
-                      <text
-                        x={p.x}
-                        y={p.y - 10}
-                        textAnchor="middle"
-                        fontSize="10"
-                        fontWeight="600"
-                        fill={YEAR_COLORS[year]}
-                      >
-                        {formatRevenue(p.val)}
-                      </text>
-                    )}
-                  </g>
-                ))}
+                  );
+                })}
               </g>
             );
           })}
