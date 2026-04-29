@@ -387,18 +387,24 @@ export default function BookingsView() {
               .sort((a, b) => b - a);
             if (visibleAtMonth.length === 0) return null;
 
-            /* Card geometry */
-            const rowH = 16;
-            const padX = 10;
-            const padY = 6;
-            const cardW = 96;
-            const cardH = padY * 2 + rowH * (visibleAtMonth.length + 1) - 2;
+            /* Card geometry. Generous spacing - header and rows must each
+               sit on their own line with breathing room (£39k vs £45k labels
+               were colliding at the previous 16px row height + 6px padding). */
+            const padX = 12;
+            const padY = 12;
+            const headerH = 18;
+            const rowH = 22;
+            const cardW = 124;
+            const cardH = padY * 2 + headerH + rowH * visibleAtMonth.length;
+
             const tx = monthX(hoveredMonth);
             /* Pin to right of crosshair when there's room, otherwise flip left. */
             const cardX = tx + cardW + 14 > W - PAD_R
               ? tx - cardW - 12
               : tx + 12;
             const cardY = PAD_T + 4;
+
+            const headerCenterY = cardY + padY + headerH / 2;
 
             return (
               <g style={{ pointerEvents: "none" }}>
@@ -411,38 +417,41 @@ export default function BookingsView() {
                   strokeWidth="1"
                 />
                 <text
-                  x={cardX + padX} y={cardY + padY + 11}
+                  x={cardX + padX}
+                  y={headerCenterY}
+                  dominantBaseline="central"
                   fontSize="10" fontWeight="700"
-                  letterSpacing="0.08em"
-                  textTransform="uppercase"
-                  fill="rgba(44,24,16,0.5)"
+                  letterSpacing="0.1em"
+                  fill="rgba(44,24,16,0.45)"
                 >
                   {SHORT_MONTHS[hoveredMonth].toUpperCase()}
                 </text>
                 {visibleAtMonth.map((year, i) => {
-                  const rowY = cardY + padY + rowH + 2 + i * rowH;
+                  const rowCenterY = cardY + padY + headerH + i * rowH + rowH / 2;
                   return (
                     <g key={year}>
                       <circle
                         cx={cardX + padX + 4}
-                        cy={rowY - 4}
+                        cy={rowCenterY}
                         r={4}
                         fill={YEAR_COLORS[year]}
                       />
                       <text
                         x={cardX + padX + 14}
-                        y={rowY}
-                        fontSize="11"
+                        y={rowCenterY}
+                        dominantBaseline="central"
+                        fontSize="12"
                         fontWeight={year === CURRENT_YEAR ? "600" : "500"}
-                        fill="rgba(44,24,16,0.7)"
+                        fill="rgba(44,24,16,0.72)"
                       >
                         {year}
                       </text>
                       <text
                         x={cardX + cardW - padX}
-                        y={rowY}
+                        y={rowCenterY}
                         textAnchor="end"
-                        fontSize="11"
+                        dominantBaseline="central"
+                        fontSize="12"
                         fontWeight="600"
                         fill={YEAR_COLORS[year]}
                         fontVariantNumeric="tabular-nums"
