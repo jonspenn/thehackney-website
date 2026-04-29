@@ -30,7 +30,7 @@ import PricingView from "./dashboard/PricingView.jsx";
 import DatesView from "./dashboard/DatesView.jsx";
 
 /* ───────── URL persistence ───────── */
-const VALID_TABS = ["pipeline", "leads", "dates", "customers", "bookings", "overview", "analytics", "lost", "pricing"];
+const VALID_TABS = ["pipeline", "leads", "dates", "customers", "bookings", "website", "overview", "analytics", "lost", "pricing"];
 const VALID_TYPES = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
 
 /* ───────── main component ───────── */
@@ -60,11 +60,19 @@ export default function AdminDashboard({ pricing }) {
     };
   })();
 
-  const [activeTab, setActiveTab] = useState(initialUrlState.tab === "lost" ? "leads" : initialUrlState.tab);
+  // ── Tab redirects (29 Apr 2026 IA restructure) ──
+  // - ?tab=lost      → leads + showLost=true
+  // - ?tab=overview  → website + websiteSub='performance'
+  // - ?tab=analytics → website + websiteSub='events'
+  // Old bookmarks and copied URLs all keep working; the user just lands in
+  // the new home of that content.
+  const initialResolvedTab = (() => {
+    if (initialUrlState.tab === "lost") return "leads";
+    if (initialUrlState.tab === "overview" || initialUrlState.tab === "analytics") return "website";
+    return initialUrlState.tab;
+  })();
+  const [activeTab, setActiveTab] = useState(initialResolvedTab);
   const [activeLeadType, setActiveLeadType] = useState(initialUrlState.type);
-  // Lost tab demotion (29 Apr 2026): Lost is now an inline toggle on the Leads
-  // tab. Reading ?tab=lost on URL hydration auto-redirects to ?tab=leads&lost=1.
-  // Reading ?tab=leads&lost=1 boots into Lost mode directly.
   const initialLostMode = (() => {
     if (typeof window === "undefined") return false;
     if (initialUrlState.tab === "lost") return true;
@@ -72,6 +80,15 @@ export default function AdminDashboard({ pricing }) {
     return params.get("lost") === "1";
   })();
   const [showLost, setShowLost] = useState(initialLostMode);
+  const initialWebsiteSub = (() => {
+    if (typeof window === "undefined") return "performance";
+    if (initialUrlState.tab === "analytics") return "events";
+    if (initialUrlState.tab === "overview") return "performance";
+    const params = new URLSearchParams(window.location.search);
+    const sub = params.get("sub");
+    return sub === "events" ? "events" : "performance";
+  })();
+  const [websiteSub, setWebsiteSub] = useState(initialWebsiteSub);
   const [pendingLeadId, setPendingLeadId] = useState(initialUrlState.leadId); // resolved to selectedLead once data arrives
   const [analyticsFilter, setAnalyticsFilter] = useState(null); // { type, value, label } or null
   const [selectedLead, setSelectedLead] = useState(null); // lead object for profile panel
@@ -316,11 +333,18 @@ export default function AdminDashboard({ pricing }) {
       setAnalyticsFilter(null);
     } else {
       setAnalyticsFilter({ type, value, label });
-      if (activeTab !== "analytics") {
-        setActiveTab("analytics");
+      // Cross-tab navigation: chart click on a non-Website tab jumps the user
+      // into the Website tab's Events sub-section (the merged Analytics view).
+      if (activeTab !== "website" || websiteSub !== "events") {
+        setActiveTab("website");
+        setWebsiteSub("events");
         setSelectedLead(null);
         setPendingLeadId(null);
-        syncUrl({ tab: "analytics", type: activeLeadType, leadId: null });
+        const params = new URLSearchParams(window.location.search);
+        params.set("tab", "website");
+        params.set("sub", "events");
+        params.delete("lead");
+        window.history.pushState({}, "", `${window.location.pathname}?${params.toString()}`);
       }
     }
   }
@@ -391,8 +415,7 @@ export default function AdminDashboard({ pricing }) {
     { id: "dates", label: "Dates" },
     { id: "customers", label: "Customers" },
     { id: "bookings", label: "Bookings" },
-    { id: "overview", label: "Overview" },
-    { id: "analytics", label: "Analytics" },
+    { id: "website", label: "Website" },
   ];
 
   return (
@@ -427,8 +450,46 @@ export default function AdminDashboard({ pricing }) {
         <button className="rep-refresh adm-refresh" onClick={load} type="button" aria-label="Refresh data">Refresh</button>
       </div>
 
-      {/* ═══════ OVERVIEW TAB ═══════ */}
-      {activeTab === "overview" && (
+      {/* ═══════ WEBSITE TAB ═══════
+           Merged Overview + Analytics (29 Apr 2026 IA restructure Phase 3).
+           Sub-tabs: Performance (was Overview - KPIs, top pages, sources,
+           devices, day-of-week, CTAs, dates) and Events (was Analytics -
+           visitor table, date clicks log, event log). The cross-navigation
+           from Performance charts to Events log is preserved as intra-tab
+           sub-switching. */}
+      {activeTab === "website" && (
+        <div className="adm-leads-mode adm-website-sub">
+          <button
+            type="button"
+            className={`adm-leads-mode__btn${websiteSub === "performance" ? " adm-leads-mode__btn--active" : ""}`}
+            onClick={() => {
+              setWebsiteSub("performance");
+              const params = new URLSearchParams(window.location.search);
+              params.set("tab", "website");
+              params.set("sub", "performance");
+              window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+            }}
+          >
+            Performance
+          </button>
+          <button
+            type="button"
+            className={`adm-leads-mode__btn${websiteSub === "events" ? " adm-leads-mode__btn--active" : ""}`}
+            onClick={() => {
+              setWebsiteSub("events");
+              const params = new URLSearchParams(window.location.search);
+              params.set("tab", "website");
+              params.set("sub", "events");
+              window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+            }}
+          >
+            Events
+          </button>
+        </div>
+      )}
+
+      {/* Performance sub-tab: was the standalone Overview tab */}
+      {activeTab === "website" && websiteSub === "performance" && (
         <>
           {/* Top-level KPIs */}
           <div className="rep-totals" style={{ marginBottom: "12px" }}>
@@ -585,8 +646,8 @@ export default function AdminDashboard({ pricing }) {
         </>
       )}
 
-      {/* ═══════ ANALYTICS TAB (Visitors + Date Clicks + Events) ═══════ */}
-      {activeTab === "analytics" && (
+      {/* Events sub-tab: was the standalone Analytics tab (Visitors + Date Clicks + Events) */}
+      {activeTab === "website" && websiteSub === "events" && (
         <>
           <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Visitors</h2>
           <div className="rep-totals">
@@ -814,7 +875,7 @@ export default function AdminDashboard({ pricing }) {
         <PricingView pricing={pricing} />
       )}
 
-      {activeTab === "analytics" && (
+      {activeTab === "website" && websiteSub === "events" && (
         <>
           <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
           <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Date clicks</h2>
