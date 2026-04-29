@@ -18,12 +18,13 @@ import LeadTable from "./dashboard/LeadTable.jsx";
 import PipelineView from "./dashboard/PipelineView.jsx";
 import BookingsView from "./dashboard/BookingsView.jsx";
 import WebsiteView from "./dashboard/WebsiteView.jsx";
+import AttributionView from "./dashboard/AttributionView.jsx";
 import CustomersView from "./dashboard/CustomersView.jsx";
 import PricingView from "./dashboard/PricingView.jsx";
 import DatesView from "./dashboard/DatesView.jsx";
 
 /* ───────── URL persistence ───────── */
-const VALID_TABS = ["pipeline", "leads", "dates", "customers", "bookings", "website", "overview", "analytics", "lost", "pricing"];
+const VALID_TABS = ["pipeline", "leads", "dates", "customers", "bookings", "website", "attribution", "overview", "analytics", "lost", "pricing"];
 const VALID_TYPES = ["wedding", "corporate", "supperclub", "private-events", "cafe-bar"];
 
 /* ───────── main component ───────── */
@@ -354,6 +355,7 @@ export default function AdminDashboard({ pricing }) {
     { id: "customers", label: "Customers" },
     { id: "bookings", label: "Bookings" },
     { id: "website", label: "Website" },
+    { id: "attribution", label: "Attribution" },
   ];
 
   return (
@@ -407,6 +409,15 @@ export default function AdminDashboard({ pricing }) {
           setAnalyticsFilter={setAnalyticsFilter}
           onApplyFilter={applyAnalyticsFilter}
         />
+      )}
+
+      {/* ═══════ ATTRIBUTION TAB ═══════
+           Per-platform funnel performance (29 Apr 2026 - kickoff brief at
+           website/pages/dashboard/next-session-attribution-kickoff.md).
+           Phase 0: skeleton. Subsequent phases add API + funnel table +
+           drill-in + ad-platform connectors. */}
+      {activeTab === "attribution" && (
+        <AttributionView />
       )}
 
 
