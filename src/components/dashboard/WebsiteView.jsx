@@ -49,7 +49,6 @@ export default function WebsiteView({
   const eventTypeMax = useMemo(() => tracking?.eventTypes?.[0]?.event_count || 1, [tracking]);
   /* New panels (Phase 2c) */
   const countryMax = useMemo(() => tracking?.countries?.[0]?.visitor_count || 1, [tracking]);
-  const adPlatformMax = useMemo(() => tracking?.adPlatforms?.[0]?.visitor_count || 1, [tracking]);
   const formSubMax = useMemo(() => tracking?.formSubmissions?.[0]?.submission_count || 1, [tracking]);
 
   /* Filtered recent tables - depend on the active analyticsFilter */
@@ -264,42 +263,24 @@ export default function WebsiteView({
             </section>
           </div>
 
-          {/* Top countries (Phase 2c - audit A1) */}
-          <div className="rep-two-col">
-            <section className="rep-section">
-              <h2 className="rep-h2">Top countries</h2>
-              <p className="rep-sub">Visitor count by Cloudflare-detected country (first hit).</p>
-              {(tracking?.countries || []).length === 0 ? <p className="rep-empty-small">No country data yet.</p> : (
-                <ol className="rep-toplist">
-                  {tracking.countries.slice(0, 10).map((row, i) => (
-                    <li key={row.country} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.country || "Unknown"}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / countryMax) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.visitor_count}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-            {/* Ad platforms (Phase 2c - audit A3) */}
-            <section className="rep-section">
-              <h2 className="rep-h2">Ad platforms</h2>
-              <p className="rep-sub">First-touch paid attribution. Click ID present = paid; UTM-only = organic.</p>
-              {(tracking?.adPlatforms || []).length === 0 ? <p className="rep-empty-small">No platform data yet.</p> : (
-                <ol className="rep-toplist">
-                  {tracking.adPlatforms.map((row, i) => (
-                    <li key={row.platform} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{row.platform}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / adPlatformMax) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.visitor_count}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </section>
-          </div>
+          {/* Top countries - Cloudflare-detected first-hit country.
+               Per-platform attribution lives on the Attribution tab. */}
+          <section className="rep-section">
+            <h2 className="rep-h2">Top countries</h2>
+            <p className="rep-sub">Visitor count by Cloudflare-detected country (first hit).</p>
+            {(tracking?.countries || []).length === 0 ? <p className="rep-empty-small">No country data yet.</p> : (
+              <ol className="rep-toplist">
+                {tracking.countries.slice(0, 10).map((row, i) => (
+                  <li key={row.country} className="rep-toprow rep-toprow--compact">
+                    <span className="rep-toprank">{i + 1}</span>
+                    <span className="rep-topdate">{row.country || "Unknown"}</span>
+                    <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / countryMax) * 100}%` }} /></span>
+                    <span className="rep-topcount">{row.visitor_count}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
 
           {/* Form submissions by type (Phase 2c - audit A7) */}
           <section className="rep-section">
