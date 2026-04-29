@@ -352,7 +352,8 @@ import pricing from '../../../data/wedding-pricing.json';
       }
 
       /* ── Two-column layout ── */
-      .rep-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+      /* align-items: start prevents the shorter child being stretched to match the taller. Each panel takes its natural height; the row's effective height = max(child heights). */
+      .rep-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; align-items: start; }
       .rep-two-col + .rep-two-col { margin-top: 16px; }
       .rep-totals + .rep-two-col,
       .rep-totals--today + .rep-two-col { margin-top: 16px; }

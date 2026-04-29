@@ -218,24 +218,45 @@ export default function WebsiteView({
             </section>
           </div>
 
+          {/* Devices - own full-width row. Pulled out of the .rep-two-col
+              pair (was sitting next to Top CTA clicks which is a tall list).
+              .rep-device-grid auto-fits so the 3 device cards spread to fill. */}
+          <section className="rep-section">
+            <h2 className="rep-h2">Devices</h2>
+            <p className="rep-sub">Visitor breakdown by device type.</p>
+            {(tracking?.devices || []).length === 0 ? <p className="rep-empty-small">No device data yet.</p> : (
+              <div className="rep-device-grid">
+                {tracking.devices.map((d) => {
+                  const pct = deviceTotal > 0 ? Math.round((d.visitor_count / deviceTotal) * 100) : 0;
+                  return (
+                    <div key={d.device_type} className={`rep-device-card rep-device-card--clickable${analyticsFilter?.type === "device" && analyticsFilter?.value === (d.device_type || "Unknown") ? " rep-device-card--active" : ""}`}
+                         onClick={() => onApplyFilter("device", d.device_type || "Unknown", `Device: ${d.device_type || "Unknown"}`)}>
+                      <div className="rep-device-card__pct">{pct}%</div>
+                      <div className="rep-device-card__label">{d.device_type || "Unknown"}</div>
+                      <div className="rep-device-card__count">{d.visitor_count} visitors</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          {/* Pair 2: Top countries | Top CTA clicks - both tall lists, heights match. */}
           <div className="rep-two-col">
             <section className="rep-section">
-              <h2 className="rep-h2">Devices</h2>
-              <p className="rep-sub">Visitor breakdown by device type.</p>
-              {(tracking?.devices || []).length === 0 ? <p className="rep-empty-small">No device data yet.</p> : (
-                <div className="rep-device-grid">
-                  {tracking.devices.map((d) => {
-                    const pct = deviceTotal > 0 ? Math.round((d.visitor_count / deviceTotal) * 100) : 0;
-                    return (
-                      <div key={d.device_type} className={`rep-device-card rep-device-card--clickable${analyticsFilter?.type === "device" && analyticsFilter?.value === (d.device_type || "Unknown") ? " rep-device-card--active" : ""}`}
-                           onClick={() => onApplyFilter("device", d.device_type || "Unknown", `Device: ${d.device_type || "Unknown"}`)}>
-                        <div className="rep-device-card__pct">{pct}%</div>
-                        <div className="rep-device-card__label">{d.device_type || "Unknown"}</div>
-                        <div className="rep-device-card__count">{d.visitor_count} visitors</div>
-                      </div>
-                    );
-                  })}
-                </div>
+              <h2 className="rep-h2">Top countries</h2>
+              <p className="rep-sub">Visitor count by Cloudflare-detected country (first hit).</p>
+              {(tracking?.countries || []).length === 0 ? <p className="rep-empty-small">No country data yet.</p> : (
+                <ol className="rep-toplist">
+                  {tracking.countries.slice(0, 10).map((row, i) => (
+                    <li key={row.country} className="rep-toprow rep-toprow--compact">
+                      <span className="rep-toprank">{i + 1}</span>
+                      <span className="rep-topdate">{row.country || "Unknown"}</span>
+                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / countryMax) * 100}%` }} /></span>
+                      <span className="rep-topcount">{row.visitor_count}</span>
+                    </li>
+                  ))}
+                </ol>
               )}
             </section>
             <section className="rep-section">
@@ -262,25 +283,6 @@ export default function WebsiteView({
               )}
             </section>
           </div>
-
-          {/* Top countries - Cloudflare-detected first-hit country.
-               Per-platform attribution lives on the Attribution tab. */}
-          <section className="rep-section">
-            <h2 className="rep-h2">Top countries</h2>
-            <p className="rep-sub">Visitor count by Cloudflare-detected country (first hit).</p>
-            {(tracking?.countries || []).length === 0 ? <p className="rep-empty-small">No country data yet.</p> : (
-              <ol className="rep-toplist">
-                {tracking.countries.slice(0, 10).map((row, i) => (
-                  <li key={row.country} className="rep-toprow rep-toprow--compact">
-                    <span className="rep-toprank">{i + 1}</span>
-                    <span className="rep-topdate">{row.country || "Unknown"}</span>
-                    <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / countryMax) * 100}%` }} /></span>
-                    <span className="rep-topcount">{row.visitor_count}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </section>
 
           {/* Form submissions by type (Phase 2c - audit A7) */}
           <section className="rep-section">
