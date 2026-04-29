@@ -340,70 +340,6 @@ export default function WebsiteView({
       {websiteSub === "events" && (
         <>
           <section className="rep-section">
-            <h2 className="rep-h2">Top pages</h2>
-            <p className="rep-sub">Most viewed pages by total page_view events. Click a count to filter recent events.</p>
-            {(tracking?.topPages || []).length === 0 ? <p className="rep-empty-small">No page views yet.</p> : (
-              <ol className="rep-toplist">
-                {tracking.topPages.map((row, i) => {
-                  const short = shortenUrl(row.page_url);
-                  const active = analyticsFilter?.type === "page" && analyticsFilter?.value === short;
-                  return (
-                    <li key={row.page_url} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                        onClick={() => onApplyFilter("page", short, `Page: ${short}`)}>
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{short}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.view_count / topPageMax) * 100}%` }} /></span>
-                      <span className="rep-topcount rep-topcount--link">{row.view_count}</span>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </section>
-
-          <div className="rep-two-col">
-            <section className="rep-section">
-              <h2 className="rep-h2">Traffic sources</h2>
-              <p className="rep-sub">First-touch UTM source per visitor. Click a count to filter recent visitors.</p>
-              {(tracking?.sources || []).length === 0 ? <p className="rep-empty-small">No source data yet.</p> : (
-                <ol className="rep-toplist">
-                  {tracking.sources.map((row, i) => {
-                    const active = analyticsFilter?.type === "source" && analyticsFilter?.value === row.source;
-                    return (
-                      <li key={row.source} className={`rep-toprow rep-toprow--compact rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                          onClick={() => onApplyFilter("source", row.source, `Source: ${row.source}`)}>
-                        <span className="rep-toprank">{i + 1}</span>
-                        <span className="rep-topdate">{row.source}</span>
-                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.visitor_count / sourceMax) * 100}%` }} /></span>
-                        <span className="rep-topcount rep-topcount--link">{row.visitor_count}</span>
-                      </li>
-                    );
-                  })}
-                </ol>
-              )}
-            </section>
-            <section className="rep-section">
-              <h2 className="rep-h2">Devices</h2>
-              <p className="rep-sub">Visitor count by device type.</p>
-              {(tracking?.devices || []).length === 0 ? <p className="rep-empty-small">No device data yet.</p> : (
-                <div className="rep-device-grid">
-                  {tracking.devices.map((d) => {
-                    const pct = deviceTotal > 0 ? Math.round((d.visitor_count / deviceTotal) * 100) : 0;
-                    return (
-                      <div key={d.device_type} className={`rep-device-card rep-device-card--clickable${analyticsFilter?.type === "device" && analyticsFilter?.value === (d.device_type || "Unknown") ? " rep-device-card--active" : ""}`}
-                           onClick={() => onApplyFilter("device", d.device_type || "Unknown", `Device: ${d.device_type || "Unknown"}`)}>
-                        <div className="rep-device-card__pct">{pct}%</div>
-                        <div className="rep-device-card__label">{d.device_type || "Unknown"}</div>
-                        <div className="rep-device-card__count">{d.visitor_count} visitors</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-          </div>
-
-          <section className="rep-section">
             <h2 className="rep-h2">Recent visitors</h2>
             <p className="rep-sub">Last 30 visitors with first-touch attribution.</p>
             {analyticsFilter && (analyticsFilter.type === "source" || analyticsFilter.type === "device" || analyticsFilter.type === "page") && (
@@ -439,9 +375,6 @@ export default function WebsiteView({
           </section>
 
 
-          <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
-          <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Events</h2>
-
           <section className="rep-section">
             <h2 className="rep-h2">Events by type</h2>
             <p className="rep-sub">Total count for each event type tracked.</p>
@@ -463,29 +396,6 @@ export default function WebsiteView({
             )}
           </section>
 
-          <section className="rep-section">
-            <h2 className="rep-h2">CTA clicks</h2>
-            <p className="rep-sub">Which buttons are getting clicked, and on which pages. Click a count to filter recent events.</p>
-            {(tracking?.topCTAs || []).length === 0 ? <p className="rep-empty-small">No CTA clicks yet.</p> : (
-              <ol className="rep-toplist">
-                {tracking.topCTAs.map((row, i) => {
-                  const active = analyticsFilter?.type === "cta" && analyticsFilter?.value === row.cta_id;
-                  return (
-                    <li key={`${row.cta_id}-${row.page_url}`} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                        onClick={() => onApplyFilter("cta", row.cta_id, `CTA: ${row.cta_id}`)}>
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">
-                        <strong>{row.cta_id || "unknown"}</strong><br />
-                        <span style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>{shortenUrl(row.page_url)}</span>
-                      </span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topCTAMax) * 100}%` }} /></span>
-                      <span className="rep-topcount rep-topcount--link">{row.click_count}</span>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </section>
 
           <section className="rep-section">
             <h2 className="rep-h2">Recent events</h2>
