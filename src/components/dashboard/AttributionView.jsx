@@ -28,7 +28,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { MetadataStrip, MetadataCell, SoftPill, SubModeToggle } from "./primitives/index.js";
+import { MetadataStrip, MetadataCell, SoftPill, SubModeToggle, DrillInPanel } from "./primitives/index.js";
 import { shortenUrl, formatCount, formatPounds, resolveSourceVariant, resolveTierColour } from "./utils.js";
 
 const WINDOW_MODES = [
@@ -226,24 +226,12 @@ export default function AttributionView() {
 
       {/* ── Drill-in: per-campaign breakdown for clicked platform ── */}
       {drillIn && (
-        <section className="lp-card" style={{ marginTop: 16 }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8C472E" }}>
-                DRILL-IN · {drillIn.platform.toUpperCase()}
-              </div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 500, margin: "4px 0 0" }}>
-                Top campaigns ({drillCampaigns.length})
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => setDrillIn(null)}
-              style={{ background: "transparent", border: 0, color: "#8C472E", fontSize: 12, cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase" }}
-            >
-              Close
-            </button>
-          </div>
+        <DrillInPanel
+          className="lp-drill-card--attribution"
+          eyebrow={`DRILL-IN · ${drillIn.platform.toUpperCase()}`}
+          title={`Top campaigns (${drillCampaigns.length})`}
+          onClose={() => setDrillIn(null)}
+        >
           {drillCampaigns.length === 0 ? (
             <p className="rep-empty">No campaign data captured for this platform yet.</p>
           ) : (
@@ -275,7 +263,7 @@ export default function AttributionView() {
               </table>
             </div>
           )}
-        </section>
+        </DrillInPanel>
       )}
 
       {/* ── Top campaigns (cross-platform) + Top landing pages (paid only) ── */}

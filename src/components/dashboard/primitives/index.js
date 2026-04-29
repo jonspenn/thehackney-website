@@ -30,3 +30,4 @@ export { MILESTONE_ICONS, MilestoneIcon } from "./activity-icons.jsx";
 export { default as CardSurface } from "./CardSurface.jsx";
 export { default as FunnelTrack } from "./FunnelTrack.jsx";
 export { default as SubModeToggle } from "./SubModeToggle.jsx";
+export { default as DrillInPanel } from "./DrillInPanel.jsx";

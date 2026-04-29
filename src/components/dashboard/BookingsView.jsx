@@ -11,7 +11,7 @@ import {
   YEAR_COLORS, YEAR_STYLES,
 } from "./bookings-data.js";
 import { DEALS_BY_MONTH } from "./bookings-deals.js";
-import { MetadataStrip, MetadataCell } from "./primitives/index.js";
+import { MetadataStrip, MetadataCell, DrillInPanel } from "./primitives/index.js";
 import { formatPoundsRounded, formatPoundsExact, resolveTierColour } from "./utils.js";
 
 const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -618,26 +618,19 @@ export default function BookingsView() {
 
       {/* ── Drill-down panel ── */}
       {drillDown && drillDeals && (
-        <div className="lp-card bookings-drill-card">
-          <div className="bookings-drill-card__header">
-            <div className="bookings-drill-card__title-wrap">
-              <span className="lp-meta-cell__eyebrow">Drill-in · {FULL_MONTHS[drillDown.month]} {drillDown.year}</span>
-              <h3 className="bookings-drill-card__title">
-                {formatPoundsExact(REVENUE_BY_YEAR[drillDown.year][drillDown.month])}
-                <span className="bookings-drill-card__sub">from {drillDeals.length} deal{drillDeals.length !== 1 ? "s" : ""}</span>
-              </h3>
-            </div>
-            <button
-              type="button"
-              className="bookings-drill-card__close"
-              onClick={() => setDrillDown(null)}
-              title="Close drill-in"
-              aria-label="Close drill-in"
-            >×</button>
-          </div>
+        <DrillInPanel
+          eyebrow={`Drill-in · ${FULL_MONTHS[drillDown.month]} ${drillDown.year}`}
+          title={
+            <>
+              {formatPoundsExact(REVENUE_BY_YEAR[drillDown.year][drillDown.month])}
+              <span className="lp-drill-card__sub">from {drillDeals.length} deal{drillDeals.length !== 1 ? "s" : ""}</span>
+            </>
+          }
+          onClose={() => setDrillDown(null)}
+        >
           {drillDeals.length > 0 ? (
-            <div className="rep-table-wrap bookings-drill-card__table-wrap">
-              <table className="rep-table bookings-drill-card__table">
+            <div className="rep-table-wrap lp-drill-card__table-wrap">
+              <table className="rep-table lp-drill-card__table">
                 <thead>
                   <tr>
                     <th style={{ textAlign: "left" }}>Deal</th>
@@ -659,9 +652,9 @@ export default function BookingsView() {
               </table>
             </div>
           ) : (
-            <p className="bookings-drill-card__empty">No deal data available for this month.</p>
+            <p className="lp-drill-card__empty">No deal data available for this month.</p>
           )}
-        </div>
+        </DrillInPanel>
       )}
 
       {/* ── Month detail table ── */}
