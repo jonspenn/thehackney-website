@@ -234,7 +234,7 @@ export default function BookingsView() {
             <span
               className="pipe-metric"
               style={{ color: strip.bestEverPct == null ? undefined : (strip.bestEverPct >= 0 ? "#2E4009" : "#8C472E") }}
-              title={strip.bestEverYTD ? `Best-ever YTD = sum of per-month historical maxes (£${strip.bestEverYTD.toLocaleString("en-GB")} for Jan-${SHORT_MONTHS[CURRENT_DATA_MONTH - 1]})` : ""}
+              title={strip.bestEverYTD ? `Best-ever YTD = sum of per-month historical maxes across 2023, 2024, 2025 (£${strip.bestEverYTD.toLocaleString("en-GB")} for Jan-${SHORT_MONTHS[CURRENT_DATA_MONTH - 1]})` : ""}
             >
               {strip.bestEverPctDisplay == null
                 ? "—"
@@ -760,7 +760,7 @@ export default function BookingsView() {
 
       <p className="bookings-footnote">
         Source: HubSpot won deals export (29 Apr 2026). Close date basis, all event types.
-        2026 data through {SHORT_MONTHS[CURRENT_DATA_MONTH - 1]}. Click any figure to see deals.
+        2026 data through {SHORT_MONTHS[CURRENT_DATA_MONTH - 1]}. Best-ever benchmark uses 2023-2025 only (2022 and earlier excluded as soft-launch trading volume). Click any figure to see deals.
       </p>
     </div>
   );
