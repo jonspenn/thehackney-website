@@ -431,7 +431,7 @@ export default function BookingsView() {
           Year-over-year by month
           <span className="pipe-collapse-toggle__summary">{"\u00A3"} closed per month, all event types</span>
         </div>
-        <div className="rep-table-wrap bookings-table-wrap">
+        <div className="rep-table-wrap">
           <table className="rep-table bookings-rep-table">
             <thead>
               <tr>
