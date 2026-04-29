@@ -99,14 +99,43 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
   const summary = useMemo(() => {
     if (!data) return null;
     const max = data.heat?.reduce((m, r) => Math.max(m, r.clicks), 0) || 0;
+
+    // Index click data by ISO date for O(1) lookup
+    const clicksByDate = {};
+    for (const r of data.heat || []) clicksByDate[r.clicked_date] = r.clicks;
+
+    // Cold dates: count of dates in the next 90 days with < 5 clicks AND
+    // not booked. Includes zero-click dates which are the riskiest.
+    // Restricted to the selected year so the cell tracks the strip's scope.
+    let coldCount = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 90; i++) {
+      const d = new Date(today.getTime() + i * 86400000);
+      const iso = d.toISOString().slice(0, 10);
+      if (!iso.startsWith(String(year))) continue;
+      if (bookedDates.has(iso)) continue;
+      if ((clicksByDate[iso] || 0) < 5) coldCount += 1;
+    }
+
+    // Booked %: proportion of the selected year's dates already booked
+    const yearStr = String(year);
+    let bookedInYear = 0;
+    for (const d of bookedDates) if (typeof d === "string" && d.startsWith(yearStr)) bookedInYear += 1;
+    const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    const yearDates = isLeap ? 366 : 365;
+    const bookedPct = Math.round((bookedInYear / yearDates) * 100);
+
     return {
-      activeDates: data.activeDates || 0,
       totalClicks: data.totalClicks || 0,
       peakDate: (data.heat || []).find((r) => r.clicks === max),
       peakCount: max,
-      overrideCount: Object.keys(data.overrides || {}).length,
+      coldCount,
+      bookedInYear,
+      bookedPct,
+      yearDates,
     };
-  }, [data]);
+  }, [data, bookedDates, year]);
 
   return (
     <>
@@ -156,9 +185,6 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
         {/* Metric strip - matches Pipeline pattern */}
         <div className="pipe-meta-wrap">
           <MetadataStrip>
-            <MetadataCell eyebrow="Active dates">
-              <span className="pipe-metric">{summary?.activeDates ?? "—"}</span>
-            </MetadataCell>
             <MetadataCell eyebrow="Total clicks">
               <span className="pipe-metric">{summary?.totalClicks ?? "—"}</span>
             </MetadataCell>
@@ -168,8 +194,16 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
                 {summary?.peakCount > 0 && <span className="pipe-metric__unit">{summary.peakCount} clicks</span>}
               </span>
             </MetadataCell>
-            <MetadataCell eyebrow="Manual overrides">
-              <span className="pipe-metric">{summary?.overrideCount ?? 0}</span>
+            <MetadataCell eyebrow="Cold dates">
+              <span className="pipe-metric">
+                {summary?.coldCount ?? "—"}
+                <span className="pipe-metric__unit">within 90d</span>
+              </span>
+            </MetadataCell>
+            <MetadataCell eyebrow="Booked">
+              <span className="pipe-metric">
+                {summary?.bookedPct ?? "—"}<span className="pipe-metric__unit">% of {summary?.yearDates || 365}</span>
+              </span>
             </MetadataCell>
           </MetadataStrip>
         </div>
