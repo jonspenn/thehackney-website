@@ -72,6 +72,15 @@ import pricing from '../../../data/wedding-pricing.json';
         --text-faint: rgba(44, 24, 16, 0.4);
         --serif: 'Cormorant Garamond', Georgia, serif;
         --sans: 'DM Sans', system-ui, sans-serif;
+
+        /* ── Admin-scoped card chrome tokens ── */
+        /* The dashboard runs softer 8px cards on a soft white tint.
+           Public-site cards are 2px sharp (memory: feedback_card_border_radius).
+           These tokens are consumed by both .lp-card and .pipe-panel so the
+           two card systems stay in sync. */
+        --admin-card-bg: rgba(255, 255, 255, 0.7);
+        --admin-card-border-color: rgba(64, 22, 12, 0.10);
+        --admin-card-radius: 8px;
       }
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
@@ -653,9 +662,9 @@ import pricing from '../../../data/wedding-pricing.json';
       /* ── Pipeline view ── */
       /* Pipeline panel - matches dashboard card chrome (8px, Mahogany 10%, soft white tint) */
       .pipe-panel {
-        background: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(64, 22, 12, 0.10);
-        border-radius: 8px; overflow: hidden;
+        background: var(--admin-card-bg);
+        border: 1px solid var(--admin-card-border-color);
+        border-radius: var(--admin-card-radius); overflow: hidden;
       }
       .pipe-panel__tabs {
         display: flex; gap: 4px; padding: 10px 14px; flex-wrap: wrap;
@@ -1089,8 +1098,8 @@ import pricing from '../../../data/wedding-pricing.json';
 
       /* Card wrapper - now applied to each of the three sibling cards */
       .lp-card {
-        background: rgba(255,255,255,0.7); border: 1px solid rgba(64,22,12,0.10);
-        border-radius: 8px; overflow: hidden;
+        background: var(--admin-card-bg); border: 1px solid var(--admin-card-border-color);
+        border-radius: var(--admin-card-radius); overflow: hidden;
       }
 
       .lp-hero {
