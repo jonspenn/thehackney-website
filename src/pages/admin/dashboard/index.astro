@@ -374,6 +374,17 @@ import pricing from '../../../data/wedding-pricing.json';
       .rep-totals--today + .rep-two-col { margin-top: 16px; }
       @media (max-width: 720px) { .rep-two-col { grid-template-columns: 1fr; } }
 
+      /* ── Content-aware panel pack ──
+         Used on Website Performance sub-mode. Children flow into 2
+         CSS columns balanced by natural height — short panels pair
+         with short, tall with tall, automatically. Children with
+         .rep-panel-stack__full break out and span both columns. */
+      .rep-panel-stack { column-count: 2; column-gap: 16px; column-fill: balance; margin-top: 16px; }
+      .rep-panel-stack > * { break-inside: avoid; margin: 0 0 16px; }
+      .rep-panel-stack > *:last-child { margin-bottom: 0; }
+      .rep-panel-stack__full { column-span: all; }
+      @media (max-width: 720px) { .rep-panel-stack { column-count: 1; } }
+
       /* ── Device cards ── */
       .rep-device-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
       .rep-device-card {

@@ -174,7 +174,7 @@ export default function WebsiteView({
             </div>
           </div>
 
-          <div className="rep-two-col">
+          <div className="rep-panel-stack">
             <section className="rep-section">
               <h2 className="rep-h2">Top pages</h2>
               <p className="rep-sub">Most viewed pages.</p>
@@ -216,33 +216,29 @@ export default function WebsiteView({
                 </ol>
               )}
             </section>
-          </div>
 
-          {/* Devices - own full-width row. Pulled out of the .rep-two-col
-              pair (was sitting next to Top CTA clicks which is a tall list).
-              .rep-device-grid auto-fits so the 3 device cards spread to fill. */}
-          <section className="rep-section">
-            <h2 className="rep-h2">Devices</h2>
-            <p className="rep-sub">Visitor breakdown by device type.</p>
-            {(tracking?.devices || []).length === 0 ? <p className="rep-empty-small">No device data yet.</p> : (
-              <div className="rep-device-grid">
-                {tracking.devices.map((d) => {
-                  const pct = deviceTotal > 0 ? Math.round((d.visitor_count / deviceTotal) * 100) : 0;
-                  return (
-                    <div key={d.device_type} className={`rep-device-card rep-device-card--clickable${analyticsFilter?.type === "device" && analyticsFilter?.value === (d.device_type || "Unknown") ? " rep-device-card--active" : ""}`}
-                         onClick={() => onApplyFilter("device", d.device_type || "Unknown", `Device: ${d.device_type || "Unknown"}`)}>
-                      <div className="rep-device-card__pct">{pct}%</div>
-                      <div className="rep-device-card__label">{d.device_type || "Unknown"}</div>
-                      <div className="rep-device-card__count">{d.visitor_count} visitors</div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
+            {/* Devices - .rep-panel-stack__full so the 3-card device grid
+                spans both columns. .rep-device-grid auto-fits inside. */}
+            <section className="rep-section rep-panel-stack__full">
+                <h2 className="rep-h2">Devices</h2>
+              <p className="rep-sub">Visitor breakdown by device type.</p>
+              {(tracking?.devices || []).length === 0 ? <p className="rep-empty-small">No device data yet.</p> : (
+                <div className="rep-device-grid">
+                  {tracking.devices.map((d) => {
+                    const pct = deviceTotal > 0 ? Math.round((d.visitor_count / deviceTotal) * 100) : 0;
+                    return (
+                      <div key={d.device_type} className={`rep-device-card rep-device-card--clickable${analyticsFilter?.type === "device" && analyticsFilter?.value === (d.device_type || "Unknown") ? " rep-device-card--active" : ""}`}
+                           onClick={() => onApplyFilter("device", d.device_type || "Unknown", `Device: ${d.device_type || "Unknown"}`)}>
+                        <div className="rep-device-card__pct">{pct}%</div>
+                        <div className="rep-device-card__label">{d.device_type || "Unknown"}</div>
+                        <div className="rep-device-card__count">{d.visitor_count} visitors</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
 
-          {/* Pair 2: Top countries | Top CTA clicks - both tall lists, heights match. */}
-          <div className="rep-two-col">
             <section className="rep-section">
               <h2 className="rep-h2">Top countries</h2>
               <p className="rep-sub">Visitor count by Cloudflare-detected country (first hit).</p>
@@ -282,39 +278,40 @@ export default function WebsiteView({
                 </ol>
               )}
             </section>
-          </div>
 
-          {/* Form submissions by type (Phase 2c - audit A7) */}
-          <section className="rep-section">
-            <h2 className="rep-h2">Submissions by form</h2>
-            <p className="rep-sub">All form completions, broken out by which form fired the lead.</p>
-            {(tracking?.formSubmissions || []).length === 0 ? <p className="rep-empty-small">No submissions yet.</p> : (
-              <ol className="rep-toplist">
-                {tracking.formSubmissions.map((row, i) => {
-                  const label = (
-                    row.form_type === "wedding-quiz"      ? "Wedding quiz" :
-                    row.form_type === "corporate-quiz"    ? "Corporate quiz" :
-                    row.form_type === "brochure-download" ? "Brochure download" :
-                    row.form_type === "supperclub-signup" ? "Supper club signup" :
-                    row.form_type
-                  );
-                  return (
-                    <li key={row.form_type} className="rep-toprow rep-toprow--compact">
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">
-                        <strong>{label}</strong>
-                        {row.last_submission_at && (
-                          <><br /><span style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>last {formatRelativeTime(row.last_submission_at)}</span></>
-                        )}
-                      </span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.submission_count / formSubMax) * 100}%` }} /></span>
-                      <span className="rep-topcount">{row.submission_count}</span>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </section>
+            {/* Form submissions by type - .rep-panel-stack__full so the
+                4-row list spans both columns. */}
+            <section className="rep-section rep-panel-stack__full">
+              <h2 className="rep-h2">Submissions by form</h2>
+              <p className="rep-sub">All form completions, broken out by which form fired the lead.</p>
+              {(tracking?.formSubmissions || []).length === 0 ? <p className="rep-empty-small">No submissions yet.</p> : (
+                <ol className="rep-toplist">
+                  {tracking.formSubmissions.map((row, i) => {
+                    const label = (
+                      row.form_type === "wedding-quiz"      ? "Wedding quiz" :
+                      row.form_type === "corporate-quiz"    ? "Corporate quiz" :
+                      row.form_type === "brochure-download" ? "Brochure download" :
+                      row.form_type === "supperclub-signup" ? "Supper club signup" :
+                      row.form_type
+                    );
+                    return (
+                      <li key={row.form_type} className="rep-toprow rep-toprow--compact">
+                        <span className="rep-toprank">{i + 1}</span>
+                        <span className="rep-topdate">
+                          <strong>{label}</strong>
+                          {row.last_submission_at && (
+                            <><br /><span style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>last {formatRelativeTime(row.last_submission_at)}</span></>
+                          )}
+                        </span>
+                        <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.submission_count / formSubMax) * 100}%` }} /></span>
+                        <span className="rep-topcount">{row.submission_count}</span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </section>
+          </div>
 
         </>
       )}
