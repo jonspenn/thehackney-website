@@ -214,7 +214,9 @@ import pricing from '../../../data/wedding-pricing.json';
       /* ── Stat cards ── */
       .rep-totals {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        /* auto-fit so 3-stat or 4-stat rows lay out cleanly without an
+           empty trailing cell. Min 160px keeps numbers readable on phone. */
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 12px;
         margin-bottom: 12px;
       }

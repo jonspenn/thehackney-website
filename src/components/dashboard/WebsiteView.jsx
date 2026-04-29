@@ -27,15 +27,12 @@ import {
 
 import { formatRelativeTime, formatAbsoluteTime, formatLongDate,
   shortenUrl, parseEventData, eventSummary,
-  buildHeatmapMonths, heatColour, heatTextColour, formatCount, resolveSourceVariant, resolveDeviceVariant, resolveTierColour } from "./utils.js";
+  formatCount, resolveSourceVariant, resolveDeviceVariant, resolveTierColour } from "./utils.js";
 
 import { MetadataStrip, MetadataCell, SoftPill, SubModeToggle } from "./primitives/index.js";
 
-const DAY_LABELS_SHORT_LOCAL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 export default function WebsiteView({
   tracking,
-  clicks,
   websiteSub,
   setWebsiteSub,
   analyticsFilter,
@@ -43,7 +40,6 @@ export default function WebsiteView({
   onApplyFilter,
 }) {
   const t = tracking?.totals || {};
-  const c = clicks?.totals || {};
 
   /* Derived list maxes for the bar fills */
   const topPageMax = useMemo(() => tracking?.topPages?.[0]?.view_count || 1, [tracking]);
@@ -51,27 +47,10 @@ export default function WebsiteView({
   const sourceMax  = useMemo(() => tracking?.sources?.[0]?.visitor_count || 1, [tracking]);
   const deviceTotal = useMemo(() => (tracking?.devices || []).reduce((s, d) => s + d.visitor_count, 0), [tracking]);
   const eventTypeMax = useMemo(() => tracking?.eventTypes?.[0]?.event_count || 1, [tracking]);
-  const topDateMax = useMemo(() => clicks?.topDates?.[0]?.click_count || 1, [clicks]);
   /* New panels (Phase 2c) */
   const countryMax = useMemo(() => tracking?.countries?.[0]?.visitor_count || 1, [tracking]);
   const adPlatformMax = useMemo(() => tracking?.adPlatforms?.[0]?.visitor_count || 1, [tracking]);
   const formSubMax = useMemo(() => tracking?.formSubmissions?.[0]?.submission_count || 1, [tracking]);
-
-  /* Heatmap + day-of-week derivations */
-  const heatmapMonths = useMemo(() => clicks ? buildHeatmapMonths(clicks.heatmap || []) : [], [clicks]);
-  const heatmapMax = useMemo(() => {
-    let m = 0;
-    for (const row of (clicks?.heatmap || [])) { if (row.click_count > m) m = row.click_count; }
-    return m;
-  }, [clicks]);
-
-  const dowSorted = useMemo(() => {
-    if (!clicks) return [];
-    const map = new Map();
-    for (const row of (clicks.dayOfWeek || [])) map.set(row.dow, row.click_count);
-    return [1, 2, 3, 4, 5, 6, 0].map((dow) => ({ dow, label: DAY_LABELS_SHORT_LOCAL[dow], count: map.get(dow) || 0 }));
-  }, [clicks]);
-  const dowMax = useMemo(() => Math.max(1, ...dowSorted.map((d) => d.count)), [dowSorted]);
 
   /* Filtered recent tables - depend on the active analyticsFilter */
   const filteredRecentVisitors = useMemo(() => {
@@ -97,14 +76,6 @@ export default function WebsiteView({
     });
     return list;
   }, [tracking, analyticsFilter]);
-
-  const filteredRecentClicks = useMemo(() => {
-    const list = clicks?.recent || [];
-    if (!analyticsFilter) return list;
-    const f = analyticsFilter;
-    if (f.type === "date") return list.filter(c => c.clicked_date === f.value);
-    return list;
-  }, [clicks, analyticsFilter]);
 
   function persistSub(next) {
     setWebsiteSub(next);
@@ -182,10 +153,6 @@ export default function WebsiteView({
             <div className="rep-stat">
               <div className="rep-stat__num">{t.totalEvents || 0}</div>
               <div className="rep-stat__label">Total events</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{c.totalClicks || 0}</div>
-              <div className="rep-stat__label">Date clicks</div>
             </div>
           </div>
 
@@ -366,26 +333,6 @@ export default function WebsiteView({
             )}
           </section>
 
-          <section className="rep-section">
-            <h2 className="rep-h2">Most wanted dates</h2>
-            <p className="rep-sub">Top 5 most-clicked future dates on /check-your-date.</p>
-            {(clicks?.topDates || []).length === 0 ? <p className="rep-empty-small">No date clicks yet.</p> : (
-              <ol className="rep-toplist">
-                {clicks.topDates.slice(0, 5).map((row, i) => {
-                  const active = analyticsFilter?.type === "date" && analyticsFilter?.value === row.clicked_date;
-                  return (
-                    <li key={row.clicked_date} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                        onClick={() => onApplyFilter("date", row.clicked_date, `Date: ${formatLongDate(row.clicked_date)}`)}>
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{formatLongDate(row.clicked_date)}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topDateMax) * 100}%` }} /></span>
-                      <span className="rep-topcount rep-topcount--link">{row.click_count}</span>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </section>
         </>
       )}
 
@@ -491,130 +438,6 @@ export default function WebsiteView({
             )}
           </section>
 
-          <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
-          <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Date clicks</h2>
-          <div className="rep-totals">
-            <div className="rep-stat">
-              <div className="rep-stat__num">{c.totalClicks || 0}</div>
-              <div className="rep-stat__label">Total clicks</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{c.uniqueDates || 0}</div>
-              <div className="rep-stat__label">Unique dates clicked</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{c.lastClickAt ? formatRelativeTime(c.lastClickAt) : "—"}</div>
-              <div className="rep-stat__label">Most recent click</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{c.firstClickAt ? formatAbsoluteTime(c.firstClickAt) : "—"}</div>
-              <div className="rep-stat__label">Tracking since</div>
-            </div>
-          </div>
-
-          <section className="rep-section">
-            <h2 className="rep-h2">Top dates by click count</h2>
-            <p className="rep-sub">Future dates only, ranked by interest. This is the demand signal.</p>
-            {(clicks?.topDates || []).length === 0 ? <p className="rep-empty-small">No future-date clicks yet.</p> : (
-              <ol className="rep-toplist">
-                {clicks.topDates.map((row, i) => {
-                  const active = analyticsFilter?.type === "date" && analyticsFilter?.value === row.clicked_date;
-                  return (
-                    <li key={row.clicked_date} className={`rep-toprow rep-toprow--clickable${active ? " rep-toprow--active" : ""}`}
-                        onClick={() => onApplyFilter("date", row.clicked_date, `Date: ${formatLongDate(row.clicked_date)}`)}>
-                      <span className="rep-toprank">{i + 1}</span>
-                      <span className="rep-topdate">{formatLongDate(row.clicked_date)}</span>
-                      <span className="rep-topbar"><span className="rep-topbar__fill" style={{ width: `${(row.click_count / topDateMax) * 100}%` }} /></span>
-                      <span className="rep-topcount rep-topcount--link">{row.click_count}</span>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </section>
-
-          <section className="rep-section">
-            <h2 className="rep-h2">Clicks by day of week</h2>
-            <p className="rep-sub">Confirms or challenges the assumption that Saturday is king.</p>
-            <div className="rep-dow">
-              {dowSorted.map((d) => (
-                <div key={d.dow} className="rep-dow__col">
-                  <div className="rep-dow__bar">
-                    <div className="rep-dow__fill" style={{ height: `${Math.max((d.count / dowMax) * 100, 2)}%` }} title={`${d.count} clicks`} />
-                  </div>
-                  <div className="rep-dow__count">{d.count}</div>
-                  <div className="rep-dow__label">{d.label}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rep-section">
-            <h2 className="rep-h2">12-month heatmap</h2>
-            <p className="rep-sub">Darker = more clicks. Spot seasonal patterns at a glance.</p>
-            <div className="rep-heatmap">
-              {heatmapMonths.map((m) => (
-                <div key={m.label} className="rep-month">
-                  <div className="rep-month__label">{m.label}</div>
-                  <div className="rep-month__dow">
-                    {["M", "T", "W", "T", "F", "S", "S"].map((l, i) => <span key={i}>{l}</span>)}
-                  </div>
-                  <div className="rep-month__grid">
-                    {(() => {
-                      const cells = m.cells.slice();
-                      const firstReal = cells.find((cell) => cell !== null);
-                      const startDow = firstReal ? firstReal.dow : 1;
-                      const monStartBlanks = (startDow + 6) % 7;
-                      const stripped = cells.filter((cell) => cell !== null);
-                      const out = [];
-                      for (let i = 0; i < monStartBlanks; i++) out.push(null);
-                      out.push(...stripped);
-                      return out.map((cell, i) => {
-                        if (!cell) return <span key={i} className="rep-month__cell rep-month__cell--blank" />;
-                        return (
-                          <span
-                            key={i}
-                            className="rep-month__cell"
-                            title={`${formatLongDate(cell.iso)} - ${cell.count} click${cell.count === 1 ? "" : "s"}`}
-                            style={{ background: heatColour(cell.count, heatmapMax), color: heatTextColour(cell.count, heatmapMax) }}
-                          >
-                            {cell.day}
-                          </span>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rep-section">
-            <h2 className="rep-h2">Recent activity</h2>
-            <p className="rep-sub">Last 50 date clicks.</p>
-            {analyticsFilter?.type === "date" && (
-              <div className="breakdown-filter-bar">
-                <span className="breakdown-filter-bar__label">Filtered by: <strong>{analyticsFilter.label}</strong> ({filteredRecentClicks.length} of {(clicks?.recent || []).length})</span>
-                <button className="breakdown-filter-bar__clear" onClick={() => setAnalyticsFilter(null)}>{"✕"} Clear filter</button>
-              </div>
-            )}
-            {filteredRecentClicks.length === 0 ? <p className="rep-empty-small">{analyticsFilter?.type === "date" ? "No matching clicks in recent data." : "No clicks logged yet."}</p> : (
-              <div className="rep-table-wrap">
-                <table className="rep-table">
-                  <thead><tr><th>When</th><th>Date clicked</th><th>Came from</th></tr></thead>
-                  <tbody>
-                    {filteredRecentClicks.map((row, i) => (
-                      <tr key={i}>
-                        <td>{formatRelativeTime(row.clicked_at)}</td>
-                        <td style={{ fontVariantNumeric: "tabular-nums" }}>{formatLongDate(row.clicked_date)}</td>
-                        <td className="rep-table__ref" style={{ color: row.referrer ? undefined : "rgba(44,24,16,0.4)", fontStyle: row.referrer ? undefined : "italic" }}>{row.referrer || "—"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
 
           <hr style={{ border: "none", borderTop: "1px solid rgba(44,24,16,0.1)", margin: "32px 0" }} />
           <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Events</h2>
