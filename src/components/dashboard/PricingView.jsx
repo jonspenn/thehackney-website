@@ -63,8 +63,7 @@ export default function PricingView({ pricing }) {
   if (!pricing || !pricing.rateCards) {
     return (
       <section className="rep-section">
-        <h2 className="rep-h2">Pricing review</h2>
-        <p className="rep-empty-small">
+        <p className="rep-empty">
           Pricing data not available. The dashboard page should pass the
           <code>wedding-pricing.json</code> contents as a prop to
           <code>&lt;AdminDashboard /&gt;</code>.
