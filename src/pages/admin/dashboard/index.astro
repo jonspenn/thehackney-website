@@ -271,18 +271,38 @@ import pricing from '../../../data/wedding-pricing.json';
         padding: 16px 0;
       }
 
-      .rep-section { margin-top: 48px; }
+      /* .rep-section now consumes .pipe-panel chrome (8px / Mahogany 10% /
+         soft white tint) so every section card on the Website tab matches
+         Pipeline / Bookings / Dates visually. Inherits margin-top from the
+         shared dashboard cadence. */
+      .rep-section {
+        margin-top: 16px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(64, 22, 12, 0.10);
+        border-radius: 8px;
+        padding: 22px 26px 24px;
+      }
+      .rep-section + .rep-section { margin-top: 16px; }
+      .rep-two-col + .rep-section,
+      .rep-section + .rep-two-col { margin-top: 16px; }
+      .rep-two-col .rep-section { margin-top: 0; }
       .rep-h2 {
         font-family: var(--serif);
-        font-size: 26px;
+        font-size: 20px;
         font-weight: 500;
+        letter-spacing: -0.01em;
         margin: 0 0 4px;
         color: var(--color-brewery-dark);
       }
       .rep-sub {
-        font-size: 13px;
-        color: rgba(44, 24, 16, 0.6);
-        margin: 0 0 20px;
+        font-family: var(--sans);
+        font-size: 12px;
+        color: rgba(44, 24, 16, 0.5);
+        margin: 0 0 16px;
+      }
+      @media (max-width: 900px) {
+        .rep-section { padding: 18px 16px 18px; }
+        .rep-h2 { font-size: 18px; }
       }
 
       /* ── Top lists ── */

@@ -408,26 +408,6 @@ export default function WebsiteView({
       {/* Events sub-tab */}
       {websiteSub === "events" && (
         <>
-          <h2 className="rep-h2" style={{ marginBottom: "16px" }}>Visitors</h2>
-          <div className="rep-totals">
-            <div className="rep-stat">
-              <div className="rep-stat__num">{t.totalVisitors || 0}</div>
-              <div className="rep-stat__label">Total visitors</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{t.totalSessions || 0}</div>
-              <div className="rep-stat__label">Total sessions</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{t.avgPagesPerSession || 0}</div>
-              <div className="rep-stat__label">Avg pages / session</div>
-            </div>
-            <div className="rep-stat">
-              <div className="rep-stat__num">{t.trackingSince ? formatAbsoluteTime(t.trackingSince) : "—"}</div>
-              <div className="rep-stat__label">Tracking since</div>
-            </div>
-          </div>
-
           <section className="rep-section">
             <h2 className="rep-h2">Top pages</h2>
             <p className="rep-sub">Most viewed pages by total page_view events. Click a count to filter recent events.</p>
