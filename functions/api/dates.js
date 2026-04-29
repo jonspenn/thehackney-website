@@ -20,12 +20,16 @@
  *     90d sparkline buckets, recent leads who clicked, latest override.
  *     Used by DateDetailDrawer.jsx.
  *
- * Stream filter:
+ * Stream attribution (29 Apr 2026):
  *   stream=all → date_clicks (anonymous + identified, full signal)
- *   stream=wedding | corporate | private-events | supperclub
- *     → events table joined to contacts, lead_type filter. Smaller signal,
- *     only includes visitors who later identified via a form submission.
- *     Cafe-bar excluded per prd-sys-dates-tab.md (decided 29 Apr 2026).
+ *   stream=<X> → events joined via visitors → contacts → submissions, where
+ *     the contact has AT LEAST ONE submission of a form_type belonging to
+ *     stream X. A multi-stream contact (e.g. supper club + corporate +
+ *     wedding) counts in every stream they have submitted to, not just
+ *     their original lead_type. This is the correct attribution model
+ *     because a single contact can be a buyer for several streams.
+ *
+ *   Cafe-bar excluded per prd-sys-dates-tab.md (decided 29 Apr 2026).
  *
  * Append-only override read pattern: latest row per event_date wins; if
  * cleared=1 on the latest row, treat as no override.
@@ -33,14 +37,45 @@
  * No PII leaks - the recent-leads list returns first_name only, never email
  * or phone. Names are linked to LeadProfile via contact_id.
  *
- * Cached at the edge for 60s. Heat data changes slowly (date_clicks +1/click)
- * and detail is per-user-driven, so a short cache is harmless.
+ * Cached at the edge for 60s.
  *
  * Binding: env.DB (D1 database `hackney-date-tracking`)
  */
 
 const CACHE_SECONDS = 60;
 const VALID_STREAMS = ["all", "wedding", "corporate", "private-events", "supperclub"];
+
+/* Stream → form_type membership (form_types submissions.form_type can take).
+   `brochure-download` legacy form_type stores the actual stream in
+   submissions.brochure_type, so it gets a separate matched OR clause. */
+const STREAM_FORM_TYPES = {
+  wedding:          { forms: ["wedding-quiz", "brochure-wedding"],          brochureType: "wedding" },
+  corporate:        { forms: ["corporate-quiz", "brochure-corporate"],      brochureType: "corporate" },
+  "private-events": { forms: ["brochure-private-events"],                   brochureType: "private-events" },
+  supperclub:       { forms: ["supperclub-signup", "brochure-supper-club"], brochureType: "supper-club" },
+};
+
+/**
+ * Build the "EXISTS submissions for this stream" SQL fragment + bind values.
+ * Used inside the events query: filters down to events whose contact has at
+ * least one submission belonging to the stream (multi-stream contacts count
+ * in every stream they submitted to).
+ */
+function streamExistsClause(stream) {
+  const cfg = STREAM_FORM_TYPES[stream];
+  if (!cfg) return null;
+  const placeholders = cfg.forms.map(() => "?").join(", ");
+  const sql = `EXISTS (
+    SELECT 1 FROM submissions s
+     WHERE s.contact_id = v.contact_id
+       AND (
+         s.form_type IN (${placeholders})
+         OR (s.form_type = 'brochure-download' AND s.brochure_type = ?)
+       )
+  )`;
+  const binds = [...cfg.forms, cfg.brochureType];
+  return { sql, binds };
+}
 
 function json(data, status = 200, cache = true) {
   return new Response(JSON.stringify(data), {
@@ -57,7 +92,6 @@ function json(data, status = 200, cache = true) {
 async function heatMode(env, year, stream) {
   const yearPrefix = `${year}-`;
 
-  // 1. Pull click counts per date for the year
   let heatRows;
   if (stream === "all") {
     const r = await env.DB
@@ -72,27 +106,27 @@ async function heatMode(env, year, stream) {
       .all();
     heatRows = r.results || [];
   } else {
-    // Stream filter via events table → contacts (lead_type)
+    const filter = streamExistsClause(stream);
+    if (!filter) return json({ ok: false, error: "invalid_stream" }, 400);
     const r = await env.DB
       .prepare(
         `SELECT json_extract(e.event_data, '$.date') AS clicked_date,
                 COUNT(*) AS clicks
            FROM events e
-           JOIN contacts c ON e.visitor_id = c.visitor_id
+           JOIN visitors v ON e.visitor_id = v.visitor_id
           WHERE e.event_type = 'date_check'
-            AND c.lead_type = ?
+            AND v.contact_id IS NOT NULL
+            AND ${filter.sql}
             AND json_extract(e.event_data, '$.date') LIKE ?
           GROUP BY clicked_date
           ORDER BY clicked_date`
       )
-      .bind(stream, `${yearPrefix}%`)
+      .bind(...filter.binds, `${yearPrefix}%`)
       .all();
     heatRows = r.results || [];
   }
 
-  // 2. Compute per-stream calibrated thresholds (33rd / 66th / 90th percentile)
-  //    of the click distribution for THIS stream's dates. Per the
-  //    "per-stream over global" data principle in prd-sys-dates-tab.md.
+  // Per-stream calibrated thresholds (33rd / 66th / 90th percentile)
   const counts = heatRows.map((r) => r.clicks).filter((c) => c > 0).sort((a, b) => a - b);
   let thresholds = { low: 1, mid: 6, high: 16 };
   if (counts.length >= 5) {
@@ -103,7 +137,7 @@ async function heatMode(env, year, stream) {
     thresholds = { low: Math.max(1, low), mid: Math.max(low + 1, mid), high: Math.max(mid + 1, high) };
   }
 
-  // 3. Pull current overrides snapshot (latest row per date, not cleared)
+  // Current overrides snapshot (latest non-cleared row per date)
   const overridesRes = await env.DB
     .prepare(
       `SELECT event_date, override_fee, override_min_spend
@@ -161,7 +195,6 @@ async function topMode(env, year, stream, direction, limit) {
         .all();
       rows = r.results || [];
     } else {
-      // cold: dates within 90 days, low click count, available
       const r = await env.DB
         .prepare(
           `SELECT clicked_date, COUNT(*) AS clicks, MAX(clicked_at) AS last_click_at
@@ -179,6 +212,8 @@ async function topMode(env, year, stream, direction, limit) {
       rows = r.results || [];
     }
   } else {
+    const filter = streamExistsClause(stream);
+    if (!filter) return json({ ok: false, error: "invalid_stream" }, 400);
     if (direction === "hot") {
       const r = await env.DB
         .prepare(
@@ -186,16 +221,17 @@ async function topMode(env, year, stream, direction, limit) {
                   COUNT(*) AS clicks,
                   MAX(e.created_at) AS last_click_at
              FROM events e
-             JOIN contacts c ON e.visitor_id = c.visitor_id
+             JOIN visitors v ON e.visitor_id = v.visitor_id
             WHERE e.event_type = 'date_check'
-              AND c.lead_type = ?
+              AND v.contact_id IS NOT NULL
+              AND ${filter.sql}
               AND json_extract(e.event_data, '$.date') LIKE ?
               AND json_extract(e.event_data, '$.date') >= ?
             GROUP BY clicked_date
             ORDER BY clicks DESC, clicked_date ASC
             LIMIT ?`
         )
-        .bind(stream, `${yearPrefix}%`, today, limit)
+        .bind(...filter.binds, `${yearPrefix}%`, today, limit)
         .all();
       rows = r.results || [];
     } else {
@@ -205,9 +241,10 @@ async function topMode(env, year, stream, direction, limit) {
                   COUNT(*) AS clicks,
                   MAX(e.created_at) AS last_click_at
              FROM events e
-             JOIN contacts c ON e.visitor_id = c.visitor_id
+             JOIN visitors v ON e.visitor_id = v.visitor_id
             WHERE e.event_type = 'date_check'
-              AND c.lead_type = ?
+              AND v.contact_id IS NOT NULL
+              AND ${filter.sql}
               AND json_extract(e.event_data, '$.date') LIKE ?
               AND json_extract(e.event_data, '$.date') >= ?
               AND json_extract(e.event_data, '$.date') <= ?
@@ -216,7 +253,7 @@ async function topMode(env, year, stream, direction, limit) {
             ORDER BY clicks ASC, clicked_date ASC
             LIMIT ?`
         )
-        .bind(stream, `${yearPrefix}%`, today, ninety, limit)
+        .bind(...filter.binds, `${yearPrefix}%`, today, ninety, limit)
         .all();
       rows = r.results || [];
     }
@@ -238,24 +275,49 @@ async function topMode(env, year, stream, direction, limit) {
 async function detailMode(env, date) {
   const ninetyAgo = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
 
-  // Total anonymous clicks for this date
+  // Total anonymous clicks (full signal regardless of stream)
   const totalRes = await env.DB
     .prepare(`SELECT COUNT(*) AS clicks FROM date_clicks WHERE clicked_date = ?`)
     .bind(date)
     .first();
 
-  // Per-stream click breakdown via events → contacts
-  const breakdownRes = await env.DB
+  // Per-stream click breakdown via submissions (contacts can count in
+  // multiple streams). One conditional-SUM query rather than 4 round trips.
+  const streamCols = Object.entries(STREAM_FORM_TYPES).map(([streamKey, cfg]) => {
+    const placeholders = cfg.forms.map(() => "?").join(", ");
+    return {
+      key: streamKey,
+      sql: `SUM(CASE WHEN EXISTS (
+        SELECT 1 FROM submissions s
+         WHERE s.contact_id = v.contact_id
+           AND (
+             s.form_type IN (${placeholders})
+             OR (s.form_type = 'brochure-download' AND s.brochure_type = ?)
+           )
+      ) THEN 1 ELSE 0 END) AS ${streamKey.replace("-", "_")}_clicks`,
+      binds: [...cfg.forms, cfg.brochureType],
+    };
+  });
+  const allBinds = streamCols.flatMap((c) => c.binds);
+  const streamBreakdownRes = await env.DB
     .prepare(
-      `SELECT c.lead_type AS stream, COUNT(*) AS clicks
-         FROM events e
-         JOIN contacts c ON e.visitor_id = c.visitor_id
-        WHERE e.event_type = 'date_check'
-          AND json_extract(e.event_data, '$.date') = ?
-        GROUP BY c.lead_type`
+      `SELECT
+        ${streamCols.map((c) => c.sql).join(",\n        ")}
+       FROM events e
+       JOIN visitors v ON e.visitor_id = v.visitor_id
+      WHERE e.event_type = 'date_check'
+        AND json_extract(e.event_data, '$.date') = ?
+        AND v.contact_id IS NOT NULL`
     )
-    .bind(date)
-    .all();
+    .bind(...allBinds, date)
+    .first();
+
+  const breakdown = [];
+  for (const c of streamCols) {
+    const col = `${c.key.replace("-", "_")}_clicks`;
+    const clicks = streamBreakdownRes?.[col] || 0;
+    if (clicks > 0) breakdown.push({ stream: c.key, clicks });
+  }
 
   // Sparkline: clicks per ISO week over last ~12 weeks
   const sparkRes = await env.DB
@@ -270,13 +332,15 @@ async function detailMode(env, date) {
     .bind(date, ninetyAgo)
     .all();
 
-  // Recent leads (known contacts only) - first_name + contact_id only, no PII
+  // Recent leads (known contacts only) - first_name + contact_id only.
+  // Joined via visitors → contacts so any of the contact's sessions count.
   const leadsRes = await env.DB
     .prepare(
       `SELECT c.contact_id, c.first_name, c.lead_type,
               MAX(e.created_at) AS last_click_at
          FROM events e
-         JOIN contacts c ON e.visitor_id = c.visitor_id
+         JOIN visitors v ON e.visitor_id = v.visitor_id
+         JOIN contacts c ON v.contact_id = c.contact_id
         WHERE e.event_type = 'date_check'
           AND json_extract(e.event_data, '$.date') = ?
         GROUP BY c.contact_id
@@ -286,7 +350,7 @@ async function detailMode(env, date) {
     .bind(date)
     .all();
 
-  // Latest override row for this date (append-only read pattern)
+  // Latest override row (append-only read pattern)
   const overrideRes = await env.DB
     .prepare(
       `SELECT override_fee, override_min_spend, note, cleared, edited_by, edited_at
@@ -298,7 +362,7 @@ async function detailMode(env, date) {
     .bind(date)
     .first();
 
-  // Override history (append-only audit log) - last 10
+  // Audit history (last 10)
   const historyRes = await env.DB
     .prepare(
       `SELECT override_fee, override_min_spend, note, cleared, edited_by, edited_at
@@ -316,7 +380,7 @@ async function detailMode(env, date) {
     date,
     generatedAt: new Date().toISOString(),
     totalClicks: totalRes?.clicks || 0,
-    breakdown: breakdownRes.results || [],
+    breakdown,
     sparkline: sparkRes.results || [],
     recentLeads: leadsRes.results || [],
     override: overrideRes && overrideRes.cleared === 0 ? {
