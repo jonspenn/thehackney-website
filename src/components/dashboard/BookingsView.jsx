@@ -350,22 +350,43 @@ export default function BookingsView() {
                     strokeWidth={1.5}
                   />
                 )}
-                {/* Per-point hit targets - kept invisible so hover/click still work */}
+                {/* Per-point hover/active dot + value label. Rendered only when
+                    hovered or the drilled-in cell, so the chart stays clean by default
+                    but surfaces the £k value the moment the user reads a month. Label
+                    sits above the dot with a Warm Canvas stroke halo so it stays
+                    legible over crossing year lines. */}
                 {points.map((p) => {
                   const isHovered = hoveredMonth === p.month;
                   const isActive = drillDown && drillDown.year === year && drillDown.month === p.month;
                   if (!isHovered && !isActive) return null;
                   return (
-                    <circle
-                      key={p.month}
-                      cx={p.x} cy={p.y}
-                      r={isActive ? 5 : 4}
-                      fill={p.val > 0 ? YEAR_COLORS[year] : "transparent"}
-                      stroke={isActive ? "#2E4009" : "#F5F0E8"}
-                      strokeWidth={isActive ? 2.5 : 1.5}
-                      style={{ cursor: p.val > 0 ? "pointer" : "default" }}
-                      onClick={() => handleCellClick(year, p.month)}
-                    />
+                    <g key={p.month}>
+                      <circle
+                        cx={p.x} cy={p.y}
+                        r={isActive ? 5 : 4}
+                        fill={p.val > 0 ? YEAR_COLORS[year] : "transparent"}
+                        stroke={isActive ? "#2E4009" : "#F5F0E8"}
+                        strokeWidth={isActive ? 2.5 : 1.5}
+                        style={{ cursor: p.val > 0 ? "pointer" : "default" }}
+                        onClick={() => handleCellClick(year, p.month)}
+                      />
+                      {p.val > 0 && (
+                        <text
+                          x={p.x}
+                          y={p.y - 11}
+                          textAnchor="middle"
+                          fontSize="11"
+                          fontWeight="600"
+                          fill={YEAR_COLORS[year]}
+                          stroke="#F5F0E8"
+                          strokeWidth="3"
+                          paintOrder="stroke"
+                          style={{ pointerEvents: "none" }}
+                        >
+                          {formatRevenue(p.val)}
+                        </text>
+                      )}
+                    </g>
                   );
                 })}
               </g>
