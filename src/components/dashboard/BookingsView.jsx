@@ -18,6 +18,30 @@ const FULL_MONTHS = ["January", "February", "March", "April", "May", "June", "Ju
 const YEARS = Object.keys(REVENUE_BY_YEAR).map(Number).sort();
 const CURRENT_YEAR = YEARS[YEARS.length - 1];
 
+/* Best-ever per month: the historical high-water mark for each calendar month
+   across all years EXCLUDING the current one. Acts as the ceiling benchmark
+   on the chart - if the current year's line sits above this, we're breaking
+   records for that month. Computed once at module load since the underlying
+   year data is static within a deploy. */
+const BEST_EVER_BY_MONTH = (() => {
+  const arr = new Array(12).fill(0);
+  for (let m = 0; m < 12; m++) {
+    let best = 0;
+    for (const y of YEARS) {
+      if (y === CURRENT_YEAR) continue;
+      const v = REVENUE_BY_YEAR[y][m];
+      if (v > best) best = v;
+    }
+    arr[m] = best;
+  }
+  return arr;
+})();
+const BEST_EVER_KEY = "best"; /* sentinel key in hiddenYears + legend */
+const BEST_EVER_COLOR = "#40160C"; /* Mahogany */
+const BEST_EVER_DASH = "5 3";
+const BEST_EVER_WIDTH = 1.5;
+const BEST_EVER_OPACITY = 0.42;
+
 function formatRevenue(val) {
   if (val >= 1000) return `£${Math.round(val / 1000)}k`;
   return `£${val}`;
@@ -73,7 +97,8 @@ export default function BookingsView() {
   const [drillDown, setDrillDown] = useState(null); // { year, month } or null
   const [chartOpen, setChartOpen] = useState(true);
 
-  /* Compute max value across visible years for Y-axis scaling */
+  /* Compute max value across visible years (and best-ever benchmark when
+     visible) for Y-axis scaling */
   const maxVal = useMemo(() => {
     let max = 0;
     for (const year of YEARS) {
@@ -82,6 +107,11 @@ export default function BookingsView() {
         if (year === CURRENT_YEAR && m >= CURRENT_DATA_MONTH) continue;
         const val = REVENUE_BY_YEAR[year][m];
         if (val > max) max = val;
+      }
+    }
+    if (!hiddenYears.has(BEST_EVER_KEY)) {
+      for (let m = 0; m < 12; m++) {
+        if (BEST_EVER_BY_MONTH[m] > max) max = BEST_EVER_BY_MONTH[m];
       }
     }
     return max || 1;
@@ -133,7 +163,26 @@ export default function BookingsView() {
       dealsPriorYTD += (DEALS_BY_MONTH[`${CURRENT_YEAR - 1}-${m}`] || []).length;
     }
 
-    return { ytdTotal, yoyPct, bestMonthLabel, bestMonthValue, dealsCurrentYTD, dealsPriorYTD };
+    /* vs best ever YTD: sum of per-month historical maxes through CURRENT_DATA_MONTH */
+    let bestEverYTD = 0;
+    for (let m = 0; m < CURRENT_DATA_MONTH; m++) {
+      bestEverYTD += BEST_EVER_BY_MONTH[m];
+    }
+    const bestEverPct = bestEverYTD ? Math.round(((ytdTotal - bestEverYTD) / bestEverYTD) * 100) : null;
+    /* For sub-0.5% deltas show one decimal so "+0%" doesn't read as "tied" */
+    const bestEverPctFine = bestEverYTD ? ((ytdTotal - bestEverYTD) / bestEverYTD) * 100 : null;
+    const bestEverPctDisplay = bestEverPctFine == null
+      ? null
+      : (Math.abs(bestEverPctFine) < 1
+          ? bestEverPctFine.toFixed(1)
+          : Math.round(bestEverPctFine).toString());
+
+    return {
+      ytdTotal, yoyPct,
+      bestMonthLabel, bestMonthValue,
+      dealsCurrentYTD, dealsPriorYTD,
+      bestEverYTD, bestEverPct, bestEverPctFine, bestEverPctDisplay,
+    };
   }, [ytdByYear]);
 
   function handleCellClick(year, monthIdx) {
@@ -181,6 +230,18 @@ export default function BookingsView() {
               <span className="pipe-metric__unit">vs {CURRENT_YEAR - 1} YTD</span>
             </span>
           </MetadataCell>
+          <MetadataCell eyebrow="vs best ever">
+            <span
+              className="pipe-metric"
+              style={{ color: strip.bestEverPct == null ? undefined : (strip.bestEverPct >= 0 ? "#2E4009" : "#8C472E") }}
+              title={strip.bestEverYTD ? `Best-ever YTD = sum of per-month historical maxes (£${strip.bestEverYTD.toLocaleString("en-GB")} for Jan-${SHORT_MONTHS[CURRENT_DATA_MONTH - 1]})` : ""}
+            >
+              {strip.bestEverPctDisplay == null
+                ? "—"
+                : `${strip.bestEverPctFine >= 0 ? "+" : ""}${strip.bestEverPctDisplay}%`}
+              <span className="pipe-metric__unit">vs best YTD</span>
+            </span>
+          </MetadataCell>
           <MetadataCell eyebrow="Best month YTD">
             <span className="pipe-metric">
               {strip.bestMonthLabel}
@@ -212,7 +273,7 @@ export default function BookingsView() {
         {chartOpen && (
         <div className="bookings-chart-body" id="bookings-chart-body">
 
-        {/* Interactive legend */}
+        {/* Interactive legend - years + best-ever benchmark */}
         <div className="bookings-legend">
           {YEARS.map(year => (
             <button
@@ -228,6 +289,7 @@ export default function BookingsView() {
                 return next;
               })}
               title={hiddenYears.has(year) ? `Show ${year}` : `Hide ${year}`}
+              type="button"
             >
               <svg width="20" height="10" style={{ marginRight: 4, verticalAlign: "middle" }}>
                 <line
@@ -240,6 +302,32 @@ export default function BookingsView() {
               {year}
             </button>
           ))}
+          {/* Best-ever benchmark toggle */}
+          <button
+            className="bookings-legend__item"
+            style={{
+              opacity: hiddenYears.has(BEST_EVER_KEY) ? 0.3 : 1,
+              textDecoration: hiddenYears.has(BEST_EVER_KEY) ? "line-through" : "none",
+            }}
+            onClick={() => setHiddenYears(prev => {
+              const next = new Set(prev);
+              next.has(BEST_EVER_KEY) ? next.delete(BEST_EVER_KEY) : next.add(BEST_EVER_KEY);
+              return next;
+            })}
+            title={hiddenYears.has(BEST_EVER_KEY) ? "Show best-ever benchmark" : "Hide best-ever benchmark"}
+            type="button"
+          >
+            <svg width="20" height="10" style={{ marginRight: 4, verticalAlign: "middle" }}>
+              <line
+                x1="0" y1="5" x2="20" y2="5"
+                stroke={hiddenYears.has(BEST_EVER_KEY) ? "rgba(44,24,16,0.15)" : BEST_EVER_COLOR}
+                strokeOpacity={hiddenYears.has(BEST_EVER_KEY) ? 1 : BEST_EVER_OPACITY}
+                strokeWidth={BEST_EVER_WIDTH}
+                strokeDasharray={BEST_EVER_DASH}
+              />
+            </svg>
+            Best ever
+          </button>
         </div>
 
         <svg
@@ -309,6 +397,28 @@ export default function BookingsView() {
               {label}
             </text>
           ))}
+
+          {/* Best-ever benchmark line - per-month historical max across all
+              prior years. Renders BEFORE the year lines so the actual data
+              draws on top of the benchmark. Spans all 12 months (it's a
+              static reference line, not bounded by CURRENT_DATA_MONTH). */}
+          {!hiddenYears.has(BEST_EVER_KEY) && (() => {
+            const points = BEST_EVER_BY_MONTH.map((v, m) => ({
+              x: monthX(m), y: valY(v), val: v, month: m,
+            }));
+            return (
+              <path
+                d={smoothPath(points, 0.5)}
+                fill="none"
+                stroke={BEST_EVER_COLOR}
+                strokeOpacity={BEST_EVER_OPACITY}
+                strokeWidth={BEST_EVER_WIDTH}
+                strokeDasharray={BEST_EVER_DASH}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            );
+          })()}
 
           {/* Year lines - smoothPath (Catmull-Rom Bezier, tension 0.5) for visual
               parity with PipelineView's monthly trends. Lines only on the path;
@@ -385,7 +495,9 @@ export default function BookingsView() {
                 return hoveredMonth < endMonth && REVENUE_BY_YEAR[y][hoveredMonth] > 0;
               })
               .sort((a, b) => b - a);
-            if (visibleAtMonth.length === 0) return null;
+            const bestVal = BEST_EVER_BY_MONTH[hoveredMonth];
+            const showBest = !hiddenYears.has(BEST_EVER_KEY) && bestVal > 0;
+            if (visibleAtMonth.length === 0 && !showBest) return null;
 
             /* Card geometry. Generous spacing - header and rows must each
                sit on their own line with breathing room (£39k vs £45k labels
@@ -395,7 +507,8 @@ export default function BookingsView() {
             const headerH = 18;
             const rowH = 22;
             const cardW = 124;
-            const cardH = padY * 2 + headerH + rowH * visibleAtMonth.length;
+            const totalRows = visibleAtMonth.length + (showBest ? 1 : 0);
+            const cardH = padY * 2 + headerH + rowH * totalRows;
 
             const tx = monthX(hoveredMonth);
             /* Pin to right of crosshair when there's room, otherwise flip left. */
@@ -461,6 +574,56 @@ export default function BookingsView() {
                     </g>
                   );
                 })}
+                {/* Best-ever benchmark row - separated visually by a 1px rule above */}
+                {showBest && (() => {
+                  const bestRowIdx = visibleAtMonth.length;
+                  const rowCenterY = cardY + padY + headerH + bestRowIdx * rowH + rowH / 2;
+                  return (
+                    <g>
+                      {visibleAtMonth.length > 0 && (
+                        <line
+                          x1={cardX + padX} y1={rowCenterY - rowH / 2}
+                          x2={cardX + cardW - padX} y2={rowCenterY - rowH / 2}
+                          stroke="rgba(44,24,16,0.10)"
+                          strokeWidth="1"
+                        />
+                      )}
+                      <line
+                        x1={cardX + padX}
+                        x2={cardX + padX + 8}
+                        y1={rowCenterY} y2={rowCenterY}
+                        stroke={BEST_EVER_COLOR}
+                        strokeOpacity={BEST_EVER_OPACITY}
+                        strokeWidth={BEST_EVER_WIDTH}
+                        strokeDasharray={BEST_EVER_DASH}
+                      />
+                      <text
+                        x={cardX + padX + 14}
+                        y={rowCenterY}
+                        dominantBaseline="central"
+                        fontSize="11"
+                        fontWeight="500"
+                        fontStyle="italic"
+                        fill="rgba(44,24,16,0.55)"
+                      >
+                        Best ever
+                      </text>
+                      <text
+                        x={cardX + cardW - padX}
+                        y={rowCenterY}
+                        textAnchor="end"
+                        dominantBaseline="central"
+                        fontSize="12"
+                        fontWeight="600"
+                        fill={BEST_EVER_COLOR}
+                        fillOpacity={0.7}
+                        fontVariantNumeric="tabular-nums"
+                      >
+                        {formatRevenue(bestVal)}
+                      </text>
+                    </g>
+                  );
+                })()}
               </g>
             );
           })()}
