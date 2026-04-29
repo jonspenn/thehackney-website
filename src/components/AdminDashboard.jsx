@@ -14,6 +14,7 @@ import {
 } from "./dashboard/constants.js";
 
 import LeadProfile from "./dashboard/LeadProfile.jsx";
+import { SubModeToggle } from "./dashboard/primitives/index.js";
 import LeadTable from "./dashboard/LeadTable.jsx";
 import PipelineView from "./dashboard/PipelineView.jsx";
 import BookingsView from "./dashboard/BookingsView.jsx";
@@ -429,22 +430,14 @@ export default function AdminDashboard({ pricing }) {
            render path; only the data source and `mode` prop change. */}
       {activeTab === "leads" && !selectedLead && (
         <>
-          <div className="adm-leads-mode">
-            <button
-              type="button"
-              className={`adm-leads-mode__btn${!showLost ? " adm-leads-mode__btn--active" : ""}`}
-              onClick={() => {
-                setShowLost(false);
-                syncUrl({ tab: "leads", type: activeLeadType, leadId: null }, { replace: true });
-              }}
-            >
-              Active leads
-              <span className="adm-leads-mode__count">{totalLeadsCount}</span>
-            </button>
-            <button
-              type="button"
-              className={`adm-leads-mode__btn${showLost ? " adm-leads-mode__btn--active" : ""}`}
-              onClick={() => {
+          <SubModeToggle
+            modes={[
+              { id: "active", label: "Active leads", count: totalLeadsCount },
+              { id: "lost",   label: "Lost",         count: totalLostCount  },
+            ]}
+            active={showLost ? "lost" : "active"}
+            onChange={(id) => {
+              if (id === "lost") {
                 setShowLost(true);
                 const params = new URLSearchParams(window.location.search);
                 params.set("tab", "leads");
@@ -452,12 +445,12 @@ export default function AdminDashboard({ pricing }) {
                 params.set("lost", "1");
                 params.delete("lead");
                 window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
-              }}
-            >
-              Lost
-              <span className="adm-leads-mode__count">{totalLostCount}</span>
-            </button>
-          </div>
+              } else {
+                setShowLost(false);
+                syncUrl({ tab: "leads", type: activeLeadType, leadId: null }, { replace: true });
+              }
+            }}
+          />
           {showLost ? (
             <LeadTable
               leads={lostLeads}

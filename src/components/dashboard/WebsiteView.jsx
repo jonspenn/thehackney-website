@@ -29,7 +29,7 @@ import { formatRelativeTime, formatAbsoluteTime, formatLongDate,
   shortenUrl, parseEventData, eventSummary,
   buildHeatmapMonths, heatColour, heatTextColour, formatCount, resolveSourceVariant, resolveDeviceVariant, resolveTierColour } from "./utils.js";
 
-import { MetadataStrip, MetadataCell, SoftPill } from "./primitives/index.js";
+import { MetadataStrip, MetadataCell, SoftPill, SubModeToggle } from "./primitives/index.js";
 
 const DAY_LABELS_SHORT_LOCAL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -157,22 +157,15 @@ export default function WebsiteView({
       </div>
 
       {/* Sub-mode toggle */}
-      <div className="adm-leads-mode adm-website-sub">
-        <button
-          type="button"
-          className={`adm-leads-mode__btn${websiteSub === "performance" ? " adm-leads-mode__btn--active" : ""}`}
-          onClick={() => persistSub("performance")}
-        >
-          Performance
-        </button>
-        <button
-          type="button"
-          className={`adm-leads-mode__btn${websiteSub === "events" ? " adm-leads-mode__btn--active" : ""}`}
-          onClick={() => persistSub("events")}
-        >
-          Events
-        </button>
-      </div>
+      <SubModeToggle
+        className="adm-website-sub"
+        modes={[
+          { id: "performance", label: "Performance" },
+          { id: "events",      label: "Events"      },
+        ]}
+        active={websiteSub}
+        onChange={persistSub}
+      />
 
       {/* Performance sub-tab */}
       {websiteSub === "performance" && (

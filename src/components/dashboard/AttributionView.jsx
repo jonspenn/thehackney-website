@@ -28,7 +28,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { MetadataStrip, MetadataCell, SoftPill } from "./primitives/index.js";
+import { MetadataStrip, MetadataCell, SoftPill, SubModeToggle } from "./primitives/index.js";
 import { shortenUrl, formatCount, formatPounds, resolveSourceVariant, resolveTierColour } from "./utils.js";
 
 const WINDOW_MODES = [
@@ -152,18 +152,12 @@ export default function AttributionView() {
       </div>
 
       {/* Time-window toggle (sub-mode style, mirrors WebsiteView) */}
-      <div className="adm-leads-mode adm-website-sub">
-        {WINDOW_MODES.map(m => (
-          <button
-            key={m.id}
-            type="button"
-            className={`adm-leads-mode__btn${windowMode === m.id ? " adm-leads-mode__btn--active" : ""}`}
-            onClick={() => selectWindow(m.id)}
-          >
-            {m.label}
-          </button>
-        ))}
-      </div>
+      <SubModeToggle
+        className="adm-website-sub"
+        modes={WINDOW_MODES}
+        active={windowMode}
+        onChange={selectWindow}
+      />
 
       {/* ── Per-platform funnel table ── */}
       <section className="rep-section pipe-panel">
