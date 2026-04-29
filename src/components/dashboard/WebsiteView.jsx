@@ -217,9 +217,9 @@ export default function WebsiteView({
               )}
             </section>
 
-            {/* Devices - .rep-panel-stack__full so the 3-card device grid
-                spans both columns. .rep-device-grid auto-fits inside. */}
-            <section className="rep-section rep-panel-stack__full">
+            {/* Devices - flows as a column item. .rep-device-grid auto-fits
+                3 tiles to the column width. */}
+            <section className="rep-section">
                 <h2 className="rep-h2">Devices</h2>
               <p className="rep-sub">Visitor breakdown by device type.</p>
               {(tracking?.devices || []).length === 0 ? <p className="rep-empty-small">No device data yet.</p> : (
@@ -279,9 +279,8 @@ export default function WebsiteView({
               )}
             </section>
 
-            {/* Form submissions by type - .rep-panel-stack__full so the
-                4-row list spans both columns. */}
-            <section className="rep-section rep-panel-stack__full">
+            {/* Form submissions by type - flows as a column item. */}
+            <section className="rep-section">
               <h2 className="rep-h2">Submissions by form</h2>
               <p className="rep-sub">All form completions, broken out by which form fired the lead.</p>
               {(tracking?.formSubmissions || []).length === 0 ? <p className="rep-empty-small">No submissions yet.</p> : (
