@@ -31,7 +31,7 @@ import {
   buildHeatmapMonths, heatColour, heatTextColour,
 } from "./utils.js";
 
-import { MetadataStrip, MetadataCell } from "./primitives/index.js";
+import { MetadataStrip, MetadataCell, SoftPill } from "./primitives/index.js";
 
 const DAY_LABELS_SHORT_LOCAL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -114,6 +114,30 @@ export default function WebsiteView({
     params.set("tab", "website");
     params.set("sub", next);
     window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+  }
+
+  /* Map a UTM source string to a SoftPill variant for the recent-visitors
+     table. Mirrors SOURCE_MAP in constants.js (used on the Leads table)
+     but operates on the simpler first_utm_source values surfaced here. */
+  function sourceVariant(src) {
+    if (!src || src === "Direct") return "muted";
+    const v = String(src).toLowerCase();
+    if (v.includes("google")) return "olive";
+    if (v.includes("facebook") || v.includes("instagram") || v.includes("meta") || v.includes("fb")) return "coral";
+    if (v.includes("hitched") || v.includes("bridebook")) return "brick";
+    if (v.includes("pinterest")) return "coral";
+    if (v.includes("tiktok")) return "muted";
+    if (v.includes("bing") || v.includes("microsoft")) return "olive";
+    return "muted";
+  }
+
+  /* Device variants - keep them quiet since this is a secondary signal. */
+  function deviceVariant(d) {
+    const v = String(d || "").toLowerCase();
+    if (v === "desktop") return "olive";
+    if (v === "mobile")  return "coral";
+    if (v === "tablet")  return "brick";
+    return "muted";
   }
 
   /* Number formatters for the metric strip */
@@ -488,16 +512,19 @@ export default function WebsiteView({
                     <tr><th>First seen</th><th>Device</th><th>Landing page</th><th>Source</th><th>Sessions</th><th>Pages</th></tr>
                   </thead>
                   <tbody>
-                    {filteredRecentVisitors.map((row) => (
-                      <tr key={row.visitor_id}>
-                        <td>{formatRelativeTime(row.first_seen_at)}</td>
-                        <td>{row.device_type || "—"}</td>
-                        <td className="rep-table__ref">{shortenUrl(row.first_landing_page)}</td>
-                        <td>{row.first_utm_source || "Direct"}{row.first_utm_medium ? ` / ${row.first_utm_medium}` : ""}</td>
-                        <td>{row.total_sessions}</td>
-                        <td>{row.total_page_views}</td>
-                      </tr>
-                    ))}
+                    {filteredRecentVisitors.map((row) => {
+                      const src = row.first_utm_source || "Direct";
+                      return (
+                        <tr key={row.visitor_id}>
+                          <td>{formatRelativeTime(row.first_seen_at)}</td>
+                          <td>{row.device_type ? <SoftPill variant={deviceVariant(row.device_type)} dot>{row.device_type}</SoftPill> : "—"}</td>
+                          <td className="rep-table__ref">{shortenUrl(row.first_landing_page)}</td>
+                          <td><SoftPill variant={sourceVariant(src)} dot>{src}{row.first_utm_medium ? ` / ${row.first_utm_medium}` : ""}</SoftPill></td>
+                          <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{row.total_sessions}</td>
+                          <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{row.total_page_views}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -619,8 +646,8 @@ export default function WebsiteView({
                     {filteredRecentClicks.map((row, i) => (
                       <tr key={i}>
                         <td>{formatRelativeTime(row.clicked_at)}</td>
-                        <td>{formatLongDate(row.clicked_date)}</td>
-                        <td className="rep-table__ref">{row.referrer || "—"}</td>
+                        <td style={{ fontVariantNumeric: "tabular-nums" }}>{formatLongDate(row.clicked_date)}</td>
+                        <td className="rep-table__ref" style={{ color: row.referrer ? undefined : "rgba(44,24,16,0.4)", fontStyle: row.referrer ? undefined : "italic" }}>{row.referrer || "—"}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -691,18 +718,28 @@ export default function WebsiteView({
                 <table className="rep-table">
                   <thead><tr><th>When</th><th>Type</th><th>Page</th><th>Detail</th></tr></thead>
                   <tbody>
-                    {filteredRecentEvents.map((row, i) => (
-                      <tr key={i}>
-                        <td>{formatRelativeTime(row.created_at)}</td>
-                        <td>
-                          <span className={`rep-event-badge rep-event-badge--${row.event_type.split("_")[0]}`}>
-                            {EVENT_TYPE_LABELS[row.event_type] || row.event_type}
-                          </span>
-                        </td>
-                        <td className="rep-table__ref">{shortenUrl(row.page_url)}</td>
-                        <td className="rep-table__ref">{eventSummary(row.event_type, row.event_data)}</td>
-                      </tr>
-                    ))}
+                    {filteredRecentEvents.map((row, i) => {
+                      const prefix = row.event_type.split("_")[0];
+                      const eventVariant =
+                        prefix === "page"          ? "muted" :
+                        prefix === "cta"           ? "olive" :
+                        prefix === "date"          ? "coral" :
+                        prefix === "form"          ? "brick" :
+                        prefix === "questionnaire" ? "brick" :
+                        "muted";
+                      return (
+                        <tr key={i}>
+                          <td>{formatRelativeTime(row.created_at)}</td>
+                          <td>
+                            <SoftPill variant={eventVariant} dot>
+                              {EVENT_TYPE_LABELS[row.event_type] || row.event_type}
+                            </SoftPill>
+                          </td>
+                          <td className="rep-table__ref">{shortenUrl(row.page_url)}</td>
+                          <td className="rep-table__ref">{eventSummary(row.event_type, row.event_data)}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
