@@ -380,72 +380,81 @@ export default function BookingsView() {
       )}
 
       {/* ── Month detail table ── */}
-      <div className="bookings-table-wrap">
-        <table className="bookings-table">
-          <thead>
-            <tr>
-              <th>Month</th>
-              {YEARS.map(y => <th key={y}>{y}</th>)}
-              <th>Best</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SHORT_MONTHS.map((label, i) => {
-              const isFuture = i >= CURRENT_DATA_MONTH;
-              const vals = YEARS.map(y => REVENUE_BY_YEAR[y][i]);
-              const pastVals = vals.filter((v, idx) => YEARS[idx] !== CURRENT_YEAR || !isFuture);
-              const bestVal = Math.max(...pastVals);
+      <div className="pipe-panel bookings-table-panel">
+        <div className="pipe-collapse-toggle pipe-collapse-toggle--static">
+          <span className="pipe-collapse-toggle__arrow pipe-collapse-toggle__arrow--open">{"\u25B6"}</span>
+          Year-over-year by month
+          <span className="pipe-collapse-toggle__summary">{"\u00A3"} closed per month, all event types</span>
+        </div>
+        <div className="rep-table-wrap bookings-table-wrap">
+          <table className="rep-table bookings-rep-table">
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left" }}>Month</th>
+                {YEARS.map(y => <th key={y} style={{ textAlign: "right" }}>{y}</th>)}
+                <th style={{ textAlign: "left" }}>Best</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SHORT_MONTHS.map((label, i) => {
+                const isFuture = i >= CURRENT_DATA_MONTH;
+                const vals = YEARS.map(y => REVENUE_BY_YEAR[y][i]);
+                const pastVals = vals.filter((v, idx) => YEARS[idx] !== CURRENT_YEAR || !isFuture);
+                const bestVal = Math.max(...pastVals);
 
-              return (
-                <tr
-                  key={i}
-                  style={{ opacity: isFuture ? 0.35 : 1 }}
-                  onMouseEnter={() => setHoveredMonth(i)}
-                  onMouseLeave={() => setHoveredMonth(null)}
-                  className={hoveredMonth === i ? "bookings-table__row--hover" : ""}
-                >
-                  <td style={{ fontWeight: 600 }}>{label}</td>
-                  {YEARS.map((y) => {
-                    const val = REVENUE_BY_YEAR[y][i];
-                    const isBest = val === bestVal && val > 0 && (!isFuture || y !== CURRENT_YEAR);
-                    const isActive = drillDown && drillDown.year === y && drillDown.month === i;
-                    return (
-                      <td
-                        key={y}
-                        className={val > 0 ? "bookings-table__cell--clickable" : ""}
-                        style={{
-                          fontWeight: isBest ? 700 : 400,
-                          color: isBest ? "#2E4009" : undefined,
-                          background: isActive ? "rgba(46,64,9,0.08)" : undefined,
-                          cursor: val > 0 ? "pointer" : "default",
-                        }}
-                        onClick={() => handleCellClick(y, i)}
-                        title={val > 0 ? `Click to see ${FULL_MONTHS[i]} ${y} deals` : ""}
-                      >
-                        {val > 0 ? formatRevenueExact(val) : "-"}
-                      </td>
-                    );
-                  })}
-                  <td style={{ fontSize: "0.8em", color: "rgba(44,24,16,0.4)" }}>
-                    {bestVal > 0 ? YEARS[pastVals.indexOf(bestVal)] : "-"}
+                return (
+                  <tr
+                    key={i}
+                    style={{ opacity: isFuture ? 0.4 : 1 }}
+                    onMouseEnter={() => setHoveredMonth(i)}
+                    onMouseLeave={() => setHoveredMonth(null)}
+                    className={hoveredMonth === i ? "bookings-rep-table__row--hover" : ""}
+                  >
+                    <td style={{ fontWeight: 600 }}>{label}</td>
+                    {YEARS.map((y) => {
+                      const val = REVENUE_BY_YEAR[y][i];
+                      const isBest = val === bestVal && val > 0 && (!isFuture || y !== CURRENT_YEAR);
+                      const isActive = drillDown && drillDown.year === y && drillDown.month === i;
+                      return (
+                        <td
+                          key={y}
+                          className={val > 0 ? "bookings-rep-table__cell--clickable" : ""}
+                          style={{
+                            textAlign: "right",
+                            fontVariantNumeric: "tabular-nums",
+                            fontWeight: isBest ? 700 : 400,
+                            color: isBest ? "#2E4009" : undefined,
+                            background: isActive ? "rgba(46,64,9,0.08)" : undefined,
+                            cursor: val > 0 ? "pointer" : "default",
+                          }}
+                          onClick={() => handleCellClick(y, i)}
+                          title={val > 0 ? `Click to see ${FULL_MONTHS[i]} ${y} deals` : ""}
+                        >
+                          {val > 0 ? formatRevenueExact(val) : "—"}
+                        </td>
+                      );
+                    })}
+                    <td style={{ fontSize: "12px", color: "rgba(44,24,16,0.5)" }}>
+                      {bestVal > 0 ? YEARS[pastVals.indexOf(bestVal)] : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+              <tr className="bookings-rep-table__total">
+                <td style={{ fontWeight: 700 }}>Total</td>
+                {YEARS.map(y => (
+                  <td key={y} style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
+                    {y === CURRENT_YEAR
+                      ? formatRevenueExact(REVENUE_BY_YEAR[y].slice(0, CURRENT_DATA_MONTH).reduce((a, b) => a + b, 0))
+                      : formatRevenueExact(YEAR_TOTALS[y])
+                    }
                   </td>
-                </tr>
-              );
-            })}
-            <tr className="bookings-table__total">
-              <td style={{ fontWeight: 700 }}>Total</td>
-              {YEARS.map(y => (
-                <td key={y} style={{ fontWeight: 700 }}>
-                  {y === CURRENT_YEAR
-                    ? formatRevenueExact(REVENUE_BY_YEAR[y].slice(0, CURRENT_DATA_MONTH).reduce((a, b) => a + b, 0))
-                    : formatRevenueExact(YEAR_TOTALS[y])
-                  }
-                </td>
-              ))}
-              <td />
-            </tr>
-          </tbody>
-        </table>
+                ))}
+                <td />
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <p className="bookings-footnote">

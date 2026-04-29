@@ -754,6 +754,17 @@ import pricing from '../../../data/wedding-pricing.json';
       @media (max-width: 900px) {
         .bookings-chart-body { padding: 4px 14px 16px; }
       }
+      /* Bookings YoY-by-month table panel - reuses .pipe-panel + .rep-table */
+      .bookings-table-panel { margin-bottom: 16px; }
+      .bookings-table-panel .rep-table-wrap { padding: 0 0 14px; }
+      .bookings-table-panel .rep-table { border: none; border-radius: 0; min-width: 540px; }
+      .bookings-rep-table tbody tr { transition: background 0.12s ease; }
+      .bookings-rep-table__row--hover { background: rgba(44,24,16,0.025); }
+      .bookings-rep-table__cell--clickable:hover { background: rgba(46,64,9,0.05); }
+      .bookings-rep-table__total td { border-top: 2px solid rgba(44,24,16,0.18); }
+      /* Static collapse-toggle - looks like the pipe pattern but doesn't toggle */
+      .pipe-collapse-toggle--static { cursor: default; }
+      .pipe-collapse-toggle--static:hover { background: transparent; }
       .bookings-kpis {
         display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
       }
