@@ -21,6 +21,8 @@ import {
   computeLeadScore, computeFunnelStage, resolveSource,
 } from "./utils.js";
 
+import { SubModeToggle } from "./primitives/index.js";
+
 /** Per-lead-type sort preference is persisted in localStorage under this prefix. */
 const SORT_STORAGE_PREFIX = "thk_dashboard_leadsort_";
 const DEFAULT_SORT = { field: "created_at", dir: "desc" };
@@ -60,6 +62,17 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [deleteConfirm, setDeleteConfirm] = useState(null); // null | "confirm1" | "confirm2"
   const [deleteLoading, setDeleteLoading] = useState(false);
+  /* Year filter - shrinks long lead lists (especially Lost mode which
+     accumulates) to a single year. Date used for the filter is mode-
+     dependent: created_at when viewing Active leads, lost_at when
+     viewing Lost. Default = current calendar year. URL persistence
+     via ?year=. "all" disables the filter. */
+  const [yearFilter, setYearFilter] = useState(() => {
+    if (typeof window === "undefined") return String(new Date().getFullYear());
+    const url = new URLSearchParams(window.location.search);
+    const y = url.get("year");
+    return y || String(new Date().getFullYear());
+  });
 
   function changeLeadType(type) {
     setActiveLeadType(type);
@@ -159,8 +172,42 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
     return counts;
   }, [scoredLeads]);
 
+  /* Mode-aware date field: created_at for Active mode (when the lead
+     came in), lost_at for Lost mode (when it was lost). */
+  const yearDateField = mode === "lost" ? "lost_at" : "created_at";
+
+  /* Years that have data in the current dataset, descending. */
+  const availableYears = useMemo(() => {
+    const years = new Set();
+    for (const l of scoredLeads) {
+      const v = l[yearDateField];
+      if (!v) continue;
+      const y = new Date(v).getFullYear();
+      if (Number.isFinite(y)) years.add(y);
+    }
+    return [...years].sort((a, b) => b - a);
+  }, [scoredLeads, yearDateField]);
+
+  /* SubModeToggle modes: each year that has data, plus "All time". */
+  const yearModes = useMemo(() => {
+    const modes = availableYears.map(y => ({ id: String(y), label: String(y) }));
+    modes.push({ id: "all", label: "All time" });
+    return modes;
+  }, [availableYears]);
+
   const sortedLeads = useMemo(() => {
     let arr = [...scoredLeads];
+    /* Year filter applies first so heat / breakdown / search work over
+       the year-scoped subset. */
+    if (yearFilter !== "all") {
+      const target = parseInt(yearFilter, 10);
+      arr = arr.filter(l => {
+        const v = l[yearDateField];
+        if (!v) return false;
+        const y = new Date(v).getFullYear();
+        return y === target;
+      });
+    }
     if (heatFilter !== "all") arr = arr.filter(l => l._score.tier === heatFilter);
     if (breakdownFilter) {
       arr = arr.filter(l => {
@@ -197,7 +244,20 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
       return 0;
     });
     return arr;
-  }, [scoredLeads, leadSort, heatFilter, breakdownFilter, leadSearch]);
+  }, [scoredLeads, leadSort, heatFilter, breakdownFilter, leadSearch, yearFilter, yearDateField]);
+
+  function selectYear(id) {
+    setYearFilter(id);
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (id === String(new Date().getFullYear())) {
+      params.delete("year"); /* default - keep URL clean */
+    } else {
+      params.set("year", id);
+    }
+    const qs = params.toString();
+    window.history.replaceState({}, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+  }
 
   function toggleSort(field) {
     setLeadSort(prev =>
@@ -234,6 +294,18 @@ export default function LeadTable({ leads, deletedLeads, selectedLeadId, onSelec
         </div>
 
         <div className="lead-panel__divider" />
+
+        {/* Year filter - mode-aware (created_at for Active, lost_at for Lost).
+            Shrinks long lists (especially Lost which accumulates over years). */}
+        {yearModes.length > 1 && (
+          <div style={{ padding: "0 0 8px" }}>
+            <SubModeToggle
+              modes={yearModes}
+              active={yearFilter}
+              onChange={selectYear}
+            />
+          </div>
+        )}
 
         {/* Filter / Sort / Search */}
         <div className="lead-panel__filters">
