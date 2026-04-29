@@ -18,10 +18,12 @@
  *   Phase 5  - per-campaign drill-in              │
  *   Phase 6  - top campaigns + landing pages panels ┘
  *   Phase 7  - mobile + CSS sweep
- *   Sessions 57-58 - Google Ads + Meta API connectors layer in spend / CPA / ROAS.
+ *   Phase 8  - ad_spend D1 table + /api/ad-spend-import + spend/CPA wired in
  *
- * Spend / CPA / ROAS columns are rendered as em-dash placeholders until
- * the connector work lands.
+ * Spend + CPA columns now light up from /api/ad-spend-import. Weekly CSV
+ * cadence rather than full API integration - see PROJECT.md session 56
+ * trade-off discussion. ROAS column stays em-dash until deal-value capture
+ * lands at won_at (separate work).
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -84,6 +86,17 @@ export default function AttributionView() {
     if (n == null) return "0";
     if (n >= 1000) return `${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
     return String(n);
+  };
+
+  /* £ formatter for spend and CPA cells. Mirrors the Bookings tab £k
+     compaction pattern. Values under £1k render with no decimals;
+     values >= £1k compact to £Xk. Returns the em-dash placeholder when
+     value is null/0/falsy. */
+  const formatPounds = (n) => {
+    if (n == null || n === 0) return "—";
+    if (n >= 1000) return `£${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
+    if (n >= 100) return `£${Math.round(n)}`;
+    return `£${n.toFixed(2)}`;
   };
 
   /* SoftPill variant for the platform column. Mirrors the WebsiteView
@@ -166,11 +179,14 @@ export default function AttributionView() {
             <span
               className="pipe-metric"
               style={{ color: tierColour(totals.best_platform?.conv_rate), fontSize: "22px" }}
-              title={totals.best_platform ? `${totals.best_platform.conv_rate}% conv (paid platforms with ≥10 visitors)` : "Not enough paid traffic to call a winner"}
+              title={totals.best_platform ? `${totals.best_platform.conv_rate}% conv${totals.best_platform.cpa_pounds != null ? ` · ${formatPounds(totals.best_platform.cpa_pounds)} CPA` : ""} (paid platforms with ≥10 visitors)` : "Not enough paid traffic to call a winner"}
             >
               {totals.best_platform?.platform || "—"}
               {totals.best_platform?.conv_rate != null && (
-                <span className="pipe-metric__unit">{totals.best_platform.conv_rate}% conv</span>
+                <span className="pipe-metric__unit">
+                  {totals.best_platform.conv_rate}% conv
+                  {totals.best_platform.cpa_pounds != null && ` · ${formatPounds(totals.best_platform.cpa_pounds)} CPA`}
+                </span>
               )}
             </span>
           </MetadataCell>
@@ -195,8 +211,8 @@ export default function AttributionView() {
       <section className="rep-section pipe-panel">
         <h2 className="rep-h2">Platform funnel</h2>
         <p className="rep-empty" style={{ marginTop: 0, marginBottom: 12, fontSize: 12, color: "#8C472E" }}>
-          Click a row to see per-campaign breakdown. Spend / CPA / ROAS land
-          when the Google Ads + Meta API connectors ship.
+          Click a row to see per-campaign breakdown. Spend + CPA come from
+          weekly CSV imports per platform. ROAS waits on deal-value capture.
         </p>
         <div className="rep-table-wrap">
           <table className="rep-table">
@@ -242,9 +258,13 @@ export default function AttributionView() {
                   <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
                     {row.avg_days_to_convert == null ? "—" : `${row.avg_days_to_convert}d`}
                   </td>
-                  <td style={{ textAlign: "right", color: "#8C472E" }}>—</td>
-                  <td style={{ textAlign: "right", color: "#8C472E" }}>—</td>
-                  <td style={{ textAlign: "right", color: "#8C472E" }}>—</td>
+                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+                    {formatPounds(row.spend_pounds)}
+                  </td>
+                  <td style={{ fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+                    {formatPounds(row.cpa_pounds)}
+                  </td>
+                  <td style={{ textAlign: "right", color: "#8C472E" }} title="ROAS lights up once deal value is captured at won_at">—</td>
                 </tr>
               ))}
             </tbody>
@@ -370,7 +390,10 @@ export default function AttributionView() {
 
       <p style={{ marginTop: 16, fontSize: 11, color: "#8C472E", letterSpacing: "0.04em" }}>
         Data window: {data.window === "all" ? "all time" : `last ${data.window === "30d" ? "30" : "90"} days`}.
-        Spend / CPA / ROAS columns populate when the Google Ads + Meta API connectors land in sessions 57-58.
+        {totals.last_spend_import
+          ? ` Ad spend last imported ${new Date(totals.last_spend_import).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}.`
+          : " No ad spend imported yet - drop a CSV in /reporting/exports/{platform}/ and ask Cowork to import it."}
+        {" "}ROAS column populates once deal value is captured at won_at.
       </p>
     </>
   );

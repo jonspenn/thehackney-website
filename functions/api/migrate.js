@@ -259,6 +259,35 @@ const MIGRATIONS = [
     name: "idx_date_pricing_overrides_at",
     sql: `CREATE INDEX IF NOT EXISTS idx_date_pricing_overrides_at ON date_pricing_overrides(edited_at)`,
   },
+  {
+    name: "ad_spend",
+    sql: `CREATE TABLE IF NOT EXISTS ad_spend (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      platform TEXT NOT NULL,
+      campaign TEXT,
+      spend_pence INTEGER NOT NULL DEFAULT 0,
+      impressions INTEGER DEFAULT 0,
+      clicks INTEGER DEFAULT 0,
+      conversions REAL DEFAULT 0,
+      currency TEXT DEFAULT 'GBP',
+      source TEXT NOT NULL,
+      imported_at TEXT NOT NULL,
+      UNIQUE(date, platform, campaign, source)
+    )`,
+  },
+  {
+    name: "idx_ad_spend_date",
+    sql: `CREATE INDEX IF NOT EXISTS idx_ad_spend_date ON ad_spend(date)`,
+  },
+  {
+    name: "idx_ad_spend_platform",
+    sql: `CREATE INDEX IF NOT EXISTS idx_ad_spend_platform ON ad_spend(platform)`,
+  },
+  {
+    name: "idx_ad_spend_imported",
+    sql: `CREATE INDEX IF NOT EXISTS idx_ad_spend_imported ON ad_spend(imported_at)`,
+  },
 ];
 
 export async function onRequestPost(context) {

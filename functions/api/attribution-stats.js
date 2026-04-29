@@ -71,9 +71,17 @@ function jsonResponse(data, status = 200) {
 }
 
 function resolveWindow(windowParam) {
-  if (windowParam === "30d") return { sql: "v.first_seen_at >= datetime('now', '-30 days')", label: "30d" };
-  if (windowParam === "90d") return { sql: "v.first_seen_at >= datetime('now', '-90 days')", label: "90d" };
-  return { sql: "1=1", label: "all" };
+  if (windowParam === "30d") return {
+    sql: "v.first_seen_at >= datetime('now', '-30 days')",
+    spendSql: "date >= date('now', '-30 days')",
+    label: "30d",
+  };
+  if (windowParam === "90d") return {
+    sql: "v.first_seen_at >= datetime('now', '-90 days')",
+    spendSql: "date >= date('now', '-90 days')",
+    label: "90d",
+  };
+  return { sql: "1=1", spendSql: "1=1", label: "all" };
 }
 
 export async function onRequestGet(context) {
@@ -96,6 +104,7 @@ export async function onRequestGet(context) {
       avgDaysRes,
       campaignsRes,
       landingPagesRes,
+      adSpendRes,
     ] = await env.DB.batch([
       // 1. Visitors per platform - core attribution count.
       env.DB.prepare(
@@ -208,6 +217,23 @@ export async function onRequestGet(context) {
           ORDER BY submissions DESC, visitors DESC
           LIMIT ?`
       ).bind(TOP_LIMIT),
+      // 8. Aggregate ad_spend by platform within the time window. Imported
+      //    via /api/ad-spend-import (CSV from platform dashboards). Joined
+      //    by platform string ('Google Ads' etc) which matches the
+      //    attribution funnel buckets exactly.
+      env.DB.prepare(
+        `SELECT
+            platform,
+            SUM(spend_pence) AS spend_pence,
+            SUM(impressions) AS impressions,
+            SUM(clicks) AS clicks,
+            SUM(conversions) AS platform_conversions,
+            MAX(imported_at) AS last_imported_at,
+            COUNT(DISTINCT campaign) AS campaign_count
+           FROM ad_spend
+          WHERE ${win.spendSql || "1=1"}
+          GROUP BY platform`
+      ),
     ]);
 
     /* Merge the per-platform query results into a single funnel array
@@ -228,6 +254,16 @@ export async function onRequestGet(context) {
           won_deals: 0,
           avg_days_to_convert: null,
           conv_rate: null,
+          spend_pence: 0,
+          spend_pounds: 0,
+          impressions: 0,
+          clicks: 0,
+          platform_conversions: 0,
+          last_imported_at: null,
+          campaign_count: 0,
+          cpa_pounds: null,
+          ctr: null,
+          roas: null,
         });
       }
       return platformIndex.get(platform);
@@ -245,13 +281,35 @@ export async function onRequestGet(context) {
       r.won_deals = row.won_deals || 0;
     }
     for (const row of (avgDaysRes.results || [])) ensureRow(row.platform).avg_days_to_convert = row.avg_days_to_convert;
+    for (const row of (adSpendRes.results || [])) {
+      const r = ensureRow(row.platform);
+      r.spend_pence = row.spend_pence || 0;
+      r.spend_pounds = (row.spend_pence || 0) / 100;
+      r.impressions = row.impressions || 0;
+      r.clicks = row.clicks || 0;
+      r.platform_conversions = row.platform_conversions || 0;
+      r.last_imported_at = row.last_imported_at;
+      r.campaign_count = row.campaign_count || 0;
+    }
 
     /* Conversion rate = submissions / visitors. Null when visitors == 0
        so the UI renders "—" rather than 0% (which would be misleading). */
-    const funnel = Array.from(platformIndex.values()).map(row => ({
-      ...row,
-      conv_rate: row.visitors > 0 ? Math.round((row.submissions / row.visitors) * 10000) / 100 : null,
-    }));
+    const funnel = Array.from(platformIndex.values()).map(row => {
+      const conv_rate = row.visitors > 0 ? Math.round((row.submissions / row.visitors) * 10000) / 100 : null;
+      // CPA = spend in pounds / submissions. We use D1-side submissions as
+      // the conversion denominator (rather than the platform's own reported
+      // conversions field) so all platforms report on the same conversion
+      // event - a real form submission - regardless of the platform's
+      // attribution model. Platform-reported conversions are kept on the
+      // row (platform_conversions, ctr) for reference.
+      const cpa_pounds = (row.spend_pounds > 0 && row.submissions > 0)
+        ? Math.round((row.spend_pounds / row.submissions) * 100) / 100
+        : null;
+      const ctr = (row.impressions > 0 && row.clicks > 0)
+        ? Math.round((row.clicks / row.impressions) * 10000) / 100
+        : null;
+      return { ...row, conv_rate, cpa_pounds, ctr };
+    });
     funnel.sort((a, b) => (b.visitors || 0) - (a.visitors || 0));
 
     /* Headline totals for the 4-cell metric strip. Paid = the 6 paid
@@ -272,6 +330,16 @@ export async function onRequestGet(context) {
       ? eligibleForBest.reduce((best, r) => (r.conv_rate > (best?.conv_rate ?? -Infinity) ? r : best), null)
       : null;
 
+    const paidSpendPence = paidRows.reduce((s, r) => s + (r.spend_pence || 0), 0);
+    const paidSpendPounds = paidSpendPence / 100;
+    const paidCpaPounds = (paidSpendPounds > 0 && paidSubmissions > 0)
+      ? Math.round((paidSpendPounds / paidSubmissions) * 100) / 100
+      : null;
+    const lastImport = paidRows.reduce((latest, r) => {
+      if (!r.last_imported_at) return latest;
+      return (!latest || r.last_imported_at > latest) ? r.last_imported_at : latest;
+    }, null);
+
     const totals = {
       window: win.label,
       total_visitors: totalVisitors,
@@ -282,7 +350,14 @@ export async function onRequestGet(context) {
       paid_submissions: paidSubmissions,
       paid_tours_booked: paidToursBooked,
       paid_conv_rate: paidConvRate,
-      best_platform: bestPlatform ? { platform: bestPlatform.platform, conv_rate: bestPlatform.conv_rate } : null,
+      paid_spend_pounds: paidSpendPounds,
+      paid_cpa_pounds: paidCpaPounds,
+      last_spend_import: lastImport,
+      best_platform: bestPlatform ? {
+        platform: bestPlatform.platform,
+        conv_rate: bestPlatform.conv_rate,
+        cpa_pounds: bestPlatform.cpa_pounds,
+      } : null,
     };
 
     return jsonResponse({
