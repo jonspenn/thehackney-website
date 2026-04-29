@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { SoftPill } from "./primitives/index.js";
 
 function fmtDate(iso) {
   if (!iso) return "";
@@ -36,7 +37,7 @@ function relative(iso) {
   return `${Math.floor(diffMin / (60 * 24))}d ago`;
 }
 
-export default function DatesTopList({ year, stream, direction, onSelectDate, selectedDate, refreshKey }) {
+export default function DatesTopList({ year, stream, direction, onSelectDate, selectedDate, refreshKey, bookedDates }) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -78,24 +79,33 @@ export default function DatesTopList({ year, stream, direction, onSelectDate, se
             <th>Date</th>
             <th>Day</th>
             <th style={{ textAlign: "right" }}>Clicks</th>
+            <th>Status</th>
             <th>Last click</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
-            <tr
-              key={r.clicked_date}
-              className={`dt-top-row${selectedDate === r.clicked_date ? " dt-top-row--selected" : ""}`}
-              onClick={() => onSelectDate && onSelectDate(r.clicked_date)}
-            >
-              <td>{fmtDate(r.clicked_date)}</td>
-              <td>{dayOfWeek(r.clicked_date)}</td>
-              <td style={{ textAlign: "right" }}>
-                <span className="dt-clicks">{r.clicks}</span>
-              </td>
-              <td className="dt-when">{relative(r.last_click_at)}</td>
-            </tr>
-          ))}
+          {rows.map((r) => {
+            const booked = bookedDates && bookedDates.has(r.clicked_date);
+            return (
+              <tr
+                key={r.clicked_date}
+                className={`dt-top-row${selectedDate === r.clicked_date ? " dt-top-row--selected" : ""}${booked ? " dt-top-row--booked" : ""}`}
+                onClick={() => onSelectDate && onSelectDate(r.clicked_date)}
+              >
+                <td>{fmtDate(r.clicked_date)}</td>
+                <td>{dayOfWeek(r.clicked_date)}</td>
+                <td style={{ textAlign: "right" }}>
+                  <span className="dt-clicks">{r.clicks}</span>
+                </td>
+                <td>
+                  {booked
+                    ? <SoftPill variant="brick" dot uppercase>Booked</SoftPill>
+                    : <SoftPill variant="olive" dot uppercase>Available</SoftPill>}
+                </td>
+                <td className="dt-when">{relative(r.last_click_at)}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

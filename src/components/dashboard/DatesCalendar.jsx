@@ -98,6 +98,10 @@ export default function DatesCalendar({
                   c.isPast ? "dt-cell--past" : "",
                   c.isToday ? "dt-cell--today" : "",
                   booked ? "dt-cell--booked" : "",
+                  /* Booked dates that are still being clicked = residual demand
+                     for sold inventory. Worth flagging visually so the user can
+                     spot mispriced sold-out dates or alternatives to offer. */
+                  booked && clicks > 0 ? "dt-cell--booked-hot" : "",
                   selectedDate === c.iso ? "dt-cell--selected" : "",
                   hasOverride ? "dt-cell--override" : "",
                 ].filter(Boolean).join(" ");

@@ -228,6 +228,7 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
                   <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--mid" />{data.thresholds.mid} - {data.thresholds.high - 1}</span>
                   <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--high" />{data.thresholds.high}+</span>
                   <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--booked-mini" />Booked</span>
+                  <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--booked-hot-mini" />Booked + clicks</span>
                   <span className="dt-legend-item"><span className="dt-legend-swatch dt-cell--override-mini" />Manual override</span>
                 </div>
               )}
@@ -264,6 +265,7 @@ export default function DatesView({ pricing, leads, onSelectLead }) {
             onSelectDate={setSelectedDate}
             selectedDate={selectedDate}
             refreshKey={refreshKey}
+            bookedDates={bookedDates}
           />
         </div>
       </div>

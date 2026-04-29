@@ -2603,15 +2603,29 @@ import pricing from '../../../data/wedding-pricing.json';
         pointer-events: none;
       }
       .dt-cell-day {
-        font-size: 11px;
+        font-size: 12px;
         line-height: 1;
-        opacity: 0.85;
+        font-weight: 400;
+        color: inherit;
       }
       .dt-cell-count {
-        font-size: 10px;
+        font-size: 9px;
         line-height: 1;
         font-weight: 600;
-        opacity: 0.9;
+        font-family: 'DM Sans', sans-serif;
+        letter-spacing: 0.04em;
+        padding: 1px 5px;
+        margin-top: 2px;
+        border-radius: 8px;
+        background: rgba(191, 114, 86, 0.18);
+        color: var(--color-dusty-coral, #BF7256);
+      }
+      /* On dark heat cells the coral chip would clash with the green bg, so
+         flip it to a translucent warm-canvas chip with the cell's text colour. */
+      .dt-cell--mid .dt-cell-count,
+      .dt-cell--high .dt-cell-count {
+        background: rgba(245, 240, 232, 0.28);
+        color: var(--color-warm-white, #F5F0E8);
       }
       .dt-cell--past { opacity: 0.3; }
       .dt-cell--today { box-shadow: inset 0 0 0 1.5px var(--color-dusty-coral, #BF7256); }
@@ -2627,9 +2641,16 @@ import pricing from '../../../data/wedding-pricing.json';
         width: 0;
         height: 0;
         border-style: solid;
-        border-width: 0 8px 8px 0;
+        border-width: 0 10px 10px 0;
         border-color: transparent var(--color-mahogany, #40160C) transparent transparent;
-        opacity: 0.85;
+      }
+      /* Booked + still-clicked = residual demand for sold inventory. Add a
+         subtle Mahogany inner ring so these cells stand out at a glance. */
+      .dt-cell--booked-hot {
+        box-shadow: inset 0 0 0 1.5px rgba(64, 22, 12, 0.45);
+      }
+      .dt-cell--booked-hot .dt-cell-booked-mark {
+        border-width: 0 12px 12px 0;
       }
       .dt-cell--override::after {
         content: "";
@@ -2671,7 +2692,21 @@ import pricing from '../../../data/wedding-pricing.json';
         width: 0;
         height: 0;
         border-style: solid;
-        border-width: 0 6px 6px 0;
+        border-width: 0 7px 7px 0;
+        border-color: transparent var(--color-mahogany, #40160C) transparent transparent;
+      }
+      .dt-legend-swatch.dt-cell--booked-hot-mini {
+        box-shadow: inset 0 0 0 1.5px rgba(64, 22, 12, 0.45);
+        background: rgba(46, 64, 9, 0.4);
+      }
+      .dt-legend-swatch.dt-cell--booked-hot-mini::after {
+        content: "";
+        position: absolute;
+        inset: -1px -1px auto auto;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 7px 7px 0;
         border-color: transparent var(--color-mahogany, #40160C) transparent transparent;
       }
       .dt-legend-swatch.dt-cell--override-mini::after {
@@ -2690,6 +2725,11 @@ import pricing from '../../../data/wedding-pricing.json';
       .dt-top-row { cursor: pointer; transition: background 0.12s ease; }
       .dt-top-row:hover { background: rgba(46, 64, 9, 0.04); }
       .dt-top-row--selected { background: rgba(46, 64, 9, 0.08); }
+      /* Booked rows in the hot-dates list get a subtle brick tint so they read
+         as "demand for sold inventory" rather than "yours to push hardest". */
+      .dt-top-row--booked { background: rgba(140, 71, 46, 0.04); }
+      .dt-top-row--booked:hover { background: rgba(140, 71, 46, 0.08); }
+      .dt-top-row--booked.dt-top-row--selected { background: rgba(140, 71, 46, 0.12); }
       .dt-clicks {
         font-family: 'Cormorant Garamond', serif;
         font-size: 18px;
