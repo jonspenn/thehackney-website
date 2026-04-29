@@ -234,6 +234,31 @@ const MIGRATIONS = [
     name: "idx_submissions_type",
     sql: `CREATE INDEX IF NOT EXISTS idx_submissions_type ON submissions(form_type)`,
   },
+  // ── Date pricing overrides (Phase 1 of Dates tab, 29 Apr 2026) ──
+  // Append-only - every override change written as a new row with editor +
+  // timestamp. Latest-row-wins at read time, cleared=1 reverts to rate card.
+  // Mirrors /migrations/0004_create_date_pricing.sql.
+  {
+    name: "date_pricing_overrides",
+    sql: `CREATE TABLE IF NOT EXISTS date_pricing_overrides (
+      override_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      event_date TEXT NOT NULL,
+      override_fee INTEGER,
+      override_min_spend INTEGER,
+      note TEXT,
+      cleared INTEGER NOT NULL DEFAULT 0,
+      edited_by TEXT NOT NULL,
+      edited_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )`,
+  },
+  {
+    name: "idx_date_pricing_overrides_date",
+    sql: `CREATE INDEX IF NOT EXISTS idx_date_pricing_overrides_date ON date_pricing_overrides(event_date)`,
+  },
+  {
+    name: "idx_date_pricing_overrides_at",
+    sql: `CREATE INDEX IF NOT EXISTS idx_date_pricing_overrides_at ON date_pricing_overrides(edited_at)`,
+  },
 ];
 
 export async function onRequestPost(context) {
