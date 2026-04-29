@@ -31,6 +31,8 @@ import {
   buildHeatmapMonths, heatColour, heatTextColour,
 } from "./utils.js";
 
+import { MetadataStrip, MetadataCell } from "./primitives/index.js";
+
 const DAY_LABELS_SHORT_LOCAL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function WebsiteView({
@@ -110,8 +112,55 @@ export default function WebsiteView({
     window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
   }
 
+  /* Number formatters for the metric strip */
+  const formatVisitorCount = (n) => {
+    if (n >= 10000) return `${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
+    if (n >= 1000) return `${(n / 1000).toFixed(1)}k`.replace(".0k", "k");
+    return String(n || 0);
+  };
+
   return (
     <>
+      {/* ── Metric strip header (4 cells, all-time + 30d cross) ── */}
+      <div className="pipe-meta-wrap">
+        <MetadataStrip>
+          <MetadataCell eyebrow="Total visitors">
+            <span className="pipe-metric">
+              {formatVisitorCount(t.totalVisitors)}
+              {t.returningPct != null && (
+                <span className="pipe-metric__unit">{t.returningPct}% returning</span>
+              )}
+            </span>
+          </MetadataCell>
+          <MetadataCell eyebrow="Sessions">
+            <span className="pipe-metric">
+              {formatVisitorCount(t.totalSessions)}
+              {t.bouncePct != null && (
+                <span className="pipe-metric__unit">{t.bouncePct}% bounced</span>
+              )}
+            </span>
+          </MetadataCell>
+          <MetadataCell eyebrow="CTA clicks">
+            <span className="pipe-metric">
+              {formatVisitorCount((tracking?.topCTAs || []).reduce((sum, r) => sum + (r.click_count || 0), 0))}
+              <span className="pipe-metric__unit">all-time</span>
+            </span>
+          </MetadataCell>
+          <MetadataCell eyebrow="Conv rate (30d)">
+            <span
+              className="pipe-metric"
+              style={{ color: t.conv30dPct == null ? undefined : (t.conv30dPct >= 1 ? "#2E4009" : (t.conv30dPct >= 0.5 ? "#8C472E" : "#40160C")) }}
+              title={t.conv30dPct == null ? "" : `${t.submissions30d || 0} submissions / ${t.visitors30d || 0} visitors over the last 30 days`}
+            >
+              {t.conv30dPct == null ? "—" : `${t.conv30dPct}%`}
+              {t.conv30dPct != null && (
+                <span className="pipe-metric__unit">{t.submissions30d || 0} of {formatVisitorCount(t.visitors30d || 0)}</span>
+              )}
+            </span>
+          </MetadataCell>
+        </MetadataStrip>
+      </div>
+
       {/* Sub-mode toggle */}
       <div className="adm-leads-mode adm-website-sub">
         <button
