@@ -596,7 +596,7 @@ export default function BookingsView() {
       </div>
 
       <p className="bookings-footnote">
-        Source: HubSpot won deals export (14 Apr 2026). Close date basis, all event types.
+        Source: HubSpot won deals export (29 Apr 2026). Close date basis, all event types.
         2026 data through {SHORT_MONTHS[CURRENT_DATA_MONTH - 1]}. Click any figure to see deals.
       </p>
     </div>
