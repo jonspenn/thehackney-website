@@ -15,7 +15,7 @@
 
 interface Props {
   eyebrow?: string;
-  heading: string;
+  heading?: string;
   subtext?: string;
   align?: 'center' | 'left';
   class?: string;
@@ -32,7 +32,7 @@ const {
 
 <div class:list={['section-header', `section-header-${align}`, className]}>
   {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-  <h2>{heading}</h2>
+  {heading && <h2>{heading}</h2>}
   {subtext && <p class="section-header-sub">{subtext}</p>}
 </div>
 

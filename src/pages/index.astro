@@ -10,9 +10,65 @@ import ProofBar from '../components/ProofBar.astro';
 import PhotoBreak from '../components/PhotoBreak.astro';
 import PhotoStrip from '../components/PhotoStrip.astro';
 import FinalCTA from '../components/FinalCTA.astro';
+
+// Hide team section until photos ship. One-line flip when ready.
+const showTeam = false;
+
+// Homepage EventVenue + LocalBusiness JSON-LD.
+// Sitewide Organization schema is in Base.astro; this adds page-specific
+// venue-level structured data so Google can serve a venue knowledge panel.
+// Rating: 4.9 / 63 reviews on Hitched (Apr 2026).
+//   - Lesley's misplaced 1-star review (was about Hackney Council, not the venue)
+//     was removed by Hitched, restoring the rating from 4.8 back to 4.9.
+const homepageSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": ["EventVenue", "LocalBusiness"],
+  "@id": "https://thehackney.co/#venue",
+  "name": "The Hackney",
+  "description": "Converted 1856 brewery on Hackney Road, E2. Exclusive-hire wedding and events venue. 60 seated, 100 standing. Everything in-house.",
+  "url": "https://thehackney.co/",
+  "image": "https://thehackney.co/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp",
+  "telephone": "+442079611604",
+  "priceRange": "\u00a3\u00a3\u00a3\u00a3",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "503 Hackney Road",
+    "addressLocality": "London",
+    "postalCode": "E2 9ED",
+    "addressCountry": "GB"
+  },
+  "sameAs": [
+    "https://instagram.com/thehackney.co",
+    "https://www.tiktok.com/@thehackney",
+    "https://www.facebook.com/TheHackney.Co/"
+  ],
+  "maximumAttendeeCapacity": 100,
+  "review": [
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Sophie and James" },
+      "datePublished": "2025-10",
+      "reviewBody": "The Hackney made our wedding feel completely effortless. The team thought of everything. We just showed up and it was perfect.",
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Priya and Tom" },
+      "datePublished": "2025-08",
+      "reviewBody": "From the first tour we knew this was the one. The space is stunning and the food genuinely impressed our guests.",
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+    }
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "63",
+    "bestRating": "5"
+  }
+});
 ---
 
-<Base title="Wedding & Events Venue East London | The Hackney, E2" description="The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours." preloadImage="/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp">
+<Base title="Wedding & Events Venue East London | The Hackney, E2" description="The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues. 60 seated, 100 standing. Exclusively yours." preloadImage="/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp" schema={homepageSchema}>
 
   <!-- ==================== HERO ==================== -->
   <HeroSection
@@ -24,6 +80,7 @@ import FinalCTA from '../components/FinalCTA.astro';
     cta={{ label: "Check Your Date", href: "/check-your-date/", utm: "homepage" }}
     note="Free. No obligation. See if your date is available."
     height="full"
+    overlay={0.55}
   />
 
   <!-- ==================== SOCIAL PROOF BAR ==================== -->
@@ -112,7 +169,7 @@ import FinalCTA from '../components/FinalCTA.astro';
 
   <!-- ==================== TESTIMONIALS ==================== -->
   <Section bg="olive" padding="standard">
-    <SectionHeader eyebrow="What Couples Say" heading="" align="center" />
+    <SectionHeader eyebrow="What Couples Say" align="center" />
     <TestimonialBlock testimonials={[
       { quote: "The Hackney made our wedding feel completely effortless. The team thought of everything. We just showed up and it was perfect.", attribution: "Sophie and James, October 2025" },
       { quote: "From the first tour we knew this was the one. The space is stunning and the food genuinely impressed our guests.", attribution: "Priya and Tom, August 2025" }
@@ -145,6 +202,9 @@ import FinalCTA from '../components/FinalCTA.astro';
   ]} />
 
   <!-- ==================== THE TEAM ==================== -->
+  <!-- Hidden pre-launch until team photos exist (Hugo, Eva, Kitchen).
+       Flip showTeam to true once photos ship. See TASKS.md "Get team photos". -->
+  {showTeam && (
   <Section bg="light" padding="standard" border="top" class="team-section">
     <SectionHeader
       eyebrow="The Team"
@@ -172,6 +232,7 @@ import FinalCTA from '../components/FinalCTA.astro';
       </div>
     </div>
   </Section>
+  )}
 
   <!-- ==================== FINAL CTA ==================== -->
   <FinalCTA

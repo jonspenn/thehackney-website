@@ -58,7 +58,9 @@ const cols = columns || (testimonials.length > 1 ? 2 : 1);
     font-size: 0.8125rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--dusty-coral);
+    /* Warm canvas at 75% — meets WCAG AA on Forest Olive bg.
+       Component is used on dark sections only (homepage testimonials). */
+    color: rgba(245, 240, 232, 0.75);
     margin: 0;
   }
 

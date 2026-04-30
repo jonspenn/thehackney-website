@@ -321,6 +321,14 @@ const secondaryCtaClass = isLight ? 'btn btn-outline' : 'btn btn-outline-dark';
     margin-top: 0.875rem;
   }
 
+  /* === Image-bg hero text legibility ===
+     Eyebrow + h1 on photo backgrounds need a soft shadow so they don't
+     compete with bright spots in the image (Edison bulbs, sunlight, etc.) */
+  .hero-bg-image .hero-section-content :global(.eyebrow),
+  .hero-bg-image .hero-section-content h1 {
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
+  }
+
   /* === Typography - light background overrides === */
   .hero-bg-light .hero-section-content h1 {
     color: var(--brewery-dark);

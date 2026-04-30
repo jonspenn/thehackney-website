@@ -63,6 +63,11 @@ const {
     {ogImage ? <meta property="og:image" content={ogImage} /> : <meta property="og:image" content="/images/the-hackney-og-default.webp" />}
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} - The Hackney`} />
+    <meta name="twitter:description" content={description} />
+    {ogImage ? <meta name="twitter:image" content={ogImage} /> : <meta name="twitter:image" content="/images/the-hackney-og-default.webp" />}
     <link rel="canonical" href={`https://thehackney-website.pages.dev${Astro.url.pathname}`} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {preloadImage && <link rel="preload" as="image" href={preloadImage} type="image/webp" />}
