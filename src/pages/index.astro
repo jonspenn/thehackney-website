@@ -5,7 +5,6 @@ import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ContentBlock from '../components/ContentBlock.astro';
 import TestimonialBlock from '../components/TestimonialBlock.astro';
-import PricingTable from '../components/PricingTable.astro';
 import ProofBar from '../components/ProofBar.astro';
 import PhotoBreak from '../components/PhotoBreak.astro';
 import PhotoStrip from '../components/PhotoStrip.astro';
@@ -180,21 +179,36 @@ const homepageSchema = JSON.stringify({
   </Section>
 
   <!-- ==================== PRICING ==================== -->
+  <!-- Hook pattern adopted from /weddings/ canonical: one big number,
+       transparent hire+min split, period context. No 3-card breakdown
+       (full season-by-day-type table lives on /weddings/). Cross-link
+       below routes the 15% non-wedding visitors who scrolled past the
+       occasions grid at position 3 without using it. -->
   <Section bg="light" padding="standard" border="top">
     <SectionHeader
       eyebrow="Wedding Investment"
       heading="Honest Pricing. No Hidden Fees."
-      subtext="Hire from £1,000 in January, with a minimum food and bar spend. Full pricing per date in our brochure."
       align="center"
     />
-    <PricingTable
-      tiers={[
-        { name: "Off-Peak", period: "Jan - Mar, any day", price: "From £5,000", description: "Exclusive hire + minimum spend" },
-        { name: "Mid-Season", period: "Apr, Oct - Dec", price: "From £5,000", description: "Exclusive hire + minimum spend" },
-        { name: "Peak Season", period: "May - Sep", price: "From £7,000", description: "Exclusive hire + minimum spend" }
-      ]}
-      cta={{ label: "Lock In Your Date", href: "/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage&utm_content=pricing" }}
-    />
+
+    <div class="pricing-hook fade-in">
+      <div class="pricing-hook-label">Weddings From</div>
+      <div class="pricing-hook-amount">&pound;5,000</div>
+      <div class="pricing-hook-breakdown">Venue hire &pound;1,000 &nbsp;+&nbsp; minimum spend &pound;4,000</div>
+      <div class="pricing-hook-context">Off-peak weddings, any day of the week</div>
+    </div>
+
+    <p class="pricing-cross-link">
+      Hosting a corporate event, private celebration, supper club or cafe-bar visit?
+      <a href="/corporate/">Corporate</a>,
+      <a href="/private-events/">Private Events</a>,
+      <a href="/supper-club/">Supper Club</a> and
+      <a href="/cafe-bar/">Cafe + Bar</a> have their own pricing.
+    </p>
+
+    <div class="pricing-cta">
+      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage&utm_content=pricing" class="btn btn-primary">Lock In Your Date</a>
+    </div>
   </Section>
 
   <!-- ==================== DETAIL PHOTO STRIP ==================== -->
@@ -421,5 +435,79 @@ const homepageSchema = JSON.stringify({
       grid-template-columns: 1fr;
       gap: 3rem;
     }
+  }
+
+  /* ==================== PRICING HOOK ==================== */
+  /* Adopted from /weddings/ canonical pattern. */
+  .pricing-hook {
+    text-align: center;
+    max-width: 720px;
+    margin: -8px auto 32px;
+    padding: 48px 32px;
+    background: rgba(73, 89, 14, 0.04);
+    border: 1px solid rgba(73, 89, 14, 0.12);
+    border-radius: 2px;
+  }
+
+  .pricing-hook-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--dusty-coral);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .pricing-hook-amount {
+    font-family: var(--font-heading);
+    font-size: clamp(72px, 12vw, 128px);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--forest-olive);
+    margin-bottom: 16px;
+  }
+
+  .pricing-hook-breakdown {
+    font-family: var(--font-body);
+    font-size: clamp(15px, 1.6vw, 18px);
+    color: var(--brewery-dark);
+    margin-bottom: 8px;
+  }
+
+  .pricing-hook-context {
+    font-family: var(--font-body);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--brewery-dark);
+    opacity: 0.55;
+  }
+
+  /* Cross-link line for non-wedding routing */
+  .pricing-cross-link {
+    max-width: 720px;
+    margin: 0 auto 32px;
+    text-align: center;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--brewery-dark);
+    opacity: 0.85;
+  }
+
+  .pricing-cross-link a {
+    color: var(--dusty-coral);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  .pricing-cross-link a:hover {
+    color: var(--forest-olive);
+  }
+
+  /* Pricing CTA centred below */
+  .pricing-cta {
+    text-align: center;
   }
 </style>
