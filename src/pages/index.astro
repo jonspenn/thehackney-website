@@ -91,40 +91,8 @@ const homepageSchema = JSON.stringify({
     { number: "4.9 ★", label: "Couple rating on Hitched" }
   ]} />
 
-  <!-- ==================== VENUE INTRODUCTION ==================== -->
-  <Section bg="light" padding="standard" border="bottom">
-    <ContentBlock
-      image="/images/hackney-wedding-first-dance-guests-venue.webp"
-      alt="First dance at a Hackney wedding with guests watching"
-      reverse={true}
-      aspect="4/3"
-    >
-      <h2 class="pull-quote">"Industrial Romance. East London. Entirely Yours."</h2>
-      <p>The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues.</p>
-      <p>Exclusively hired. 60 seated, 100 standing. Everything in-house - catering, bar, florals, coordination.</p>
-      <p>No corkage. No hidden fees. No outside caterers. Just one team, one venue, one day that is entirely yours.</p>
-
-      <div class="differentiators">
-        <div>
-          <div class="diff-item-label">Exclusively Hired</div>
-          <div class="diff-item-text">The whole venue is yours. No other events, no shared spaces.</div>
-        </div>
-        <div>
-          <div class="diff-item-label">Everything In-House</div>
-          <div class="diff-item-text">Kitchen, bar, florals and coordination. One team from start to finish.</div>
-        </div>
-        <div>
-          <div class="diff-item-label">East London</div>
-          <div class="diff-item-text">503 Hackney Road E2. 8 minutes from Bethnal Green tube.</div>
-        </div>
-      </div>
-
-      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage" class="btn btn-primary">Check Your Date</a>
-    </ContentBlock>
-  </Section>
-
   <!-- ==================== FIVE OCCASIONS ==================== -->
-  <Section bg="light" padding="none" class="occasions-section">
+  <Section bg="light" padding="standard" border="bottom" class="occasions-section">
     <div class="container">
       <div class="occasions-grid">
         <a href="/weddings/" class="occasion-card" style="background-image: url('/images/hackney-wedding-ceremony-kiss-industrial-backdrop.webp');">
@@ -159,6 +127,38 @@ const homepageSchema = JSON.stringify({
         </a>
       </div>
     </div>
+  </Section>
+
+  <!-- ==================== VENUE INTRODUCTION ==================== -->
+  <Section bg="light" padding="standard" border="bottom">
+    <ContentBlock
+      image="/images/hackney-wedding-first-dance-guests-venue.webp"
+      alt="First dance at a Hackney wedding with guests watching"
+      reverse={true}
+      aspect="4/3"
+    >
+      <h2 class="pull-quote">"Industrial Romance. East London. Entirely Yours."</h2>
+      <p>The Hackney is a converted 1856 brewery on Hackney Road, E2. One of East London's most sought-after wedding and events venues.</p>
+      <p>Exclusively hired. 60 seated, 100 standing. Everything in-house - catering, bar, florals, coordination.</p>
+      <p>No corkage. No hidden fees. No outside caterers. Just one team, one venue, one day that is entirely yours.</p>
+
+      <div class="differentiators">
+        <div>
+          <div class="diff-item-label">Exclusively Hired</div>
+          <div class="diff-item-text">The whole venue is yours. No other events, no shared spaces.</div>
+        </div>
+        <div>
+          <div class="diff-item-label">Everything In-House</div>
+          <div class="diff-item-text">Kitchen, bar, florals and coordination. One team from start to finish.</div>
+        </div>
+        <div>
+          <div class="diff-item-label">East London</div>
+          <div class="diff-item-text">503 Hackney Road E2. 8 minutes from Bethnal Green tube.</div>
+        </div>
+      </div>
+
+      <a href="/check-your-date/?utm_source=website&utm_medium=cta&utm_campaign=homepage" class="btn btn-primary">Check Your Date</a>
+    </ContentBlock>
   </Section>
 
   <!-- ==================== FULL-BLEED PHOTO BREAK ==================== -->
@@ -286,11 +286,9 @@ const homepageSchema = JSON.stringify({
   }
 
   /* ==================== OCCASIONS GRID ==================== */
-  .occasions-section {
-    padding-top: 1.5rem;
-    padding-bottom: var(--space-section);
-  }
-
+  /* Section padding now handled by the Section component (padding="standard").
+     Was previously padding="none" with inline overrides that caused the
+     PhotoBreak to crowd the grid. */
   .occasions-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
