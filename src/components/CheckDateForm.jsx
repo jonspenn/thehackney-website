@@ -114,7 +114,22 @@ function FadeIn({ children, delay = 0 }) {
   );
 }
 
-export default function CheckDateForm({ eventType }) {
+export default function CheckDateForm({ eventType: eventTypeProp }) {
+  // When the standalone /check-your-date/ page is reached with `?type=corporate`
+  // or `?type=private` from a landing page CTA, adopt that as the eventType so
+  // dataLayer events, WhatsApp prefill copy, and downstream HubSpot routing all
+  // carry the visitor's actual context. Explicit prop (when this component is
+  // ever embedded on a landing page) always wins over URL.
+  const [eventType, setEventType] = useState(eventTypeProp);
+  useEffect(() => {
+    if (eventTypeProp) return;
+    if (typeof window === "undefined") return;
+    const urlType = new URLSearchParams(window.location.search).get("type");
+    if (urlType && ["wedding", "corporate", "private"].includes(urlType)) {
+      setEventType(urlType);
+    }
+  }, [eventTypeProp]);
+
   const [selectedDate, setSelectedDate] = useState("");
   const resultRef = useRef(null);
 
