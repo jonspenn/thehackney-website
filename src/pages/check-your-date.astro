@@ -185,6 +185,14 @@ import CheckDateForm from '../components/CheckDateForm.astro';
     margin: 0 auto;
   }
 
+  /* The HTML5 [hidden] attribute applies display:none via UA stylesheet,
+     but the .cd-trust-grid class rule above (display: grid) wins on
+     specificity and renders hidden variants visible. This explicit
+     override matches specificity and keeps the variant routing working. */
+  .cd-trust-grid[hidden] {
+    display: none;
+  }
+
   .cd-trust-box {
     background: rgba(44, 24, 16, 0.025);
     border: 1px solid rgba(44, 24, 16, 0.06);
