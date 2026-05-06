@@ -254,13 +254,16 @@ import SectionHeader from '../components/SectionHeader.astro';
   }
 
   /* === Tab navigation === */
+  /* Tabs styled as a filled button-pair, matching the site's CTA language
+     (Mid Olive fill = primary, outline = secondary). They functionally
+     remain tabs but read as proper CTAs - the conversion paths on this
+     page deserve more visual weight than the previous underline pattern. */
   .bk-tabs {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     justify-content: center;
     max-width: 1080px;
     margin: 0 auto 32px;
-    border-bottom: 1px solid rgba(44, 24, 16, 0.12);
     flex-wrap: wrap;
   }
 
@@ -268,26 +271,35 @@ import SectionHeader from '../components/SectionHeader.astro';
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 16px 24px;
+    padding: 16px 28px;
     background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
+    border: 1.5px solid var(--mid-olive);
+    border-radius: 2px;
     font-family: var(--font-body);
-    font-size: 0.9375rem;
-    font-weight: 500;
-    color: rgba(44, 24, 16, 0.55);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--mid-olive);
     cursor: pointer;
-    transition: color 0.2s ease, border-color 0.2s ease;
-    margin-bottom: -1px;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    letter-spacing: 0.01em;
   }
 
-  .bk-tab:hover {
+  .bk-tab:hover:not(.is-active) {
+    background: rgba(73, 89, 14, 0.08);
+    border-color: var(--mid-olive);
     color: var(--brewery-dark);
   }
 
   .bk-tab.is-active {
-    color: var(--brewery-dark);
-    border-bottom-color: var(--forest-olive);
+    background: var(--mid-olive);
+    color: #fff;
+    border-color: var(--mid-olive);
+    /* Subtle lift to reinforce the primary state */
+    box-shadow: 0 2px 8px rgba(73, 89, 14, 0.18);
+  }
+
+  .bk-tab:active {
+    transform: translateY(1px);
   }
 
   .bk-tab svg {
@@ -295,15 +307,17 @@ import SectionHeader from '../components/SectionHeader.astro';
     color: currentColor;
   }
 
+  /* Recommended badge sits inside the active button and uses an inverted
+     palette so it reads on the green fill - Warm Canvas bg + Mid Olive text. */
   .bk-tab__badge {
     display: inline-block;
-    padding: 2px 8px;
-    background: var(--forest-olive);
-    color: #fff;
+    padding: 3px 9px;
+    background: var(--warm-canvas);
+    color: var(--mid-olive);
     font-size: 0.6875rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     border-radius: 2px;
     margin-left: 4px;
   }
