@@ -18,11 +18,15 @@ import CheckDateForm from '../components/CheckDateForm.astro';
 
 <CheckDateForm />
 
-<!-- Trust signals below the form -->
+<!-- Trust signals below the form. Three variants render in HTML; inline
+     script below reads ?type= and reveals the matching one. Wedding is the
+     default + stays visible if no ?type= or an unrecognised value is passed.
+     Same routing model as the date-context banner on /bookacall/. -->
 <section class="cd-trust">
   <div class="container">
-    <div class="cd-trust-grid">
-      <!-- What happens next -->
+
+    <!-- Wedding variant (default). Visible unless script swaps it out. -->
+    <div class="cd-trust-grid" data-trust-variant="wedding">
       <div class="cd-trust-box">
         <h3>What happens next?</h3>
         <ol class="cd-steps">
@@ -32,16 +36,14 @@ import CheckDateForm from '../components/CheckDateForm.astro';
           </li>
           <li>
             <span class="cd-step-num">2</span>
-            <p><strong>Visit the venue</strong> - book a tour with Hugo, our General Manager. Want to talk something through first? You can book a call instead.</p>
+            <p><strong>Tour with Hugo</strong> - 30 minutes, 7 days a week. Or book a call first if you'd rather chat.</p>
           </li>
           <li>
             <span class="cd-step-num">3</span>
-            <p><strong>We'll hold your date</strong> - love it? We reserve it while you decide</p>
+            <p><strong>Decide together</strong> - we'll talk you through holding the date</p>
           </li>
         </ol>
       </div>
-
-      <!-- Social proof -->
       <div class="cd-trust-box cd-trust-box--stats">
         <div class="cd-stat">
           <span class="cd-stat-number">400+</span>
@@ -61,8 +63,106 @@ import CheckDateForm from '../components/CheckDateForm.astro';
         </div>
       </div>
     </div>
+
+    <!-- Corporate variant. Past clients pulled from corporate.astro logo strip. -->
+    <div class="cd-trust-grid" data-trust-variant="corporate" hidden>
+      <div class="cd-trust-box">
+        <h3>What happens next?</h3>
+        <ol class="cd-steps">
+          <li>
+            <span class="cd-step-num">1</span>
+            <p><strong>Find your date</strong> - pick a date that works for your team</p>
+          </li>
+          <li>
+            <span class="cd-step-num">2</span>
+            <p><strong>Brief Hugo</strong> - 15-minute call, we'll scope your event and talk through requirements</p>
+          </li>
+          <li>
+            <span class="cd-step-num">3</span>
+            <p><strong>Get a proposal</strong> - dedicated events manager handles delivery from brief to debrief</p>
+          </li>
+        </ol>
+      </div>
+      <div class="cd-trust-box cd-trust-box--stats">
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Adidas, Spotify, Samsung</span>
+          <span class="cd-stat-label">Past clients</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Everything Handled</span>
+          <span class="cd-stat-label">Catering, AV, events team</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Exclusive Hire</span>
+          <span class="cd-stat-label">No shared spaces, no surprises</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number">100</span>
+          <span class="cd-stat-label">Up to 100 guests (60 seated)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Private variant: birthdays, baby showers, anniversaries, engagements. -->
+    <div class="cd-trust-grid" data-trust-variant="private" hidden>
+      <div class="cd-trust-box">
+        <h3>What happens next?</h3>
+        <ol class="cd-steps">
+          <li>
+            <span class="cd-step-num">1</span>
+            <p><strong>Find your date</strong> - pick a date for your celebration</p>
+          </li>
+          <li>
+            <span class="cd-step-num">2</span>
+            <p><strong>Discovery call with Hugo</strong> - 15 minutes, no pressure, we'll talk through the options</p>
+          </li>
+          <li>
+            <span class="cd-step-num">3</span>
+            <p><strong>Plan it together</strong> - dedicated events manager handles every detail on the day</p>
+          </li>
+        </ol>
+      </div>
+      <div class="cd-trust-box cd-trust-box--stats">
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Birthdays, baby showers, anniversaries</span>
+          <span class="cd-stat-label">What we host</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Everything Included</span>
+          <span class="cd-stat-label">Venue, food, drinks, team</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number cd-stat-number--text">Exclusive Hire</span>
+          <span class="cd-stat-label">The whole venue, just for you</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-number">60 / 100</span>
+          <span class="cd-stat-label">Seated / standing capacity</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
+
+<!-- Trust strip routing. Reads ?type= synchronously at parse, before paint,
+     so corporate/private visitors never see the wedding variant flash.
+     Mirrors the URL param consumption shipped in CheckDateForm.jsx (commit
+     6813462) so dataLayer event_type and the trust strip variant always
+     agree on what kind of visitor we have. -->
+<script is:inline>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var type = params.get('type');
+    if (!type) return; // wedding stays visible by default
+    var allowed = { wedding: 1, corporate: 1, private: 1 };
+    if (!allowed[type]) return; // unknown value -> wedding default
+    var nodes = document.querySelectorAll('[data-trust-variant]');
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].hidden = nodes[i].getAttribute('data-trust-variant') !== type;
+    }
+  })();
+</script>
 
 </Base>
 
