@@ -328,6 +328,25 @@ const MIGRATIONS = [
     name: "idx_vt_tokens_created",
     sql: `CREATE INDEX IF NOT EXISTS idx_vt_tokens_created ON virtual_tour_tokens(created_at)`,
   },
+  // Dev-only seed rows for the /virtual-tour/ page (Phase 1). Idempotent.
+  // Once a real token-issuing workflow is live these rows are harmless
+  // residue. Use:
+  //   /virtual-tour/?t=test_cold_reengage  -> cold-reengage variant
+  //   /virtual-tour/?t=test_tour_recap     -> tour-recap variant
+  {
+    name: "vt_seed_cold_reengage",
+    sql: `INSERT OR IGNORE INTO virtual_tour_tokens
+      (token, contact_id, send_type, created_at, expires_at, sent_at)
+      VALUES ('test_cold_reengage', 'test_contact_dev', 'cold_reengage',
+              '2026-05-06T00:00:00.000Z', '2027-12-31T23:59:59.000Z', '2026-05-06T00:00:00.000Z')`,
+  },
+  {
+    name: "vt_seed_tour_recap",
+    sql: `INSERT OR IGNORE INTO virtual_tour_tokens
+      (token, contact_id, send_type, created_at, expires_at, sent_at)
+      VALUES ('test_tour_recap', 'test_contact_dev', 'tour_recap',
+              '2026-05-06T00:00:00.000Z', '2027-12-31T23:59:59.000Z', '2026-05-06T00:00:00.000Z')`,
+  },
 ];
 
 export async function onRequestPost(context) {
