@@ -2,7 +2,7 @@
  * POST /api/booking-intent
  *
  * Records when a lead clicks "Book a Discovery Call" or "Book a Venue Tour"
- * from the quiz success screen or visits /bookacall/ as a returning visitor.
+ * from the quiz success screen or visits /lets-talk/ as a returning visitor.
  *
  * Tracks call and tour intents INDEPENDENTLY so both are visible:
  *   - clicked_discovery_call_at: ISO timestamp (set once per intent)

@@ -29,7 +29,7 @@ const BRAND = {
 };
 
 /* ─── Internal booking page ─── */
-const BOOKACALL_PAGE = "/bookacall";
+const LETS_TALK_PAGE = "/lets-talk";
 
 const WHATSAPP_NUMBER = "442079611604";
 
@@ -61,7 +61,7 @@ function formatDate(dateStr) {
 
 /* Build internal booking page URL with date + hash anchor */
 function buildBookingUrl(hash, { date } = {}) {
-  let url = BOOKACALL_PAGE;
+  let url = LETS_TALK_PAGE;
   if (date) url += `?date=${date}`;
   url += `#${hash}`;
   return url;

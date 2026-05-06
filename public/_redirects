@@ -143,3 +143,7 @@
 
 # --- Product page ---
 /products/menu-tasting-experience /supper-club/ 301
+
+# --- Renamed page (Cowork session 59, 2 May 2026): /bookacall/ -> /lets-talk/ ---
+/bookacall/* /lets-talk/:splat 301
+/bookacall /lets-talk/ 301

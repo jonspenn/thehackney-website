@@ -423,12 +423,12 @@ function StepConfirmation({ data }) {
   const isBrowser = data.urgency === "browsing" || data.urgency === "comparing";
 
   const tourUrl = isHot
-    ? "/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz-urgent"
-    : "/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz";
+    ? "/lets-talk/?utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz-urgent"
+    : "/lets-talk/?utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz";
 
   const dcUrl = isHot
-    ? "/bookacall/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz-urgent"
-    : "/bookacall/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz";
+    ? "/lets-talk/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz-urgent"
+    : "/lets-talk/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=wedding-quiz";
 
   function trackCtaClick(ctaType) {
     const eventName = ctaType === "discovery" ? "wedding_quiz_success_discovery_click" : "wedding_quiz_success_tour_click";

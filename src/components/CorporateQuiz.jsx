@@ -424,8 +424,8 @@ function StepConfirmation({ data }) {
   const isHighValue = ["great","premium"].includes(data.budgetFit);
   const isPhotoFilm = data.eventType === "photo-film";
 
-  const discoveryUrl = `/bookacall/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
-  const tourUrl = `/bookacall/?utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
+  const discoveryUrl = `/lets-talk/?type=discovery-call&utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
+  const tourUrl = `/lets-talk/?utm_source=website&utm_medium=questionnaire&utm_campaign=corporate-quiz&utm_content=${data.eventType || "general"}`;
 
   function trackCtaClick(ctaType) {
     const eventName = ctaType === "discovery" ? "corp_quiz_success_discovery_click" : "corp_quiz_success_tour_click";

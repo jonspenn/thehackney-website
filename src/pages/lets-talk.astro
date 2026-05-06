@@ -24,7 +24,7 @@ import SectionHeader from '../components/SectionHeader.astro';
   </div>
 
   <!-- Hero -->
-  <Section bg="light" padding="compact" class="bookacall-hero">
+  <Section bg="light" padding="compact" class="lets-talk-hero">
     <SectionHeader
       eyebrow="Next Step"
       heading="Let's make it happen"
@@ -34,7 +34,7 @@ import SectionHeader from '../components/SectionHeader.astro';
   </Section>
 
   <!-- Tab navigation + booking panels -->
-  <Section bg="light" padding="compact" class="bookacall-tabs-section">
+  <Section bg="light" padding="compact" class="lets-talk-tabs-section">
     <div class="bk-tabs" role="tablist" aria-label="Booking options">
       <button
         type="button"
@@ -130,7 +130,7 @@ import SectionHeader from '../components/SectionHeader.astro';
   </Section>
 
   <!-- Fallback contact -->
-  <Section bg="light" padding="none" border="top" class="bookacall-fallback">
+  <Section bg="light" padding="none" border="top" class="lets-talk-fallback">
     <div class="contact-fallback">
       <p class="contact-fallback__label">Rather just get in touch?</p>
       <div class="contact-fallback__links">
@@ -244,11 +244,11 @@ import SectionHeader from '../components/SectionHeader.astro';
   }
 
   /* === Hero override: tighter bottom padding for conversion page === */
-  :global(.bookacall-hero) {
+  :global(.lets-talk-hero) {
     padding-bottom: 0 !important;
   }
 
-  :global(.bookacall-tabs-section) {
+  :global(.lets-talk-tabs-section) {
     padding-top: 24px !important;
     padding-bottom: 24px !important;
   }
@@ -388,7 +388,7 @@ import SectionHeader from '../components/SectionHeader.astro';
   }
 
   /* === Fallback Contact === */
-  :global(.bookacall-fallback) {
+  :global(.lets-talk-fallback) {
     padding: 32px 0 !important;
   }
 
