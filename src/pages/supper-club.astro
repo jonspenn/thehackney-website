@@ -5,6 +5,7 @@ import ProofBar from '../components/ProofBar.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
+import FAQ from '../components/FAQ.astro';
 ---
 
 <Base title="Supper Club East London | Guest Chef Dinners at The Hackney, E2" description="Supper club nights at The Hackney - guest chef dinners and paired wines inside a restored 1856 brewery on Hackney Road. Sign up for upcoming dates.">
@@ -235,6 +236,48 @@ import ProcessSteps from '../components/ProcessSteps.astro';
       </div>
       <div class="cook-image lazy-bg" data-bg="/images/hackney-supper-club-chef-ella-williams-cooking.webp" data-bg-pos="center center" role="img" aria-label="Chef Ella Williams cooking in the kitchen at The Hackney"></div>
     </div>
+  </Section>
+
+  <!-- ==================== FAQ ==================== -->
+  <Section bg="light" border="top">
+    <SectionHeader
+      eyebrow="Common Questions"
+      heading="Before You Sign Up"
+    />
+    <FAQ items={[
+      {
+        question: "Can I come on my own?",
+        answer: "Yes - most attendees come solo or as a pair. We seat the room together as one long table, so you'll be sat with people you do not know yet. That's part of the experience."
+      },
+      {
+        question: "What about dietary requirements and allergies?",
+        answer: "Each menu offers alternatives where possible. Tell us when you book and we'll brief the chef. We can usually accommodate vegetarian, pescatarian, and most allergies. The menus are tightly orchestrated, so full vegan or strict gluten-free may not work for every course."
+      },
+      {
+        question: "Is there a dress code?",
+        answer: "No formal dress code. Most people land somewhere on smart-casual. The room is candlelit and you'll be at the table for a few hours, so dress comfortable."
+      },
+      {
+        question: "How often will I hear from you after I sign up?",
+        answer: "Only when a new supper club is about to drop, which is roughly once a month. No general newsletters, no other marketing on this list."
+      },
+      {
+        question: "Can I cancel or transfer my ticket?",
+        answer: "Tickets are non-refundable but transferable. If you cannot make it, send your booking confirmation to whoever takes your seat - just let us know the new name 24 hours before the event."
+      },
+      {
+        question: "Can I bring a friend who isn't on the list?",
+        answer: "Yes. Once you have first access, you can book any number of seats in one booking. Your friend can join the list separately if they want first access to future events."
+      },
+      {
+        question: "What does a ticket usually cost?",
+        answer: "Recent events have been £75-95 per person, including a welcome cocktail, multi-course dinner, and paired wines. Prices vary by guest chef and menu format."
+      },
+      {
+        question: "Where's the venue and how do I get there?",
+        answer: "The Hackney is at 503 Hackney Road, London E2 9ED. Five minutes from Hoxton Overground, ten from Bethnal Green Underground. Street parking is limited - public transport is the best route in."
+      }
+    ]} />
   </Section>
 
   <!-- ==================== CROSS-SELL ==================== -->
