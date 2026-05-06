@@ -37,6 +37,17 @@ const VALID_EVENT_TYPES = new Set([
   "form_submit",
   "brochure_download",
   "scroll_depth",
+  // Virtual tour (prd-sys-virtual-tour.md)
+  "virtual_tour_link_sent",
+  "virtual_tour_link_opened",
+  "virtual_tour_played",
+  "virtual_tour_milestone_25",
+  "virtual_tour_milestone_50",
+  "virtual_tour_milestone_75",
+  "virtual_tour_milestone_100",
+  "virtual_tour_cta_click",
+  "virtual_tour_feedback_submit",
+  "virtual_tour_retrigger_sent",
 ]);
 
 function uuid() {
@@ -98,6 +109,44 @@ export async function onRequestPost(context) {
       await env.DB.prepare(
         "UPDATE sessions SET ended_at = ? WHERE session_id = ?"
       ).bind(ts, sessionId).run();
+    }
+
+    // ── Virtual tour token-state sync (prd-sys-virtual-tour.md) ──
+    // Mirror the relevant fields from event_data into virtual_tour_tokens so
+    // the lead profile and dashboard can read aggregated state without
+    // joining the full events table. Each branch is best-effort and silently
+    // tolerates missing tokens (test-only events on an unseeded DB).
+    if (eventType.startsWith("virtual_tour_") && body.event_data && body.event_data.token) {
+      const vtToken = String(body.event_data.token).slice(0, 200);
+      try {
+        if (eventType === "virtual_tour_played") {
+          await env.DB.prepare(
+            "UPDATE virtual_tour_tokens SET played_at = COALESCE(played_at, ?) WHERE token = ?"
+          ).bind(ts, vtToken).run();
+        } else if (eventType === "virtual_tour_milestone_25" ||
+                   eventType === "virtual_tour_milestone_50" ||
+                   eventType === "virtual_tour_milestone_75" ||
+                   eventType === "virtual_tour_milestone_100") {
+          const pct = parseInt(eventType.split("_").pop(), 10) || 0;
+          await env.DB.prepare(
+            `UPDATE virtual_tour_tokens
+             SET completion_pct_max = MAX(COALESCE(completion_pct_max, 0), ?)
+             WHERE token = ?`
+          ).bind(pct, vtToken).run();
+        } else if (eventType === "virtual_tour_cta_click") {
+          const dest = body.event_data.cta_destination
+            ? String(body.event_data.cta_destination).slice(0, 32)
+            : null;
+          await env.DB.prepare(
+            `UPDATE virtual_tour_tokens
+             SET cta_clicked = COALESCE(cta_clicked, ?),
+                 cta_clicked_at = COALESCE(cta_clicked_at, ?)
+             WHERE token = ?`
+          ).bind(dest, ts, vtToken).run();
+        }
+      } catch (vtErr) {
+        console.error("[track] virtual_tour token sync failed:", vtErr.message);
+      }
     }
 
     // ── Auto-revive from Lost (Phase 1 reactivation) ──

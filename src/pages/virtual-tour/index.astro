@@ -1,0 +1,266 @@
+---
+import Base from '../../layouts/Base.astro';
+import VirtualTourPage from '../../components/VirtualTourPage.jsx';
+
+/*
+ * /virtual-tour/?t={token}
+ *
+ * Phase 1 of prd-sys-virtual-tour.md.
+ *
+ * Private re-engagement + closing-aid surface. NOT public discovery.
+ * - noindex enforced via Base prop (survives the lockdown revert)
+ * - robots.txt also Disallows /virtual-tour/ (post-launch state)
+ * - No nav link, no sitemap entry
+ *
+ * The page is a thin shell around the VirtualTourPage React island. The island
+ * reads ?t= on mount, calls /api/virtual-tour/validate-token, and renders one
+ * of: loading / cold-reengage / tour-recap / expired-token / video-coming-soon.
+ *
+ * Cloudflare Stream Player SDK is included so that, once the env var
+ * STREAM_VIDEO_UID is swapped from `placeholder` to a real video ID, video
+ * playback events fire automatically without any code change.
+ */
+---
+
+<Base
+  title="A personal note from Hugo"
+  description="A private link from The Hackney."
+  pageType="virtual-tour"
+  noindex={true}
+>
+  <VirtualTourPage client:load />
+
+  <!-- Cloudflare Stream Player SDK - exposes window.Stream(iframe) -->
+  <script async is:inline src="https://embed.cloudflarestream.com/embed/sdk.latest.js"></script>
+</Base>
+
+<style is:global>
+  /* /virtual-tour/ chrome - utility-page surface, not part of the marketing
+     site's main flow. Uses sitewide tokens (palette + fonts + card radius) so
+     anything brand-level changes propagate without a per-page edit. */
+
+  .vt-section {
+    background-color: var(--warm-canvas);
+    padding: 64px 0 96px;
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  .vt-container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .vt-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .vt-eyebrow {
+    margin-bottom: 12px;
+  }
+
+  .vt-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    color: var(--brewery-dark);
+    margin: 0 0 16px;
+    line-height: 1.2;
+  }
+
+  .vt-sub {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--brewery-dark);
+    opacity: 0.85;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ── Player area ── */
+  .vt-player-wrap {
+    margin: 0 0 40px;
+  }
+
+  .vt-player-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 2px;
+    overflow: hidden;
+    background-color: var(--brewery-dark);
+    box-shadow: 0 12px 32px -16px rgba(64, 22, 12, 0.45);
+  }
+
+  .vt-player-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .vt-player-fallback {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 2px;
+    background-color: var(--brewery-dark);
+    border: 1px solid var(--mahogany);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--warm-canvas);
+    text-align: center;
+  }
+
+  .vt-player-fallback-inner {
+    padding: 32px;
+  }
+
+  .vt-fallback-eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dusty-coral);
+    margin: 0 0 8px;
+  }
+
+  .vt-fallback-body {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  /* ── CTA stack ── */
+  .vt-cta-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .vt-cta {
+    min-width: 220px;
+  }
+
+  .vt-cta--primary {
+    background-color: var(--mid-olive);
+    color: var(--warm-canvas);
+    border: 1px solid var(--mid-olive);
+  }
+
+  .vt-cta--primary:hover {
+    background-color: var(--forest-olive);
+    border-color: var(--forest-olive);
+    color: var(--warm-canvas);
+  }
+
+  .vt-cta--secondary {
+    background-color: transparent;
+    color: var(--mid-olive);
+    border: 1px solid var(--mid-olive);
+  }
+
+  .vt-cta--secondary:hover {
+    background-color: var(--mid-olive);
+    color: var(--warm-canvas);
+  }
+
+  /* ── Feedback form ── */
+  .vt-feedback {
+    background-color: var(--card-bg, #FFFFFF);
+    border: 1px solid var(--card-border-color, rgba(64, 22, 12, 0.12));
+    border-radius: 2px;
+    padding: 24px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .vt-feedback-label {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    color: var(--brewery-dark);
+    margin-bottom: 12px;
+  }
+
+  .vt-feedback-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    padding: 10px 12px;
+    border: 1px solid rgba(64, 22, 12, 0.18);
+    border-radius: 2px;
+    background-color: var(--warm-canvas);
+    color: var(--brewery-dark);
+    resize: vertical;
+  }
+
+  .vt-feedback-textarea:focus {
+    outline: 2px solid var(--mid-olive);
+    outline-offset: 1px;
+  }
+
+  .vt-feedback-submit {
+    margin-top: 12px;
+    background-color: var(--mid-olive);
+    color: var(--warm-canvas);
+    border: 1px solid var(--mid-olive);
+  }
+
+  .vt-feedback-submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .vt-feedback--done {
+    text-align: center;
+    color: var(--brewery-dark);
+    opacity: 0.85;
+  }
+
+  /* ── Loading skeleton ── */
+  .vt-skeleton {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: rgba(64, 22, 12, 0.06);
+    border-radius: 2px;
+  }
+
+  /* ── Expired state ── */
+  .vt-expired {
+    text-align: center;
+    padding: 64px 0;
+  }
+
+  .vt-expired .vt-heading {
+    margin-bottom: 16px;
+  }
+
+  .vt-expired .vt-cta {
+    margin-top: 24px;
+    display: inline-block;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .vt-section {
+      padding: 48px 0 72px;
+    }
+    .vt-cta-stack {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .vt-cta {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+</style>

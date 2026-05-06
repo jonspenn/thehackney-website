@@ -11,6 +11,7 @@ interface Props {
   schema?: string;
   pageType?: string;
   preloadImage?: string;
+  noindex?: boolean;
 }
 
 const {
@@ -20,6 +21,7 @@ const {
   schema,
   pageType = 'general',
   preloadImage,
+  noindex = false,
 } = Astro.props;
 ---
 
@@ -30,6 +32,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- PRE-LAUNCH LOCKDOWN - remove on launch day 2026-05-01 -->
     <meta name="robots" content="noindex, nofollow" />
+    {noindex && <meta name="robots" content="noindex, nofollow" data-source="page-level" />}
     <!-- Google Tag Manager - dataLayer init -->
     <script is:inline define:vars={{ pageType }}>
       window.dataLayer = window.dataLayer || [];

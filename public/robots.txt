@@ -1,8 +1,15 @@
 # The Hackney - robots.txt
 #
 # PRE-LAUNCH LOCKDOWN - blocks all crawlers from the pages.dev dev URL.
-# Reverted on launch day (2026-05-01) as part of the prelive-checklist,
-# at which point the live thehackney.co site becomes crawlable.
+# Reverted on launch day as part of the prelive-checklist, at which point
+# the live thehackney.co site becomes crawlable.
 
 User-agent: *
 Disallow: /
+
+# Post-launch standing rules (active once the lockdown above is reverted).
+# Keep these regardless of how the production robots.txt is otherwise written.
+#
+# /virtual-tour/  - Private re-engagement + closing-aid surface, never public.
+#                   See prd-sys-virtual-tour.md. Do not crawl. Do not index.
+# Disallow: /virtual-tour/

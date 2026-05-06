@@ -14,3 +14,16 @@ binding = "DB"
 database_name = "hackney-date-tracking"
 database_id = "5ae562a1-44f6-4327-a096-b83baf0a44c8"
 migrations_dir = "migrations"
+
+# Phase 1 of prd-sys-virtual-tour.md - Cloudflare Stream video ID for the
+# /virtual-tour/ page. While set to 'placeholder', the page renders a
+# "Video uploading - Hugo will be back here shortly." fallback so the
+# token gate, tracking, CTAs, and feedback form can all be exercised
+# end-to-end before the video itself is uploaded to Stream. Swap to the
+# real video UID once Hugo signs off and the file is uploaded.
+[vars]
+STREAM_VIDEO_UID = "placeholder"
+# Cloudflare Stream customer subdomain (auto-assigned by Cloudflare when
+# Stream is first enabled). Format: "customer-XXXXXXXXX". Placeholder while
+# Stream is not yet enabled - the page renders the "Video uploading" fallback.
+STREAM_CUSTOMER_SUBDOMAIN = "placeholder"

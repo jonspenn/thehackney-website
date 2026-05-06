@@ -288,6 +288,46 @@ const MIGRATIONS = [
     name: "idx_ad_spend_imported",
     sql: `CREATE INDEX IF NOT EXISTS idx_ad_spend_imported ON ad_spend(imported_at)`,
   },
+
+  // ── Virtual tour tokens (Phase 1 of prd-sys-virtual-tour.md) ──
+  // Mirrors /migrations/0006_virtual_tour_tokens.sql. Per-contact tokenised
+  // access to Hugo's walkthrough video. Two send-types share one page surface.
+  // FK to contacts intentionally omitted (HubSpot-only contacts arrive later).
+  {
+    name: "virtual_tour_tokens",
+    sql: `CREATE TABLE IF NOT EXISTS virtual_tour_tokens (
+      token TEXT PRIMARY KEY,
+      contact_id TEXT NOT NULL,
+      send_type TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      sent_at TEXT,
+      opened_at TEXT,
+      played_at TEXT,
+      completion_pct_max INTEGER DEFAULT 0,
+      cta_clicked TEXT,
+      cta_clicked_at TEXT,
+      feedback_text TEXT,
+      feedback_submitted_at TEXT,
+      retrigger_sent_at TEXT
+    )`,
+  },
+  {
+    name: "idx_vt_tokens_contact",
+    sql: `CREATE INDEX IF NOT EXISTS idx_vt_tokens_contact ON virtual_tour_tokens(contact_id)`,
+  },
+  {
+    name: "idx_vt_tokens_send_type",
+    sql: `CREATE INDEX IF NOT EXISTS idx_vt_tokens_send_type ON virtual_tour_tokens(send_type)`,
+  },
+  {
+    name: "idx_vt_tokens_expires",
+    sql: `CREATE INDEX IF NOT EXISTS idx_vt_tokens_expires ON virtual_tour_tokens(expires_at)`,
+  },
+  {
+    name: "idx_vt_tokens_created",
+    sql: `CREATE INDEX IF NOT EXISTS idx_vt_tokens_created ON virtual_tour_tokens(created_at)`,
+  },
 ];
 
 export async function onRequestPost(context) {
