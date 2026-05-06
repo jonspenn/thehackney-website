@@ -37,6 +37,8 @@ const VALID_EVENT_TYPES = new Set([
   "form_submit",
   "brochure_download",
   "scroll_depth",
+  // FAQ accordion engagement (prd-sys-tracking-attribution.md S1)
+  "faq_open",
   // Virtual tour (prd-sys-virtual-tour.md)
   "virtual_tour_link_sent",
   "virtual_tour_link_opened",

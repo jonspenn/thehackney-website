@@ -55,6 +55,32 @@ const faqSchema = schema ? JSON.stringify({
   ))}
 </div>
 
+<script>
+  // Fire `faq_open` to /api/track when an accordion item is opened. Tracks
+  // which questions get the most engagement and (via D1 contact stitching)
+  // which FAQ topics correlate with funnel progression.
+  // See prd-sys-tracking-attribution.md S1 for event schema.
+  document.querySelectorAll('.faq-list').forEach((list) => {
+    const items = Array.from(list.querySelectorAll('details.faq-item'));
+    items.forEach((details, idx) => {
+      details.addEventListener('toggle', () => {
+        if (!details.open) return; // opens only, not closes
+        const summary = details.querySelector('.faq-question span');
+        const question = (summary?.textContent || '').trim().slice(0, 80);
+        // @ts-ignore - window.__thk is defined by /scripts/tracking.js (vanilla JS)
+        const track = window.__thk?.track;
+        if (typeof track === 'function') {
+          track('faq_open', {
+            question,
+            faq_index: idx + 1,
+            page: window.location.pathname,
+          });
+        }
+      });
+    });
+  });
+</script>
+
 <style>
   .faq-list {
     max-width: 780px;
