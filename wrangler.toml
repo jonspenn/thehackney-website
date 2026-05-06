@@ -22,8 +22,10 @@ migrations_dir = "migrations"
 # end-to-end before the video itself is uploaded to Stream. Swap to the
 # real video UID once Hugo signs off and the file is uploaded.
 [vars]
-STREAM_VIDEO_UID = "placeholder"
-# Cloudflare Stream customer subdomain (auto-assigned by Cloudflare when
-# Stream is first enabled). Format: "customer-XXXXXXXXX". Placeholder while
-# Stream is not yet enabled - the page renders the "Video uploading" fallback.
-STREAM_CUSTOMER_SUBDOMAIN = "placeholder"
+# Hugo's 5:38 walkthrough uploaded 2026-05-06 to the Hackney's Cloudflare
+# Stream account (1,000 minutes / $5/mo tier). UID + customer subdomain
+# captured from the dashboard. Source file:
+# `sales & marketing/photos/hackney-virtual-tour-hugo-v2.mp4`. To replace
+# the video later, upload a new file to Stream, copy the new UID here, push.
+STREAM_VIDEO_UID = "416e61880a119b06fb8ff0001301ef9a"
+STREAM_CUSTOMER_SUBDOMAIN = "customer-xt12l10jdkei4lgy"
