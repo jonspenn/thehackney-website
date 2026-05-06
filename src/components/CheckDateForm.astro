@@ -124,12 +124,23 @@ const { eventType } = Astro.props;
     margin-bottom: 8px;
   }
 
-  /* ── Month navigation ── */
+  /* ── Month + year navigation ── */
   .ac-nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     margin-bottom: 20px;
+  }
+
+  /* Wraps `<< <` on the left and `> >>` on the right so the two
+     pagination granularities visually group, with the title still
+     centred between the two groups. */
+  .ac-nav__group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
   }
 
   .ac-nav__title {

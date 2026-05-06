@@ -125,6 +125,12 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
     fetchAvailability();
   }, [fetchAvailability]);
 
+  // Show through December of (current year + 2). Couples can always book
+  // at least 2 full years ahead, and the calendar auto-rolls each 1 Jan -
+  // no annual code change needed.
+  const maxDate = new Date(today.getFullYear() + 2, 11, 31);
+  const minMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
   // Navigation
   function prevMonth() {
     if (viewMonth === 0) {
@@ -144,15 +150,44 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
     }
   }
 
+  // Year jumps. If a full 12-month jump would overshoot the allowed range,
+  // clamp to the nearest valid month rather than refusing to navigate -
+  // a couple sitting on May 2028 still wants `>>` to take them somewhere
+  // useful (Dec 2028) rather than nothing.
+  function prevYear() {
+    const targetDate = new Date(viewYear - 1, viewMonth, 1);
+    if (targetDate >= minMonthDate) {
+      setViewYear(viewYear - 1);
+    } else {
+      // Clamp to the earliest viewable month (today's month)
+      setViewYear(today.getFullYear());
+      setViewMonth(today.getMonth());
+    }
+  }
+
+  function nextYear() {
+    const targetMonthEnd = new Date(viewYear + 1, viewMonth + 1, 1);
+    if (targetMonthEnd <= maxDate) {
+      setViewYear(viewYear + 1);
+    } else {
+      // Clamp to the last viewable month (Dec of today.year + 2)
+      setViewYear(maxDate.getFullYear());
+      setViewMonth(maxDate.getMonth());
+    }
+  }
+
   // Can't go before current month
   const canGoPrev = viewYear > today.getFullYear() ||
     (viewYear === today.getFullYear() && viewMonth > today.getMonth());
 
-  // Show through December of (current year + 2). Couples can always book
-  // at least 2 full years ahead, and the calendar auto-rolls each 1 Jan -
-  // no annual code change needed.
-  const maxDate = new Date(today.getFullYear() + 2, 11, 31);
   const canGoNext = new Date(viewYear, viewMonth + 1, 1) <= maxDate;
+
+  // Year-jump buttons go disabled when there's no useful jump left.
+  // Specifically: at the floor (today's month + year) `<<` is disabled,
+  // at the ceiling (Dec of today.year + 2) `>>` is disabled. In every
+  // other position a click yields a meaningful jump, even if clamped.
+  const canGoPrevYear = !(viewYear === today.getFullYear() && viewMonth === today.getMonth());
+  const canGoNextYear = !(viewYear === maxDate.getFullYear() && viewMonth === maxDate.getMonth());
 
   // Build calendar grid
   // First day of month (0=Sun, convert to Mon-start: 0=Mon)
@@ -208,33 +243,64 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
 
   return (
     <div className="ac">
-      {/* Month navigation */}
+      {/* Month + year navigation. `<<` `>>` jump 12 months at a time so
+          couples looking 18-24 months ahead don't have to chevron through
+          every single month. Clamps to the bounds of the allowed range
+          when a full 12-month jump would overshoot. */}
       <div className="ac-nav">
-        <button
-          className="ac-nav__btn"
-          onClick={prevMonth}
-          disabled={!canGoPrev}
-          type="button"
-          aria-label="Previous month"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M12 15L7 10L12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        <div className="ac-nav__group">
+          <button
+            className="ac-nav__btn"
+            onClick={prevYear}
+            disabled={!canGoPrevYear}
+            type="button"
+            aria-label="Previous year"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M14 15L9 10L14 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 15L4 10L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <button
+            className="ac-nav__btn"
+            onClick={prevMonth}
+            disabled={!canGoPrev}
+            type="button"
+            aria-label="Previous month"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M12 15L7 10L12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
         <h3 className="ac-nav__title">
           {MONTH_NAMES[viewMonth]} {viewYear}
         </h3>
-        <button
-          className="ac-nav__btn"
-          onClick={nextMonth}
-          disabled={!canGoNext}
-          type="button"
-          aria-label="Next month"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M8 5L13 10L8 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        <div className="ac-nav__group">
+          <button
+            className="ac-nav__btn"
+            onClick={nextMonth}
+            disabled={!canGoNext}
+            type="button"
+            aria-label="Next month"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M8 5L13 10L8 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <button
+            className="ac-nav__btn"
+            onClick={nextYear}
+            disabled={!canGoNextYear}
+            type="button"
+            aria-label="Next year"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M6 5L11 10L6 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M11 5L16 10L11 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Day headers */}
