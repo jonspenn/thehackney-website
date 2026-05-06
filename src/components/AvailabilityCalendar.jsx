@@ -125,10 +125,14 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
     fetchAvailability();
   }, [fetchAvailability]);
 
-  // Show through December of (current year + 2). Couples can always book
-  // at least 2 full years ahead, and the calendar auto-rolls each 1 Jan -
-  // no annual code change needed.
-  const maxDate = new Date(today.getFullYear() + 2, 11, 31);
+  // Show through December of (current year + 5). Wider than the typical
+  // 12-24 month wedding planning horizon on purpose: clicks on 4-5-year-out
+  // dates are a useful demand signal even though we wouldn't take a
+  // booking that far ahead, and the cap stops infinite scroll into the
+  // 2090s. Auto-rolls each 1 Jan - no annual code change needed. See
+  // prd-sys-check-your-date.md changelog 2 May 2026 for the data
+  // collection rationale.
+  const maxDate = new Date(today.getFullYear() + 5, 11, 31);
   const minMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
   // Navigation
@@ -170,7 +174,7 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
     if (targetMonthEnd <= maxDate) {
       setViewYear(viewYear + 1);
     } else {
-      // Clamp to the last viewable month (Dec of today.year + 2)
+      // Clamp to the last viewable month (Dec of today.year + 5)
       setViewYear(maxDate.getFullYear());
       setViewMonth(maxDate.getMonth());
     }
@@ -184,7 +188,7 @@ export default function AvailabilityCalendar({ onSelectDate, selectedDate }) {
 
   // Year-jump buttons go disabled when there's no useful jump left.
   // Specifically: at the floor (today's month + year) `<<` is disabled,
-  // at the ceiling (Dec of today.year + 2) `>>` is disabled. In every
+  // at the ceiling (Dec of today.year + 5) `>>` is disabled. In every
   // other position a click yields a meaningful jump, even if clamped.
   const canGoPrevYear = !(viewYear === today.getFullYear() && viewMonth === today.getMonth());
   const canGoNextYear = !(viewYear === maxDate.getFullYear() && viewMonth === maxDate.getMonth());
