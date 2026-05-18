@@ -10,6 +10,7 @@ import PhotoBreak from '../components/PhotoBreak.astro';
 import PhotoStrip from '../components/PhotoStrip.astro';
 import IncludedGrid from '../components/IncludedGrid.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
+import PrivateEventsQuestionnaire from '../components/PrivateEventsQuestionnaire.astro';
 
 // Private Events FAQ items
 const faqItems = [
@@ -35,7 +36,7 @@ const faqItems = [
   },
   {
     question: "How does the minimum spend work for birthdays?",
-    answer: "The Hackney is a sought-after wedding venue. When a date is available within three months and unlikely to sell for a wedding, we open it up for private celebrations at a fraction of the cost. There is no venue hire fee - you simply need to meet the minimum spend on food and drink. Everything your guests order at the bar counts towards it. The minimum is lower on weekdays than Saturdays, so if your date is flexible you can get more for your money."
+    answer: "Our minimum spend pricing applies to bookings within three months of the event date. £3,000 minimum spend on Saturdays (standing celebrations only), £2,000 minimum spend Sunday to Friday - standing only on Friday, seated or standing Sunday to Thursday. Your food, drinks and any extras count towards the minimum - there is no separate venue hire fee. Seated celebrations on Friday or Saturday, and any event more than three months out, would be priced as a wedding (£5,000 minimum). Send us your date and format and we will confirm which applies."
   },
   {
     question: "How do the baby shower packages work?",
@@ -151,6 +152,9 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       </div>
     </div>
   </Section>
+
+  <!-- ==================== SECTION 4.5: LEAD CAPTURE QUIZ ==================== -->
+  <PrivateEventsQuestionnaire />
 
   <!-- ==================== SECTION 5: VALUE PROP / WHAT'S INCLUDED ==================== -->
   <Section bg="light" border="bottom" id="included">
@@ -352,18 +356,19 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       <!-- BIRTHDAYS & CELEBRATIONS -->
       <div class="pricing-block">
         <div class="pricing-block-header">
+          <div class="eyebrow">Last-Minute Dates Available</div>
           <h3>Birthdays and Celebrations</h3>
-          <p class="pricing-block-subtitle">A wedding venue, exclusively yours - on dates that work for both of us.</p>
+          <p class="pricing-block-subtitle">Private event rates apply to dates within three months. For dates further out, see our weddings.</p>
         </div>
 
         <div class="pricing-package pricing-package-highlight">
           <div class="pricing-package-name">Saturday</div>
           <div class="pricing-package-price">&pound;3,000 <span>minimum spend</span></div>
-          <p class="pricing-package-basis">No venue hire fee</p>
+          <p class="pricing-package-basis">No venue hire fee &middot; Standing celebration</p>
           <ul class="pricing-package-includes">
             <li>Exclusive hire of the entire venue</li>
             <li>All food and bar spend counts towards minimum</li>
-            <li>Up to 100 guests standing</li>
+            <li>Up to 100 guests, standing reception format</li>
             <li>Music until 11pm, guests depart by 11:30pm</li>
           </ul>
         </div>
@@ -375,13 +380,14 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
           <ul class="pricing-package-includes">
             <li>Exclusive hire of the entire venue</li>
             <li>All food and bar spend counts towards minimum</li>
-            <li>Up to 100 guests standing</li>
+            <li>Up to 100 guests</li>
+            <li>Standing celebration on Friday; seated or standing Sunday to Thursday</li>
             <li>Earlier start times available</li>
           </ul>
         </div>
 
         <div class="pricing-minspend-note">
-          <p><strong>Why these prices?</strong> The Hackney is a sought-after wedding venue. When a date is available within three months and unlikely to sell for a wedding, we open it up for private celebrations. You get the same exclusive venue, the same team, and the same experience. There is no venue hire fee - everything you and your guests spend on food and drink counts towards the minimum.</p>
+          <p><strong>Why these prices?</strong> The Hackney is primarily a wedding venue. Private event pricing applies to dates within three months of your celebration, when wedding bookings are unlikely. Minimum spend rates on Friday and Saturday apply to standing celebrations only - seated dinners on those days are quoted separately. For dates further out or seated weekend celebrations, our wedding pricing applies regardless of event type.</p>
         </div>
 
         <div class="pricing-block-cta">
