@@ -4,6 +4,7 @@
  * Universal form submission endpoint. Handles all four form types:
  *   - wedding-quiz (WeddingQuiz.jsx)
  *   - corporate-quiz (CorporateQuiz.jsx)
+ *   - private-events-quiz (PrivateEventsQuiz.jsx)
  *   - brochure-download (weddings.astro inline form)
  *   - supperclub-signup (supper-club.astro email capture)
  *
@@ -15,7 +16,7 @@
  * Phase 2 will add Klaviyo push. Phase 3 adds HubSpot.
  *
  * Body: {
- *   form_type: "wedding-quiz" | "corporate-quiz" | "brochure-download" | "supperclub-signup",
+ *   form_type: "wedding-quiz" | "corporate-quiz" | "private-events-quiz" | "brochure-download" | "supperclub-signup",
  *   email: "required",
  *   first_name?: string,
  *   last_name?: string,
@@ -48,6 +49,7 @@ const CORS_HEADERS = {
 const VALID_FORM_TYPES = [
   "wedding-quiz",
   "corporate-quiz",
+  "private-events-quiz",
   "brochure-download",
   "supperclub-signup",
 ];
@@ -55,6 +57,7 @@ const VALID_FORM_TYPES = [
 const LEAD_TYPE_MAP = {
   "wedding-quiz": "wedding",
   "corporate-quiz": "corporate",
+  "private-events-quiz": "private-events",
   "supperclub-signup": "supperclub",
   // brochure-download is handled dynamically below based on brochure_type
 };

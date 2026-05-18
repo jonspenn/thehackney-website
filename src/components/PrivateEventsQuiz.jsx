@@ -265,7 +265,7 @@ function StepFormat({ data, setData, onNext, onBack }) {
       <BackButton onClick={onBack} />
       <FadeIn>
         <h2 className="wq-heading">What format are you thinking?</h2>
-        <p className="wq-subtext">Our minimum spend rates on Friday and Saturday apply to standing celebrations. Seated dinners on those days are quoted separately.</p>
+        <p className="wq-subtext">Our minimum spend pricing applies to standing celebrations. Seated dinners on any day are quoted separately as wedding-style bookings.</p>
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-cards">
@@ -505,8 +505,9 @@ function StepConfirmation({ data }) {
     );
   }
 
-  /* Route B: within 3 months + Sat/Fri + format not pure standing → discovery call route */
-  if (standingOnlyDay && !pureStanding) {
+  /* Route B: within 3 months + format not pure standing → discovery call route
+     (minimum spend pricing is standing-only on all days; seated/mixed needs tailored quote) */
+  if (!pureStanding) {
     return (
       <div className="wq-step wq-step--confirmation">
         <FadeIn>
@@ -522,11 +523,11 @@ function StepConfirmation({ data }) {
             We have your details{firstName}.
           </h2>
           <p className="wq-subtext" style={{ maxWidth: "none", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
-            Our minimum spend rates on Friday and Saturday apply to standing celebrations. Seated and mixed-format events on those days need a tailored quote - Hugo will come back to you within one working day with availability and a price for your celebration.
+            Our minimum spend pricing applies to standing celebrations. Seated and mixed-format events are quoted separately as wedding-style bookings - Hugo will come back to you within one working day with availability and a price for your celebration.
           </p>
         </FadeIn>
         <FadeIn delay={300}>
-          <ConfirmCardDiscovery data={data} variant="standing-only-day" />
+          <ConfirmCardDiscovery data={data} variant="seated-or-mixed" />
         </FadeIn>
       </div>
     );
@@ -636,11 +637,10 @@ export default function PrivateEventsQuiz() {
     setSubmitError(null);
 
     const withinWindow = isWithinThreeMonths(data.eventDate);
-    const standingOnlyDay = isStandingOnlyDay(data.eventDate);
     const pureStanding = data.format === "standing";
     let routedTo = "private-standard";
     if (!withinWindow) routedTo = "weddings-soft-route";
-    else if (standingOnlyDay && !pureStanding) routedTo = "discovery-call-standing-only-day";
+    else if (!pureStanding) routedTo = "discovery-call-seated-or-mixed";
 
     const formData = {
       event_type: data.eventType,
@@ -648,7 +648,6 @@ export default function PrivateEventsQuiz() {
       event_date: data.eventDate,
       event_format: data.format,
       within_three_months: withinWindow,
-      standing_only_day: standingOnlyDay,
       routed_to: routedTo,
     };
 
@@ -682,7 +681,7 @@ export default function PrivateEventsQuiz() {
         event: "private_quiz_routed_wedding",
         quiz_event_type: data.eventType,
       });
-    } else if (routedTo === "discovery-call-standing-only-day") {
+    } else if (routedTo === "discovery-call-seated-or-mixed") {
       pushDL({
         event: "private_quiz_routed_discovery_call",
         quiz_event_type: data.eventType,

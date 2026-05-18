@@ -36,7 +36,7 @@ const faqItems = [
   },
   {
     question: "How does the minimum spend work for birthdays?",
-    answer: "Our minimum spend pricing applies to bookings within three months of the event date. £3,000 minimum spend on Saturdays (standing celebrations only), £2,000 minimum spend Sunday to Friday - standing only on Friday, seated or standing Sunday to Thursday. Your food, drinks and any extras count towards the minimum - there is no separate venue hire fee. Seated celebrations on Friday or Saturday, and any event more than three months out, would be priced as a wedding (£5,000 minimum). Send us your date and format and we will confirm which applies."
+    answer: "Our minimum spend pricing applies to bookings within three months of the event date, for standing celebrations. £3,000 minimum spend on Saturdays, £2,000 minimum spend Sunday to Friday. Your food, drinks and any extras count towards the minimum - there is no separate venue hire fee. Seated celebrations on any day, and any event more than three months out, would be priced as a wedding (£5,000 minimum). Send us your date and format and we will confirm which applies."
   },
   {
     question: "How do the baby shower packages work?",
@@ -376,18 +376,17 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         <div class="pricing-package">
           <div class="pricing-package-name">Sunday to Friday</div>
           <div class="pricing-package-price">&pound;2,000 <span>minimum spend</span></div>
-          <p class="pricing-package-basis">No venue hire fee</p>
+          <p class="pricing-package-basis">No venue hire fee &middot; Standing celebration</p>
           <ul class="pricing-package-includes">
             <li>Exclusive hire of the entire venue</li>
             <li>All food and bar spend counts towards minimum</li>
-            <li>Up to 100 guests</li>
-            <li>Standing celebration on Friday; seated or standing Sunday to Thursday</li>
+            <li>Up to 100 guests, standing reception format</li>
             <li>Earlier start times available</li>
           </ul>
         </div>
 
         <div class="pricing-minspend-note">
-          <p><strong>Why these prices?</strong> The Hackney is primarily a wedding venue. Private event pricing applies to dates within three months of your celebration, when wedding bookings are unlikely. Minimum spend rates on Friday and Saturday apply to standing celebrations only - seated dinners on those days are quoted separately. For dates further out or seated weekend celebrations, our wedding pricing applies regardless of event type.</p>
+          <p><strong>Why these prices?</strong> The Hackney is primarily a wedding venue. Private event pricing applies to dates within three months of your celebration, when wedding bookings are unlikely. Minimum spend rates are for standing celebrations only - seated dinners are quoted separately. For dates further out or seated celebrations, our wedding pricing applies regardless of event type.</p>
         </div>
 
         <div class="pricing-block-cta">
