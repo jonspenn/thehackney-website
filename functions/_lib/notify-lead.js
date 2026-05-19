@@ -47,6 +47,7 @@ const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const FORM_LABELS = {
   "wedding-quiz": "Wedding enquiry",
   "corporate-quiz": "Corporate enquiry",
+  "private-events-quiz": "Private events enquiry",
   "brochure-download": "Brochure download",
   "supperclub-signup": "Supper club signup",
 };

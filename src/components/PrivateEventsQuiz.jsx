@@ -15,6 +15,19 @@ const BRAND = {
 
 /* ─── Data constants ─── */
 
+const MONTHS = [
+  "Jan","Feb","Mar","Apr","May","Jun",
+  "Jul","Aug","Sep","Oct","Nov","Dec"
+];
+
+/* Private events have short lead times (median 89 days). Current year + next
+   year only - no "Not sure yet" because date is critical to the 3-month rule. */
+const _currentYearForList = new Date().getFullYear();
+const YEARS = [
+  String(_currentYearForList),
+  String(_currentYearForList + 1),
+];
+
 const EVENT_TYPE_OPTIONS = [
   { label: "Birthday party", value: "birthday", sublabel: "Milestone birthdays, dinners, evening celebrations" },
   { label: "Baby shower", value: "baby-shower", sublabel: "Daytime, all-inclusive per-person packages" },
@@ -49,54 +62,30 @@ const FORMAT_OPTIONS = [
 */
 const TOTAL_STEPS = 5;
 
-/* ─── 3-month and day-of-week helpers ─── */
+/* ─── 3-month rule helpers (operate on month+year) ─── */
 
-function parseDate(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr + "T00:00:00");
-  return isNaN(d.getTime()) ? null : d;
-}
-
-function isWithinThreeMonths(dateStr) {
-  const d = parseDate(dateStr);
-  if (!d) return false;
+function isWithinThreeMonths(monthAbbr, yearStr) {
+  if (!monthAbbr || !yearStr) return false;
+  const monthIndex = MONTHS.indexOf(monthAbbr);
+  if (monthIndex < 0) return false;
+  const year = parseInt(yearStr, 10);
+  if (!year) return false;
+  const eventDate = new Date(year, monthIndex, 1);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const cutoff = new Date(today);
   cutoff.setMonth(cutoff.getMonth() + 3);
-  return d <= cutoff;
+  return eventDate <= cutoff;
 }
 
-function monthsAway(dateStr) {
-  const d = parseDate(dateStr);
-  if (!d) return null;
+function monthsAway(monthAbbr, yearStr) {
+  if (!monthAbbr || !yearStr) return null;
+  const monthIndex = MONTHS.indexOf(monthAbbr);
+  const year = parseInt(yearStr, 10);
+  if (monthIndex < 0 || !year) return null;
   const today = new Date();
-  const diffMs = d - today;
-  const diffMonths = Math.round(diffMs / (1000 * 60 * 60 * 24 * 30.44));
-  return Math.max(0, diffMonths);
-}
-
-function dayOfWeek(dateStr) {
-  const d = parseDate(dateStr);
-  if (!d) return null;
-  return d.getDay(); // 0 = Sun, 5 = Fri, 6 = Sat
-}
-
-function isStandingOnlyDay(dateStr) {
-  const dow = dayOfWeek(dateStr);
-  return dow === 5 || dow === 6; // Fri or Sat
-}
-
-function isoTodayPlus(days) {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
-}
-
-function formatDateLong(dateStr) {
-  const d = parseDate(dateStr);
-  if (!d) return "";
-  return d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const diff = (year - today.getFullYear()) * 12 + (monthIndex - today.getMonth());
+  return Math.max(0, diff);
 }
 
 /* ─── Shared components ─── */
@@ -167,8 +156,29 @@ function BackButton({ onClick }) {
 /* ─── Step components ─── */
 
 function StepDate({ data, setData, onNext }) {
-  const minDate = isoTodayPlus(0);
-  const canProceed = !!data.eventDate;
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonthIndex = now.getMonth();
+
+  function isMonthDisabled(monthAbbr) {
+    if (!data.year) return false;
+    const selectedYear = parseInt(data.year, 10);
+    if (selectedYear > currentYear) return false;
+    if (selectedYear < currentYear) return true;
+    const monthIndex = MONTHS.indexOf(monthAbbr);
+    return monthIndex < currentMonthIndex;
+  }
+
+  function handleYearSelect(y) {
+    let newMonth = data.month;
+    if (parseInt(y, 10) === currentYear && data.month) {
+      const monthIndex = MONTHS.indexOf(data.month);
+      if (monthIndex < currentMonthIndex) newMonth = "";
+    }
+    setData({ ...data, year: y, month: newMonth });
+  }
+
+  const canProceed = data.month && data.year;
   return (
     <div className="wq-step">
       <FadeIn>
@@ -176,19 +186,40 @@ function StepDate({ data, setData, onNext }) {
         <p className="wq-subtext">A few quick questions to confirm your date, walk you through pricing, and put you in touch with our team. Two minutes.</p>
       </FadeIn>
       <FadeIn delay={150}>
-        <div className="wq-field" style={{ maxWidth: 320, margin: "0 auto" }}>
-          <label className="wq-field__label" htmlFor="pq-date">Event date</label>
-          <input
-            id="pq-date"
-            type="date"
-            className="wq-field__input"
-            value={data.eventDate || ""}
-            min={minDate}
-            onChange={e => setData({ ...data, eventDate: e.target.value })}
-          />
+        <div className="wq-label">Year</div>
+        <div className="wq-year-row">
+          {YEARS.map(y => (
+            <button
+              key={y}
+              type="button"
+              className={`wq-year ${data.year === y ? "wq-year--selected" : ""}`}
+              onClick={() => handleYearSelect(y)}
+            >
+              {y}
+            </button>
+          ))}
         </div>
       </FadeIn>
-      <FadeIn delay={300}>
+      <FadeIn delay={250}>
+        <div className="wq-label" style={{ marginTop: 28 }}>Month</div>
+        <div className="wq-month-grid">
+          {MONTHS.map(m => {
+            const disabled = isMonthDisabled(m);
+            return (
+              <button
+                key={m}
+                type="button"
+                className={`wq-month ${data.month === m ? "wq-month--selected" : ""} ${disabled ? "wq-month--disabled" : ""}`}
+                onClick={() => !disabled && setData({ ...data, month: m })}
+                disabled={disabled}
+              >
+                {m}
+              </button>
+            );
+          })}
+        </div>
+      </FadeIn>
+      <FadeIn delay={350}>
         <button
           onClick={onNext}
           className="wq-btn wq-btn--primary"
@@ -295,7 +326,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting, submitError, c
   const guestLabel = GUEST_OPTIONS.find(o => o.value === data.guests)?.label;
   const formatLabel = FORMAT_OPTIONS.find(o => o.value === data.format)?.label;
   const summaryPills = [
-    data.eventDate ? formatDateLong(data.eventDate) : null,
+    data.month && data.year ? `${data.month} ${data.year}` : null,
     eventLabel,
     guestLabel ? `${guestLabel} guests` : null,
     formatLabel,
@@ -471,10 +502,9 @@ function ConfirmCardDiscovery({ data, variant }) {
 }
 
 function StepConfirmation({ data }) {
-  const withinWindow = isWithinThreeMonths(data.eventDate);
-  const standingOnlyDay = isStandingOnlyDay(data.eventDate);
+  const withinWindow = isWithinThreeMonths(data.month, data.year);
   const pureStanding = data.format === "standing";
-  const away = monthsAway(data.eventDate);
+  const away = monthsAway(data.month, data.year);
   const firstName = data.firstName ? `, ${data.firstName.split(" ")[0]}` : "";
 
   /* Route A: date >3 months → soft-route to /weddings/ */
@@ -549,7 +579,7 @@ function StepConfirmation({ data }) {
           Looks good{firstName}. We will be in touch.
         </h2>
         <p className="wq-subtext" style={{ maxWidth: "none", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
-          We have your details and will reply within one working day with availability for {formatDateLong(data.eventDate)} and a quote tailored to your celebration.
+          We have your details and will reply within one working day with availability for {data.month} {data.year} and a quote tailored to your celebration.
         </p>
       </FadeIn>
       <FadeIn delay={300}>
@@ -582,7 +612,8 @@ export default function PrivateEventsQuiz() {
   const [submitError, setSubmitError] = useState(null);
   const [completed, setCompleted] = useState(false);
   const [data, setData] = useState({
-    eventDate: "",
+    month: "",
+    year: String(new Date().getFullYear()),
     eventType: "",
     guests: "",
     format: "",
@@ -636,7 +667,7 @@ export default function PrivateEventsQuiz() {
     setSubmitting(true);
     setSubmitError(null);
 
-    const withinWindow = isWithinThreeMonths(data.eventDate);
+    const withinWindow = isWithinThreeMonths(data.month, data.year);
     const pureStanding = data.format === "standing";
     let routedTo = "private-standard";
     if (!withinWindow) routedTo = "weddings-soft-route";
@@ -645,7 +676,7 @@ export default function PrivateEventsQuiz() {
     const formData = {
       event_type: data.eventType,
       guest_count: data.guests,
-      event_date: data.eventDate,
+      event_date: data.month && data.year ? `${data.month} ${data.year}` : "",
       event_format: data.format,
       within_three_months: withinWindow,
       routed_to: routedTo,

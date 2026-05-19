@@ -293,18 +293,74 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     quotePosition="bottom"
   />
 
-  <!-- ==================== SECTION 8: PRICING (THE FORK) ==================== -->
-  <!-- Two distinct pricing models side by side: baby showers (per-person packages)
-       and birthdays/celebrations (minimum spend). Source: 2025 brochures.
-       James to review and update if prices have changed for 2026. -->
+  <!-- ==================== SECTION 8: PRICING (HOOK + TOGGLE + BROCHURE) ==================== -->
+  <!-- Rebuilt 2026-05-18 to match wedding-page pattern (Section 7 of weddings.astro):
+       big "from" hook + toggle to switch between baby shower per-person and
+       birthday minimum-spend models + brochure capture form.
+       Replaces previous side-by-side dual-model layout that visitors found
+       confusing. Source: 2025 brochures, Jon confirmed; James to review pricing
+       per Rule 10. -->
   <Section bg="light" border="top" id="pricing">
     <SectionHeader
-      eyebrow="Investment"
-      heading="Pricing"
+      eyebrow="Pricing"
+      heading="Private Events Pricing"
     />
 
-    <div class="pricing-fork">
-      <!-- BABY SHOWERS -->
+    <div class="pricing-hook">
+      <div class="pricing-hook-label">Private Celebrations From</div>
+      <div class="pricing-hook-amount">&pound;2,000</div>
+      <div class="pricing-hook-breakdown">Birthdays and celebrations &middot; minimum spend, no venue hire fee</div>
+      <div class="pricing-hook-context">Last-minute dates within three months</div>
+    </div>
+
+    <p class="pricing-intro">Two simple pricing models depending on what you are celebrating. Pick the one that fits.</p>
+
+    <div class="pe-toggle" role="tablist" aria-label="Pricing model selector">
+      <button type="button" role="tab" class="pe-toggle-btn pe-toggle-btn--active" data-pe-target="birthday" id="pe-toggle-birthday" aria-selected="true" aria-controls="pe-pricing-birthday">Birthdays and Celebrations</button>
+      <button type="button" role="tab" class="pe-toggle-btn" data-pe-target="babyshower" id="pe-toggle-babyshower" aria-selected="false" aria-controls="pe-pricing-babyshower">Baby Showers</button>
+    </div>
+
+    <!-- BIRTHDAYS AND CELEBRATIONS (default visible) -->
+    <div class="pricing-panel" id="pe-pricing-birthday" role="tabpanel" aria-labelledby="pe-toggle-birthday">
+      <div class="pricing-block">
+        <div class="pricing-block-header">
+          <div class="eyebrow">Last-Minute Dates Available</div>
+          <h3>Birthdays and Celebrations</h3>
+          <p class="pricing-block-subtitle">Private event rates apply to dates within three months. For dates further out, see our weddings.</p>
+        </div>
+
+        <div class="pricing-package pricing-package-highlight">
+          <div class="pricing-package-name">Saturday</div>
+          <div class="pricing-package-price">&pound;3,000 <span>minimum spend</span></div>
+          <p class="pricing-package-basis">No venue hire fee &middot; Standing celebration</p>
+          <ul class="pricing-package-includes">
+            <li>Exclusive hire of the entire venue</li>
+            <li>All food and bar spend counts towards minimum</li>
+            <li>Up to 100 guests, standing reception format</li>
+            <li>Music until 11pm, guests depart by 11:30pm</li>
+          </ul>
+        </div>
+
+        <div class="pricing-package">
+          <div class="pricing-package-name">Sunday to Friday</div>
+          <div class="pricing-package-price">&pound;2,000 <span>minimum spend</span></div>
+          <p class="pricing-package-basis">No venue hire fee &middot; Standing celebration</p>
+          <ul class="pricing-package-includes">
+            <li>Exclusive hire of the entire venue</li>
+            <li>All food and bar spend counts towards minimum</li>
+            <li>Up to 100 guests, standing reception format</li>
+            <li>Earlier start times available</li>
+          </ul>
+        </div>
+
+        <div class="pricing-minspend-note">
+          <p><strong>Why these prices?</strong> The Hackney is primarily a wedding venue. Private event pricing applies to dates within three months of your celebration, when wedding bookings are unlikely. Minimum spend rates are for standing celebrations only - seated dinners are quoted separately. For dates further out or seated celebrations, our wedding pricing applies regardless of event type.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BABY SHOWERS -->
+    <div class="pricing-panel" id="pe-pricing-babyshower" role="tabpanel" aria-labelledby="pe-toggle-babyshower" hidden>
       <div class="pricing-block">
         <div class="pricing-block-header">
           <h3>Baby Showers</h3>
@@ -347,57 +403,35 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
             <li>Dedicated event host</li>
           </ul>
         </div>
-
-        <div class="pricing-block-cta">
-          <a href="/lets-talk/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=pricing-babyshower" class="btn btn-primary" data-cta-section="pricing-babyshower-discovery-call">Book A Discovery Call</a>
-        </div>
-      </div>
-
-      <!-- BIRTHDAYS & CELEBRATIONS -->
-      <div class="pricing-block">
-        <div class="pricing-block-header">
-          <div class="eyebrow">Last-Minute Dates Available</div>
-          <h3>Birthdays and Celebrations</h3>
-          <p class="pricing-block-subtitle">Private event rates apply to dates within three months. For dates further out, see our weddings.</p>
-        </div>
-
-        <div class="pricing-package pricing-package-highlight">
-          <div class="pricing-package-name">Saturday</div>
-          <div class="pricing-package-price">&pound;3,000 <span>minimum spend</span></div>
-          <p class="pricing-package-basis">No venue hire fee &middot; Standing celebration</p>
-          <ul class="pricing-package-includes">
-            <li>Exclusive hire of the entire venue</li>
-            <li>All food and bar spend counts towards minimum</li>
-            <li>Up to 100 guests, standing reception format</li>
-            <li>Music until 11pm, guests depart by 11:30pm</li>
-          </ul>
-        </div>
-
-        <div class="pricing-package">
-          <div class="pricing-package-name">Sunday to Friday</div>
-          <div class="pricing-package-price">&pound;2,000 <span>minimum spend</span></div>
-          <p class="pricing-package-basis">No venue hire fee &middot; Standing celebration</p>
-          <ul class="pricing-package-includes">
-            <li>Exclusive hire of the entire venue</li>
-            <li>All food and bar spend counts towards minimum</li>
-            <li>Up to 100 guests, standing reception format</li>
-            <li>Earlier start times available</li>
-          </ul>
-        </div>
-
-        <div class="pricing-minspend-note">
-          <p><strong>Why these prices?</strong> The Hackney is primarily a wedding venue. Private event pricing applies to dates within three months of your celebration, when wedding bookings are unlikely. Minimum spend rates are for standing celebrations only - seated dinners are quoted separately. For dates further out or seated celebrations, our wedding pricing applies regardless of event type.</p>
-        </div>
-
-        <div class="pricing-block-cta">
-          <a href="/lets-talk/?type=private&utm_source=website&utm_medium=cta&utm_campaign=private-events&utm_content=pricing-birthday" class="btn btn-primary" data-cta-section="pricing-birthday-discovery-call">Book A Discovery Call</a>
-        </div>
       </div>
     </div>
 
-    <div class="pricing-note">
-      <p>Prices may vary by date and guest count. Book a discovery call for a tailored quote that matches your celebration and your budget.</p>
+    <!-- Pivot to brochure capture -->
+    <div class="pricing-pivot">
+      <h3>Want The Full Pricing Guide?</h3>
+      <p>The headline is above. The brochure has every menu, drinks package, styling option, and a few real celebrations we have hosted. Emailed and WhatsApped to you in seconds.</p>
     </div>
+
+    <form class="pricing-form" id="brochure" data-form="brochure-download">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="brochure-firstName">First name</label>
+          <input type="text" id="brochure-firstName" name="firstName" placeholder="Your first name" required>
+        </div>
+        <div class="form-group">
+          <label for="brochure-email">Email address</label>
+          <input type="email" id="brochure-email" name="email" placeholder="you@email.com" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="brochure-mobile">Mobile number</label>
+          <input type="tel" id="brochure-mobile" name="mobile" placeholder="07..." required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary pricing-form-submit">Get The Full Pricing Guide</button>
+      <p class="pricing-form-note">Sent instantly by email and WhatsApp. No calls, no pitch. Unsubscribe any time.</p>
+    </form>
   </Section>
 
   <!-- ==================== PHOTO STRIP ==================== -->
@@ -912,5 +946,286 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
         font-size: 14px;
       }
     }
+
+    /* ===== Pricing hook (matches /weddings/ Section 7) ===== */
+    .pricing-hook {
+      text-align: center;
+      max-width: 720px;
+      margin: -8px auto 40px;
+      padding: 48px 32px;
+      background: rgba(73, 89, 14, 0.04);
+      border: 1px solid rgba(73, 89, 14, 0.12);
+      border-radius: 2px;
+    }
+    .pricing-hook-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--dusty-coral);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .pricing-hook-amount {
+      font-family: var(--font-heading);
+      font-size: clamp(72px, 12vw, 128px);
+      font-weight: 600;
+      line-height: 1;
+      color: var(--forest-olive);
+      margin-bottom: 16px;
+    }
+    .pricing-hook-breakdown {
+      font-family: var(--font-body);
+      font-size: clamp(15px, 1.6vw, 18px);
+      color: var(--brewery-dark);
+      margin-bottom: 8px;
+    }
+    .pricing-hook-context {
+      font-family: var(--font-body);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brewery-dark);
+      opacity: 0.55;
+    }
+    .pricing-intro {
+      max-width: 720px;
+      margin: 0 auto 32px;
+      font-size: 16px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    /* ===== Toggle: Birthday / Baby shower (matches /lets-talk/ filled-button-pair pattern) ===== */
+    .pe-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      max-width: 720px;
+      margin: 0 auto 40px;
+      flex-wrap: wrap;
+    }
+    .pe-toggle-btn {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 12px 24px;
+      background: transparent;
+      color: var(--mid-olive);
+      border: 1px solid var(--mid-olive);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pe-toggle-btn:hover {
+      background: rgba(73, 89, 14, 0.06);
+    }
+    .pe-toggle-btn--active,
+    .pe-toggle-btn[aria-selected="true"] {
+      background: var(--mid-olive);
+      color: var(--warm-canvas);
+    }
+    .pe-toggle-btn--active:hover,
+    .pe-toggle-btn[aria-selected="true"]:hover {
+      background: var(--forest-olive);
+    }
+    .pricing-panel[hidden] { display: none; }
+
+    /* ===== Pivot block (matches /weddings/) ===== */
+    .pricing-pivot {
+      max-width: 720px;
+      margin: 64px auto 28px;
+      text-align: center;
+      padding-top: 48px;
+      border-top: 1px solid rgba(44, 24, 16, 0.08);
+    }
+    .pricing-pivot h3 {
+      font-family: var(--font-heading);
+      font-size: clamp(26px, 3.2vw, 36px);
+      font-weight: 600;
+      color: var(--brewery-dark);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    .pricing-pivot p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--brewery-dark);
+      opacity: 0.85;
+    }
+
+    /* ===== Brochure form (matches /weddings/ Section 7) ===== */
+    .pricing-form {
+      max-width: 720px;
+      margin: 0 auto;
+      background: rgba(44, 24, 16, 0.025);
+      border: 1px solid rgba(44, 24, 16, 0.08);
+      border-radius: 2px;
+      padding: 36px 40px;
+    }
+    .pricing-form .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+    .pricing-form .form-row:has(> .form-group:only-child) {
+      grid-template-columns: 1fr;
+    }
+    .pricing-form .form-group { display: flex; flex-direction: column; }
+    .pricing-form label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 500;
+      color: var(--brewery-dark);
+      margin-bottom: 8px;
+    }
+    .pricing-form input {
+      font-family: var(--font-body);
+      font-size: 15px;
+      padding: 12px 14px;
+      background: var(--warm-canvas);
+      border: 1px solid rgba(44, 24, 16, 0.15);
+      border-radius: 2px;
+      color: var(--brewery-dark);
+      transition: border-color 0.15s ease;
+    }
+    .pricing-form input:focus {
+      outline: none;
+      border-color: var(--forest-olive);
+    }
+    .pricing-form-submit { width: 100%; margin-top: 8px; }
+    .pricing-form-note {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 14px;
+      opacity: 0.6;
+    }
+    .pricing-form-status {
+      max-width: 720px;
+      margin: 16px auto 0;
+      text-align: center;
+      font-size: 14px;
+      padding: 12px 16px;
+      border-radius: 2px;
+    }
+    .pricing-form-status[data-state="success"] {
+      background: rgba(46, 64, 9, 0.08);
+      color: var(--forest-olive);
+    }
+    .pricing-form-status[data-state="error"] {
+      background: rgba(140, 71, 46, 0.08);
+      color: var(--fired-brick);
+    }
+    @media (max-width: 720px) {
+      .pricing-form { padding: 28px 20px; }
+      .pricing-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+    }
   </style>
+
+  <script>
+    /* ===== Pricing toggle: Birthday <-> Baby shower ===== */
+    (function () {
+      const buttons = Array.from(document.querySelectorAll('.pe-toggle-btn'));
+      const panels = {
+        birthday: document.getElementById('pe-pricing-birthday'),
+        babyshower: document.getElementById('pe-pricing-babyshower'),
+      };
+      if (!buttons.length) return;
+
+      function activate(target) {
+        buttons.forEach(b => {
+          const isActive = b.dataset.peTarget === target;
+          b.classList.toggle('pe-toggle-btn--active', isActive);
+          b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        Object.entries(panels).forEach(([key, el]) => {
+          if (!el) return;
+          if (key === target) el.removeAttribute('hidden');
+          else el.setAttribute('hidden', '');
+        });
+        if (window.dataLayer) window.dataLayer.push({ event: 'pe_pricing_toggle', target });
+        if (window.__thk) window.__thk.track('cta_click', {
+          cta_id: 'pe-pricing-toggle-' + target,
+          cta_text: target === 'birthday' ? 'Birthdays and Celebrations' : 'Baby Showers',
+          destination: '/private-events/#pricing',
+        });
+      }
+
+      buttons.forEach(b => b.addEventListener('click', () => activate(b.dataset.peTarget)));
+    })();
+
+    /* ===== Brochure download form handler ===== */
+    /* Mirrors /weddings/ Section 7 submit pattern. Captures the lead via
+       /api/submit with form_type='brochure-download' + brochure_type='private-events'.
+       Actual PDF delivery depends on the same brochure-delivery infrastructure
+       that the wedding brochure form is waiting on. */
+    (function () {
+      const form = document.getElementById('brochure');
+      if (!form) return;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        if (!btn) return;
+
+        const firstName = form.querySelector('[name="firstName"]')?.value?.trim() || '';
+        const email = form.querySelector('[name="email"]')?.value?.trim() || '';
+        const phone = form.querySelector('[name="mobile"]')?.value?.trim() || '';
+        if (!email) return;
+
+        btn.disabled = true;
+        const originalLabel = btn.textContent;
+        btn.textContent = 'Sending...';
+
+        let status = form.parentElement.querySelector('.pricing-form-status');
+        if (!status) {
+          status = document.createElement('p');
+          status.className = 'pricing-form-status';
+          form.after(status);
+        }
+
+        try {
+          const res = await fetch('/api/submit', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              form_type: 'brochure-download',
+              email,
+              first_name: firstName,
+              phone,
+              form_data: { brochure_type: 'private-events' },
+            }),
+          });
+          const result = await res.json();
+          console.log('[PE Brochure] Submitted:', result);
+
+          if (result.ok) {
+            status.textContent = "On its way. Check your email and WhatsApp.";
+            status.setAttribute('data-state', 'success');
+            btn.textContent = 'Sent';
+          } else {
+            throw new Error(result.error || 'submit_failed');
+          }
+
+          if (window.dataLayer) {
+            window.dataLayer.push({ event: 'brochure_download', brochure_type: 'private-events' });
+          }
+        } catch (err) {
+          console.error('[PE Brochure] Submit error:', err);
+          status.textContent = 'Something went wrong. Please try again or email hello@thehackney.co.';
+          status.setAttribute('data-state', 'error');
+          btn.disabled = false;
+          btn.textContent = originalLabel;
+        }
+      });
+    })();
+  </script>
 </Base>
