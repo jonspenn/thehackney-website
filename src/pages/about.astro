@@ -5,18 +5,47 @@ import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ProofBar from '../components/ProofBar.astro';
 import FinalCTA from '../components/FinalCTA.astro';
+
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "The Hackney",
+  "url": "https://thehackney.co",
+  "logo": "https://thehackney.co/images/logo/th-logo.png",
+  "foundingDate": "1856",
+  "description": "A restored 1856 brewery on Hackney Road, East London. Exclusive hire for weddings, corporate events, and private celebrations, with an in-house kitchen and cafe-bar open seven days a week.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "503 Hackney Road",
+    "addressLocality": "London",
+    "postalCode": "E2 9ED",
+    "addressCountry": "GB"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 51.5318,
+    "longitude": -0.0625
+  },
+  "sameAs": [
+    "https://www.hitched.co.uk/wedding-venues/the-hackney_p3105421.htm",
+    "https://www.instagram.com/thehackney_e2/"
+  ]
+};
 ---
 
-<Base title="About The Hackney | 1856 Brewery Wedding & Events Venue, East London E2" description="The Hackney is a restored 1856 brewery on Hackney Road, East London. One team runs everything - weddings, events, cafe-bar and in-house kitchen. Meet the team behind the venue." preloadImage="/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp">
+<Base title="About The Hackney | 1856 Brewery Wedding & Events Venue, East London E2" description="The Hackney is a restored 1856 brewery on Hackney Road, East London. One team runs everything - weddings, events, cafe-bar and in-house kitchen. Meet the team behind the venue." preloadImage="/images/hackney-about-hero-tom-danielle-couple-olliehindsphotography.webp">
+
+  <script type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
 
   <!-- ==================== HERO ==================== -->
   <HeroSection
-    image="/images/hackney-wedding-venue-hero-long-tables-edison-bulbs.webp"
-    alt="The Hackney venue interior showing exposed brick and industrial character"
+    image="/images/hackney-about-hero-tom-danielle-couple-olliehindsphotography.webp"
+    alt="A couple at their wedding at The Hackney, photographed by Ollie Hinds Photography"
     eyebrow="About The Hackney"
     heading="An 1856 Brewery. One Team. Every Detail."
     subtext="We are a wedding and events venue, a cafe-bar, and an in-house kitchen - all under one roof, all run by one team."
     height="mid"
+    textGradient={true}
   />
 
   <!-- ==================== THE BUILDING ==================== -->
@@ -28,13 +57,14 @@ import FinalCTA from '../components/FinalCTA.astro';
           eyebrow="The Building"
           heading="A Victorian Brewery On Hackney Road"
         />
-        <p>The Hackney sits at 503 Hackney Road, in a building that dates back to 1856. It started life as a Victorian brewery - and you can still see that history in the bones of the space. Exposed brick walls, original timber beams, high ceilings, and skylights that flood the room with natural light.</p>
-        <p>When we restored the building, we kept the industrial character and added modern hospitality. The result is a venue with real warmth and texture - not a blank-canvas warehouse that needs dressing up, but a space that photographs beautifully as it is.</p>
+        <p>The building at 503 Hackney Road has stood since at least 1856. It began as John Chandler &amp; Co.'s brewery, supplying 35 East London pubs for more than half a century. A 120-foot chimney rose over Hackney Road from 1895. The trade press wrote about the company. John Edmund Chandler, F.R.G.S. - a gentleman brewer who owned a steam yacht and sailed the Mediterranean - was the man behind a brewery that served the working pubs of Bethnal Green. He died in 1898, aged 38. The contradiction is the story.</p>
+        <p>In 1911 Charrington's absorbed the business and the building became a workshop. It stayed one through the decades when Hackney changed around it. At some point the Mills family came to own the plot, and three generations held it across the post-war years and into the present. In 2015, Kevin Mills - with Jon and James Penn - restored the building that had been waiting.</p>
+        <p>The exposed brick, the timber beams, the ironwork, the skylight - these are not design choices. They are what was always there. We kept the bones and added modern hospitality. The result is a venue with real warmth and texture, not a blank-canvas warehouse that needs dressing up.</p>
         <p>We are right between Bethnal Green and Cambridge Heath, in the heart of East London. Two minutes from Cambridge Heath Overground, eight minutes from Bethnal Green on the Central line. Buses stop directly outside.</p>
       </div>
       <div class="building-images">
-        <div class="building-placeholder lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The Hackney building exterior on Hackney Road"></div>
-        <div class="building-placeholder lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="Interior detail showing exposed brick and timber beams"></div>
+        <div class="building-image lazy-bg" data-bg="/images/hackney-road-chandlers-brewery-victorian.webp" data-bg-pos="center center" role="img" aria-label="Victorian-era photograph of Chandler's brewery on Hackney Road. Archival image."></div>
+        <div class="building-image lazy-bg" data-bg="/images/hackney-edison-bulbs-timber-beam-greenery.webp" data-bg-pos="center center" role="img" aria-label="Interior detail of The Hackney showing original timber beam with Edison bulbs and trailing greenery. Photo by AM Wedding Photo."></div>
       </div>
     </div>
   </Section>
@@ -65,43 +95,43 @@ import FinalCTA from '../components/FinalCTA.astro';
     />
 
     <div class="team-grid">
-      <div class="team-card">
+      <div class="team-card" data-has-photo="false">
         <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center top" role="img" aria-label="Jon Penn - Director of The Hackney"></div>
         <div class="team-name">Jon Penn</div>
         <div class="team-role">Director</div>
-        <p class="team-bio">Co-founder and owner of The Hackney. Jon oversees the business and drives the vision for the venue.</p>
+        <p class="team-bio">Jon co-founded The Hackney in 2015 with James. He owns the business, drives the brand, and leads sales and marketing day-to-day. Outside the venue, he writes about building independent businesses at jonspenn.com.</p>
         <a href="https://jonspenn.com" target="_blank" rel="noopener" class="team-link">jonspenn.com &rarr;</a>
       </div>
 
-      <div class="team-card">
-        <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center top" role="img" aria-label="James - Director of The Hackney"></div>
-        <div class="team-name">James</div>
+      <div class="team-card" data-has-photo="false">
+        <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center top" role="img" aria-label="James Penn - Director of The Hackney"></div>
+        <div class="team-name">James Penn</div>
         <div class="team-role">Director</div>
-        <p class="team-bio">Co-founder and director. James works behind the scenes to keep the business running.</p>
+        <p class="team-bio">James co-founded The Hackney with Jon in 2015. He started his career as a City lawyer in corporate and private equity, before moving into sales and then to entrepreneurship. At The Hackney he leads operations, oversees the finances, and shapes the strategic direction with his co-founders.</p>
       </div>
 
-      <div class="team-card">
+      <div class="team-card" data-has-photo="false">
         <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center top" role="img" aria-label="Hugo - General Manager at The Hackney"></div>
         <div class="team-name">Hugo</div>
         <div class="team-role">General Manager</div>
         <p class="team-bio">Hugo is your first point of contact. He runs every venue tour, handles enquiries, and makes sure your event runs perfectly from start to finish.</p>
       </div>
 
-      <div class="team-card">
+      <div class="team-card" data-has-photo="false">
         <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center top" role="img" aria-label="Eva - Events Manager at The Hackney"></div>
         <div class="team-name">Eva</div>
         <div class="team-role">Events Manager</div>
         <p class="team-bio">Eva manages the planning process from booking to the big day. She coordinates every detail so you do not have to.</p>
       </div>
 
-      <div class="team-card">
-        <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center top" role="img" aria-label="Chef Marco Mannoni - Head Chef at The Hackney"></div>
-        <div class="team-name">Chef Marco Mannoni</div>
+      <div class="team-card" data-has-photo="false">
+        <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center top" role="img" aria-label="Marco Mannoni - Head Chef at The Hackney"></div>
+        <div class="team-name">Marco Mannoni</div>
         <div class="team-role">Head Chef</div>
         <p class="team-bio">Marco leads our in-house kitchen. Modern European cuisine, seasonal menus, locally sourced ingredients. From exquisitely plated courses to abundant sharing feasts, every dish is designed to bring people together over beautifully crafted plates.</p>
       </div>
 
-      <div class="team-card">
+      <div class="team-card" data-has-photo="false">
         <div class="team-photo lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The kitchen and bar team at The Hackney"></div>
         <div class="team-name">The Kitchen and Bar Team</div>
         <div class="team-role">The People Behind Every Course and Cocktail</div>
@@ -119,27 +149,27 @@ import FinalCTA from '../components/FinalCTA.astro';
 
     <div class="gallery-grid">
       <div class="gallery-item">
-        <div class="gallery-item-bg lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The main space at The Hackney"></div>
+        <div class="gallery-item-bg lazy-bg" data-bg="/images/hackney-main-hall-long-tables-greenery-edison-bulbs.webp" data-bg-pos="center center" role="img" aria-label="The main space at The Hackney set with long tables, greenery overhead and Edison bulbs. Photo by AM Wedding Photo."></div>
         <div class="gallery-caption">The Main Space</div>
       </div>
       <div class="gallery-item">
-        <div class="gallery-item-bg lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The bar at The Hackney"></div>
+        <div class="gallery-item-bg lazy-bg" data-bg="/images/hackney-cafe-bar-bartender-pouring-champagne.webp" data-bg-pos="center center" role="img" aria-label="Bartender pouring champagne at The Hackney bar."></div>
         <div class="gallery-caption">The Bar</div>
       </div>
       <div class="gallery-item">
-        <div class="gallery-item-bg lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The winter garden at The Hackney"></div>
+        <div class="gallery-item-bg lazy-bg" data-bg="/images/hackney-real-wedding-charlotte-stephen-winter-garden-pink-installation.webp" data-bg-pos="center center" role="img" aria-label="The winter garden at The Hackney dressed with a hot-pink floral installation. Photo by This Modern Revelry."></div>
         <div class="gallery-caption">The Winter Garden</div>
       </div>
       <div class="gallery-item">
-        <div class="gallery-item-bg lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="The courtyard terrace at The Hackney"></div>
+        <div class="gallery-item-bg lazy-bg" data-bg="/images/hackney-cafe-bar-tile-courtyard-bench-greenery.webp" data-bg-pos="center center" role="img" aria-label="The courtyard at The Hackney with bench seating and tropical greenery. Photo by AM Wedding Photo."></div>
         <div class="gallery-caption">The Courtyard</div>
       </div>
       <div class="gallery-item">
-        <div class="gallery-item-bg lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="Ceremony setup at The Hackney"></div>
+        <div class="gallery-item-bg lazy-bg" data-bg="/images/hackney-wedding-ceremony-bride-aisle-edison-bulbs.webp" data-bg-pos="center center" role="img" aria-label="Wedding ceremony at The Hackney with the bride walking the aisle under Edison bulbs."></div>
         <div class="gallery-caption">Ceremony Setup</div>
       </div>
       <div class="gallery-item">
-        <div class="gallery-item-bg lazy-bg" data-bg="" data-bg-pos="center center" role="img" aria-label="Evening celebration mode at The Hackney"></div>
+        <div class="gallery-item-bg lazy-bg" data-bg="/images/hackney-real-wedding-kate-james-cocktails-disco-ball.webp" data-bg-pos="center center" role="img" aria-label="Evening celebration at The Hackney with cocktails and disco ball lighting. Photo by This Modern Revelry."></div>
         <div class="gallery-caption">Evening Mode</div>
       </div>
     </div>
@@ -147,10 +177,10 @@ import FinalCTA from '../components/FinalCTA.astro';
 
   <!-- ==================== PRESS & RECOGNITION ==================== -->
   <ProofBar stats={[
-    { number: "400+", label: "Weddings managed" },
+    { number: "200+", label: "Events delivered" },
     { number: "Everything Included", label: "Venue, food, drinks, team" },
     { number: "Exclusive Hire", label: "The whole venue, just for you" },
-    { number: "4.9 â", label: "Couple rating on Hitched" }
+    { number: "4.9 ★", label: "Couple rating on Hitched" }
   ]} />
 
   <!-- ==================== FINAL CTA ==================== -->
@@ -184,11 +214,14 @@ import FinalCTA from '../components/FinalCTA.astro';
       gap: 16px;
     }
 
-    .building-placeholder {
+    .building-image {
       width: 100%;
       aspect-ratio: 16/10;
       background-color: var(--brewery-dark);
+      background-size: cover;
+      background-position: center;
       border: 1px solid rgba(44, 24, 16, 0.08);
+      border-radius: 2px;
     }
 
     /* ==================== ONE TEAM ==================== */
@@ -227,7 +260,8 @@ import FinalCTA from '../components/FinalCTA.astro';
     .team-card {
       border: 1px solid rgba(44, 24, 16, 0.08);
       border-top: 3px solid var(--forest-olive);
-      padding: 0 0 30px;
+      border-radius: 2px;
+      padding: 24px 0 30px;
     }
 
     .team-photo {
@@ -235,6 +269,15 @@ import FinalCTA from '../components/FinalCTA.astro';
       aspect-ratio: 1;
       background-color: var(--brewery-dark);
       margin-bottom: 20px;
+    }
+
+    /* Hide the photo block on cards that don't yet have a headshot - keeps the card text-led and avoids broken-looking dark placeholders. When a headshot is added, set data-has-photo="true" and add data-bg. */
+    .team-card[data-has-photo="false"] .team-photo {
+      display: none;
+    }
+
+    .team-card[data-has-photo="false"] {
+      padding-top: 24px;
     }
 
     .team-name {
@@ -288,12 +331,15 @@ import FinalCTA from '../components/FinalCTA.astro';
       aspect-ratio: 4/3;
       overflow: hidden;
       border: 1px solid rgba(44, 24, 16, 0.08);
+      border-radius: 2px;
     }
 
     .gallery-item-bg {
       width: 100%;
       height: 100%;
       background-color: var(--brewery-dark);
+      background-size: cover;
+      background-position: center;
     }
 
     .gallery-item::after {
