@@ -61,6 +61,7 @@ const organizationLd = {
         <p>In 1911 Charrington's absorbed the business and the building became a workshop. It stayed one through the decades when Hackney changed around it. At some point the Mills family came to own the plot, and three generations held it across the post-war years and into the present. In 2015, Kevin Mills - with Jon and James Penn - restored the building that had been waiting.</p>
         <p>The exposed brick, the timber beams, the ironwork, the skylight - these are not design choices. They are what was always there. We kept the bones and added modern hospitality. The result is a venue with real warmth and texture, not a blank-canvas warehouse that needs dressing up.</p>
         <p>We are right between Bethnal Green and Cambridge Heath, in the heart of East London. Two minutes from Cambridge Heath Overground, eight minutes from Bethnal Green on the Central line. Buses stop directly outside.</p>
+        <p class="building-readmore"><a href="/journal/the-history-of-503-hackney-road/" class="building-readmore-link">Read the full 170-year history &rarr;</a></p>
       </div>
       <div class="building-images">
         <div class="building-image lazy-bg" data-bg="/images/hackney-road-chandlers-brewery-victorian.webp" data-bg-pos="center center" role="img" aria-label="Victorian-era photograph of Chandler's brewery on Hackney Road. Archival image."></div>
@@ -205,6 +206,29 @@ const organizationLd = {
       font-size: 17px;
       line-height: 1.7;
       margin-bottom: 20px;
+    }
+
+    .building-readmore {
+      margin-top: 28px;
+      margin-bottom: 0;
+    }
+
+    .building-readmore-link {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dusty-coral);
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 2px;
+      transition: color 150ms ease;
+    }
+
+    .building-readmore-link:hover,
+    .building-readmore-link:focus-visible {
+      color: var(--fired-brick);
     }
 
     .building-images {
