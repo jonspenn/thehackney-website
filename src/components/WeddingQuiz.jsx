@@ -475,7 +475,7 @@ function StepConfirmation({ data }) {
       {isHot && (
         <FadeIn delay={300}>
           <div className="wq-confirm-card wq-confirm-card--hot">
-            <p>Since you're ready to move, skip the emails and book a free venue tour directly with Hugo, our General Manager.</p>
+            <p>Since you're ready to move, skip the emails and book a free venue tour directly with us.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
                 href={dcUrl}
@@ -544,7 +544,7 @@ function StepConfirmation({ data }) {
       {!isHot && !isBrowser && !isLowBudget && !isLarge && (
         <FadeIn delay={300}>
           <div className="wq-confirm-card">
-            <p>Check your inbox - your personalised guide is on its way. If you'd like to see the space in person, book a free tour with Hugo.</p>
+            <p>Check your inbox - your personalised guide is on its way. If you'd like to see the space in person, book a free tour with us.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
                 href={dcUrl}

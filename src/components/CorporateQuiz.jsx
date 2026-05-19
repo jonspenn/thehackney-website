@@ -497,7 +497,7 @@ function StepConfirmation({ data }) {
       {!isPhotoFilm && isHighValue && (
         <FadeIn delay={300}>
           <div className="wq-confirm-card wq-confirm-card--hot">
-            <p>Want to see the space before your proposal arrives? Book a walkthrough with Hugo, our General Manager - he'll show you every corner and talk through how we'd set up your event.</p>
+            <p>Want to see the space before your proposal arrives? Book a walkthrough with us - we'll show you every corner and talk through how we'd set up your event.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
                 href={discoveryUrl}
@@ -523,7 +523,7 @@ function StepConfirmation({ data }) {
         <FadeIn delay={300}>
           <div className="wq-confirm-card">
             <h3 className="wq-confirm-card__title">What happens next</h3>
-            <p>We'll review your requirements and email you a detailed proposal covering venue hire, catering, bar, AV, and pricing - everything in one document. If you'd like to see the space in person, you can book a tour with Hugo.</p>
+            <p>We'll review your requirements and email you a detailed proposal covering venue hire, catering, bar, AV, and pricing - everything in one document. If you'd like to see the space in person, you can book a tour.</p>
             <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
               <a
                 href={discoveryUrl}

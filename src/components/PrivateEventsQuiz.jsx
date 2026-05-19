@@ -173,7 +173,7 @@ function StepDate({ data, setData, onNext }) {
     <div className="wq-step">
       <FadeIn>
         <h2 className="wq-heading">When is your celebration?</h2>
-        <p className="wq-subtext">A few quick questions to confirm your date, walk you through pricing, and put you in touch with Hugo. Two minutes.</p>
+        <p className="wq-subtext">A few quick questions to confirm your date, walk you through pricing, and put you in touch with our team. Two minutes.</p>
       </FadeIn>
       <FadeIn delay={150}>
         <div className="wq-field" style={{ maxWidth: 320, margin: "0 auto" }}>
@@ -305,7 +305,7 @@ function StepCapture({ data, setData, onNext, onBack, submitting, submitError, c
     <div className="wq-step">
       <BackButton onClick={onBack} />
       <FadeIn>
-        <h2 className="wq-heading">Where can Hugo reach you?</h2>
+        <h2 className="wq-heading">Where can we reach you?</h2>
         <p className="wq-subtext">We will come back within one working day with availability and a quote tailored to your celebration.</p>
       </FadeIn>
       <FadeIn delay={150}>
@@ -460,7 +460,7 @@ function ConfirmCardDiscovery({ data, variant }) {
   return (
     <div className="wq-confirm-card">
       <h3 className="wq-confirm-card__title">Want to skip ahead?</h3>
-      <p>If you would rather book a quick call with Hugo directly, you can grab a slot on his calendar now.</p>
+      <p>If you would rather book a quick call directly, you can grab a slot on our calendar now.</p>
       <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
         <a href={discoveryUrl} className="wq-btn wq-btn--primary" onClick={trackDiscoveryClick}>
           Book a Discovery Call
@@ -523,7 +523,7 @@ function StepConfirmation({ data }) {
             We have your details{firstName}.
           </h2>
           <p className="wq-subtext" style={{ maxWidth: "none", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
-            Our minimum spend pricing applies to standing celebrations. Seated and mixed-format events are quoted separately as wedding-style bookings - Hugo will come back to you within one working day with availability and a price for your celebration.
+            Our minimum spend pricing applies to standing celebrations. Seated and mixed-format events are quoted separately as wedding-style bookings - we will come back to you within one working day with availability and a price for your celebration.
           </p>
         </FadeIn>
         <FadeIn delay={300}>
@@ -546,10 +546,10 @@ function StepConfirmation({ data }) {
       </FadeIn>
       <FadeIn delay={150}>
         <h2 className="wq-heading">
-          Looks good{firstName}. Hugo will be in touch.
+          Looks good{firstName}. We will be in touch.
         </h2>
         <p className="wq-subtext" style={{ maxWidth: "none", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
-          We have your details. Hugo will reply within one working day with availability for {formatDateLong(data.eventDate)} and a quote tailored to your celebration.
+          We have your details and will reply within one working day with availability for {formatDateLong(data.eventDate)} and a quote tailored to your celebration.
         </p>
       </FadeIn>
       <FadeIn delay={300}>
