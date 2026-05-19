@@ -347,6 +347,107 @@ const MIGRATIONS = [
       VALUES ('test_tour_recap', 'test_contact_dev', 'tour_recap',
               '2026-05-06T00:00:00.000Z', '2027-12-31T23:59:59.000Z', '2026-05-06T00:00:00.000Z')`,
   },
+  // ── Phase A of prd-sys-reporting-unification.md (Atlas, 1 June 2026) ──
+  // HubSpot deals + revenue audit trail mirror. Canonical schema lives
+  // at /migrations/0007_create_deals_and_revenue_snapshots.sql - keep
+  // both in sync. Cancel-after-won uses Option A: is_cancelled flag,
+  // is_closed_won stays true forever (preserves historical fact for the
+  // Katharine & Ray defence). See PRD changelog 2026-05-19.
+  {
+    name: "deals",
+    sql: `CREATE TABLE IF NOT EXISTS deals (
+      deal_id TEXT PRIMARY KEY,
+      contact_id TEXT,
+      hubspot_primary_contact_id TEXT,
+      deal_name TEXT,
+      amount INTEGER,
+      pipeline TEXT,
+      deal_stage TEXT,
+      event_type TEXT,
+      event_date TEXT,
+      introducer TEXT,
+      source_channel TEXT,
+      create_date TEXT,
+      close_date TEXT,
+      closed_won_at TEXT,
+      closed_lost_at TEXT,
+      is_closed_won INTEGER DEFAULT 0,
+      is_closed_lost INTEGER DEFAULT 0,
+      is_cancelled INTEGER DEFAULT 0,
+      cancelled_at TEXT,
+      cancel_reason TEXT,
+      hs_lastmodifieddate TEXT,
+      last_synced_at TEXT,
+      raw_json TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )`,
+  },
+  { name: "idx_deals_contact_id", sql: `CREATE INDEX IF NOT EXISTS idx_deals_contact_id ON deals(contact_id)` },
+  { name: "idx_deals_hs_contact_id", sql: `CREATE INDEX IF NOT EXISTS idx_deals_hs_contact_id ON deals(hubspot_primary_contact_id)` },
+  { name: "idx_deals_close_date", sql: `CREATE INDEX IF NOT EXISTS idx_deals_close_date ON deals(close_date)` },
+  { name: "idx_deals_event_date", sql: `CREATE INDEX IF NOT EXISTS idx_deals_event_date ON deals(event_date)` },
+  { name: "idx_deals_stage", sql: `CREATE INDEX IF NOT EXISTS idx_deals_stage ON deals(deal_stage)` },
+  { name: "idx_deals_won", sql: `CREATE INDEX IF NOT EXISTS idx_deals_won ON deals(is_closed_won)` },
+  { name: "idx_deals_cancelled", sql: `CREATE INDEX IF NOT EXISTS idx_deals_cancelled ON deals(is_cancelled)` },
+  { name: "idx_deals_hs_mtime", sql: `CREATE INDEX IF NOT EXISTS idx_deals_hs_mtime ON deals(hs_lastmodifieddate)` },
+
+  {
+    name: "deal_history",
+    sql: `CREATE TABLE IF NOT EXISTS deal_history (
+      history_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      deal_id TEXT NOT NULL,
+      changed_at TEXT NOT NULL DEFAULT (datetime('now')),
+      change_type TEXT NOT NULL,
+      changed_fields TEXT,
+      old_values TEXT,
+      new_values TEXT,
+      source TEXT,
+      notes TEXT
+    )`,
+  },
+  { name: "idx_deal_history_deal", sql: `CREATE INDEX IF NOT EXISTS idx_deal_history_deal ON deal_history(deal_id)` },
+  { name: "idx_deal_history_when", sql: `CREATE INDEX IF NOT EXISTS idx_deal_history_when ON deal_history(changed_at)` },
+  { name: "idx_deal_history_type", sql: `CREATE INDEX IF NOT EXISTS idx_deal_history_type ON deal_history(change_type)` },
+
+  {
+    name: "revenue_snapshots",
+    sql: `CREATE TABLE IF NOT EXISTS revenue_snapshots (
+      snapshot_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      captured_at TEXT NOT NULL DEFAULT (datetime('now')),
+      period TEXT NOT NULL,
+      period_type TEXT NOT NULL,
+      gross_revenue INTEGER DEFAULT 0,
+      cancelled_amount INTEGER DEFAULT 0,
+      net_revenue INTEGER DEFAULT 0,
+      deal_count INTEGER DEFAULT 0,
+      cancelled_count INTEGER DEFAULT 0,
+      by_channel TEXT,
+      prev_snapshot_id INTEGER,
+      delta_vs_prev_snapshot INTEGER,
+      variance_flag INTEGER DEFAULT 0,
+      notes TEXT
+    )`,
+  },
+  { name: "idx_rev_snap_period", sql: `CREATE INDEX IF NOT EXISTS idx_rev_snap_period ON revenue_snapshots(period)` },
+  { name: "idx_rev_snap_captured", sql: `CREATE INDEX IF NOT EXISTS idx_rev_snap_captured ON revenue_snapshots(captured_at)` },
+  { name: "idx_rev_snap_variance", sql: `CREATE INDEX IF NOT EXISTS idx_rev_snap_variance ON revenue_snapshots(variance_flag)` },
+
+  // ── Contacts: HubSpot lifecycle-stage entry timestamps ──
+  // Mirrors HubSpot "Date entered '<stage>' (Lifecycle Stage Pipeline)"
+  // properties. Today (19 May 2026) the trimmed contacts export missed
+  // these and broke the funnel-health monthly report; D1 sync removes
+  // the dependency on a particular HubSpot export view.
+  { name: "ct_add_lifecycle_stage", sql: `ALTER TABLE contacts ADD COLUMN lifecycle_stage TEXT` },
+  { name: "ct_add_entered_subscriber_at", sql: `ALTER TABLE contacts ADD COLUMN entered_subscriber_at TEXT` },
+  { name: "ct_add_entered_lead_at", sql: `ALTER TABLE contacts ADD COLUMN entered_lead_at TEXT` },
+  { name: "ct_add_entered_mql_at", sql: `ALTER TABLE contacts ADD COLUMN entered_mql_at TEXT` },
+  { name: "ct_add_entered_sql_at", sql: `ALTER TABLE contacts ADD COLUMN entered_sql_at TEXT` },
+  { name: "ct_add_entered_opportunity_at", sql: `ALTER TABLE contacts ADD COLUMN entered_opportunity_at TEXT` },
+  { name: "ct_add_entered_customer_at", sql: `ALTER TABLE contacts ADD COLUMN entered_customer_at TEXT` },
+  { name: "idx_contacts_hubspot", sql: `CREATE INDEX IF NOT EXISTS idx_contacts_hubspot ON contacts(hubspot_contact_id)` },
+
+
 ];
 
 export async function onRequestPost(context) {
