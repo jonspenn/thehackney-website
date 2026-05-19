@@ -539,6 +539,186 @@ async function captureAllSnapshots(db, results) {
 // Entry point
 // ─────────────────────────────────────────────────────────────────────
 
+
+// ─────────────────────────────────────────────────────────────────────
+// Bulk pre-fetch + batched write (subrequest-limit defence)
+// ─────────────────────────────────────────────────────────────────────
+
+async function loadExistingDealsMap(db) {
+  // Fetch every existing deal's id + cancellation/won state in one D1 call.
+  // ~hundreds to low thousands of rows; well within D1 response size limits.
+  const rs = await db.prepare(
+    `SELECT deal_id, is_closed_won, is_closed_lost, is_cancelled, deal_stage,
+            deal_name, amount, pipeline, event_type, event_date, introducer,
+            source_channel, close_date, closed_won_at, closed_lost_at,
+            cancelled_at, cancel_reason
+       FROM deals`
+  ).all().catch(() => ({ results: [] }));
+  const map = new Map();
+  for (const r of (rs.results || [])) map.set(String(r.deal_id), r);
+  return map;
+}
+
+const DEAL_BATCH_SIZE = 25;        // 2 statements per deal → ~50 stmts/batch
+const CONTACT_BATCH_SIZE = 25;     // 1 statement per contact → ~25 stmts/batch
+
+async function batchedUpsertDeals(db, deals, existingMap, results) {
+  let pending = [];
+  const flush = async () => {
+    if (pending.length === 0) return;
+    try {
+      await db.batch(pending);
+    } catch (err) {
+      results.errors.push({ where: "deal_batch_flush", message: err.message, batch_size: pending.length });
+    }
+    pending = [];
+  };
+  for (const hs of deals) {
+    try {
+      const row = dealRowFromHubSpot(hs);
+      const existing = existingMap.get(row.deal_id) || null;
+      const diff = diffDealRow(existing, row);
+
+      const newlyDetectedCancellation =
+        existing && existing.is_closed_won === 1 && row.is_closed_won === 1 &&
+        CANCELLED_STAGE_NAMES.has(row.deal_stage) && existing.is_cancelled !== 1;
+      const undeleted =
+        existing?.is_cancelled === 1 && !CANCELLED_STAGE_NAMES.has(row.deal_stage);
+
+      const cancelFields = newlyDetectedCancellation
+        ? { is_cancelled: 1, cancelled_at: nowIso(), cancel_reason: "HubSpot stage transitioned to Cancelled" }
+        : (undeleted ? { is_cancelled: 0, cancelled_at: null, cancel_reason: null } : {});
+
+      const raw_json = JSON.stringify(hs);
+      const now = nowIso();
+
+      pending.push(
+        db.prepare(`
+          INSERT INTO deals (
+            deal_id, hubspot_primary_contact_id, deal_name, amount, pipeline, deal_stage,
+            event_type, event_date, introducer, source_channel,
+            create_date, close_date, closed_won_at, closed_lost_at,
+            is_closed_won, is_closed_lost, is_cancelled, cancelled_at, cancel_reason,
+            hs_lastmodifieddate, last_synced_at, raw_json, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(deal_id) DO UPDATE SET
+            hubspot_primary_contact_id = excluded.hubspot_primary_contact_id,
+            deal_name = excluded.deal_name,
+            amount = excluded.amount,
+            pipeline = excluded.pipeline,
+            deal_stage = excluded.deal_stage,
+            event_type = COALESCE(excluded.event_type, deals.event_type),
+            event_date = COALESCE(excluded.event_date, deals.event_date),
+            introducer = COALESCE(excluded.introducer, deals.introducer),
+            source_channel = COALESCE(excluded.source_channel, deals.source_channel),
+            create_date = excluded.create_date,
+            close_date = excluded.close_date,
+            closed_won_at = COALESCE(excluded.closed_won_at, deals.closed_won_at),
+            closed_lost_at = COALESCE(excluded.closed_lost_at, deals.closed_lost_at),
+            is_closed_won = excluded.is_closed_won,
+            is_closed_lost = excluded.is_closed_lost,
+            is_cancelled = COALESCE(?, deals.is_cancelled),
+            cancelled_at = COALESCE(?, deals.cancelled_at),
+            cancel_reason = COALESCE(?, deals.cancel_reason),
+            hs_lastmodifieddate = excluded.hs_lastmodifieddate,
+            last_synced_at = excluded.last_synced_at,
+            raw_json = excluded.raw_json,
+            updated_at = excluded.updated_at
+        `).bind(
+          row.deal_id, row.hubspot_primary_contact_id, row.deal_name, row.amount, row.pipeline, row.deal_stage,
+          row.event_type, row.event_date, row.introducer, row.source_channel,
+          row.create_date, row.close_date, row.closed_won_at, row.closed_lost_at,
+          row.is_closed_won, row.is_closed_lost,
+          cancelFields.is_cancelled ?? 0,
+          cancelFields.cancelled_at ?? null,
+          cancelFields.cancel_reason ?? null,
+          row.hs_lastmodifieddate, now, raw_json, now, now,
+          cancelFields.is_cancelled ?? null,
+          cancelFields.cancelled_at ?? null,
+          cancelFields.cancel_reason ?? null,
+        )
+      );
+
+      const changeType = existing
+        ? (newlyDetectedCancellation ? "cancelled" : (undeleted ? "undeleted" : "updated"))
+        : "created";
+      if (!existing || diff.changed.length > 0 || newlyDetectedCancellation || undeleted) {
+        pending.push(
+          db.prepare(`
+            INSERT INTO deal_history (deal_id, change_type, changed_fields, old_values, new_values, source, changed_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            row.deal_id, changeType, JSON.stringify(diff.changed),
+            JSON.stringify(diff.old), JSON.stringify(diff.next), "hubspot_sync", now,
+          )
+        );
+      }
+
+      if (!existing) results.deals_created++;
+      else if (diff.changed.length > 0) results.deals_updated++;
+      if (newlyDetectedCancellation) results.cancellations_detected++;
+
+      if (pending.length >= DEAL_BATCH_SIZE * 2) await flush();
+    } catch (err) {
+      results.errors.push({ where: `deal ${hs.id}`, message: err.message });
+    }
+  }
+  await flush();
+}
+
+async function batchedUpsertContacts(db, contacts, results) {
+  let pending = [];
+  const flush = async () => {
+    if (pending.length === 0) return;
+    try {
+      await db.batch(pending);
+    } catch (err) {
+      results.errors.push({ where: "contact_batch_flush", message: err.message, batch_size: pending.length });
+    }
+    pending = [];
+  };
+  for (const hs of contacts) {
+    try {
+      const p = hs.properties || {};
+      const hubspot_contact_id = String(hs.id);
+      const email = p.email;
+      if (!email) continue;
+      const now = nowIso();
+      pending.push(
+        db.prepare(`
+          UPDATE contacts
+             SET hubspot_contact_id = COALESCE(hubspot_contact_id, ?),
+                 lifecycle_stage = ?,
+                 entered_subscriber_at = COALESCE(?, entered_subscriber_at),
+                 entered_lead_at = COALESCE(?, entered_lead_at),
+                 entered_mql_at = COALESCE(?, entered_mql_at),
+                 entered_sql_at = COALESCE(?, entered_sql_at),
+                 entered_opportunity_at = COALESCE(?, entered_opportunity_at),
+                 entered_customer_at = COALESCE(?, entered_customer_at),
+                 last_seen_at = COALESCE(last_seen_at, ?)
+           WHERE hubspot_contact_id = ? OR email = ?
+        `).bind(
+          hubspot_contact_id,
+          p.lifecyclestage || null,
+          p.hs_lifecyclestage_subscriber_date || null,
+          p.hs_lifecyclestage_lead_date || null,
+          p.hs_lifecyclestage_marketingqualifiedlead_date || null,
+          p.hs_lifecyclestage_salesqualifiedlead_date || null,
+          p.hs_lifecyclestage_opportunity_date || null,
+          p.hs_lifecyclestage_customer_date || null,
+          now,
+          hubspot_contact_id, email,
+        )
+      );
+      results.contacts_synced++;
+      if (pending.length >= CONTACT_BATCH_SIZE) await flush();
+    } catch (err) {
+      results.errors.push({ where: `contact ${hs.id}`, message: err.message });
+    }
+  }
+  await flush();
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const token = env.HUBSPOT_API_TOKEN;
@@ -576,38 +756,43 @@ export async function onRequestPost(context) {
     results.deal_watermark_used = dealWatermark;
     results.contact_watermark_used = contactWatermark;
 
-    // 2. Fetch + upsert modified deals
+    // 2. Pre-fetch all existing deal state in ONE D1 read so the per-deal
+    // upsert loop doesn't burn a subrequest per row (we hit the 1000
+    // subrequest cap at deal 333 on the first attempt with full=1).
+    const existingDealsMap = await loadExistingDealsMap(env.DB);
+
+    // 3. Fetch + batched-upsert modified deals
     const deals = await fetchModifiedDeals(token, dealWatermark);
     results.deals_fetched = deals.length;
-    for (const d of deals) {
+    await batchedUpsertDeals(env.DB, deals, existingDealsMap, results);
+
+    // 4. Cancellation diff (Katharine & Ray defence). Skip on first full
+    // backfill: D1 has no prior won set to diff against.
+    if (!full && existingDealsMap.size > 0) {
       try {
-        await upsertDeal(env.DB, d, "hubspot_sync", results);
+        const hsWonIds = await fetchAllWonDealIds(token);
+        results.hubspot_won_count = hsWonIds.size;
+        await detectSilentCancellations(env.DB, hsWonIds, results);
       } catch (err) {
-        results.errors.push({ where: `deal ${d.id}`, message: err.message });
+        results.errors.push({ where: "cancel_detect", message: err.message });
+      }
+    } else {
+      // Still record the won-set size for visibility.
+      try {
+        const hsWonIds = await fetchAllWonDealIds(token);
+        results.hubspot_won_count = hsWonIds.size;
+        results.cancel_detect_skipped = "first_full_backfill";
+      } catch (err) {
+        results.errors.push({ where: "cancel_detect_visibility", message: err.message });
       }
     }
 
-    // 3. Cancellation diff (Katharine & Ray defence)
-    try {
-      const hsWonIds = await fetchAllWonDealIds(token);
-      results.hubspot_won_count = hsWonIds.size;
-      await detectSilentCancellations(env.DB, hsWonIds, results);
-    } catch (err) {
-      results.errors.push({ where: "cancel_detect", message: err.message });
-    }
-
-    // 4. Fetch + upsert modified contacts (lifecycle stages)
+    // 5. Fetch + batched-upsert modified contacts (lifecycle stages)
     const contacts = await fetchModifiedContacts(token, contactWatermark);
     results.contacts_fetched = contacts.length;
-    for (const c of contacts) {
-      try {
-        await upsertContactLifecycle(env.DB, c, results);
-      } catch (err) {
-        results.errors.push({ where: `contact ${c.id}`, message: err.message });
-      }
-    }
+    await batchedUpsertContacts(env.DB, contacts, results);
 
-    // 5. Revenue snapshots + variance audit
+    // 6. Revenue snapshots + variance audit
     await captureAllSnapshots(env.DB, results);
 
     results.finished_at = nowIso();
