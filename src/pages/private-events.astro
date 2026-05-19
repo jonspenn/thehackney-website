@@ -130,13 +130,35 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       heading="Events We Host"
     />
     <div class="event-grid">
-      <div class="event-card fade-in">
-        <h3>Birthday Parties</h3>
-        <p>From intimate 30th dinners to full-scale 50th celebrations. The whole venue is yours for the evening - dinner, dancing, speeches, and a proper party.</p>
+      <div class="event-card event-card--with-image fade-in">
+        <img
+          src="/images/private-events/hackney-private-events-card-birthday-olliehindsphotography.webp"
+          alt="Friends with cocktails at an evening party at The Hackney"
+          width="800"
+          height="600"
+          loading="lazy"
+          decoding="async"
+          class="event-card-image"
+        />
+        <div class="event-card-body">
+          <h3>Birthday Parties</h3>
+          <p>From intimate 30th dinners to full-scale 50th celebrations. The whole venue is yours for the evening - dinner, dancing, speeches, and a proper party.</p>
+        </div>
       </div>
-      <div class="event-card fade-in">
-        <h3>Baby Showers</h3>
-        <p>A bright, beautiful space for celebrating new life. All-inclusive daytime packages with food, drinks, and four hours of exclusive hire. Bring your own decorations and cake.</p>
+      <div class="event-card event-card--with-image fade-in">
+        <img
+          src="/images/private-events/hackney-private-events-card-baby-shower-photographer-tbd.webp"
+          alt="Friends celebrating a mother-to-be at a baby shower at The Hackney"
+          width="800"
+          height="600"
+          loading="lazy"
+          decoding="async"
+          class="event-card-image"
+        />
+        <div class="event-card-body">
+          <h3>Baby Showers</h3>
+          <p>A bright, beautiful space for celebrating new life. All-inclusive daytime packages with food, drinks, and four hours of exclusive hire. Bring your own decorations and cake.</p>
+        </div>
       </div>
       <div class="event-card fade-in">
         <h3>Gender Reveals</h3>
@@ -544,6 +566,7 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
       border-top: 3px solid var(--forest-olive);
       border-radius: 2px;
       transition: border-color 0.2s ease, transform 0.2s ease;
+      overflow: hidden;
     }
 
     .event-card:hover {
@@ -561,6 +584,26 @@ const combinedSchema = JSON.stringify([localBusinessSchema]);
     }
 
     .event-card p { font-size: 16px; line-height: 1.6; opacity: 0.85; }
+
+    /* ===== Image-on-top variant for cards that have a category-true photo ===== */
+    .event-card--with-image {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .event-card--with-image .event-card-image {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      background: rgba(44, 24, 16, 0.04);
+    }
+    .event-card--with-image .event-card-body {
+      padding: 24px 24px 28px;
+    }
+    @media (max-width: 720px) {
+      .event-card--with-image .event-card-body { padding: 20px 20px 24px; }
+    }
 
     /* ==================== VALUE PROP ==================== */
     .different-body {
