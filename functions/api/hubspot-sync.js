@@ -814,6 +814,11 @@ export async function onRequestPost(context) {
   // Full-backfill flag - ignore watermark, fetch every deal HubSpot has.
   // Use sparingly; main use case is first run after the migration lands.
   const full = url.searchParams.get("full") === "1";
+  // Manual watermark override - useful for skipping past mtime clusters
+  // where many contacts share an identical lastmodifieddate (HubSpot bulk
+  // events). Pass ?since=2026-03-23T16:55:35.578Z to advance 1ms past a
+  // stuck spot. Applies to BOTH deals + contacts (same param, simplest).
+  const overrideSince = url.searchParams.get("since") || null;
 
   const started = Date.now();
   const results = {
@@ -830,8 +835,8 @@ export async function onRequestPost(context) {
 
   try {
     // 1. Determine watermarks
-    const dealWatermark = full ? null : await getLastDealWatermark(env.DB);
-    const contactWatermark = full ? null : await getLastContactWatermark(env.DB);
+    const dealWatermark = full ? null : (overrideSince || await getLastDealWatermark(env.DB));
+    const contactWatermark = full ? null : (overrideSince || await getLastContactWatermark(env.DB));
     results.deal_watermark_used = dealWatermark;
     results.contact_watermark_used = contactWatermark;
 
