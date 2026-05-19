@@ -168,7 +168,7 @@ async function fetchAllWonDealIds(token, opts = {}) {
 }
 
 async function fetchModifiedContacts(token, sinceIso, opts = {}) {
-  const maxPages = opts.maxPages ?? 10;
+  const maxPages = opts.maxPages ?? 30;
   const limit = 100;
   const results = [];
   let after = null;
@@ -666,7 +666,24 @@ async function batchedUpsertDeals(db, deals, existingMap, results) {
   await flush();
 }
 
-async function batchedUpsertContacts(db, contacts, results) {
+async function loadExistingContactsMap(db) {
+  // Single read of every D1 contact's identity keys so the per-contact
+  // upsert loop can decide INSERT-vs-UPDATE in memory rather than running
+  // a SELECT per HubSpot row (would blow the subrequest budget on a
+  // multi-thousand-contact backfill).
+  const rs = await db.prepare(
+    `SELECT contact_id, hubspot_contact_id, LOWER(email) AS email_lc FROM contacts`
+  ).all().catch(() => ({ results: [] }));
+  const byHsId = new Map();
+  const byEmail = new Map();
+  for (const r of (rs.results || [])) {
+    if (r.hubspot_contact_id) byHsId.set(String(r.hubspot_contact_id), r.contact_id);
+    if (r.email_lc) byEmail.set(r.email_lc, r.contact_id);
+  }
+  return { byHsId, byEmail };
+}
+
+async function batchedUpsertContacts(db, contacts, existingMap, results) {
   let pending = [];
   const flush = async () => {
     if (pending.length === 0) return;
@@ -681,35 +698,89 @@ async function batchedUpsertContacts(db, contacts, results) {
     try {
       const p = hs.properties || {};
       const hubspot_contact_id = String(hs.id);
-      const email = p.email;
-      if (!email) continue;
+      const email = (p.email || "").trim();
+      if (!email) {
+        // HubSpot contact with no email - cannot store in our schema
+        // (email is UNIQUE NOT NULL). Skip and count.
+        results.contacts_skipped_no_email = (results.contacts_skipped_no_email || 0) + 1;
+        continue;
+      }
+      const emailLc = email.toLowerCase();
       const now = nowIso();
-      pending.push(
-        db.prepare(`
-          UPDATE contacts
-             SET hubspot_contact_id = COALESCE(hubspot_contact_id, ?),
-                 lifecycle_stage = ?,
-                 entered_subscriber_at = COALESCE(?, entered_subscriber_at),
-                 entered_lead_at = COALESCE(?, entered_lead_at),
-                 entered_mql_at = COALESCE(?, entered_mql_at),
-                 entered_sql_at = COALESCE(?, entered_sql_at),
-                 entered_opportunity_at = COALESCE(?, entered_opportunity_at),
-                 entered_customer_at = COALESCE(?, entered_customer_at),
-                 last_seen_at = COALESCE(last_seen_at, ?)
-           WHERE hubspot_contact_id = ? OR email = ?
-        `).bind(
-          hubspot_contact_id,
-          p.lifecyclestage || null,
-          p.hs_lifecyclestage_subscriber_date || null,
-          p.hs_lifecyclestage_lead_date || null,
-          p.hs_lifecyclestage_marketingqualifiedlead_date || null,
-          p.hs_lifecyclestage_salesqualifiedlead_date || null,
-          p.hs_lifecyclestage_opportunity_date || null,
-          p.hs_lifecyclestage_customer_date || null,
-          now,
-          hubspot_contact_id, email,
-        )
-      );
+
+      // Decide INSERT or UPDATE based on pre-loaded mapping
+      const existingByHs = existingMap.byHsId.get(hubspot_contact_id);
+      const existingByEmail = existingMap.byEmail.get(emailLc);
+      const existingContactId = existingByHs || existingByEmail;
+
+      const lifecycle_stage = p.lifecyclestage || null;
+      const entered_subscriber_at = p.hs_lifecyclestage_subscriber_date || null;
+      const entered_lead_at = p.hs_lifecyclestage_lead_date || null;
+      const entered_mql_at = p.hs_lifecyclestage_marketingqualifiedlead_date || null;
+      const entered_sql_at = p.hs_lifecyclestage_salesqualifiedlead_date || null;
+      const entered_opportunity_at = p.hs_lifecyclestage_opportunity_date || null;
+      const entered_customer_at = p.hs_lifecyclestage_customer_date || null;
+
+      if (existingContactId) {
+        // UPDATE existing D1 contact in place. Use contact_id to target the
+        // exact row so we never accidentally collide on the email UNIQUE
+        // index (UPDATE doesn't trigger it but explicit targeting is safer).
+        pending.push(
+          db.prepare(`
+            UPDATE contacts
+               SET hubspot_contact_id = COALESCE(hubspot_contact_id, ?),
+                   lifecycle_stage = COALESCE(?, lifecycle_stage),
+                   entered_subscriber_at = COALESCE(?, entered_subscriber_at),
+                   entered_lead_at = COALESCE(?, entered_lead_at),
+                   entered_mql_at = COALESCE(?, entered_mql_at),
+                   entered_sql_at = COALESCE(?, entered_sql_at),
+                   entered_opportunity_at = COALESCE(?, entered_opportunity_at),
+                   entered_customer_at = COALESCE(?, entered_customer_at),
+                   first_name = COALESCE(first_name, ?),
+                   last_name = COALESCE(last_name, ?),
+                   phone = COALESCE(phone, ?),
+                   last_seen_at = COALESCE(last_seen_at, ?)
+             WHERE contact_id = ?
+          `).bind(
+            hubspot_contact_id, lifecycle_stage,
+            entered_subscriber_at, entered_lead_at, entered_mql_at,
+            entered_sql_at, entered_opportunity_at, entered_customer_at,
+            p.firstname || null, p.lastname || null, p.phone || null,
+            now, existingContactId,
+          )
+        );
+        results.contacts_updated = (results.contacts_updated || 0) + 1;
+      } else {
+        // INSERT new HubSpot-only contact. visitor_id points at the
+        // sentinel visitor row (added by migrate.js); contact_id is the
+        // HubSpot id with an 'hs_' prefix so it never collides with the
+        // existing 'c_<uuid>' contact_ids generated by /api/submit.
+        const newContactId = "hs_" + hubspot_contact_id;
+        pending.push(
+          db.prepare(`
+            INSERT OR IGNORE INTO contacts (
+              contact_id, visitor_id, email, first_name, last_name, phone,
+              hubspot_contact_id, lifecycle_stage,
+              entered_subscriber_at, entered_lead_at, entered_mql_at,
+              entered_sql_at, entered_opportunity_at, entered_customer_at,
+              created_at, first_seen_at, last_seen_at, contact_type
+            ) VALUES (?, 'hubspot_sync_sentinel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'lead')
+          `).bind(
+            newContactId, email,
+            p.firstname || null, p.lastname || null, p.phone || null,
+            hubspot_contact_id, lifecycle_stage,
+            entered_subscriber_at, entered_lead_at, entered_mql_at,
+            entered_sql_at, entered_opportunity_at, entered_customer_at,
+            now, now, now,
+          )
+        );
+        // Update the in-memory map so subsequent contacts in the same
+        // batch with the same hubspot_id or email are treated as updates.
+        existingMap.byHsId.set(hubspot_contact_id, newContactId);
+        existingMap.byEmail.set(emailLc, newContactId);
+        results.contacts_inserted = (results.contacts_inserted || 0) + 1;
+      }
+
       results.contacts_synced++;
       if (pending.length >= CONTACT_BATCH_SIZE) await flush();
     } catch (err) {
@@ -787,10 +858,14 @@ export async function onRequestPost(context) {
       }
     }
 
-    // 5. Fetch + batched-upsert modified contacts (lifecycle stages)
+    // 5. Fetch + batched-upsert modified contacts (lifecycle stages).
+    // HubSpot is the source of truth for the contact universe - we
+    // mirror EVERY HubSpot contact (insert if new, update if known),
+    // not just the subset that came through the website form.
+    const existingContactsMap = await loadExistingContactsMap(env.DB);
     const contacts = await fetchModifiedContacts(token, contactWatermark);
     results.contacts_fetched = contacts.length;
-    await batchedUpsertContacts(env.DB, contacts, results);
+    await batchedUpsertContacts(env.DB, contacts, existingContactsMap, results);
 
     // 6. Revenue snapshots + variance audit
     await captureAllSnapshots(env.DB, results);

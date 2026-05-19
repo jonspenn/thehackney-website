@@ -347,6 +347,20 @@ const MIGRATIONS = [
       VALUES ('test_tour_recap', 'test_contact_dev', 'tour_recap',
               '2026-05-06T00:00:00.000Z', '2027-12-31T23:59:59.000Z', '2026-05-06T00:00:00.000Z')`,
   },
+
+  // ── Sentinel visitor row for HubSpot-only contacts (Phase A) ──
+  // HubSpot has thousands of contacts that never came through the website
+  // form; they have no visitor_id. The contacts.visitor_id NOT NULL +
+  // FOREIGN KEY constraint requires SOME visitor row. This sentinel is
+  // the parent for every HubSpot-only contact. Contacts that later DO
+  // come through the website get their visitor_id swapped to the real
+  // first-touch visitor.
+  {
+    name: "visitors_hubspot_sentinel",
+    sql: `INSERT OR IGNORE INTO visitors
+      (visitor_id, first_seen_at, last_seen_at)
+      VALUES ('hubspot_sync_sentinel', datetime('now'), datetime('now'))`,
+  },
   // ── Phase A of prd-sys-reporting-unification.md (Atlas, 1 June 2026) ──
   // HubSpot deals + revenue audit trail mirror. Canonical schema lives
   // at /migrations/0007_create_deals_and_revenue_snapshots.sql - keep
