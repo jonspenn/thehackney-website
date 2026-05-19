@@ -206,7 +206,7 @@ async function getLastDealWatermark(db) {
 
 async function getLastContactWatermark(db) {
   const r = await db.prepare(
-    `SELECT MAX(last_synced_at) AS max_ts FROM contacts WHERE hubspot_contact_id IS NOT NULL`
+    `SELECT MAX(hs_lastmodifieddate) AS max_ts FROM contacts WHERE hubspot_contact_id IS NOT NULL`
   ).first().catch(() => null);
   return r?.max_ts || null;
 }
@@ -739,14 +739,19 @@ async function batchedUpsertContacts(db, contacts, existingMap, results) {
                    first_name = COALESCE(first_name, ?),
                    last_name = COALESCE(last_name, ?),
                    phone = COALESCE(phone, ?),
-                   last_seen_at = COALESCE(last_seen_at, ?)
+                   last_seen_at = COALESCE(last_seen_at, ?),
+                 hs_lastmodifieddate = ?,
+                 hubspot_last_synced_at = ?
              WHERE contact_id = ?
           `).bind(
             hubspot_contact_id, lifecycle_stage,
             entered_subscriber_at, entered_lead_at, entered_mql_at,
             entered_sql_at, entered_opportunity_at, entered_customer_at,
             p.firstname || null, p.lastname || null, p.phone || null,
-            now, existingContactId,
+            now,
+            p.lastmodifieddate || p.hs_lastmodifieddate || null,
+            now,
+            existingContactId,
           )
         );
         results.contacts_updated = (results.contacts_updated || 0) + 1;
@@ -763,8 +768,9 @@ async function batchedUpsertContacts(db, contacts, existingMap, results) {
               hubspot_contact_id, lifecycle_stage,
               entered_subscriber_at, entered_lead_at, entered_mql_at,
               entered_sql_at, entered_opportunity_at, entered_customer_at,
-              created_at, first_seen_at, last_seen_at, contact_type
-            ) VALUES (?, 'hubspot_sync_sentinel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'lead')
+              created_at, first_seen_at, last_seen_at, contact_type,
+              hs_lastmodifieddate, hubspot_last_synced_at
+            ) VALUES (?, 'hubspot_sync_sentinel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'lead', ?, ?)
           `).bind(
             newContactId, email,
             p.firstname || null, p.lastname || null, p.phone || null,
@@ -772,6 +778,8 @@ async function batchedUpsertContacts(db, contacts, existingMap, results) {
             entered_subscriber_at, entered_lead_at, entered_mql_at,
             entered_sql_at, entered_opportunity_at, entered_customer_at,
             now, now, now,
+            p.lastmodifieddate || p.hs_lastmodifieddate || null,
+            now,
           )
         );
         // Update the in-memory map so subsequent contacts in the same
