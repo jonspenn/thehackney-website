@@ -459,6 +459,14 @@ const MIGRATIONS = [
   { name: "ct_add_entered_sql_at", sql: `ALTER TABLE contacts ADD COLUMN entered_sql_at TEXT` },
   { name: "ct_add_entered_opportunity_at", sql: `ALTER TABLE contacts ADD COLUMN entered_opportunity_at TEXT` },
   { name: "ct_add_entered_customer_at", sql: `ALTER TABLE contacts ADD COLUMN entered_customer_at TEXT` },
+  // Watermark column for the incremental contact sync. Set to the HubSpot
+  // contact's lastmodifieddate every sync; getLastContactWatermark uses
+  // MAX(hs_lastmodifieddate) to fetch only newer rows next time. Required
+  // for chunking through the 15,629-row universe across multiple sync
+  // invocations (Phase A backfill, 19 May 2026).
+  { name: "ct_add_hs_lastmodifieddate", sql: `ALTER TABLE contacts ADD COLUMN hs_lastmodifieddate TEXT` },
+  { name: "ct_add_hubspot_last_synced_at", sql: `ALTER TABLE contacts ADD COLUMN hubspot_last_synced_at TEXT` },
+  { name: "idx_contacts_hs_mtime", sql: `CREATE INDEX IF NOT EXISTS idx_contacts_hs_mtime ON contacts(hs_lastmodifieddate)` },
   { name: "idx_contacts_hubspot", sql: `CREATE INDEX IF NOT EXISTS idx_contacts_hubspot ON contacts(hubspot_contact_id)` },
 
 
